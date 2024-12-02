@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {LoginService} from '../../service/login.service';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 
@@ -15,14 +14,14 @@ import {Router} from '@angular/router';
 export class LoginComponent {
   credentials = {username: '', password: ''};
 
-  constructor(private loginService: LoginService, private http: HttpClient, private router: Router) {
+  constructor( private http: HttpClient, private router: Router) {
   }
 
   login() {
-    this.loginService.authenticate(this.credentials, () => {
-      this.router.navigateByUrl('/');
-    });
-    return false;
+    // this.loginService.authenticate(this.credentials, () => {
+    //   this.router.navigateByUrl('/');
+    // });
+    // return false;
   }
 
 }

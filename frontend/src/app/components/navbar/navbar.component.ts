@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
-import {LoginService} from '../../service/login.service';
+// import {LoginService} from '../../service/login.service';
 import {HttpClient} from '@angular/common/http';
 import {finalize} from 'rxjs';
 
@@ -15,18 +15,18 @@ import {finalize} from 'rxjs';
 })
 export class NavbarComponent {
 
-  constructor(private loginService: LoginService, private http: HttpClient, private router: Router) {
+  constructor( private http: HttpClient, private router: Router) {
   }
 
   authenticated() {
-    return this.loginService.authenticated;
+    // return this.loginService.authenticated;
   }
 
   logout() {
-    this.http.post('logout', {}).pipe(finalize(() => {
-      this.loginService.authenticated = false;
-      this.router.navigateByUrl('/login');
-    })).subscribe();
+    // this.http.post('logout', {}).pipe(finalize(() => {
+    //   this.loginService.authenticated = false;
+    //   this.router.navigateByUrl('/login');
+    // })).subscribe();
   }
 
 }

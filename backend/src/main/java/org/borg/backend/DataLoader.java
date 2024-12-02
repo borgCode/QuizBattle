@@ -17,7 +17,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (roleRepository.findByName("USER").isEmpty()) {
             Role userRole = new Role();
             userRole.setName("USER");
