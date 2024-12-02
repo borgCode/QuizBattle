@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+  <div class="container">
+    <a href="#" class="navbar-brand" routerLink="" routerLinkActive="active">Quiz Clash</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navmenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/register" routerLinkActive="active">Register</a>
+        </li>
+<!--        <li class="nav-item">-->
+<!--          <a class="nav-link" routerLink="/users" routerLinkActive="active">All users</a>-->
+<!--        </li>-->
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/users/:username" routerLinkActive="active">My profile</a>
+        </li>
+<!--        <li class="nav-item">-->
+<!--          <a class="nav-link" routerLink="/play" routerLinkActive="active">Play</a>-->
+<!--        </li>-->
+        <li class="nav-item">
+
+          <a class="nav-link" (click)="logout()">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</nav>

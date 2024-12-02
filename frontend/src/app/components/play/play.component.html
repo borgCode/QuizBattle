@@ -1,0 +1,8 @@
+<div *ngIf="showCategory">
+  <app-play-quiz-category (categorySelected)="onCategorySelected($event)"></app-play-quiz-category>
+</div>
+
+<div *ngIf="!showCategory">
+  <app-play-quiz-questions [category]="selectedCategory"></app-play-quiz-questions>
+  <button (click)="resetToCategorySelection()">Go Back to Category Selection</button>
+</div>
