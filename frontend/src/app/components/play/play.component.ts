@@ -6,8 +6,6 @@ import {NgIf} from '@angular/common';
 @Component({
   selector: 'app-play',
   imports: [
-    PlayQuizCategoryComponent,
-    PlayQuizQuestionsComponent,
     NgIf
   ],
   templateUrl: './play.component.html',
@@ -17,15 +15,15 @@ export class PlayComponent {
   showCategory: boolean = true;
   selectedCategory: string = '';
 
-  //Show questions component when a category is selected
-  onCategorySelected(category: string) {
-    this.selectedCategory = category;
-    this.showCategory = false;
-  }
-
-  resetToCategorySelection() {
-    this.showCategory = true;
-    this.selectedCategory = '';
-  }
+  // //Show questions component when a category is selected
+  // onCategorySelected(category: string) {
+  //   this.selectedCategory = category;
+  //   this.showCategory = false;
+  // }
+  //
+  // resetToCategorySelection() {
+  //   this.showCategory = true;
+  //   this.selectedCategory = '';
+  // }
 
 }

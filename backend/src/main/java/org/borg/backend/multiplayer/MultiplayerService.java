@@ -11,6 +11,7 @@ import java.util.*;
 public class MultiplayerService {
     private final List<Long> matchmakingQueue = Collections.synchronizedList(new ArrayList<>());
     private final MultiplayerSessionRepository multiplayerSessionRepository;
+    
 
     public MatchmakingResponse findMatch(MatchmakingRequest request) {
         synchronized (matchmakingQueue) {
@@ -48,13 +49,15 @@ public class MultiplayerService {
         );
     }
 
-    public GameStateUpdate updateGameState(Long sessionId, Long playerId, boolean isCorrect) {
+    public synchronized GameStateUpdate updateGameState(Long sessionId, Long playerId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
-            scores.put(playerId, scores.get(playerId) + 1);
+            Integer playerScore = scores.getOrDefault(playerId, 0);
+            scores.put(playerId, playerScore + 1);
         }
+        
         Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
         questionsAnswered.put(playerId, questionsAnswered.get(playerId) + 1);
 
@@ -66,7 +69,13 @@ public class MultiplayerService {
             }
         }
 
-        if (questionsAnswered.get(playerId) == 18 && questionsAnswered.get(opponentId) == 18) {
+        if (opponentId == null) {
+            throw new IllegalStateException("No opponent found in session");
+        }
+        
+
+        if (questionsAnswered.get(playerId) == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER
+                && questionsAnswered.get(opponentId) == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER) {
             return new GameStateUpdate(
                     null,
                     session.getScore(),
@@ -75,11 +84,10 @@ public class MultiplayerService {
             );
         }
 
-        session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % 3);
+        session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
         
         boolean isOpponentTurn = false;
         if (session.getCurrentQuestionIndex() == 0) {
-            session.setCurrentQuestionIndex(0);
             if (questionsAnswered.get(playerId) > questionsAnswered.get(opponentId)) {
                 session.setCurrentPlayerTurn(opponentId);
                 isOpponentTurn = true;

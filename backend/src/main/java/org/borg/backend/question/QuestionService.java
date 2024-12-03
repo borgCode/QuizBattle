@@ -29,6 +29,10 @@ public class QuestionService {
     }
 
     public AnswerValidationResponse validateAnswer(AnswerValidationRequest request) {
+        if (request == null || request.getAnswer() == null) {
+            throw new IllegalArgumentException("Request or answer cannot be null");
+        }
+        
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
         

@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {UserService} from '../../service/user.service';
 import {HttpClientModule} from '@angular/common/http';
 
 @Component({
@@ -10,22 +9,22 @@ import {HttpClientModule} from '@angular/common/http';
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent {
   users: any[] = [];
 
-  constructor(private backendService: UserService) {
-  }
-
-  ngOnInit() {
-    this.getUsers();
-  }
-
-  getUsers() {
-    this.backendService.getUsers().subscribe(
-      (data) => {
-        this.users = data;
-
-    });
-  }
+  // constructor(private backendService: UserService) {
+  // }
+  //
+  // ngOnInit() {
+  //   this.getUsers();
+  // }
+  //
+  // getUsers() {
+  //   this.backendService.getUsers().subscribe(
+  //     (data) => {
+  //       this.users = data;
+  //
+  //   });
+  // }
 
 }
