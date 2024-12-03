@@ -29,5 +29,9 @@ public class MultiplayerController {
         return ResponseEntity.ok(multiplayerService.getGameState(sessionId));
     }
     
+    //TODO Give up mapping
+    
+    
+    
     
 }

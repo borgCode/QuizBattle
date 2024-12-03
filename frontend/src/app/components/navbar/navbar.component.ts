@@ -1,32 +1,31 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
-// import {LoginService} from '../../service/login.service';
-import {HttpClient} from '@angular/common/http';
-import {finalize} from 'rxjs';
+import {LoginStateService} from '../../services/login-state-service/login-state.service';
+import {AsyncPipe, NgIf} from '@angular/common';
+import {TokenService} from '../../services/token/token.service';
 
 @Component({
   selector: 'app-navbar',
   imports: [
     RouterLinkActive,
-    RouterLink
+    RouterLink,
+    NgIf,
+    AsyncPipe
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
 
-  constructor( private http: HttpClient, private router: Router) {
-  }
-
-  authenticated() {
-    // return this.loginService.authenticated;
+  constructor(
+    public loginStateService: LoginStateService,
+    private tokenService: TokenService,
+    private router: Router
+  ) {
   }
 
   logout() {
-    // this.http.post('logout', {}).pipe(finalize(() => {
-    //   this.loginService.authenticated = false;
-    //   this.router.navigateByUrl('/login');
-    // })).subscribe();
+    this.tokenService.clearToken();
+    this.router.navigate(['/login']);
   }
-
 }

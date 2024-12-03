@@ -4,9 +4,11 @@ import {UsersComponent} from './components/users/users.component';
 import {UserProfileComponent} from './components/user-profile/user-profile.component';
 import {PlayComponent} from './components/play/play.component';
 import {ModeSelectionComponent} from './components/mode-selection/mode-selection.component';
+import {RegisterComponent} from './components/register/register.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
+  {path: 'register', component: RegisterComponent},
   {path: 'user', component: UsersComponent},
   {path: 'user/:username', component: UserProfileComponent},
   {path: 'play', component: PlayComponent},

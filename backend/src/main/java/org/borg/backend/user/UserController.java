@@ -25,6 +25,10 @@ public class UserController {
         userService.updateUser(request);
         return ResponseEntity.ok().build();  
     }
+    
+    //TODO add friend mapping
+    
+    //TODO send message mapping
 }
    
 
