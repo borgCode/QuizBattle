@@ -3,6 +3,7 @@ package org.borg.backend.handler;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public enum BusinessErrorCodes {
 
     NO_CODE(0, HttpStatus.NOT_IMPLEMENTED, "No code"),
@@ -13,11 +14,8 @@ public enum BusinessErrorCodes {
     BAD_CREDENTIALS(304, HttpStatus.FORBIDDEN, "Username and/or password is incorrect"),
     ;
 
-    @Getter
     private final int code;
-    @Getter
     private final HttpStatus httpStatus;
-    @Getter
     private final String description;
 
 

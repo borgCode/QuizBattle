@@ -1,7 +1,7 @@
 import { Component} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {NavbarComponent} from './navbar/navbar.component';
-import {RouterOutlet} from '@angular/router';;
+import {RouterOutlet} from '@angular/router';
 
 
 @Component({
