@@ -6,7 +6,6 @@ import {NgIf} from '@angular/common';
 @Component({
   selector: 'app-play',
   imports: [
-    NgIf
   ],
   templateUrl: './play.component.html',
   styleUrl: './play.component.css'
