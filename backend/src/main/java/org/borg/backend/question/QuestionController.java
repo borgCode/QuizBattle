@@ -15,12 +15,17 @@ public class QuestionController {
 
 
     @GetMapping("/{category}")
-    public List<QuestionDTO> getThreeQuestionsByCategory(@PathVariable String category) {
-        return questionService.getThreeQuestionsByCategory(category);
+    public ResponseEntity<List<QuestionDTO>> getThreeQuestionsByCategory(@RequestBody CategorySelectionRequest request) {
+        return ResponseEntity.ok(questionService.getThreeQuestionsByCategory(request));
     }
 
     @PostMapping("/validate-answer")
     public ResponseEntity<AnswerValidationResponse> validateAnswer(@RequestBody AnswerValidationRequest request) {
         return ResponseEntity.ok(questionService.validateAnswer(request));
+    }
+
+    @GetMapping("/session/{sessionId}")
+    public ResponseEntity<List<QuestionDTO>> getSessionQuestions(@PathVariable Long sessionId) {
+        return ResponseEntity.ok(questionService.getQuestionsForSession(sessionId));
     }
 }

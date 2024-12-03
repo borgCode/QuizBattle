@@ -28,6 +28,8 @@ public class MultiplayerSession {
     private Long currentPlayerTurn;
     @ElementCollection
     private Map<Long, Integer> questionsAnswered;
+    @ElementCollection
+    private List<Long> questionIds;
     
 
     public MultiplayerSession(Long player1Id, Long player2Id, Long currentPlayerTurn) {

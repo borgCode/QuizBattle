@@ -1,6 +1,7 @@
 package org.borg.backend.multiplayer;
 
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.question.Question;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -91,6 +92,17 @@ public class MultiplayerService {
                 GameStatus.ACTIVE,
                 isOpponentTurn
                 );
+    }
+
+    public void updateSessionQuestions(Long sessionId, List<Question> questions) {
+        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+        
+        session.getQuestionIds().clear();
+        for (Question question : questions) {
+            session.getQuestionIds().add(question.getId());
+        }
+        multiplayerSessionRepository.save(session);
     }
 }
             
