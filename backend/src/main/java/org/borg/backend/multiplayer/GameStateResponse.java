@@ -1,0 +1,18 @@
+package org.borg.backend.multiplayer;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Map;
+import java.util.List;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class GameStateResponse {
+    private List<Long> playerIds;
+    private Integer currentQuestionIndex;
+    private Map<Long, Integer> scores;
+    private GameStatus status;
+}
