@@ -1,5 +1,6 @@
 package org.borg.backend.question;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/questions")
+@Tag(name="Questions")
 public class QuestionController {
     
     private final QuestionService questionService;

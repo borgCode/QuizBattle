@@ -1,5 +1,6 @@
 package org.borg.backend.multiplayer;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("multiplayer")
 @RequiredArgsConstructor
+@Tag(name = "Multiplayer")
 public class MultiplayerController {
     private final MultiplayerService multiplayerService;
     
