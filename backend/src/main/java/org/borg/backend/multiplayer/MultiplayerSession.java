@@ -25,11 +25,16 @@ public class MultiplayerSession {
     private Map<Long, Integer> score;
     @Enumerated(EnumType.STRING)
     private GameStatus status;
+    private Long currentPlayerTurn;
+    @ElementCollection
+    private Map<Long, Integer> questionsAnswered;
     
 
-    public MultiplayerSession(Long player1Id, Long player2Id) {
+    public MultiplayerSession(Long player1Id, Long player2Id, Long currentPlayerTurn) {
         playerIds = new ArrayList<>(List.of(player1Id, player2Id));
         score = new HashMap<>(Map.of(player1Id, 0, player2Id, 0));
         status = GameStatus.ACTIVE;
+        this.currentPlayerTurn = currentPlayerTurn;
+        questionsAnswered = new HashMap<>(Map.of(player1Id, 0, player2Id, 0));
     }
 }
