@@ -12,6 +12,7 @@ import java.util.Map;
 @Getter
 @Builder
 public class MultiplayerSessionDTO {
+    private Long id;
     private List<PlayerDTO> playerDTOList;
     private Map<Long, Integer> score;
     private GameStatus status;

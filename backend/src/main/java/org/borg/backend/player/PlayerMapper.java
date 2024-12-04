@@ -10,6 +10,7 @@ public class PlayerMapper {
         }
         
         return PlayerDTO.builder()
+                .id(player.getId())
                 .username(player.getUsername())
                 .displayName(player.getDisplayName())
                 .numOfGames(player.getNumOfGames())
@@ -22,6 +23,7 @@ public class PlayerMapper {
         List<PlayerDTO> dtoList = new ArrayList<>();
         for (Player player : players) {
             PlayerDTO playerDTO = PlayerDTO.builder()
+                    .id(player.getId())
                     .username(player.getUsername())
                     .displayName(player.getDisplayName())
                     .numOfGames(player.getNumOfGames())

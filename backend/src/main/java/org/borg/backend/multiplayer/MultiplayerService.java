@@ -127,6 +127,7 @@ public class MultiplayerService {
         List<MultiplayerSessionDTO> multiplayerSessionDTOS = new ArrayList<>();
         for (MultiplayerSession multiplayerSession : multiplayerSessions) {
             MultiplayerSessionDTO multiplayerSessionDTO = MultiplayerSessionDTO.builder()
+                    .id(multiplayerSession.getId())
                     .playerDTOList(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
                     .score(multiplayerSession.getScore())
                     .status(multiplayerSession.getStatus())

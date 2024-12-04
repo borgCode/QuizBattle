@@ -10,19 +10,22 @@ import org.springframework.stereotype.Component;
 public class DataLoader implements CommandLineRunner {
     private final PlayerRepository playerRepository;
     private final RoleRepository roleRepository;
+    private final SeedService seedService;
 
-    public DataLoader(PlayerRepository playerRepository, RoleRepository roleRepository) {
+    public DataLoader(PlayerRepository playerRepository, RoleRepository roleRepository, SeedService seedService) {
         this.playerRepository = playerRepository;
         this.roleRepository = roleRepository;
+        this.seedService = seedService;
     }
 
     @Override
     public void run(String... args) {
-        if (roleRepository.findByName("USER").isEmpty()) {
-            Role userRole = new Role();
-            userRole.setName("USER");
-            roleRepository.save(userRole);
-        }
+//        seedService.seedTestData();
+//        if (roleRepository.findByName("USER").isEmpty()) {
+//            Role userRole = new Role();
+//            userRole.setName("USER");
+//            roleRepository.save(userRole);
+//        }
 //        Question q1 = new Question("General Knowledge", "What is the capital of France?", Arrays.asList("Berlin", "Madrid", "Paris", "Rome"), "Paris");
 //        Question q2 = new Question("Science", "What is the chemical symbol for water?", Arrays.asList("O2", "H2O", "CO2", "N2"), "H2O");
 //        Question q3 = new Question("Math", "What is 2 + 2?", Arrays.asList("3", "4", "5", "6"), "4");

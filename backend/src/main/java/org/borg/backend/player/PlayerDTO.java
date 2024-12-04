@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class PlayerDTO {
+    private Long id;
     private String username;
     private String displayName;
     private int numOfGames;

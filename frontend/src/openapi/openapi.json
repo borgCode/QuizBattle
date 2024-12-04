@@ -252,6 +252,40 @@
         }
       }
     },
+    "/multiplayer/{playerId}": {
+      "get": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "getPlayerSessions",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MultiplayerSessionDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/multiplayer/session/{sessionId}": {
       "get": {
         "tags": [
@@ -468,6 +502,10 @@
       "PlayerDTO": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
           "username": {
             "type": "string"
           },
@@ -511,6 +549,38 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "MultiplayerSessionDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "playerDTOList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerDTO"
+            }
+          },
+          "score": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "COMPLETED"
+            ]
+          },
+          "currentPlayerTurn": {
+            "$ref": "#/components/schemas/PlayerDTO"
           }
         }
       },
