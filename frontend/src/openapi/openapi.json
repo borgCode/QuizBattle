@@ -457,11 +457,34 @@
           "message": {
             "type": "string"
           },
-          "username": {
-            "type": "string"
+          "userDTO": {
+            "$ref": "#/components/schemas/UserDTO"
           },
           "token": {
             "type": "string"
+          }
+        }
+      },
+      "UserDTO": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "numOfGames": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numOfWins": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numOfLosses": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -531,13 +554,13 @@
               "$ref": "#/components/schemas/GrantedAuthority"
             }
           },
-          "accountNonLocked": {
-            "type": "boolean"
-          },
           "accountNonExpired": {
             "type": "boolean"
           },
           "credentialsNonExpired": {
+            "type": "boolean"
+          },
+          "accountNonLocked": {
             "type": "boolean"
           }
         }

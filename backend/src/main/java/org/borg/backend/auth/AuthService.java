@@ -6,6 +6,7 @@ import org.borg.backend.role.RoleRepository;
 import org.borg.backend.security.JwtService;
 import org.borg.backend.user.User;
 import org.borg.backend.user.UserDTO;
+import org.borg.backend.user.UserMapper;
 import org.borg.backend.user.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,13 +52,7 @@ public class AuthService {
 
         //Return userDTO if login is successful
 
-        UserDTO userDTO = UserDTO.builder()
-                .username(user.getUsername())
-                .displayName(user.getDisplayName())
-                .numOfGames(user.getNumOfGames())
-                .numOfWins(user.getNumOfWins())
-                .numOfLosses(user.getNumOfLosses())
-                .build();
+        UserDTO userDTO = UserMapper.toDTO(user);
 
         return AuthResponse.builder()
                 .message("Login successful")

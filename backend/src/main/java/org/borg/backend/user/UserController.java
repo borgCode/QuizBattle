@@ -14,7 +14,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{username}")
-    public User getUserById(@PathVariable String username) {
+    public UserDTO getUserById(@PathVariable String username) {
         return userService.getUserByName(username);
     }
 

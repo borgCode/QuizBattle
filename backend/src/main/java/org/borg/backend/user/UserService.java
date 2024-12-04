@@ -13,9 +13,10 @@ public class UserService {
 
     
 
-    public User getUserByName(String username) {
-        return userRepository.findByUsername(username)
+    public UserDTO getUserByName(String username) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        return UserMapper.toDTO(user);
     }
 
     public void updateUser(UpdateUserRequest request) {
