@@ -1,7 +1,7 @@
 package org.borg.backend.security;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.user.UserRepository;
+import org.borg.backend.player.PlayerRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final PlayerRepository playerRepository;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
+        return playerRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

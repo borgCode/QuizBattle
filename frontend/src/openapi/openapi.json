@@ -12,17 +12,17 @@
     }
   ],
   "paths": {
-    "/user/update": {
+    "/player/update": {
       "put": {
         "tags": [
-          "User"
+          "Player"
         ],
-        "operationId": "updateUser",
+        "operationId": "updatePlayer",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserRequest"
+                "$ref": "#/components/schemas/UpdatePlayerRequest"
               }
             }
           },
@@ -155,36 +155,6 @@
         }
       }
     },
-    "/user/{username}": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "getUserById",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/questions/{category}": {
       "get": {
         "tags": [
@@ -252,6 +222,36 @@
         }
       }
     },
+    "/player/{username}": {
+      "get": {
+        "tags": [
+          "Player"
+        ],
+        "operationId": "getPlayerById",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/multiplayer/session/{sessionId}": {
       "get": {
         "tags": [
@@ -310,10 +310,10 @@
   },
   "components": {
     "schemas": {
-      "UpdateUserRequest": {
+      "UpdatePlayerRequest": {
         "type": "object",
         "properties": {
-          "userId": {
+          "playerId": {
             "type": "integer",
             "format": "int64"
           },
@@ -457,15 +457,15 @@
           "message": {
             "type": "string"
           },
-          "userDTO": {
-            "$ref": "#/components/schemas/UserDTO"
+          "playerDTO": {
+            "$ref": "#/components/schemas/PlayerDTO"
           },
           "token": {
             "type": "string"
           }
         }
       },
-      "UserDTO": {
+      "PlayerDTO": {
         "type": "object",
         "properties": {
           "username": {

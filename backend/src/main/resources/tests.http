@@ -2,7 +2,7 @@
 GET https://examples.http-client.intellij.net/get
     ?generated-in=IntelliJ IDEA
 
-### Register new user
+### Register new player
 POST http://localhost:8080/auth/register
 Content-Type: application/json
 

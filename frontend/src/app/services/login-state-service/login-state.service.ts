@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {UserDto} from '../models/user-dto';
+import {PlayerDto} from '../models/player-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +8,7 @@ import {UserDto} from '../models/user-dto';
 export class LoginStateService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   isLoggedIn$ = this.isLoggedInSubject.asObservable();
-  private _loggedInUser: UserDto;
+  private _loggedInUser: PlayerDto;
 
   constructor() {
     const storedUser = localStorage.getItem('loggedInUser');
@@ -24,11 +24,11 @@ export class LoginStateService {
   }
 
 
-  get loggedInUser(): UserDto {
+  get loggedInUser(): PlayerDto {
     return this._loggedInUser;
   }
 
-  set loggedInUser(value: UserDto) {
+  set loggedInUser(value: PlayerDto) {
     this._loggedInUser = value;
 
     localStorage.setItem('loggedInUser', JSON.stringify(value));

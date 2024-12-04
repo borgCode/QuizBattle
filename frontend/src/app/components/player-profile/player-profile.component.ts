@@ -1,15 +1,15 @@
 import {Component, OnInit} from '@angular/core';
-import {UserDto} from '../../services/models/user-dto';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
+import {PlayerDto} from '../../services/models/player-dto';
 
 @Component({
   selector: 'app-user-profile',
   imports: [],
-  templateUrl: './user-profile.component.html',
-  styleUrl: './user-profile.component.css'
+  templateUrl: './player-profile.component.html',
+  styleUrl: './player-profile.component.css'
 })
-export class UserProfileComponent implements OnInit {
-  user!: UserDto;
+export class PlayerProfileComponent implements OnInit {
+  player!: PlayerDto;
 
   constructor(
     private loginStateService: LoginStateService
@@ -18,10 +18,10 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit() {
 
-    this.user = this.loginStateService.loggedInUser;
+    this.player = this.loginStateService.loggedInUser;
 
     //TODO show user error
-    if (!this.user) {
+    if (!this.player) {
       console.warn('No logged-in user found!');
     }
   }

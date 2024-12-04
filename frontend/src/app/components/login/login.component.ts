@@ -1,14 +1,12 @@
 import { Component } from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {AuthRequest} from '../../services/models/auth-request';
-import {AuthenticationService} from '../../services/services/authentication.service';
-import {AuthResponse} from '../../services/models/auth-response';
 import {NgForOf, NgIf} from '@angular/common';
 import {TokenService} from '../../services/token/token.service';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
-import {UserDto} from '../../services/models/user-dto';
+import {AuthRequest} from '../../services/models/auth-request';
+import {AuthenticationService} from '../../services/services/authentication.service';
+import {AuthResponse} from '../../services/models/auth-response';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +37,7 @@ export class LoginComponent {
     }).subscribe({
       next: (res:AuthResponse) => {
         this.tokenService.token = res.token as string;
-        this.loginStateService.loggedInUser = res.userDTO;
+        this.loginStateService.loggedInUser = res.playerDTO;
         this.router.navigate(['']);
       },
       error: (err) => {

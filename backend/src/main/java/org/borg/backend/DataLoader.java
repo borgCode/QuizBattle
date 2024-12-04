@@ -2,17 +2,17 @@ package org.borg.backend;
 
 import org.borg.backend.role.Role;
 import org.borg.backend.role.RoleRepository;
-import org.borg.backend.user.UserRepository;
+import org.borg.backend.player.PlayerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataLoader implements CommandLineRunner {
-    private final UserRepository userRepository;
+    private final PlayerRepository playerRepository;
     private final RoleRepository roleRepository;
 
-    public DataLoader(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
+    public DataLoader(PlayerRepository playerRepository, RoleRepository roleRepository) {
+        this.playerRepository = playerRepository;
         this.roleRepository = roleRepository;
     }
 

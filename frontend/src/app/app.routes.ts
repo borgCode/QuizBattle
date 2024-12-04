@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import {LoginComponent} from './components/login/login.component';
-import {UserProfileComponent} from './components/user-profile/user-profile.component';
+import {PlayerProfileComponent} from './components/player-profile/player-profile.component';
 import {ModeSelectionComponent} from './components/mode-selection/mode-selection.component';
 import {RegisterComponent} from './components/register/register.component';
 import {authGuard} from './services/guard/auth.guard';
@@ -9,7 +9,7 @@ import {MultiplayerComponent} from './components/multiplayer/multiplayer.compone
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
-  {path: 'profile', component: UserProfileComponent, canActivate:[authGuard]},
+  {path: 'profile', component: PlayerProfileComponent, canActivate:[authGuard]},
   {path: 'multiplayer', component: MultiplayerComponent, canActivate:[authGuard]},
   {path: '', component: ModeSelectionComponent}
 ];

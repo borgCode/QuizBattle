@@ -1,4 +1,4 @@
-package org.borg.backend.user;
+package org.borg.backend.player;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -6,21 +6,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("player")
 @RequiredArgsConstructor
-@Tag(name="User")
-public class UserController {
+@Tag(name="Player")
+public class PlayerController {
     
-    private final UserService userService;
+    private final PlayerService playerService;
 
     @GetMapping("/{username}")
-    public UserDTO getUserById(@PathVariable String username) {
-        return userService.getUserByName(username);
+    public PlayerDTO getPlayerById(@PathVariable String username) {
+        return playerService.getPlayerByName(username);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Void> updateUser(@RequestBody UpdateUserRequest request) {
-        userService.updateUser(request);
+    public ResponseEntity<Void> updatePlayer(@RequestBody UpdatePlayerRequest request) {
+        playerService.updatePlayer(request);
         return ResponseEntity.ok().build();  
     }
     

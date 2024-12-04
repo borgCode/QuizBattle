@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.borg.backend.role.Role;
 import org.borg.backend.role.RoleRepository;
 import org.borg.backend.security.JwtService;
-import org.borg.backend.user.User;
-import org.borg.backend.user.UserDTO;
-import org.borg.backend.user.UserMapper;
-import org.borg.backend.user.UserRepository;
+import org.borg.backend.player.Player;
+import org.borg.backend.player.PlayerDTO;
+import org.borg.backend.player.PlayerMapper;
+import org.borg.backend.player.PlayerRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,14 +21,14 @@ public class AuthService {
 
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final PlayerRepository playerRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
     public void register(RegistrationRequest request) {
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
-        User user = User.builder()
+        Player player = Player.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .displayName(request.getDisplayName())
@@ -36,7 +36,7 @@ public class AuthService {
                 .enabled(true)
                 .roles(List.of(userRole))
                 .build();
-        userRepository.save(user);
+        playerRepository.save(player);
     }
 
     public AuthResponse authenticate(AuthRequest authRequest) {
@@ -47,16 +47,16 @@ public class AuthService {
                 )
         );
 
-        User user = (User) auth.getPrincipal();
-        String token = jwtService.generateToken(user);
+        Player player = (Player) auth.getPrincipal();
+        String token = jwtService.generateToken(player);
 
         //Return userDTO if login is successful
 
-        UserDTO userDTO = UserMapper.toDTO(user);
+        PlayerDTO playerDTO = PlayerMapper.toDTO(player);
 
         return AuthResponse.builder()
                 .message("Login successful")
-                .userDTO(userDTO)
+                .playerDTO(playerDTO)
                 .token(token)
                 .build();
 

@@ -1,4 +1,4 @@
-package org.borg.backend.user;
+package org.borg.backend.player;
 
 public enum UpdateField {
     USERNAME,

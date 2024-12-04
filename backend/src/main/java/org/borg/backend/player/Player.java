@@ -1,4 +1,4 @@
-package org.borg.backend.user;
+package org.borg.backend.player;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "app_user")
-public class User implements UserDetails {
+@Table(name = "players")
+public class Player implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //auto generates IDs for new records
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
-
+    
     @Column(unique = true)
     private String username;
     private String password;
