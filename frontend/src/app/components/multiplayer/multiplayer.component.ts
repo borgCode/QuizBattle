@@ -3,13 +3,13 @@ import {PlayerDto} from '../../services/models/player-dto';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
 import {MultiplayerService} from '../../services/services/multiplayer.service';
 import {MultiplayerSessionDto} from '../../services/models/multiplayer-session-dto';
-import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {NgForOf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-multiplayer',
   imports: [
     NgForOf,
-    NgIf,
     NgSwitch,
     NgSwitchCase
   ],
@@ -23,7 +23,8 @@ export class MultiplayerComponent implements OnInit{
 
   constructor(
     private loginStateService: LoginStateService,
-    private multiplayerService: MultiplayerService
+    private multiplayerService: MultiplayerService,
+    private router: Router,
   ) {
   }
 
@@ -40,10 +41,9 @@ export class MultiplayerComponent implements OnInit{
         this.gameSessions = value;
       }
     })
-
-
-
   }
 
-
+  openGame(id: number) {
+    this.router.navigate(['multiplayer', id]);
+  }
 }

@@ -20,7 +20,8 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-//        seedService.seedTestData();
+
+        seedService.seedTestData();
 //        if (roleRepository.findByName("USER").isEmpty()) {
 //            Role userRole = new Role();
 //            userRole.setName("USER");

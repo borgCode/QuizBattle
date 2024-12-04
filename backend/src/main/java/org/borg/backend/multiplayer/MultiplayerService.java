@@ -55,7 +55,8 @@ public class MultiplayerService {
                 PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()),
                 multiplayerSession.getCurrentQuestionIndex(),
                 multiplayerSession.getScore(),
-                multiplayerSession.getStatus()
+                multiplayerSession.getStatus(),
+                multiplayerSession.getQuestionResults()
         );
     }
 

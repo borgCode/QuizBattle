@@ -1,4 +1,4 @@
-<div class="container p-5">
+<div class="container p-5" xmlns:cursor="http://www.w3.org/1999/xhtml">
   <div class="container g-4">
     <div class="row mb-4">
       <div class="col-md-3">
@@ -18,12 +18,12 @@
         <div class="card-body p-0">
           <ul class="list-group mb-3">
             <ng-container *ngFor="let gameSession of gameSessions">
-              <li class="list-group-item ju ">
+              <li (click)="openGame(gameSession.id)" class="list-group-item ju" style="cursor: pointer;">
                 <div class="row align-items-center">
                   <!-- Player 1 Section -->
                   <div class="col-md-4 d-flex align-items-center">
                     <div class="player-avatar bg-light rounded-circle p-2 me-3">
-                      <img src="/api/placeholder/40/40" alt="Player 1" class="rounded-circle"/>
+                      <img src="https://placehold.co/40" alt="Player 1" class="rounded-circle"/>
                     </div>
                     <div class="player-info">
                       <div class="fw-bold">{{ gameSession.playerDTOList[0].displayName }}</div>
@@ -37,6 +37,7 @@
                       <span class="badge bg-light text-dark px-4 py-2">VS</span>
                     </div>
                     <div class="mt-2">
+<!--                      TODO win/loss instead of complete-->
                       <ng-container [ngSwitch]="gameSession.status">
                         <span *ngSwitchCase="'ACTIVE'" class="badge bg-primary rounded-pill px-3">Active</span>
                         <span *ngSwitchCase="'COMPLETED'" class="badge bg-success rounded-pill px-3">Completed</span>
@@ -51,7 +52,7 @@
                       <div class="text-primary fs-4">{{ gameSession.score[gameSession.playerDTOList[1].id] }}</div>
                     </div>
                     <div class="player-avatar bg-light rounded-circle p-2 ms-3">
-                      <img src="/api/placeholder/40/40" alt="Player 2" class="rounded-circle"/>
+                      <img src="https://placehold.co/40" alt="Player 2" class="rounded-circle"/>
                     </div>
                   </div>
                 </div>

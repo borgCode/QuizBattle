@@ -5,11 +5,15 @@ import {ModeSelectionComponent} from './components/mode-selection/mode-selection
 import {RegisterComponent} from './components/register/register.component';
 import {authGuard} from './services/guard/auth.guard';
 import {MultiplayerComponent} from './components/multiplayer/multiplayer.component';
+import {
+  MultiplayerScoreWindowComponent
+} from './components/multiplayer/multiplayer-score-window/multiplayer-score-window.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'profile', component: PlayerProfileComponent, canActivate:[authGuard]},
   {path: 'multiplayer', component: MultiplayerComponent, canActivate:[authGuard]},
+  {path: 'multiplayer/:sessionId', component: MultiplayerScoreWindowComponent, canActivate:[authGuard]},
   {path: '', component: ModeSelectionComponent}
 ];

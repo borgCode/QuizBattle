@@ -6,6 +6,7 @@ import org.borg.backend.multiplayer.MultiplayerSession;
 import org.borg.backend.multiplayer.MultiplayerSessionRepository;
 import org.borg.backend.player.Player;
 import org.borg.backend.player.PlayerRepository;
+import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;
 import org.borg.backend.question.QuestionRepository;
 import org.borg.backend.role.Role;
@@ -31,7 +32,8 @@ public class QuizGameSeeder {
             PlayerRepository playerRepository,
             QuestionRepository questionRepository,
             RoleRepository roleRepository,
-            MultiplayerSessionRepository sessionRepository, PasswordEncoder passwordEncoder) {
+            MultiplayerSessionRepository sessionRepository,
+            PasswordEncoder passwordEncoder) {
         this.playerRepository = playerRepository;
         this.questionRepository = questionRepository;
         this.roleRepository = roleRepository;
@@ -52,7 +54,7 @@ public class QuizGameSeeder {
         // Create questions
         List<Question> questions = createQuestions(numQuestions);
 
-        // Create multiplayer sessions
+        // Create multiplayer sessions with more sessions per player
         createMultiplayerSessions(numSessions, players, questions);
 
         System.out.println("Database seeded successfully!");
@@ -70,18 +72,17 @@ public class QuizGameSeeder {
     }
 
     private List<Player> createPlayers(int count, List<Role> roles) {
-
-        
-        
         Role userRole = roles.stream()
                 .filter(r -> r.getName().equals("USER"))
                 .findFirst()
                 .orElseThrow();
 
         List<Player> players = new ArrayList<>();
+
+        // Create test user
         Player testUser = new Player();
         testUser.setUsername("testuser");
-        testUser.setPassword(passwordEncoder.encode("password")); // password is "password"
+        testUser.setPassword(passwordEncoder.encode("password"));
         testUser.setDisplayName("Test User");
         testUser.setNumOfGames(10);
         testUser.setNumOfWins(5);
@@ -90,7 +91,7 @@ public class QuizGameSeeder {
         testUser.setEnabled(true);
         testUser.setRoles(Collections.singletonList(userRole));
         players.add(playerRepository.save(testUser));
-        
+
         for (int i = 0; i < count; i++) {
             Player player = new Player();
             player.setUsername(faker.name().username() + random.nextInt(1000));
@@ -100,7 +101,7 @@ public class QuizGameSeeder {
             if (player.getNumOfGames() > 0) {
                 player.setNumOfWins(random.nextInt(player.getNumOfGames()));
             } else {
-                player.setNumOfWins(0); 
+                player.setNumOfWins(0);
             }
             player.setNumOfLosses(player.getNumOfGames() - player.getNumOfWins());
             player.setAccountLocked(false);
@@ -121,7 +122,6 @@ public class QuizGameSeeder {
             question.setCategory(categories.get(random.nextInt(categories.size())));
             question.setQuestion(faker.lorem().sentence() + "?");
 
-            // Generate 4 options with one being correct
             List<String> options = new ArrayList<>();
             String correctAnswer = faker.lorem().word();
             options.add(correctAnswer);
@@ -130,7 +130,6 @@ public class QuizGameSeeder {
                 options.add(faker.lorem().word());
             }
 
-            // Shuffle options
             Collections.shuffle(options);
             question.setOptions(options);
             question.setCorrectAnswer(correctAnswer);
@@ -142,46 +141,63 @@ public class QuizGameSeeder {
     }
 
     private void createMultiplayerSessions(int count, List<Player> allPlayers, List<Question> allQuestions) {
-        for (int i = 0; i < count; i++) {
-            MultiplayerSession session = new MultiplayerSession();
+        // Ensure each player participates in multiple sessions
+        for (Player player : allPlayers) {
+            // Create 2-5 sessions for each player
+            int sessionsForPlayer = random.nextInt(4) + 2;
 
-            // Add 2-4 random players to session
-            int numPlayersInSession = random.nextInt(1) + 2;
-            List<Player> sessionPlayers = getRandomSublist(allPlayers, numPlayersInSession);
-            session.setPlayers(sessionPlayers);
+            for (int i = 0; i < sessionsForPlayer; i++) {
+                MultiplayerSession session = new MultiplayerSession();
 
-            // Set random current player
-            session.setCurrentPlayerTurn(sessionPlayers.get(random.nextInt(sessionPlayers.size())));
+                // Add the current player and 1-3 random other players
+                List<Player> sessionPlayers = new ArrayList<>();
+                sessionPlayers.add(player);
 
-            // Set random game status
-            session.setStatus(GameStatus.values()[random.nextInt(GameStatus.values().length)]);
+                List<Player> otherPlayers = allPlayers.stream()
+                        .filter(p -> !p.equals(player))
+                        .collect(Collectors.toList());
 
-            // Set current question index
-            session.setCurrentQuestionIndex(random.nextInt(20));
+                int additionalPlayers = random.nextInt(1) + 2;
+                sessionPlayers.addAll(getRandomSublist(otherPlayers, additionalPlayers));
 
-            // Initialize scores
-            Map<Long, Integer> scores = sessionPlayers.stream()
-                    .collect(Collectors.toMap(
-                            Player::getId,
-                            player -> random.nextInt(10)
-                    ));
-            session.setScore(scores);
+                session.setPlayers(sessionPlayers);
+                session.setCurrentPlayerTurn(sessionPlayers.get(random.nextInt(sessionPlayers.size())));
+                session.setStatus(GameStatus.values()[random.nextInt(GameStatus.values().length)]);
+                session.setCurrentQuestionIndex(random.nextInt(20));
 
-            // Initialize questions answered
-            Map<Long, Integer> questionsAnswered = sessionPlayers.stream()
-                    .collect(Collectors.toMap(
-                            Player::getId,
-                            player -> random.nextInt(session.getCurrentQuestionIndex() + 1)
-                    ));
-            session.setQuestionsAnswered(questionsAnswered);
+                // Set scores and questions answered
+                Map<Long, Integer> scores = new HashMap<>();
+                Map<Long, Integer> questionsAnswered = new HashMap<>();
+                Set<PlayerQuestionResult> questionResults = new HashSet<>();
 
-            // Add random questions
-            List<Long> questionIds = getRandomSublist(allQuestions, 20).stream()
-                    .map(Question::getId)
-                    .collect(Collectors.toList());
-            session.setQuestionIds(questionIds);
+                // Get session questions
+                List<Question> sessionQuestions = getRandomSublist(allQuestions, 20);
+                session.setQuestionIds(sessionQuestions.stream()
+                        .map(Question::getId)
+                        .collect(Collectors.toList()));
 
-            sessionRepository.save(session);
+                for (Player sessionPlayer : sessionPlayers) {
+                    scores.put(sessionPlayer.getId(), random.nextInt(10));
+                    int answeredCount = random.nextInt(session.getCurrentQuestionIndex() + 1);
+                    questionsAnswered.put(sessionPlayer.getId(), answeredCount);
+
+                    // Create question results for each answered question
+                    for (int q = 0; q < answeredCount; q++) {
+                        PlayerQuestionResult result = new PlayerQuestionResult();
+                        result.setPlayerId(sessionPlayer.getId());
+                        result.setQuestionId(sessionQuestions.get(q).getId());
+                        result.setQuestionIndex(q);
+                        result.setCorrect(random.nextBoolean());
+                        questionResults.add(result);
+                    }
+                }
+
+                session.setScore(scores);
+                session.setQuestionsAnswered(questionsAnswered);
+                session.setQuestionResults(questionResults);
+
+                sessionRepository.save(session);
+            }
         }
     }
 

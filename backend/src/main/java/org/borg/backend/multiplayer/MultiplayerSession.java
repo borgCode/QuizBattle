@@ -5,11 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.borg.backend.player.Player;
+import org.borg.backend.question.PlayerQuestionResult;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -44,6 +42,9 @@ public class MultiplayerSession {
     private Map<Long, Integer> questionsAnswered;
     @ElementCollection
     private List<Long> questionIds;
+    @ElementCollection
+    @CollectionTable(name = "player_question_results")
+    private Set<PlayerQuestionResult> questionResults;
     
 
     public MultiplayerSession(Player player1, Player player2, Player currentPlayerTurn) {
