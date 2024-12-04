@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {MultiplayerService} from '../../../services/services/multiplayer.service';
 import {ActivatedRoute} from '@angular/router';
-import {MultiplayerSessionDto} from '../../../services/models/multiplayer-session-dto';
 import {NgForOf} from '@angular/common';
+import {GameStateResponse} from '../../../services/models/game-state-response';
 
 interface Box {
   color: string;
@@ -22,21 +22,36 @@ interface BoxRow {
   styleUrl: './multiplayer-score-window.component.css'
 })
 export class MultiplayerScoreWindowComponent implements OnInit{
-  gameSession!:MultiplayerSessionDto;
+  gameState!:GameStateResponse;
   boxes: BoxRow[] = [];
+  opponentIndex: number | null = null;
 
   constructor(
     private multiplayerService: MultiplayerService,
     private activatedRoute: ActivatedRoute,
-
-
   ) {
   }
 
   ngOnInit() {
     this.initBoxes();
     this.activatedRoute.params.subscribe(value => {
-      const sessionId = value['id'];
+      const sessionId = value['sessionId'];
+
+      this.multiplayerService.getGameState({sessionId: sessionId}).subscribe({
+        next: gameState => {
+          this.gameState = gameState;
+
+          const storedPlayer = localStorage.getItem('loggedInUser');
+          if (storedPlayer) {
+            const storedPlayerId = JSON.parse(storedPlayer).id;
+
+            this.opponentIndex = this.gameState.playerDTOS.findIndex(player =>
+            player.id !== storedPlayerId
+            );
+
+          }
+        }
+      })
     });
   }
 

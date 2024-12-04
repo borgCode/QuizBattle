@@ -65,36 +65,6 @@
         }
       }
     },
-    "/multiplayer/matchmaking": {
-      "post": {
-        "tags": [
-          "Multiplayer"
-        ],
-        "operationId": "findMatch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MatchmakingRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MatchmakingResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -245,6 +215,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlayerDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/multiplayer": {
+      "get": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "findMatch",
+        "parameters": [
+          {
+            "name": "request",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/MatchmakingRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchmakingResponse"
                 }
               }
             }
@@ -423,34 +423,6 @@
           }
         }
       },
-      "MatchmakingRequest": {
-        "type": "object",
-        "properties": {
-          "playerId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "MatchmakingResponse": {
-        "type": "object",
-        "properties": {
-          "matchStatus": {
-            "type": "string",
-            "enum": [
-              "WAITING",
-              "MATCHED",
-              "CANCELLED",
-              "ERROR",
-              "TIMEOUT"
-            ]
-          },
-          "sessionId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "RegistrationRequest": {
         "required": [
           "displayName",
@@ -552,6 +524,34 @@
           }
         }
       },
+      "MatchmakingRequest": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "MatchmakingResponse": {
+        "type": "object",
+        "properties": {
+          "matchStatus": {
+            "type": "string",
+            "enum": [
+              "WAITING",
+              "MATCHED",
+              "CANCELLED",
+              "ERROR",
+              "TIMEOUT"
+            ]
+          },
+          "sessionId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "MultiplayerSessionDTO": {
         "type": "object",
         "properties": {
@@ -610,6 +610,33 @@
               "ACTIVE",
               "COMPLETED"
             ]
+          },
+          "results": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerQuestionResult"
+            }
+          }
+        }
+      },
+      "PlayerQuestionResult": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "questionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "questionIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "correct": {
+            "type": "boolean"
           }
         }
       }
