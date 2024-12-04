@@ -1,16 +1,59 @@
-<div class="user-profile-section">
-<!--  <input type="file" (change)="onFileSelected($event)" accept="image/*">-->
-<!--  <img [src]="profileImageUrl || '/api/placeholder/150/150'" alt="Profile Picture">-->
-  <h1>{{user.displayName}}</h1>
-</div>
+<!--<div class="user-profile-section">-->
+<!--&lt;!&ndash;  <input type="file" (change)="onFileSelected($event)" accept="image/*">&ndash;&gt;-->
+<!--&lt;!&ndash;  <img [src]="profileImageUrl || '/api/placeholder/150/150'" alt="Profile Picture">&ndash;&gt;-->
+<!--  <h1>{{user.displayName}}</h1>-->
+<!--</div>-->
 
-<div class="stats">
-  <h2>Game Statistics</h2>
-  <div class="match-stats">
-    <h3>Match Statistics</h3>
-    <p>Total Matches: {{user.numOfGames}}</p>
-    <p>Wins: {{user.numOfWins}}</p>
-    <p>Losses: {{user.numOfLosses}}</p>
-<!--    <p>Win Rate: {{winRate}}%</p>-->
+<!--<div class="stats">-->
+<!--  <h2>Game Statistics</h2>-->
+<!--  <div class="match-stats">-->
+<!--    <h3>Match Statistics</h3>-->
+<!--    <p>Total Matches: {{user.numOfGames}}</p>-->
+<!--    <p>Wins: {{user.numOfWins}}</p>-->
+<!--    <p>Losses: {{user.numOfLosses}}</p>-->
+<!--&lt;!&ndash;    <p>Win Rate: {{winRate}}%</p>&ndash;&gt;-->
+<!--  </div>-->
+<!--</div>-->
+
+<div class="container p-5">
+  <div class="row">
+    <div class="col-md">
+      <div class="card" style="width: 18rem;">
+        <img src="https://placehold.co/400" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">{{user?.displayName}}</h5>
+          <a href="#" class="btn btn-primary">Edit Profile</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md">
+      <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <div class="col">
+            <p>Total games played: {{user?.numOfGames}}</p>
+          </div>
+        <hr>
+        <div class="row">
+          <div class="col-sm-3">
+            <p class="mb-0">Email</p>
+          </div>
+          <div class="col-sm-9">
+            <p class="text-muted mb-0">example</p>
+          </div>
+        </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-sm-3">
+            <p class="mb-0">Phone</p>
+          </div>
+          <div class="col-sm-9">
+            <p class="text-muted mb-0">(097) 234-5678</p>
+          </div>
+        </div>
+        </div>
+      </div>
+    <div class="col-md">123</div>
+    </div>
   </div>
-</div>
+
