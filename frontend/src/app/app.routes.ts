@@ -4,11 +4,12 @@ import {UserProfileComponent} from './components/user-profile/user-profile.compo
 import {PlayComponent} from './components/play/play.component';
 import {ModeSelectionComponent} from './components/mode-selection/mode-selection.component';
 import {RegisterComponent} from './components/register/register.component';
+import {authGuard} from './services/guard/auth.guard';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
-  {path: 'profile', component: UserProfileComponent},
-  {path: 'play', component: PlayComponent},
+  {path: 'profile', component: UserProfileComponent, canActivate:[authGuard]},
+  {path: 'play', component: PlayComponent, canActivate:[authGuard]},
   {path: '', component: ModeSelectionComponent}
 ];
