@@ -1,1 +1,40 @@
-<p>multiplayer-score-window works!</p>
+<div class="container">
+  <div class="row mb-3 justify-content-between">
+    <div class="col-2">
+      <div class="card">
+        <img src="https://placehold.co/100" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Display name</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-2 offset-2 text-end">
+      <div class="card">
+        <img src="https://placehold.co/100" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Display name</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngFor="let row of boxes; let i = index">
+    <div class="col-5">
+      <div class="row">
+        <div class="col-4 mb-3" *ngFor="let box of row.left">
+          <div class="square" [style.background-color]="box.color"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-2 d-flex align-items-center justify-content-center">
+      <h5>Row {{i + 1}} Label</h5>
+    </div>
+    <div class="col-5">
+      <div class="row">
+        <div class="col-4 mb-3" *ngFor="let box of row.right">
+          <div class="square" [style.background-color]="box.color"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
