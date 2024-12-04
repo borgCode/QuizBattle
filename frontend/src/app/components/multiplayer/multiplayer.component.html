@@ -1,6 +1,6 @@
 <div class="container p-5">
-  <div class="container">
-    <div class="row">
+  <div class="container g-4">
+    <div class="row mb-4">
       <div class="col-md-3">
         <div class="card">
           <img src="https://placehold.co/400" class="card-img-top" alt="...">
@@ -11,16 +11,54 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-5 offset-md-4">
-        <h5 class="text-center">Current Games</h5>
-        <ul class="list-group mb-3">
-          <ng-container *ngFor="let gameSession of gameSessions">
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{gameSession.status}}
-<!--            <span class="badge bg-primary rounded-pill">Active</span>-->
-          </li>
-          </ng-container>
-        </ul>
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white py-3">
+          <h5 class="mb-0 text-center">Games</h5>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group mb-3">
+            <ng-container *ngFor="let gameSession of gameSessions">
+              <li class="list-group-item ju ">
+                <div class="row align-items-center">
+                  <!-- Player 1 Section -->
+                  <div class="col-md-4 d-flex align-items-center">
+                    <div class="player-avatar bg-light rounded-circle p-2 me-3">
+                      <img src="/api/placeholder/40/40" alt="Player 1" class="rounded-circle"/>
+                    </div>
+                    <div class="player-info">
+                      <div class="fw-bold">{{ gameSession.playerDTOList[0].displayName }}</div>
+                      <div class="text-primary fs-4">{{ gameSession.score[gameSession.playerDTOList[0].id] }}</div>
+                    </div>
+                  </div>
+
+                  <!-- VS Section -->
+                  <div class="col-md-4 text-center">
+                    <div class="versus-badge">
+                      <span class="badge bg-light text-dark px-4 py-2">VS</span>
+                    </div>
+                    <div class="mt-2">
+                      <ng-container [ngSwitch]="gameSession.status">
+                        <span *ngSwitchCase="'ACTIVE'" class="badge bg-primary rounded-pill px-3">Active</span>
+                        <span *ngSwitchCase="'COMPLETED'" class="badge bg-success rounded-pill px-3">Completed</span>
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <!-- Player 2 Section -->
+                  <div class="col-md-4 d-flex align-items-center justify-content-end">
+                    <div class="player-info text-end">
+                      <div class="fw-bold">{{ gameSession.playerDTOList[1].displayName }}</div>
+                      <div class="text-primary fs-4">{{ gameSession.score[gameSession.playerDTOList[1].id] }}</div>
+                    </div>
+                    <div class="player-avatar bg-light rounded-circle p-2 ms-3">
+                      <img src="/api/placeholder/40/40" alt="Player 2" class="rounded-circle"/>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ng-container>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

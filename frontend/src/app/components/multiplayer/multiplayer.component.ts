@@ -3,12 +3,15 @@ import {PlayerDto} from '../../services/models/player-dto';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
 import {MultiplayerService} from '../../services/services/multiplayer.service';
 import {MultiplayerSessionDto} from '../../services/models/multiplayer-session-dto';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 
 @Component({
   selector: 'app-multiplayer',
   imports: [
-    NgForOf
+    NgForOf,
+    NgIf,
+    NgSwitch,
+    NgSwitchCase
   ],
   templateUrl: './multiplayer.component.html',
   styleUrl: './multiplayer.component.css'
