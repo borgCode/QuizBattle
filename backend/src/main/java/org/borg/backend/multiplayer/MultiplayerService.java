@@ -1,6 +1,9 @@
 package org.borg.backend.multiplayer;
 
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.player.Player;
+import org.borg.backend.player.PlayerMapper;
+import org.borg.backend.player.PlayerRepository;
 import org.borg.backend.question.Question;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +14,26 @@ import java.util.*;
 public class MultiplayerService {
     private final List<Long> matchmakingQueue = Collections.synchronizedList(new ArrayList<>());
     private final MultiplayerSessionRepository multiplayerSessionRepository;
+    private final PlayerRepository playerRepository;
     
 
     public MatchmakingResponse findMatch(MatchmakingRequest request) {
         synchronized (matchmakingQueue) {
-            Optional<Long> opponent = matchmakingQueue.stream().findFirst();
+            Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
 
-            if (opponent.isPresent()) {
-                matchmakingQueue.remove(opponent.get());
+            if (opponentId.isPresent()) {
+                matchmakingQueue.remove(opponentId.get());
+
+                Player requestingPlayer = playerRepository.findById(request.getPlayerId())
+                        .orElseThrow(() -> new NoSuchElementException("Requesting player not found"));
+                Player opponent = playerRepository.findById(opponentId.get())
+                        .orElseThrow(() -> new NoSuchElementException("Opponent not found"));
 
                 //Randomly choose who starts
-                Long startingPlayer = Math.random() < 0.5 ? request.getPlayerId() : opponent.get();
+                
+                Player startingPlayer = Math.random() < 0.5 ? requestingPlayer : opponent;
 
-                MultiplayerSession session = new MultiplayerSession(request.getPlayerId(), opponent.get(), startingPlayer);
+                MultiplayerSession session = new MultiplayerSession(requestingPlayer, opponent, startingPlayer);
                 multiplayerSessionRepository.save(session);
                 return new MatchmakingResponse(MatchStatus.MATCHED, session.getId());
             }
@@ -42,7 +52,7 @@ public class MultiplayerService {
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
         return new GameStateResponse(
-                multiplayerSession.getPlayerIds(),
+                PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()),
                 multiplayerSession.getCurrentQuestionIndex(),
                 multiplayerSession.getScore(),
                 multiplayerSession.getStatus()
@@ -52,30 +62,28 @@ public class MultiplayerService {
     public synchronized GameStateUpdate updateGameState(Long sessionId, Long playerId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
+        
+        //Increment score if answer was correct
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
             Integer playerScore = scores.getOrDefault(playerId, 0);
             scores.put(playerId, playerScore + 1);
         }
         
+        //Update questions answered
         Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
         questionsAnswered.put(playerId, questionsAnswered.get(playerId) + 1);
 
-        Long opponentId = null;
-        for (Long id : questionsAnswered.keySet()) {
-            if (!id.equals(playerId)) {
-                opponentId = id;
-                break;
-            }
-        }
-
-        if (opponentId == null) {
-            throw new IllegalStateException("No opponent found in session");
-        }
+        //Find opponent in session
+        Player opponent = session.getPlayers().stream()
+                .filter(player -> !player.getId().equals(playerId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No opponent found in session"));
         
 
+        //Check if game is completed
         if (questionsAnswered.get(playerId) == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER
-                && questionsAnswered.get(opponentId) == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER) {
+                && questionsAnswered.get(opponent.getId()) == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER) {
             return new GameStateUpdate(
                     null,
                     session.getScore(),
@@ -86,10 +94,11 @@ public class MultiplayerService {
 
         session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
         
+        //Determine if it's opponent's turn
         boolean isOpponentTurn = false;
         if (session.getCurrentQuestionIndex() == 0) {
-            if (questionsAnswered.get(playerId) > questionsAnswered.get(opponentId)) {
-                session.setCurrentPlayerTurn(opponentId);
+            if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
+                session.setCurrentPlayerTurn(opponent);
                 isOpponentTurn = true;
                 
             }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.borg.backend.player.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,25 +19,38 @@ public class MultiplayerSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ElementCollection
-    private List<Long> playerIds;
+    @ManyToMany
+    @JoinTable(
+            name = "session_players",
+            joinColumns = @JoinColumn(name = "session_id"),
+            inverseJoinColumns = @JoinColumn(name = "player_id")
+    )
+    private List<Player> players;
     private Integer currentQuestionIndex;
     @ElementCollection
+    @CollectionTable(name = "player_scores")
+    @MapKeyColumn(name = "player_id")
+    @Column(name = "score")
     private Map<Long, Integer> score;
     @Enumerated(EnumType.STRING)
     private GameStatus status;
-    private Long currentPlayerTurn;
+    @ManyToOne
+    @JoinColumn(name = "current_player_id")
+    private Player currentPlayerTurn;
     @ElementCollection
+    @CollectionTable(name = "questions_answered")
+    @MapKeyColumn(name = "player_id")
+    @Column(name = "count")
     private Map<Long, Integer> questionsAnswered;
     @ElementCollection
     private List<Long> questionIds;
     
 
-    public MultiplayerSession(Long player1Id, Long player2Id, Long currentPlayerTurn) {
-        playerIds = new ArrayList<>(List.of(player1Id, player2Id));
-        score = new HashMap<>(Map.of(player1Id, 0, player2Id, 0));
+    public MultiplayerSession(Player player1, Player player2, Player currentPlayerTurn) {
+        players = new ArrayList<>(List.of(player1, player2));
+        score = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
         status = GameStatus.ACTIVE;
         this.currentPlayerTurn = currentPlayerTurn;
-        questionsAnswered = new HashMap<>(Map.of(player1Id, 0, player2Id, 0));
+        questionsAnswered = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
     }
 }

@@ -2,6 +2,7 @@ package org.borg.backend.player;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.borg.backend.multiplayer.MultiplayerSession;
 import org.borg.backend.role.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,6 +34,8 @@ public class Player implements UserDetails {
     private int numOfLosses;
     private boolean accountLocked;
     private boolean enabled;
+    @ManyToMany(mappedBy = "players")
+    private List<MultiplayerSession> session;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
