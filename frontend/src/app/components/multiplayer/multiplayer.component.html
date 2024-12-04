@@ -14,18 +14,12 @@
       <div class="col-md-5 offset-md-4">
         <h5 class="text-center">Current Games</h5>
         <ul class="list-group mb-3">
+          <ng-container *ngFor="let gameSession of gameSessions">
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            Game 1
-            <span class="badge bg-primary rounded-pill">Active</span>
+            {{gameSession.status}}
+<!--            <span class="badge bg-primary rounded-pill">Active</span>-->
           </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            Game 2
-            <span class="badge bg-danger rounded-pill">Lost</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            Game 3
-            <span class="badge bg-success rounded-pill">Won</span>
-          </li>
+          </ng-container>
         </ul>
       </div>
     </div>

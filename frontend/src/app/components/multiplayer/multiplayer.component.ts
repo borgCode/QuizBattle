@@ -3,10 +3,13 @@ import {PlayerDto} from '../../services/models/player-dto';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
 import {MultiplayerService} from '../../services/services/multiplayer.service';
 import {MultiplayerSessionDto} from '../../services/models/multiplayer-session-dto';
+import {NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-multiplayer',
-  imports: [],
+  imports: [
+    NgForOf
+  ],
   templateUrl: './multiplayer.component.html',
   styleUrl: './multiplayer.component.css'
 })
@@ -24,6 +27,11 @@ export class MultiplayerComponent implements OnInit{
   ngOnInit() {
 
     this.player = this.loginStateService.loggedInUser;
+    //TODO show user error
+    if (!this.player) {
+      console.warn('No logged-in user found!');
+    }
+
     this.multiplayerService.getPlayerSessions({playerId: this.player.id}).subscribe({
       next: value => {
         this.gameSessions = value;
@@ -31,10 +39,7 @@ export class MultiplayerComponent implements OnInit{
     })
 
 
-    //TODO show user error
-    if (!this.player) {
-      console.warn('No logged-in user found!');
-    }
+
   }
 
 
