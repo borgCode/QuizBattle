@@ -7,6 +7,8 @@ import {AuthenticationService} from '../../services/services/authentication.serv
 import {AuthResponse} from '../../services/models/auth-response';
 import {NgForOf, NgIf} from '@angular/common';
 import {TokenService} from '../../services/token/token.service';
+import {LoginStateService} from '../../services/login-state-service/login-state.service';
+import {UserDto} from '../../services/models/user-dto';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +28,7 @@ export class LoginComponent {
     private router: Router,
     private authService: AuthenticationService,
     private tokenService: TokenService,
+    private loginStateService: LoginStateService,
   ) {
   }
 
@@ -36,6 +39,7 @@ export class LoginComponent {
     }).subscribe({
       next: (res:AuthResponse) => {
         this.tokenService.token = res.token as string;
+        this.loginStateService.loggedInUser = res.userDTO;
         this.router.navigate(['']);
       },
       error: (err) => {

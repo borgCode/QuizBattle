@@ -16,7 +16,7 @@
 <!--        Protected routes-->
         <ng-container *ngIf="loginStateService.isLoggedIn$ | async">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/user/:username" routerLinkActive="active">My profile</a>
+          <a class="nav-link" routerLink="/profile" routerLinkActive="active">My profile</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" (click)="logout()" style="cursor: pointer;">Logout</a>

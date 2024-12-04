@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {UserDto} from '../../services/models/user-dto';
+import {LoginStateService} from '../../services/login-state-service/login-state.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -7,21 +8,21 @@ import {ActivatedRoute} from '@angular/router';
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })
-export class UserProfileComponent {
-// user!: User;
-//
-// constructor(
-//   private route: ActivatedRoute,
-//   private backendService: UserService
-// ) {}
-//
-//   ngOnInit() {
-//     const username = this.route.snapshot.paramMap.get('username')!;
-//     this.backendService.getUserByName(username).subscribe(
-//       (data) => {
-//         this.user = data as User;
-//       }
-//     )
-//   }
+export class UserProfileComponent implements OnInit {
+  user!: UserDto;
 
+  constructor(
+    private loginStateService: LoginStateService
+  ) {
+  }
+
+  ngOnInit() {
+
+    this.user = this.loginStateService.loggedInUser;
+
+    //TODO show user error
+    if (!this.user) {
+      console.warn('No logged-in user found!');
+    }
+  }
 }

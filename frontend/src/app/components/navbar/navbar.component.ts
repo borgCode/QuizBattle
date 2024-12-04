@@ -15,7 +15,7 @@ import {TokenService} from '../../services/token/token.service';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent {
+export class NavbarComponent{
 
   constructor(
     public loginStateService: LoginStateService,
@@ -24,8 +24,10 @@ export class NavbarComponent {
   ) {
   }
 
+
   logout() {
     this.tokenService.clearToken();
+    this.loginStateService.loggedInUser = null;
     this.router.navigate(['/login']);
   }
 }
