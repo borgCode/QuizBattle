@@ -517,11 +517,10 @@
       "GameStateResponse": {
         "type": "object",
         "properties": {
-          "playerIds": {
+          "playerDTOS": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int64"
+              "$ref": "#/components/schemas/PlayerDTO"
             }
           },
           "currentQuestionIndex": {
