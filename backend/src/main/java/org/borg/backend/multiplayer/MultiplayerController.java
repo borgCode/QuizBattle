@@ -5,12 +5,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("multiplayer")
 @RequiredArgsConstructor
 @Tag(name = "Multiplayer")
 public class MultiplayerController {
     private final MultiplayerService multiplayerService;
+    
+    @GetMapping("{playerId}")
+    public List<MultiplayerSessionDTO> getPlayerSessions(@PathVariable Long playerId) {
+        return multiplayerService.getMultiplayerSessionsById(playerId);
+    }
     
     @PostMapping("/matchmaking")
     public ResponseEntity<MatchmakingResponse> findMatch(
@@ -28,6 +35,7 @@ public class MultiplayerController {
     public ResponseEntity<GameStateResponse> getGameState(@PathVariable Long sessionId) {
         return ResponseEntity.ok(multiplayerService.getGameState(sessionId));
     }
+    
     
     //TODO Give up mapping
     

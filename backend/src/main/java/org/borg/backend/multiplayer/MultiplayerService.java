@@ -121,5 +121,20 @@ public class MultiplayerService {
         }
         multiplayerSessionRepository.save(session);
     }
+
+    public List<MultiplayerSessionDTO> getMultiplayerSessionsById(Long playerId) {
+        List<MultiplayerSession> multiplayerSessions = multiplayerSessionRepository.findByPlayerId(playerId);
+        List<MultiplayerSessionDTO> multiplayerSessionDTOS = new ArrayList<>();
+        for (MultiplayerSession multiplayerSession : multiplayerSessions) {
+            MultiplayerSessionDTO multiplayerSessionDTO = MultiplayerSessionDTO.builder()
+                    .playerDTOList(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
+                    .score(multiplayerSession.getScore())
+                    .status(multiplayerSession.getStatus())
+                    .currentPlayerTurn(PlayerMapper.toDTO(multiplayerSession.getCurrentPlayerTurn()))
+                    .build();
+            multiplayerSessionDTOS.add(multiplayerSessionDTO);
+        }
+        return multiplayerSessionDTOS;
+    }
 }
             
