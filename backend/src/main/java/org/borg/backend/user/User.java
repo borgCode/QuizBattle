@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Entity
 @Table(name = "app_user")
 public class User implements UserDetails {

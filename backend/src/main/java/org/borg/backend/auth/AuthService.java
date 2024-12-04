@@ -5,6 +5,7 @@ import org.borg.backend.role.Role;
 import org.borg.backend.role.RoleRepository;
 import org.borg.backend.security.JwtService;
 import org.borg.backend.user.User;
+import org.borg.backend.user.UserDTO;
 import org.borg.backend.user.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,9 +49,19 @@ public class AuthService {
         User user = (User) auth.getPrincipal();
         String token = jwtService.generateToken(user);
 
+        //Return userDTO if login is successful
+
+        UserDTO userDTO = UserDTO.builder()
+                .username(user.getUsername())
+                .displayName(user.getDisplayName())
+                .numOfGames(user.getNumOfGames())
+                .numOfWins(user.getNumOfWins())
+                .numOfLosses(user.getNumOfLosses())
+                .build();
+
         return AuthResponse.builder()
                 .message("Login successful")
-                .username(user.getUsername())
+                .userDTO(userDTO)
                 .token(token)
                 .build();
 
