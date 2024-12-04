@@ -15,45 +15,34 @@
 <!--  </div>-->
 <!--</div>-->
 
+
 <div class="container p-5">
-  <div class="row">
+  <div class="container">
+  <div class="row text-center g-4">
     <div class="col-md">
-      <div class="card" style="width: 18rem;">
+      <div class="card">
         <img src="https://placehold.co/400" class="card-img-top" alt="...">
         <div class="card-body">
-          <h5 class="card-title">{{user?.displayName}}</h5>
+          <h5 class="card-title">{{ user?.displayName }}</h5>
           <a href="#" class="btn btn-primary">Edit Profile</a>
         </div>
       </div>
     </div>
     <div class="col-md">
-      <div class="card" style="width: 18rem;">
+      <div class="card">
+        <div class="card-header">Stats</div>
         <div class="card-body">
-          <div class="col">
-            <p>Total games played: {{user?.numOfGames}}</p>
-          </div>
-        <hr>
-        <div class="row">
-          <div class="col-sm-3">
-            <p class="mb-0">Email</p>
-          </div>
-          <div class="col-sm-9">
-            <p class="text-muted mb-0">example</p>
-          </div>
-        </div>
-        </div>
-        <hr>
-        <div class="row">
-          <div class="col-sm-3">
-            <p class="mb-0">Phone</p>
-          </div>
-          <div class="col-sm-9">
-            <p class="text-muted mb-0">(097) 234-5678</p>
-          </div>
-        </div>
+          <ul class="list-group">
+            <li class="list-group-item">Total games played: {{ user?.numOfGames }}</li>
+            <li class="list-group-item">Wins: {{ user?.numOfWins }}</li>
+            <li class="list-group-item">Losses: {{ user?.numOfLosses }}</li>
+            <li class="list-group-item">Win rate: {{ user?.numOfLosses }}</li>
+          </ul>
         </div>
       </div>
-    <div class="col-md">123</div>
     </div>
+    <div class="col-md">123</div>
   </div>
+</div>
+</div>
 
