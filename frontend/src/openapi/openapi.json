@@ -125,6 +125,40 @@
         }
       }
     },
+    "/questions/{sessionId}/category-selection": {
+      "get": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "getThreeRandomCategories",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions/{category}": {
       "get": {
         "tags": [
@@ -587,6 +621,10 @@
       "GameStateResponse": {
         "type": "object",
         "properties": {
+          "playerTurn": {
+            "type": "integer",
+            "format": "int64"
+          },
           "playerDTOS": {
             "type": "array",
             "items": {

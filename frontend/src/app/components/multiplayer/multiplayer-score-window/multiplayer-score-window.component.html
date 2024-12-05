@@ -1,18 +1,18 @@
 <div class="container">
-  <div class="row mb-3 justify-content-between">
-    <div class="col-2">
+  <div class="row mb-4">
+    <div class="col-6 col-md-3">
       <div class="card">
         <img src="https://placehold.co/100" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">{{gameState.playerDTOS[(opponentIndex + 1) % 2].displayName}}</h5>
+        <div class="card-body p-2">
+          <h5 class="card-title">{{ gameState.playerDTOS[(opponentIndex + 1) % 2].displayName }}</h5>
         </div>
       </div>
     </div>
-    <div class="col-2 offset-2 text-end">
+    <div class="col-6 col-md-3 offset-md-6">
       <div class="card">
         <img src="https://placehold.co/100" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">{{gameState.playerDTOS[opponentIndex].displayName}}</h5>
+        <div class="card-body p-2">
+          <h5 class="card-title">{{ gameState.playerDTOS[opponentIndex].displayName }}</h5>
         </div>
       </div>
     </div>
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="col-2 d-flex align-items-center justify-content-center">
-      <h5>Row {{i + 1}} Label</h5>
+      <h5>Row {{ i + 1 }} Label</h5>
     </div>
     <div class="col-5">
       <div class="row">
@@ -35,6 +35,18 @@
           <div class="square" [style.background-color]="box.color"></div>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-12 text-center">
+      <div (click)="openCategorySelection()" *ngIf="gameState.playerTurn == storedPlayerId; else elseBlock" class="btn btn-success btn-lg">
+        Play
+      </div>
+      <ng-template #elseBlock>
+        <div class="btn btn-secondary" disabled="">
+          Waiting for other player
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>

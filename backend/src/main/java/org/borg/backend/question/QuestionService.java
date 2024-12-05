@@ -7,6 +7,7 @@ import org.borg.backend.multiplayer.MultiplayerSession;
 import org.borg.backend.multiplayer.MultiplayerSessionRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -21,8 +22,9 @@ public class QuestionService {
 
 
     public List<QuestionDTO> getThreeQuestionsByCategory(CategorySelectionRequest request) {
-        List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(request.getSelectedCategory().toLowerCase());
-        multiplayerService.updateSessionQuestions(request.getSessionId(), questions);
+        String selectedCategory = request.getSelectedCategory();
+        List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(selectedCategory);
+        multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, selectedCategory);
         return questions.stream()
                 .map(question -> new QuestionDTO(question.getQuestion(), question.getOptions()))
                 .collect(Collectors.toList());
@@ -53,6 +55,23 @@ public class QuestionService {
         List<Question> questions = questionRepository.findAllById(questionIds);
         return questions.stream()
                 .map(question -> new QuestionDTO(question.getQuestion(), question.getOptions()))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getThreeRandomCategories(Long sessionId) {
+        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+        
+        List<String> allCategories = questionRepository.findAllCategories();
+        
+        List<String> categoriesNotPlayed = allCategories.stream()
+                .filter(category -> !session.getPlayedCategories().contains(category))
+                .collect(Collectors.toList());
+        
+        Collections.shuffle(categoriesNotPlayed);
+        
+        return categoriesNotPlayed.stream()
+                .limit(3)
                 .collect(Collectors.toList());
     }
 }

@@ -30,7 +30,7 @@ public class MultiplayerController {
     public ResponseEntity<Void> cancelMatchmaking(@PathVariable Long playerId) {
         multiplayerService.cancelMatchmaking(playerId);
         return ResponseEntity.noContent().build();
-    }
+    } 
     
     
     @GetMapping("/session/{sessionId}")

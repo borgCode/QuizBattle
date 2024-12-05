@@ -15,6 +15,10 @@ public class QuestionController {
     
     private final QuestionService questionService;
 
+    @GetMapping("/{sessionId}/category-selection")
+    public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
+        return ResponseEntity.ok(questionService.getThreeRandomCategories(sessionId));
+    } 
 
     @GetMapping("/{category}")
     public ResponseEntity<List<QuestionDTO>> getThreeQuestionsByCategory(@RequestBody CategorySelectionRequest request) {

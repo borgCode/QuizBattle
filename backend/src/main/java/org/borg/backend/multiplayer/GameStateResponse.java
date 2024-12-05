@@ -14,6 +14,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 public class GameStateResponse {
+    private Long playerTurn;
     private List<PlayerDTO> playerDTOS;
     private Integer currentQuestionIndex;
     private Map<Long, Integer> scores;

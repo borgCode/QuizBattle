@@ -12,4 +12,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query(value = "SELECT * FROM questions WHERE category = :category ORDER BY RAND() LIMIT 3", nativeQuery = true)
     List<Question> findThreeRandomQuestionsByCategory(@Param("category") String category);
+
+    @Query(value = "SELECT DISTINCT question.category FROM Question question")
+    List<String> findAllCategories();
 }

@@ -52,6 +52,7 @@ public class MultiplayerService {
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
         return new GameStateResponse(
+                multiplayerSession.getCurrentPlayerTurn().getId(),
                 PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()),
                 multiplayerSession.getCurrentQuestionIndex(),
                 multiplayerSession.getScore(),
@@ -112,7 +113,7 @@ public class MultiplayerService {
                 );
     }
 
-    public void updateSessionQuestions(Long sessionId, List<Question> questions) {
+    public void updateSessionQuestionsAndCategory(Long sessionId, List<Question> questions, String selectedCategory) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
         
@@ -120,6 +121,7 @@ public class MultiplayerService {
         for (Question question : questions) {
             session.getQuestionIds().add(question.getId());
         }
+        session.getPlayedCategories().add(selectedCategory);
         multiplayerSessionRepository.save(session);
     }
 

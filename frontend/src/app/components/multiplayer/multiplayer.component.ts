@@ -17,7 +17,6 @@ import {Router} from '@angular/router';
   styleUrl: './multiplayer.component.css'
 })
 export class MultiplayerComponent implements OnInit{
-
   player!: PlayerDto;
   gameSessions: Array<MultiplayerSessionDto> = [];
 

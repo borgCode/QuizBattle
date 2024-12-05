@@ -42,6 +42,7 @@ public class QuizGameSeeder {
         this.faker = new Faker();
         this.random = new Random();
     }
+    
 
     @Transactional
     public void seedDatabase(int numPlayers, int numQuestions, int numSessions) {
@@ -162,7 +163,6 @@ public class QuizGameSeeder {
 
                 session.setPlayers(sessionPlayers);
                 session.setCurrentPlayerTurn(sessionPlayers.get(random.nextInt(sessionPlayers.size())));
-                session.setStatus(GameStatus.values()[random.nextInt(GameStatus.values().length)]);
                 session.setCurrentQuestionIndex(random.nextInt(20));
 
                 // Set scores and questions answered
@@ -191,10 +191,21 @@ public class QuizGameSeeder {
                         questionResults.add(result);
                     }
                 }
+                
 
                 session.setScore(scores);
                 session.setQuestionsAnswered(questionsAnswered);
                 session.setQuestionResults(questionResults);
+                session.setPlayedCategories(new HashSet<>());
+
+                for (Long l : questionsAnswered.keySet()) {
+                    if (questionsAnswered.get(l) < 18) {
+                        session.setStatus(GameStatus.ACTIVE);
+                    }
+                } 
+                if (!session.getStatus().equals(GameStatus.ACTIVE)) {
+                    session.setStatus(GameStatus.COMPLETED);
+                }
 
                 sessionRepository.save(session);
             }

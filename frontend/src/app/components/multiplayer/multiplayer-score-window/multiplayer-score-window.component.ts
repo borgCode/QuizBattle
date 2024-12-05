@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {MultiplayerService} from '../../../services/services/multiplayer.service';
-import {ActivatedRoute} from '@angular/router';
-import {NgForOf} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {NgForOf, NgIf} from '@angular/common';
 import {GameStateResponse} from '../../../services/models/game-state-response';
 import {PlayerQuestionResult} from '../../../services/models/player-question-result';
 
@@ -17,7 +17,8 @@ interface BoxRow {
 @Component({
   selector: 'app-multiplayer-score-window',
   imports: [
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './multiplayer-score-window.component.html',
   styleUrl: './multiplayer-score-window.component.css'
@@ -28,10 +29,12 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   opponentIndex: number | null = null;
   results: Array<PlayerQuestionResult> = [];
   storedPlayerId: number;
+  sessionId: number;
 
   constructor(
     private multiplayerService: MultiplayerService,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
   ) {
   }
 
@@ -60,9 +63,9 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   private getGameState() {
     this.activatedRoute.params.subscribe(value => {
-      const sessionId = value['sessionId'];
+      this.sessionId = value['sessionId'];
 
-      this.multiplayerService.getGameState({sessionId: sessionId}).subscribe({
+      this.multiplayerService.getGameState({sessionId: this.sessionId}).subscribe({
         next: gameState => {
           this.gameState = gameState;
 
@@ -104,4 +107,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
 
+  openCategorySelection() {
+    this.router.navigate(['multiplayer', this.sessionId, 'category']);
+  }
 }
