@@ -1,10 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {QuestionsService} from '../../../services/services/questions.service';
+import {NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-multiplayer-category',
-  imports: [],
+  imports: [
+    NgForOf
+  ],
   templateUrl: './multiplayer-category.component.html',
   styleUrl: './multiplayer-category.component.css'
 })
