@@ -34,4 +34,7 @@ export class MultiplayerCategoryComponent implements OnInit{
   }
 
 
+  selectCategory(category: string) {
+
+  }
 }

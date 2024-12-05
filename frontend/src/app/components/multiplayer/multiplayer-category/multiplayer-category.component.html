@@ -1,34 +1,28 @@
 <div class="container mt-4">
   <div class="row g-3">
     <div class="col-md-4">
-      <div class="card h-100">
-<!--           [class.selected]="selectedCategory === 1"-->
-<!--           (click)="selectCategory(1)">-->
+      <div class="card h-100 " style="cursor: pointer;"
+           (click)="selectCategory(categories[0])">
         <div class="card-body text-center">
-          <h5 class="card-title">Category One</h5>
-          <p class="card-text">First category description</p>
+          <h5 class="card-title">{{categories[0]}}</h5>
         </div>
       </div>
     </div>
 
     <div class="col-md-4">
-      <div class="card h-100">
-<!--           [class.selected]="selectedCategory === 2"-->
-<!--           (click)="selectCategory(2)">-->
+      <div class="card h-100" style="cursor: pointer;"
+           (click)="selectCategory(categories[1])">
         <div class="card-body text-center">
-          <h5 class="card-title">Category Two</h5>
-          <p class="card-text">Second category description</p>
+          <h5 class="card-title">{{categories[1]}}</h5>
         </div>
       </div>
     </div>
 
     <div class="col-md-4">
-      <div class="card h-100">
-<!--           [class.selected]="selectedCategory === 3"-->
-<!--           (click)="selectCategory(3)">-->
+      <div class="card h-100" style="cursor: pointer;"
+           (click)="selectCategory(categories[2])">
         <div class="card-body text-center">
-          <h5 class="card-title">Category Three</h5>
-          <p class="card-text">Third category description</p>
+          <h5 class="card-title">{{categories[2]}}</h5>
         </div>
       </div>
     </div>
