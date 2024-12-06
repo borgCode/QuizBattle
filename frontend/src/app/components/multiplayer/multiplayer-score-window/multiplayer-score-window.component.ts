@@ -108,6 +108,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
 
   openCategorySelection() {
-    this.router.navigate(['multiplayer', this.sessionId, 'category']);
+    this.router.navigate(['multiplayer', this.sessionId, 'play']);
   }
 }

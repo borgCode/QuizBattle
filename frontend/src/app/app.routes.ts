@@ -9,8 +9,8 @@ import {
   MultiplayerScoreWindowComponent
 } from './components/multiplayer/multiplayer-score-window/multiplayer-score-window.component';
 import {
-  MultiplayerCategoryComponent
-} from './components/multiplayer/multiplayer-category/multiplayer-category.component';
+  MultiplayerPlayRoundComponent
+} from './components/multiplayer/multiplayer-play-round/multiplayer-play-round.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -18,6 +18,6 @@ export const routes: Routes = [
   {path: 'profile', component: PlayerProfileComponent, canActivate:[authGuard]},
   {path: 'multiplayer', component: MultiplayerComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId', component: MultiplayerScoreWindowComponent, canActivate:[authGuard]},
-  {path: 'multiplayer/:sessionId/category', component: MultiplayerCategoryComponent, canActivate:[authGuard]},
+  {path: 'multiplayer/:sessionId/play', component: MultiplayerPlayRoundComponent, canActivate:[authGuard]},
   {path: '', component: ModeSelectionComponent}
 ];

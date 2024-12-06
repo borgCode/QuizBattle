@@ -1,0 +1,9 @@
+<app-multiplayer-category
+  [categories] = "categories"
+  (categorySelected) = "onCategorySelected($event)"
+  ></app-multiplayer-category>
+<app-multiplayer-questions
+  [questions]="questions"
+  *ngIf="selectedCategory"
+  (answerSelected)="onAnswerSelected($event)"
+></app-multiplayer-questions>

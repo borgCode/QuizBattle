@@ -61,7 +61,7 @@ public class MultiplayerService {
         );
     }
 
-    public synchronized GameStateUpdate updateGameState(Long sessionId, Long playerId, boolean isCorrect) {
+    public synchronized void updateGameState(Long sessionId, Long playerId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
         
@@ -82,35 +82,27 @@ public class MultiplayerService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No opponent found in session"));
         
+        if(isGameComplete(questionsAnswered)) {
+            session.setStatus(GameStatus.COMPLETED);
+        } else {
+            //Update question index to manage turns
+            session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
 
-        //Check if game is completed
-        if (questionsAnswered.get(playerId) == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER
-                && questionsAnswered.get(opponent.getId()) == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER) {
-            return new GameStateUpdate(
-                    null,
-                    session.getScore(),
-                    GameStatus.COMPLETED,
-                    null
-            );
-        }
-
-        session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
-        
-        //Determine if it's opponent's turn
-        boolean isOpponentTurn = false;
-        if (session.getCurrentQuestionIndex() == 0) {
-            if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
-                session.setCurrentPlayerTurn(opponent);
-                isOpponentTurn = true;
-                
+            //Determine if it's the opponent's turn
+            if (session.getCurrentQuestionIndex() == 0) {
+                if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
+                    session.setCurrentPlayerTurn(opponent);
+                }
             }
         }
-        return new GameStateUpdate(
-                session.getCurrentQuestionIndex(),
-                session.getScore(),
-                GameStatus.ACTIVE,
-                isOpponentTurn
-                );
+        
+        multiplayerSessionRepository.save(session);
+        
+    }
+
+    private boolean isGameComplete(Map<Long, Integer> questionsAnswered) {
+        return questionsAnswered.values().stream()
+                .allMatch(count -> count == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER);
     }
 
     public void updateSessionQuestionsAndCategory(Long sessionId, List<Question> questions, String selectedCategory) {

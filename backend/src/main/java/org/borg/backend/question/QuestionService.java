@@ -1,7 +1,6 @@
 package org.borg.backend.question;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.multiplayer.GameStateUpdate;
 import org.borg.backend.multiplayer.MultiplayerService;
 import org.borg.backend.multiplayer.MultiplayerSession;
 import org.borg.backend.multiplayer.MultiplayerSessionRepository;
@@ -26,11 +25,11 @@ public class QuestionService {
         List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(selectedCategory);
         multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, selectedCategory);
         return questions.stream()
-                .map(question -> new QuestionDTO(question.getQuestion(), question.getOptions()))
+                .map(question -> new QuestionDTO(question.getId(), question.getQuestion(), question.getOptions()))
                 .collect(Collectors.toList());
     }
 
-    public AnswerValidationResponse validateAnswer(AnswerValidationRequest request) {
+    public boolean validateAnswer(AnswerValidationRequest request) {
         if (request == null || request.getAnswer() == null) {
             throw new IllegalArgumentException("Request or answer cannot be null");
         }
@@ -39,13 +38,13 @@ public class QuestionService {
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
         
         boolean isCorrect = question.getCorrectAnswer().equals(request.getAnswer());
-        GameStateUpdate gameStateUpdate = multiplayerService.updateGameState(
+        multiplayerService.updateGameState(
                 request.getSessionId(),
                 request.getPlayerId(),
                 isCorrect
         );
         
-        return new AnswerValidationResponse(isCorrect, gameStateUpdate);
+        return isCorrect;
     }
 
     public List<QuestionDTO> getQuestionsForSession(Long sessionId) {
@@ -54,7 +53,7 @@ public class QuestionService {
         List<Long> questionIds = session.getQuestionIds();
         List<Question> questions = questionRepository.findAllById(questionIds);
         return questions.stream()
-                .map(question -> new QuestionDTO(question.getQuestion(), question.getOptions()))
+                .map(question -> new QuestionDTO(question.getId(), question.getQuestion(), question.getOptions()))
                 .collect(Collectors.toList());
     }
 

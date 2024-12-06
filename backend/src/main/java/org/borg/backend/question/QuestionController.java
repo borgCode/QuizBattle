@@ -26,7 +26,7 @@ public class QuestionController {
     }
 
     @PostMapping("/validate-answer")
-    public ResponseEntity<AnswerValidationResponse> validateAnswer(@RequestBody AnswerValidationRequest request) {
+    public ResponseEntity<Boolean> validateAnswer(@RequestBody AnswerValidationRequest request) {
         return ResponseEntity.ok(questionService.validateAnswer(request));
     }
 
