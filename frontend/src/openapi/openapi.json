@@ -65,6 +65,37 @@
         }
       }
     },
+    "/multiplayer/matchmaking/find/{playerId}": {
+      "post": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "findMatch",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchmakingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -265,36 +296,6 @@
         }
       }
     },
-    "/multiplayer": {
-      "get": {
-        "tags": [
-          "Multiplayer"
-        ],
-        "operationId": "findMatch",
-        "parameters": [
-          {
-            "name": "request",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/MatchmakingRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MatchmakingResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/multiplayer/{playerId}": {
       "get": {
         "tags": [
@@ -360,7 +361,7 @@
         }
       }
     },
-    "/multiplayer/matchmaking/{playerId}": {
+    "/multiplayer/matchmaking/cancel/{playerId}": {
       "delete": {
         "tags": [
           "Multiplayer"
@@ -438,6 +439,25 @@
           },
           "correct": {
             "type": "boolean"
+          }
+        }
+      },
+      "MatchmakingResponse": {
+        "type": "object",
+        "properties": {
+          "matchStatus": {
+            "type": "string",
+            "enum": [
+              "WAITING",
+              "MATCHED",
+              "CANCELLED",
+              "ERROR",
+              "TIMEOUT"
+            ]
+          },
+          "sessionId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -531,34 +551,6 @@
             "items": {
               "type": "string"
             }
-          }
-        }
-      },
-      "MatchmakingRequest": {
-        "type": "object",
-        "properties": {
-          "playerId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "MatchmakingResponse": {
-        "type": "object",
-        "properties": {
-          "matchStatus": {
-            "type": "string",
-            "enum": [
-              "WAITING",
-              "MATCHED",
-              "CANCELLED",
-              "ERROR",
-              "TIMEOUT"
-            ]
-          },
-          "sessionId": {
-            "type": "integer",
-            "format": "int64"
           }
         }
       },

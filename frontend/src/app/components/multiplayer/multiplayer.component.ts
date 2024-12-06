@@ -53,6 +53,11 @@ export class MultiplayerComponent implements OnInit {
   findGame() {
     this.isSearching = true;
 
+    this.multiplayerService.findMatch({playerId: this.player.id}).subscribe({
+      next: response => {
+
+      }
+    })
   }
 
 }
