@@ -5,6 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {QuestionDto} from '../../../services/models/question-dto';
 import {MultiplayerQuestionsComponent} from './multiplayer-questions/multiplayer-questions.component';
 import {NgIf} from '@angular/common';
+import {AnswerValidationResponse} from '../../../services/models/answer-validation-response';
 
 @Component({
   selector: 'app-multiplayer-play-round',
@@ -23,6 +24,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   sessionId: number;
   storedPlayerId: number;
   answerIsCorrect: boolean = null;
+  correctAnswerIndex: number;
 
   constructor(
     private questionService: QuestionsService,
@@ -78,12 +80,15 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     }
 
     this.questionService.validateAnswer(validationRequest).subscribe({
-      next: (response: boolean) => {
-        this.answerIsCorrect = response;
-        console.log("Setting correctness of validated answer: " + response)
+      next: (response: AnswerValidationResponse) => {
+        this.answerIsCorrect = response.correct;
+        this.correctAnswerIndex = response.correctAnswerIndex
 
       }
     })
 
+  }
+  onNavigateBack() {
+    this.router.navigate(['multiplayer', this.sessionId]);
   }
 }

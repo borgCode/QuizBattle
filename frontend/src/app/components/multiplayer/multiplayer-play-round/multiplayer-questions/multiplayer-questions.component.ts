@@ -13,7 +13,9 @@ import {NgForOf} from '@angular/common';
 export class MultiplayerQuestionsComponent implements OnChanges {
   @Input() questions: QuestionDto[] = [];
   @Input() isCorrect: boolean | null = null;
+  @Input() correctAnswerIndex: number | null = null;
   @Output() answerSelected = new EventEmitter<{ questionId: number, answer: string }>
+  @Output() navigateBackToScoreScreen = new EventEmitter<void>();
   currentQuestionIndex = 0;
   selectedAnswerIndex: number | null = null;
   answerIsCorrect: boolean | null = null;
@@ -28,8 +30,7 @@ export class MultiplayerQuestionsComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['isCorrect']) {
-      console.log("Iscorrect has changed to: " + this.isCorrect)
+    if (changes['isCorrect'] && changes['correctAnswerIndex']) {
       this.showAnswerFeedback();
     }
   }
@@ -39,22 +40,20 @@ export class MultiplayerQuestionsComponent implements OnChanges {
       this.hasClickedOption = true
       const answerBox = document.querySelectorAll('.answer-box')[this.selectedAnswerIndex];
       if (this.isCorrect) {
-        console.log("Marking selecting answer as correct")
         answerBox.classList.add('correct');
       } else {
-        console.log("Marking selecting answer as incorrect")
         answerBox.classList.add('incorrect')
+        const correctAnswer = document.querySelectorAll('.answer-box')[this.correctAnswerIndex];
+        correctAnswer.classList.add('correct');
       }
     }
   }
-
-
   goToNextQuestion() {
-    //TODO Next question logic
-    // if (this.currentQuestionIndex < this.questions.length - 1) {
-    //   this.currentQuestionIndex++;
+    if (this.currentQuestionIndex < this.questions.length - 1) {
+      this.currentQuestionIndex++;
       this.hasClickedOption = false;
-
+    } else {
+      this.navigateBackToScoreScreen.emit();
+    }
   }
-
 }

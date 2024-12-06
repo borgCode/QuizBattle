@@ -57,7 +57,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "boolean"
+                  "$ref": "#/components/schemas/AnswerValidationResponse"
                 }
               }
             }
@@ -426,6 +426,18 @@
           "playerId": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "AnswerValidationResponse": {
+        "type": "object",
+        "properties": {
+          "correctAnswerIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "correct": {
+            "type": "boolean"
           }
         }
       },

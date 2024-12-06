@@ -6,6 +6,8 @@
 <app-multiplayer-questions
   [questions]="questions"
   [isCorrect]="answerIsCorrect"
+  [correctAnswerIndex]="correctAnswerIndex"
   *ngIf="selectedCategory"
   (answerSelected)="onAnswerSelected($event)"
+  (navigateBackToScoreScreen)="onNavigateBack()"
 ></app-multiplayer-questions>

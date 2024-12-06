@@ -30,7 +30,7 @@ public class QuestionService {
                 .collect(Collectors.toList());
     }
 
-    public boolean validateAnswer(AnswerValidationRequest request) {
+    public AnswerValidationResponse validateAnswer(AnswerValidationRequest request) {
         if (request == null || request.getAnswer() == null) {
             throw new IllegalArgumentException("Request or answer cannot be null");
         }
@@ -44,10 +44,10 @@ public class QuestionService {
                 request.getPlayerId(),
                 isCorrect
         );
-
-        System.out.println("Return correctness: " + isCorrect);
         
-        return isCorrect;
+        int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
+        
+        return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }
 
     public List<QuestionDTO> getQuestionsForSession(Long sessionId) {
