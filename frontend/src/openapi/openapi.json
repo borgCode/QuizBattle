@@ -57,7 +57,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnswerValidationResponse"
+                  "type": "boolean"
                 }
               }
             }
@@ -417,43 +417,6 @@
           "playerId": {
             "type": "integer",
             "format": "int64"
-          }
-        }
-      },
-      "AnswerValidationResponse": {
-        "type": "object",
-        "properties": {
-          "correct": {
-            "type": "boolean"
-          },
-          "gameStateUpdate": {
-            "$ref": "#/components/schemas/GameStateUpdate"
-          }
-        }
-      },
-      "GameStateUpdate": {
-        "type": "object",
-        "properties": {
-          "currentQuestionIndex": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "scores": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "COMPLETED"
-            ]
-          },
-          "isOpponentTurn": {
-            "type": "boolean"
           }
         }
       },

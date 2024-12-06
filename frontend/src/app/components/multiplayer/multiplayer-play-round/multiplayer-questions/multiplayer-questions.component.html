@@ -3,17 +3,13 @@
     <h2>{{ questions[currentQuestionIndex].question }}</h2>
   </div>
   <div class="answer-boxes">
-    <div class="answer-box" (click)="selectAnswer(questions[currentQuestionIndex].options[0])">
-      {{ questions[currentQuestionIndex].options[0] }}
-    </div>
-    <div class="answer-box" (click)="selectAnswer(questions[currentQuestionIndex].options[1])">
-      {{ questions[currentQuestionIndex].options[1] }}
-    </div>
-    <div class="answer-box" (click)="selectAnswer(questions[currentQuestionIndex].options[2])">
-      {{ questions[currentQuestionIndex].options[2] }}
-    </div>
-    <div class="answer-box" (click)="selectAnswer(questions[currentQuestionIndex].options[3])">
-      {{ questions[currentQuestionIndex].options[3] }}
+    <div *ngFor="let option of questions[currentQuestionIndex].options; let i = index"
+         class="answer-box"
+         [class.selected]="selectedAnswerIndex === i"
+         [class.correct]="selectedAnswerIndex === i && answerIsCorrect"
+         [class.incorrect]="selectedAnswerIndex === i && answerIsCorrect === false"
+         (click)="selectAnswer(option, i)">
+      {{option}}
     </div>
   </div>
   <button type="button" (click)="goToNextQuestion()">Next!</button>

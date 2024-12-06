@@ -4,6 +4,7 @@
   ></app-multiplayer-category>
 <app-multiplayer-questions
   [questions]="questions"
+  [isCorrect]="answerIsCorrect"
   *ngIf="selectedCategory"
   (answerSelected)="onAnswerSelected($event)"
 ></app-multiplayer-questions>
