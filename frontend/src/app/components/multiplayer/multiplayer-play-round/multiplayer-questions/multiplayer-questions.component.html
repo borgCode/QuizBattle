@@ -1,16 +1,23 @@
 <div class="container">
-  <div class="question-box">
-    <h2>{{ questions[currentQuestionIndex].question }}</h2>
-  </div>
-  <div class="answer-boxes">
-    <div *ngFor="let option of questions[currentQuestionIndex].options; let i = index"
-         class="answer-box"
-         [class.selected]="selectedAnswerIndex === i"
-         [class.correct]="selectedAnswerIndex === i && answerIsCorrect"
-         [class.incorrect]="selectedAnswerIndex === i && answerIsCorrect === false"
-         (click)="selectAnswer(option, i)">
-      {{option}}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="question-box p-3 bg-light rounded">
+        <h2>{{ questions[currentQuestionIndex].question }}</h2>
+      </div>
     </div>
   </div>
-  <button type="button" (click)="goToNextQuestion()">Next!</button>
+  <div class="row">
+    <div *ngFor="let option of questions[currentQuestionIndex].options; let i = index"
+         class="col-12 col-md-6 col-lg-4 mb-3">
+      <div class="answer-box p-3 border rounded text-center"
+           [class.correct]="selectedAnswerIndex === i && answerIsCorrect"
+           [class.incorrect]="selectedAnswerIndex === i && answerIsCorrect === false"
+           [class.isDisabled]="hasClickedOption"
+           [attr.aria-disabled]="hasClickedOption"
+           (click)="!hasClickedOption && selectAnswer(option, i)">
+        {{ option }}
+      </div>
+    </div>
+  </div>
+  <button type="button" class="btn btn-primary btn-block mt-3" (click)="goToNextQuestion()">Next!</button>
 </div>

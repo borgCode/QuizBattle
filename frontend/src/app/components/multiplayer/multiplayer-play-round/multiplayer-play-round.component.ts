@@ -22,7 +22,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   questions: QuestionDto[] = [];
   sessionId: number;
   storedPlayerId: number;
-  answerIsCorrect: boolean | null = null;
+  answerIsCorrect: boolean = null;
 
   constructor(
     private questionService: QuestionsService,
@@ -64,7 +64,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
         this.questions = data;
       }
     });
-    console.log(this.questions)
 
   }
 
@@ -81,6 +80,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     this.questionService.validateAnswer(validationRequest).subscribe({
       next: (response: boolean) => {
         this.answerIsCorrect = response;
+        console.log("Setting correctness of validated answer: " + response)
 
       }
     })

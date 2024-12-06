@@ -16,7 +16,8 @@ export class MultiplayerQuestionsComponent implements OnChanges {
   @Output() answerSelected = new EventEmitter<{ questionId: number, answer: string }>
   currentQuestionIndex = 0;
   selectedAnswerIndex: number | null = null;
-  answerIsCorrect: boolean;
+  answerIsCorrect: boolean | null = null;
+  hasClickedOption: boolean | null = null;
 
   selectAnswer(answer: string, i: number) {
     this.selectedAnswerIndex = i;
@@ -28,16 +29,20 @@ export class MultiplayerQuestionsComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isCorrect']) {
+      console.log("Iscorrect has changed to: " + this.isCorrect)
       this.showAnswerFeedback();
     }
   }
 
   private showAnswerFeedback() {
     if (this.isCorrect !== null && this.selectedAnswerIndex !== null) {
+      this.hasClickedOption = true
       const answerBox = document.querySelectorAll('.answer-box')[this.selectedAnswerIndex];
       if (this.isCorrect) {
+        console.log("Marking selecting answer as correct")
         answerBox.classList.add('correct');
       } else {
+        console.log("Marking selecting answer as incorrect")
         answerBox.classList.add('incorrect')
       }
     }
@@ -46,9 +51,10 @@ export class MultiplayerQuestionsComponent implements OnChanges {
 
   goToNextQuestion() {
     //TODO Next question logic
-    if (this.currentQuestionIndex < this.questions.length - 1) {
-      this.currentQuestionIndex++;
-    }
+    // if (this.currentQuestionIndex < this.questions.length - 1) {
+    //   this.currentQuestionIndex++;
+      this.hasClickedOption = false;
+
   }
 
 }

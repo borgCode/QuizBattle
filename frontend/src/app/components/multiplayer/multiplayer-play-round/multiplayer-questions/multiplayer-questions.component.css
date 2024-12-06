@@ -2,17 +2,18 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 
-  &.selected {
-    background-color: #e0e0e0;
-  }
-
   &.correct {
-    background-color: #4caf50;  // green
+    background-color: #4caf50;
   color: white;
   }
 
   &.incorrect {
-    background-color: #f44336;  // red
+    background-color: #f44336;
   color: white;
+  }
+
+  &.isDisabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }

@@ -30,6 +30,7 @@ public class QuestionController {
 
     @PostMapping("/validate-answer")
     public ResponseEntity<Boolean> validateAnswer(@RequestBody AnswerValidationRequest request) {
+        System.out.println("Validating answer");
         return ResponseEntity.ok(questionService.validateAnswer(request));
     }
 
