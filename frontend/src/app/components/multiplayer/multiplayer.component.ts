@@ -3,7 +3,7 @@ import {PlayerDto} from '../../services/models/player-dto';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
 import {MultiplayerService} from '../../services/services/multiplayer.service';
 import {MultiplayerSessionDto} from '../../services/models/multiplayer-session-dto';
-import {NgForOf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {NgForOf, NgIf, NgStyle, NgSwitch, NgSwitchCase} from '@angular/common';
 import {Router} from '@angular/router';
 
 @Component({
@@ -11,14 +11,17 @@ import {Router} from '@angular/router';
   imports: [
     NgForOf,
     NgSwitch,
-    NgSwitchCase
+    NgSwitchCase,
+    NgStyle,
+    NgIf
   ],
   templateUrl: './multiplayer.component.html',
   styleUrl: './multiplayer.component.css'
 })
-export class MultiplayerComponent implements OnInit{
+export class MultiplayerComponent implements OnInit {
   player!: PlayerDto;
   gameSessions: Array<MultiplayerSessionDto> = [];
+  isSearching: boolean = false;
 
   constructor(
     private loginStateService: LoginStateService,
@@ -35,6 +38,7 @@ export class MultiplayerComponent implements OnInit{
       console.warn('No logged-in user found!');
     }
 
+
     this.multiplayerService.getPlayerSessions({playerId: this.player.id}).subscribe({
       next: value => {
         this.gameSessions = value;
@@ -45,4 +49,10 @@ export class MultiplayerComponent implements OnInit{
   openGame(id: number) {
     this.router.navigate(['multiplayer', id]);
   }
+
+  findGame() {
+    this.isSearching = true;
+
+  }
+
 }

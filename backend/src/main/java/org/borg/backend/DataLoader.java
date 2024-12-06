@@ -1,6 +1,5 @@
 package org.borg.backend;
 
-import org.borg.backend.role.Role;
 import org.borg.backend.role.RoleRepository;
 import org.borg.backend.player.PlayerRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -11,6 +10,8 @@ public class DataLoader implements CommandLineRunner {
     private final PlayerRepository playerRepository;
     private final RoleRepository roleRepository;
     private final SeedService seedService;
+    
+    
 
     public DataLoader(PlayerRepository playerRepository, RoleRepository roleRepository, SeedService seedService) {
         this.playerRepository = playerRepository;

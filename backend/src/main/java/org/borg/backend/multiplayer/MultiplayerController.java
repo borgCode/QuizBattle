@@ -18,15 +18,14 @@ public class MultiplayerController {
     public List<MultiplayerSessionDTO> getPlayerSessions(@PathVariable Long playerId) {
         return multiplayerService.getMultiplayerSessionsById(playerId);
     }
-    @GetMapping()
-    
-    @PostMapping("/matchmaking")
+
+    @PostMapping("/matchmaking/find/{playerId}")
     public ResponseEntity<MatchmakingResponse> findMatch(
-            @RequestBody MatchmakingRequest request) {
-        return ResponseEntity.ok(multiplayerService.findMatch(request));
+            @PathVariable Long playerId) {
+        return ResponseEntity.ok(multiplayerService.findMatch(playerId));
     }
     
-    @DeleteMapping("/matchmaking/{playerId}")
+    @DeleteMapping("/matchmaking/cancel/{playerId}")
     public ResponseEntity<Void> cancelMatchmaking(@PathVariable Long playerId) {
         multiplayerService.cancelMatchmaking(playerId);
         return ResponseEntity.noContent().build();

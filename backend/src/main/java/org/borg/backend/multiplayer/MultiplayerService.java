@@ -17,14 +17,14 @@ public class MultiplayerService {
     private final PlayerRepository playerRepository;
     
 
-    public MatchmakingResponse findMatch(MatchmakingRequest request) {
+    public MatchmakingResponse findMatch(Long playerId) {
         synchronized (matchmakingQueue) {
             Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
 
             if (opponentId.isPresent()) {
                 matchmakingQueue.remove(opponentId.get());
 
-                Player requestingPlayer = playerRepository.findById(request.getPlayerId())
+                Player requestingPlayer = playerRepository.findById(playerId)
                         .orElseThrow(() -> new NoSuchElementException("Requesting player not found"));
                 Player opponent = playerRepository.findById(opponentId.get())
                         .orElseThrow(() -> new NoSuchElementException("Opponent not found"));
@@ -38,7 +38,7 @@ public class MultiplayerService {
                 return new MatchmakingResponse(MatchStatus.MATCHED, session.getId());
             }
 
-            matchmakingQueue.add(request.getPlayerId());
+            matchmakingQueue.add(playerId);
             return new MatchmakingResponse(MatchStatus.WAITING, null);
         }
     }

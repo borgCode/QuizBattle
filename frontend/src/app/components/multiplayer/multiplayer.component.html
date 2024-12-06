@@ -5,8 +5,17 @@
         <div class="card">
           <img src="https://placehold.co/400" class="card-img-top" alt="...">
           <div class="card-body">
-            <h5 class="card-title">Username</h5>
+            <h5 class="card-title">{{ player.displayName }}</h5>
           </div>
+        </div>
+      </div>
+      <div class="col-md-3 align-content-center">
+        <div (click)="!isSearching && findGame()"
+             class="btn btn-success btn-lg"
+             [class.disabled]="isSearching"
+             [ngStyle]="{'cursor': isSearching ? 'not-allowed' : 'pointer'}">
+          {{ isSearching ? 'Finding Game' : 'Find Game' }}
+          <span *ngIf="isSearching" class="loading-dots"></span>
         </div>
       </div>
     </div>
@@ -37,7 +46,7 @@
                       <span class="badge bg-light text-dark px-4 py-2">VS</span>
                     </div>
                     <div class="mt-2">
-<!--                      TODO win/loss instead of complete-->
+                      <!--                      TODO win/loss instead of complete-->
                       <ng-container [ngSwitch]="gameSession.status">
                         <span *ngSwitchCase="'ACTIVE'" class="badge bg-primary rounded-pill px-3">Active</span>
                         <span *ngSwitchCase="'COMPLETED'" class="badge bg-success rounded-pill px-3">Completed</span>

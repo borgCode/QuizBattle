@@ -23,6 +23,7 @@ export class MultiplayerQuestionsComponent implements OnChanges {
 
   selectAnswer(answer: string, i: number) {
     this.selectedAnswerIndex = i;
+    this.hasClickedOption = true
     this.answerSelected.emit({
       questionId: this.questions[this.currentQuestionIndex].questionId,
       answer: answer
@@ -37,7 +38,6 @@ export class MultiplayerQuestionsComponent implements OnChanges {
 
   private showAnswerFeedback() {
     if (this.isCorrect !== null && this.selectedAnswerIndex !== null) {
-      this.hasClickedOption = true
       const answerBox = document.querySelectorAll('.answer-box')[this.selectedAnswerIndex];
       if (this.isCorrect) {
         answerBox.classList.add('correct');
@@ -49,11 +49,14 @@ export class MultiplayerQuestionsComponent implements OnChanges {
     }
   }
   goToNextQuestion() {
+    this.selectedAnswerIndex = null;
+    this.answerIsCorrect = null;
+    this.hasClickedOption = false;
     if (this.currentQuestionIndex < this.questions.length - 1) {
       this.currentQuestionIndex++;
-      this.hasClickedOption = false;
     } else {
       this.navigateBackToScoreScreen.emit();
     }
   }
+
 }
