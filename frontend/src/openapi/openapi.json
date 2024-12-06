@@ -159,19 +159,20 @@
         }
       }
     },
-    "/questions/{category}": {
+    "/questions/session/{sessionId}": {
       "get": {
         "tags": [
           "Questions"
         ],
-        "operationId": "getThreeQuestionsByCategory",
+        "operationId": "getSessionQuestions",
         "parameters": [
           {
-            "name": "request",
-            "in": "query",
+            "name": "sessionId",
+            "in": "path",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/CategorySelectionRequest"
+              "type": "integer",
+              "format": "int64"
             }
           }
         ],
@@ -192,16 +193,24 @@
         }
       }
     },
-    "/questions/session/{sessionId}": {
+    "/questions/random-questions": {
       "get": {
         "tags": [
           "Questions"
         ],
-        "operationId": "getSessionQuestions",
+        "operationId": "getThreeQuestionsByCategory",
         "parameters": [
           {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "sessionId",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "integer",
@@ -492,18 +501,6 @@
           "numOfLosses": {
             "type": "integer",
             "format": "int32"
-          }
-        }
-      },
-      "CategorySelectionRequest": {
-        "type": "object",
-        "properties": {
-          "selectedCategory": {
-            "type": "string"
-          },
-          "sessionId": {
-            "type": "integer",
-            "format": "int64"
           }
         }
       },

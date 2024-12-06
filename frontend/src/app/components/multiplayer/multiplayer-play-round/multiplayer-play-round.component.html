@@ -1,5 +1,6 @@
 <app-multiplayer-category
   [categories] = "categories"
+  *ngIf="!selectedCategory"
   (categorySelected) = "onCategorySelected($event)"
   ></app-multiplayer-category>
 <app-multiplayer-questions

@@ -24,6 +24,10 @@ public class QuestionService {
         String selectedCategory = request.getSelectedCategory();
         List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(selectedCategory);
         multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, selectedCategory);
+        for (Question question : questions) {
+            System.out.println(question.getQuestion());
+        }
+        
         return questions.stream()
                 .map(question -> new QuestionDTO(question.getId(), question.getQuestion(), question.getOptions()))
                 .collect(Collectors.toList());

@@ -10,18 +10,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/questions")
-@Tag(name="Questions")
+@Tag(name = "Questions")
 public class QuestionController {
-    
+
     private final QuestionService questionService;
 
     @GetMapping("/{sessionId}/category-selection")
     public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
         return ResponseEntity.ok(questionService.getThreeRandomCategories(sessionId));
-    } 
+    }
 
-    @GetMapping("/{category}")
-    public ResponseEntity<List<QuestionDTO>> getThreeQuestionsByCategory(@RequestBody CategorySelectionRequest request) {
+    @GetMapping("/random-questions")
+    public ResponseEntity<List<QuestionDTO>> getThreeQuestionsByCategory(
+            @RequestParam String category,
+            @RequestParam Long sessionId) {
+        CategorySelectionRequest request = new CategorySelectionRequest(category, sessionId);
         return ResponseEntity.ok(questionService.getThreeQuestionsByCategory(request));
     }
 

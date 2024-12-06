@@ -58,15 +58,14 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   }
 
   private fetchQuestions(category: string) {
-    const request = {
-      category: category,
-      sessionId: this.sessionId
-    }
-    this.questionService.getThreeQuestionsByCategory({request: request}).subscribe({
+
+    this.questionService.getThreeQuestionsByCategory({category, sessionId: this.sessionId}).subscribe({
       next: data => {
         this.questions = data;
       }
     });
+    console.log(this.questions)
+
   }
 
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
