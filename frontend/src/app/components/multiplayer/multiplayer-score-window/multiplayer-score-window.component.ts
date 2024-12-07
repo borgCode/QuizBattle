@@ -123,8 +123,27 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   }
 
+  handleButtonClick() {
+    console.log(this.gameState.questionIds.length)
+    if (this.gameState?.questionIds?.length > 0) {
+      this.openPlayQuestions();
+    } else {
+      this.openCategorySelection();
+    }
+  }
+
+  //When player should play the same category as the other player
+  openPlayQuestions() {
+
+    console.log("Open play questions: " + this.gameState.questionIds)
+    this.router.navigate(['multiplayer', this.sessionId, 'play'],
+      {state: {questionIds: this.gameState.questionIds}});
+  }
 
   openCategorySelection() {
     this.router.navigate(['multiplayer', this.sessionId, 'play']);
   }
+
+
+
 }

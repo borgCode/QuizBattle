@@ -2,7 +2,6 @@ package org.borg.backend.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.multiplayer.model.MatchStatus;
 import org.borg.backend.multiplayer.model.MatchmakingResponse;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.model.PendingSession;

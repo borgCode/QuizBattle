@@ -38,4 +38,9 @@ public class QuestionController {
     public ResponseEntity<List<QuestionDTO>> getSessionQuestions(@PathVariable Long sessionId) {
         return ResponseEntity.ok(questionService.getQuestionsForSession(sessionId));
     }
+    
+    @GetMapping("/session/current-questions")
+    public ResponseEntity<List<QuestionDTO>> getCurrentQuestions(@RequestParam List<Long> currentQuestionIds) {
+        return ResponseEntity.ok(questionService.getCurrentQuestions(currentQuestionIds));
+    }
 }

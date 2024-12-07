@@ -20,4 +20,5 @@ public class GameStateResponse {
     private Map<Long, Integer> scores;
     private GameStatus status;
     private Set<PlayerQuestionResult> results;
+    private List<Long> questionIds;
 }

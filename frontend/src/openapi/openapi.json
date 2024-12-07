@@ -193,6 +193,43 @@
         }
       }
     },
+    "/questions/session/current-questions": {
+      "get": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "getCurrentQuestions",
+        "parameters": [
+          {
+            "name": "currentQuestionIds",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions/random-questions": {
       "get": {
         "tags": [
@@ -572,6 +609,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerQuestionResult"
+            }
+          },
+          "questionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
             }
           }
         }

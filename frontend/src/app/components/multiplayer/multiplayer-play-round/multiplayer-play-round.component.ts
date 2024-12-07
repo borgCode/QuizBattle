@@ -26,6 +26,10 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   answerIsCorrect: boolean = null;
   correctAnswerIndex: number;
 
+  get hasQuestions():boolean {
+    return this.questions.length > 0;
+  }
+
   constructor(
     private questionService: QuestionsService,
     private activatedRoute: ActivatedRoute,
@@ -37,15 +41,28 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   ngOnInit() {
     this.initStoredPlayerId();
 
-    this.activatedRoute.params.subscribe(value => {
-      this.sessionId = value['sessionId'];
+    let questionIds= (history.state as any).questionIds;
+    console.log(questionIds);
 
-      this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
-        next: categories =>
-          this.categories = categories
+    if (questionIds) {
+      this.questionService.getCurrentQuestions({currentQuestionIds: questionIds}).subscribe({
+        next: data => {
+          this.questions = data;
+        }
       })
 
-    })
+    } else {
+      this.activatedRoute.params.subscribe(value => {
+        this.sessionId = value['sessionId'];
+
+        this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
+          next: categories =>
+            this.categories = categories
+        })
+
+      })
+    }
+
   }
 
   private initStoredPlayerId() {

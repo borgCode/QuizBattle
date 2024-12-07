@@ -24,13 +24,18 @@ public class MultiplayerService {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
+        for (Long questionId : multiplayerSession.getQuestionIds()) {
+            log.warn("Question ID: " + questionId);
+        }
+
         return new GameStateResponse(
                 multiplayerSession.getCurrentPlayerTurn().getId(),
                 PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()),
                 multiplayerSession.getCurrentQuestionIndex(),
                 multiplayerSession.getScore(),
                 multiplayerSession.getStatus(),
-                multiplayerSession.getQuestionResults()
+                multiplayerSession.getQuestionResults(),
+                multiplayerSession.getQuestionIds()
         );
     }
 
@@ -61,7 +66,7 @@ public class MultiplayerService {
         
         //Update which question out of the 18 is correct
         session.getQuestionResults().add(new PlayerQuestionResult(playerId, questionId, session.getQuestionsAnswered().get(playerId) - 1, isCorrect));
-
+        log.warn("Set is empty? {}", session.getQuestionResults().isEmpty());
         //Find opponent in session
         Player opponent = session.getPlayers().stream()
                 .filter(player -> !player.getId().equals(playerId))
@@ -83,8 +88,11 @@ public class MultiplayerService {
                 if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
                     log.warn("Setting player to opponent");
                     session.setCurrentPlayerTurn(opponent);
+                } else {
+                    session.getQuestionIds().clear();
+                    log.warn("Round over but not opponents turn");
                 }
-                log.warn("Round over but not opponents turn");
+                
             }
         }
 

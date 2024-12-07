@@ -39,7 +39,9 @@
   </div>
   <div class="row mt-3">
     <div class="col-12 text-center">
-      <div (click)="openCategorySelection()" *ngIf="gameState.playerTurn == storedPlayerId; else elseBlock" class="btn btn-success btn-lg">
+      <div *ngIf="gameState.playerTurn === storedPlayerId; else elseBlock"
+           (click)="handleButtonClick()"
+           class="btn btn-success btn-lg">
         Play
       </div>
       <ng-template #elseBlock>

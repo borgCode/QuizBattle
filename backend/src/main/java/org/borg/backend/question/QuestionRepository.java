@@ -15,4 +15,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query(value = "SELECT DISTINCT question.category FROM Question question")
     List<String> findAllCategories();
+
+    List<Question> findAllById(Iterable<Long> ids);
 }

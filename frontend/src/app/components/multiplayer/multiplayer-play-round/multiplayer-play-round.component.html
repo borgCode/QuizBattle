@@ -1,13 +1,13 @@
 <app-multiplayer-category
   [categories] = "categories"
-  *ngIf="!selectedCategory"
+  *ngIf="!selectedCategory && !hasQuestions"
   (categorySelected) = "onCategorySelected($event)"
   ></app-multiplayer-category>
 <app-multiplayer-questions
   [questions]="questions"
   [isCorrect]="answerIsCorrect"
   [correctAnswerIndex]="correctAnswerIndex"
-  *ngIf="selectedCategory"
+  *ngIf="selectedCategory || hasQuestions"
   (answerSelected)="onAnswerSelected($event)"
   (navigateBackToScoreScreen)="onNavigateBack()"
 ></app-multiplayer-questions>

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
-    
+
     private final QuestionRepository questionRepository;
     private final MultiplayerService multiplayerService;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
@@ -24,20 +24,18 @@ public class QuestionService {
         String selectedCategory = request.getSelectedCategory();
         List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(selectedCategory);
         multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, selectedCategory);
-        
-        return questions.stream()
-                .map(question -> new QuestionDTO(question.getId(), question.getQuestion(), question.getOptions()))
-                .collect(Collectors.toList());
+
+        return QuestionMapper.multipleToDTO(questions);
     }
 
     public AnswerValidationResponse validateAnswer(AnswerValidationRequest request) {
         if (request == null || request.getAnswer() == null) {
             throw new IllegalArgumentException("Request or answer cannot be null");
         }
-        
+
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
-        
+
         boolean isCorrect = question.getCorrectAnswer().equals(request.getAnswer());
         multiplayerService.updateGameState(
                 request.getSessionId(),
@@ -45,9 +43,9 @@ public class QuestionService {
                 request.getQuestionId(),
                 isCorrect
         );
-        
+
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
-        
+
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }
 
@@ -55,26 +53,28 @@ public class QuestionService {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
         List<Long> questionIds = session.getQuestionIds();
-        List<Question> questions = questionRepository.findAllById(questionIds);
-        return questions.stream()
-                .map(question -> new QuestionDTO(question.getId(), question.getQuestion(), question.getOptions()))
-                .collect(Collectors.toList());
+
+        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
     }
 
     public List<String> getThreeRandomCategories(Long sessionId) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-        
+
         List<String> allCategories = questionRepository.findAllCategories();
-        
+
         List<String> categoriesNotPlayed = allCategories.stream()
                 .filter(category -> !session.getPlayedCategories().contains(category))
                 .collect(Collectors.toList());
-        
+
         Collections.shuffle(categoriesNotPlayed);
-        
+
         return categoriesNotPlayed.stream()
                 .limit(3)
                 .collect(Collectors.toList());
+    }
+
+    public List<QuestionDTO> getCurrentQuestions(List<Long> currentQuestionIds) {
+        return QuestionMapper.multipleToDTO(questionRepository.findAllById(currentQuestionIds));
     }
 }
