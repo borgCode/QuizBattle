@@ -42,6 +42,7 @@ public class QuestionService {
         multiplayerService.updateGameState(
                 request.getSessionId(),
                 request.getPlayerId(),
+                request.getQuestionId(),
                 isCorrect
         );
         

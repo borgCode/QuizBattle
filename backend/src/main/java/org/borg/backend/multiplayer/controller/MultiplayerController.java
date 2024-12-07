@@ -58,6 +58,7 @@ public class MultiplayerController {
     
     @GetMapping("/session/{sessionId}")
     public ResponseEntity<GameStateResponse> getGameState(@PathVariable Long sessionId) {
+        log.warn("Getting game state");
         return ResponseEntity.ok(multiplayerService.getGameState(sessionId));
     }
     

@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.model.*;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.multiplayer.util.MultiplayerGameConstants;
 import org.borg.backend.player.Player;
 import org.borg.backend.player.PlayerMapper;
-import org.borg.backend.player.PlayerRepository;
+import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,7 +34,7 @@ public class MultiplayerService {
         );
     }
 
-    public synchronized void updateGameState(Long sessionId, Long playerId, boolean isCorrect) {
+    public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
         log.warn("Finding game session to update");
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
@@ -60,6 +58,9 @@ public class MultiplayerService {
         log.warn("questinsAnswered before update: {}", questionsAnswered.getOrDefault(playerId, 0));
         questionsAnswered.put(playerId, questionsAnswered.get(playerId) + 1);
         log.warn("questionsAnswer after update: {}", questionsAnswered.get(playerId));
+        
+        //Update which question out of the 18 is correct
+        session.getQuestionResults().add(new PlayerQuestionResult(playerId, questionId, session.getQuestionsAnswered().get(playerId) - 1, isCorrect));
 
         //Find opponent in session
         Player opponent = session.getPlayers().stream()

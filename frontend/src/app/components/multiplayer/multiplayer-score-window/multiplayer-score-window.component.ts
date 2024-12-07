@@ -58,8 +58,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   private initBoxes() {
     for (let i = 0; i < 6; i++) {
       this.boxes.push({
-        left: Array(3).fill({color: '#ccc'}),
-        right: Array(3).fill({color: '#ccc'})
+        left: Array.from({ length: 3 }, () => ({ color: '#ccc' })),
+        right: Array.from({ length: 3 }, () => ({ color: '#ccc' }))
       });
     }
   }
@@ -76,13 +76,24 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             player.id !== this.storedPlayerId
           );
 
+
           this.results = this.gameState.results
+          for (const result of this.results) {
+            console.log(result)
+          }
+
+
           this.results.forEach((result) => {
+              console.log(`Result playerId: ${result.playerId}, Stored playerId: ${this.storedPlayerId}`);
               if (result.playerId == this.storedPlayerId) {
                 const position = this.indexToBoxPosition(result.questionIndex);
+                console.log(`Index: ${result.questionIndex}, Position: Row ${position.rowIndex}, Col ${position.colIndex}`);
+                console.log(`Result Correct: ${result.correct}, Side: ${result.playerId === this.storedPlayerId ? 'left' : 'right'}`);
                 this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct)
               } else {
                 const position = this.indexToBoxPosition(result.questionIndex);
+                console.log(`Index: ${result.questionIndex}, Position: Row ${position.rowIndex}, Col ${position.colIndex}`);
+                console.log(`Result Correct: ${result.correct}, Side: ${result.playerId === this.storedPlayerId ? 'left' : 'right'}`);
                 this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct);
               }
             }
@@ -101,9 +112,12 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   updateBoxColor(side: "left" | "right", rowIndex: number, colIndex: number, correct: boolean) {
+    console.log("Result is: " + correct);
     if (correct) {
+      console.log("Result in green is: " + correct)
       this.boxes[rowIndex][side][colIndex].color = '#66FF00'
     } else {
+      console.log("Result in red is: " + correct)
       this.boxes[rowIndex][side][colIndex].color = '#EF0107'
     }
 
