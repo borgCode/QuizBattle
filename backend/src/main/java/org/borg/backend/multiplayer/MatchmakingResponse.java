@@ -11,5 +11,6 @@ import lombok.Setter;
 public class MatchmakingResponse {
     private MatchStatus matchStatus;
     private Long sessionId;
+    private String opponentDisplayName;
     
 }

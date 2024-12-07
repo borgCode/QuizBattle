@@ -44,16 +44,17 @@ public class MultiplayerService {
                 
                 log.warn("Sending matched status to both players");
                 
+                
                 messagingTemplate.convertAndSend("/topic/match" + requestingPlayer.getId(),
-                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId()));
+                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId(), opponent.getDisplayName()));
                 messagingTemplate.convertAndSend("/topic/match" + opponent.getId(),
-                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId()));
+                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId(), requestingPlayer.getDisplayName()));
 
             } else {
                 log.warn("Sending waiting to players");
                 matchmakingQueue.add(playerId);
                 messagingTemplate.convertAndSend("/topic/match" + playerId,
-                        new MatchmakingResponse(MatchStatus.WAITING, null));
+                        new MatchmakingResponse(MatchStatus.WAITING, null, null));
             }
         }
     }

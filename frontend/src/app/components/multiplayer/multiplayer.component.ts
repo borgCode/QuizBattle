@@ -6,6 +6,8 @@ import {MultiplayerSessionDto} from '../../services/models/multiplayer-session-d
 import {NgForOf, NgIf, NgStyle, NgSwitch, NgSwitchCase} from '@angular/common';
 import {Router} from '@angular/router';
 import {WebSocketService} from '../../services/websocket/web-socket.service';
+import {MatDialog} from '@angular/material/dialog';
+import {MatchFoundDialogComponent} from './dialog/match-found-dialog/match-found-dialog.component';
 
 @Component({
   selector: 'app-multiplayer',
@@ -29,6 +31,7 @@ export class MultiplayerComponent implements OnInit {
     private multiplayerService: MultiplayerService,
     private webSocketService: WebSocketService,
     private router: Router,
+    private matchFoundDialog: MatDialog
   ) {
   }
 
@@ -55,25 +58,40 @@ export class MultiplayerComponent implements OnInit {
   findGame() {
     this.isSearching = true;
 
+    this.webSocketService.subscribe('/topic/match' + this.player.id,
+      (matchUpdate) => {
+        console.log("Match update received", matchUpdate);
+        if (matchUpdate.matchStatus === 'MATCHED') {
+          console.log("Match was found")
+          this.isSearching = false;
+
+          this.openMatchFoundDialog(matchUpdate.opponentDisplayName)
+        }
+      });
+
     this.multiplayerService.findMatch({playerId: this.player.id}).subscribe({
       next: response => {
         console.log("Matchmaking initiated", response);
-
-        this.webSocketService.subscribe('/topic/match' + this.player.id,
-          (matchUpdate) => {
-            console.log("Match update received", matchUpdate);
-            if (matchUpdate.matchStatus === 'MATCHED') {
-              console.log("Match was found")
-              this.isSearching = false;
-
-              //TODO Handle match found logic
-            }
-          });
-
       },
       error: err => {
         console.error('Error initiating matchmaking:', err)
         this.isSearching = false;
+      }
+    })
+  }
+
+  private openMatchFoundDialog(opponentName: string) {
+    const dialogRef = this.matchFoundDialog.open(MatchFoundDialogComponent, {
+      data: {opponentName},
+      width: '300px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        console.log("Match accepted")
+      } else {
+        console.log("Match declined")
       }
     })
   }
