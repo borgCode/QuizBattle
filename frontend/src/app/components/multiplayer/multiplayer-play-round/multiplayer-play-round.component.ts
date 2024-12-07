@@ -26,7 +26,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   answerIsCorrect: boolean = null;
   correctAnswerIndex: number;
 
-  get hasQuestions():boolean {
+  get hasQuestions(): boolean {
     return this.questions.length > 0;
   }
 
@@ -34,14 +34,16 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     private questionService: QuestionsService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-
   ) {
   }
 
   ngOnInit() {
     this.initStoredPlayerId();
+    this.activatedRoute.params.subscribe(value => {
+      this.sessionId = value['sessionId'];
+    });
 
-    let questionIds= (history.state as any).questionIds;
+    let questionIds = (history.state as any).questionIds;
     console.log(questionIds);
 
     if (questionIds) {
@@ -52,15 +54,11 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       })
 
     } else {
-      this.activatedRoute.params.subscribe(value => {
-        this.sessionId = value['sessionId'];
-
-        this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
-          next: categories =>
-            this.categories = categories
-        })
-
+      this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
+        next: categories =>
+          this.categories = categories
       })
+
     }
 
   }
@@ -88,6 +86,10 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   }
 
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
+    console.log("QuestionID: " + selectedAnswer.questionId);
+    console.log("Answer: " + selectedAnswer.answer);
+    console.log("Sending session: " + this.sessionId);
+    console.log("Sending playerId: " + this.storedPlayerId);
     const validationRequest = {
       body: {
         questionId: selectedAnswer.questionId,
@@ -97,6 +99,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       }
     }
 
+    console.log("Sending answer for validation")
     this.questionService.validateAnswer(validationRequest).subscribe({
       next: (response: AnswerValidationResponse) => {
         this.answerIsCorrect = response.correct;
@@ -106,6 +109,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     })
 
   }
+
   onNavigateBack() {
     this.router.navigate(['multiplayer', this.sessionId]);
   }
