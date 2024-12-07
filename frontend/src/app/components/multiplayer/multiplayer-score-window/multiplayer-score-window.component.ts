@@ -39,8 +39,11 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log("Init player ID in score screen")
     this.initStoredPlayerId();
+    console.log("Init boxes");
     this.initBoxes();
+    console.log("Getting name state")
     this.getGameState();
 
   }

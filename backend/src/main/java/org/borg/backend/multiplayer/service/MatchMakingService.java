@@ -42,7 +42,7 @@ public class MatchMakingService {
                 log.warn("Sending waiting to players");
                 matchmakingQueue.add(playerId);
                 messagingTemplate.convertAndSend("/topic/match" + playerId,
-                        new MatchmakingResponse(MatchStatus.WAITING, null, null));
+                        MatchmakingResponse.waiting());
             }
         }
     }
@@ -59,10 +59,9 @@ public class MatchMakingService {
         pendingSessionRepository.save(pendingSession);
 
         messagingTemplate.convertAndSend("/topic/match" + requestingPlayer.getId(),
-                new MatchmakingResponse(MatchStatus.MATCHED, pendingSession.getId(), opponent.getDisplayName()));
+                MatchmakingResponse.matched(pendingSession.getId(), opponent.getDisplayName()));
         messagingTemplate.convertAndSend("/topic/match" + opponent.getId(),
-                new MatchmakingResponse(MatchStatus.MATCHED, pendingSession.getId(), requestingPlayer.getDisplayName()));
-
+                MatchmakingResponse.matched(pendingSession.getId(), requestingPlayer.getDisplayName()));
     }
 
     public void handleMatchResponse(long pendingSessionId, long playerId, boolean hasAccepted) {
@@ -70,7 +69,7 @@ public class MatchMakingService {
                 .orElseThrow(() -> new NoSuchElementException("Pending session not found"));
         
         if (!hasAccepted) {
-            cancelMatch(pendingSession, playerId);
+            cancelMatch(pendingSession);
             return;
         }
         
@@ -79,7 +78,6 @@ public class MatchMakingService {
         } else if (playerId == pendingSession.getOpponentId()) {
             pendingSession.setOpponentAccepted(true);
         }
-        
         pendingSessionRepository.save(pendingSession);
         
         if (pendingSession.isOpponentAccepted() && pendingSession.isRequestingPlayerAccepted()) {
@@ -89,11 +87,12 @@ public class MatchMakingService {
         
     }
     
-    private void cancelMatch(PendingSession pendingSession, long playerId) {
+    private void cancelMatch(PendingSession pendingSession) {
+        
         messagingTemplate.convertAndSend("/topic/match" + pendingSession.getRequestingPlayerId(),
-                new MatchmakingResponse(MatchStatus.DECLINED, null, null));
+                MatchmakingResponse.declined());
         messagingTemplate.convertAndSend("/topic/match" + pendingSession.getOpponentId(),
-                new MatchmakingResponse(MatchStatus.DECLINED, null, null));;
+                MatchmakingResponse.declined());
         pendingSessionRepository.delete(pendingSession);
     }
 
@@ -111,9 +110,9 @@ public class MatchMakingService {
         multiplayerSessionRepository.save(session);
 
         messagingTemplate.convertAndSend("/topic/match" + player1.getId(),
-                new MatchmakingResponse(MatchStatus.ACCEPTED, null, player2.getDisplayName()));
+                MatchmakingResponse.accepted(session.getId(), player2.getDisplayName()));
         messagingTemplate.convertAndSend("/topic/match" + player2.getId(),
-                new MatchmakingResponse(MatchStatus.ACCEPTED, null, player1.getDisplayName()));
+                MatchmakingResponse.accepted(session.getId(), player1.getDisplayName()));
         
         pendingSessionRepository.delete(pendingSession);
         

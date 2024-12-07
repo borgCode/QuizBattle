@@ -62,6 +62,7 @@ public class MultiplayerSession {
         players = new ArrayList<>(List.of(player1, player2));
         score = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
         status = GameStatus.ACTIVE;
+        this.currentQuestionIndex = 0;
         this.currentPlayerTurn = currentPlayerTurn;
         questionsAnswered = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
     }

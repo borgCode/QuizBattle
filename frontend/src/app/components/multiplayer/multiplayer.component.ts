@@ -8,6 +8,7 @@ import {Router} from '@angular/router';
 import {WebSocketService} from '../../services/websocket/web-socket.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatchFoundDialogComponent} from './dialog/match-found-dialog/match-found-dialog.component';
+import {MatchConfirmedDialogComponent} from './dialog/match-confirmed-dialog/match-confirmed-dialog.component';
 
 interface MatchDecision {
   pendingSessionId: number;
@@ -36,7 +37,8 @@ export class MultiplayerComponent implements OnInit {
     private multiplayerService: MultiplayerService,
     private webSocketService: WebSocketService,
     private router: Router,
-    private matchFoundDialog: MatDialog
+    private matchFoundDialog: MatDialog,
+    private matchConfirmedDialog: MatDialog
   ) {
   }
 
@@ -56,8 +58,8 @@ export class MultiplayerComponent implements OnInit {
     })
   }
 
-  openGame(id: number) {
-    this.router.navigate(['multiplayer', id]);
+  openGame(sessionId: number) {
+    this.router.navigate(['multiplayer', sessionId]);
   }
 
   findGame() {
@@ -76,6 +78,7 @@ export class MultiplayerComponent implements OnInit {
             this.openMatchFoundDialog(matchUpdate.pendingSessionId, matchUpdate.opponentDisplayName)
             break;
           case 'ACCEPTED':
+            this.showMatchConfirmation(matchUpdate.sessionId,matchUpdate.opponentDisplayName);
             break;
           case 'DECLINED':
             break;
@@ -105,6 +108,26 @@ export class MultiplayerComponent implements OnInit {
         console.log("Match declined")
       }
     })
+  }
+
+  private showMatchConfirmation(sessionId: number, opponentDisplayName: string) {
+    console.log("Showing confirmation dialog")
+    const dialogRef = this.matchConfirmedDialog.open(MatchConfirmedDialogComponent, {
+      data: {opponentName: opponentDisplayName},
+      width: '300px',
+      disableClose: true,
+      autoFocus: false
+    })
+    dialogRef.afterClosed().subscribe(() => {
+      console.log("Opening gamesession after closing dialog")
+      this.openGame(sessionId);
+    })
+
+    setTimeout(() => {
+      dialogRef.close();
+      console.log("Closing confirmation dialog")
+    }, 3000)
+
   }
 
 }
