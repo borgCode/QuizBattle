@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer;
+package org.borg.backend.multiplayer.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

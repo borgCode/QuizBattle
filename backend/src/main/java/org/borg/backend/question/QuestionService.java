@@ -1,9 +1,9 @@
 package org.borg.backend.question;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.multiplayer.MultiplayerService;
-import org.borg.backend.multiplayer.MultiplayerSession;
-import org.borg.backend.multiplayer.MultiplayerSessionRepository;
+import org.borg.backend.multiplayer.service.MultiplayerService;
+import org.borg.backend.multiplayer.model.MultiplayerSession;
+import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

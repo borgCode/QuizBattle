@@ -1,7 +1,11 @@
-package org.borg.backend.multiplayer;
+package org.borg.backend.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.multiplayer.model.*;
+import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.multiplayer.repository.PendingSessionRepository;
+import org.borg.backend.multiplayer.util.MultiplayerGameConstants;
 import org.borg.backend.player.Player;
 import org.borg.backend.player.PlayerMapper;
 import org.borg.backend.player.PlayerRepository;
@@ -15,54 +19,9 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class MultiplayerService {
-    private final List<Long> matchmakingQueue = Collections.synchronizedList(new ArrayList<>());
+    
     private final MultiplayerSessionRepository multiplayerSessionRepository;
-    private final PlayerRepository playerRepository;
-    private final SimpMessagingTemplate messagingTemplate;
-
-
-    public void findMatch(Long playerId) {
-        synchronized (matchmakingQueue) {
-            log.warn("Finding first player in queue");
-            Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
-
-            if (opponentId.isPresent()) {
-                log.warn("Found opponent in queue");
-                matchmakingQueue.remove(opponentId.get());
-                
-                Player requestingPlayer = playerRepository.findById(playerId)
-                        .orElseThrow(() -> new NoSuchElementException("Requesting player not found"));
-                Player opponent = playerRepository.findById(opponentId.get())
-                        .orElseThrow(() -> new NoSuchElementException("Opponent not found"));
-
-                //Randomly choose who starts
-
-                Player startingPlayer = Math.random() < 0.5 ? requestingPlayer : opponent;
-
-                MultiplayerSession session = new MultiplayerSession(requestingPlayer, opponent, startingPlayer);
-                multiplayerSessionRepository.save(session);
-                
-                log.warn("Sending matched status to both players");
-                
-                
-                messagingTemplate.convertAndSend("/topic/match" + requestingPlayer.getId(),
-                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId(), opponent.getDisplayName()));
-                messagingTemplate.convertAndSend("/topic/match" + opponent.getId(),
-                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId(), requestingPlayer.getDisplayName()));
-
-            } else {
-                log.warn("Sending waiting to players");
-                matchmakingQueue.add(playerId);
-                messagingTemplate.convertAndSend("/topic/match" + playerId,
-                        new MatchmakingResponse(MatchStatus.WAITING, null, null));
-            }
-        }
-    }
-
-    public void cancelMatchmaking(Long playerId) {
-        matchmakingQueue.remove(playerId);
-    }
-
+    
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
@@ -148,5 +107,6 @@ public class MultiplayerService {
         }
         return multiplayerSessionDTOS;
     }
+    
 }
             

@@ -45,6 +45,8 @@ export class WebSocketService {
 
   }
   sendMessage(destination: string, message: any) {
+    console.log(message);
+    console.log(JSON.stringify(message));
     this.stompClient.publish({destination, body: JSON.stringify(message)});
   }
 

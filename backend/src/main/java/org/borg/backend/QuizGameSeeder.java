@@ -1,9 +1,9 @@
 package org.borg.backend;
 
 import com.github.javafaker.Faker;
-import org.borg.backend.multiplayer.GameStatus;
-import org.borg.backend.multiplayer.MultiplayerSession;
-import org.borg.backend.multiplayer.MultiplayerSessionRepository;
+import org.borg.backend.multiplayer.model.GameStatus;
+import org.borg.backend.multiplayer.model.MultiplayerSession;
+import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.player.Player;
 import org.borg.backend.player.PlayerRepository;
 import org.borg.backend.question.PlayerQuestionResult;

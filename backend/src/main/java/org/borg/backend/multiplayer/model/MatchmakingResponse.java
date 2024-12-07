@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer;
+package org.borg.backend.multiplayer.model;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MatchmakingResponse {
     private MatchStatus matchStatus;
-    private Long sessionId;
+    private Long pendingSessionId;
     private String opponentDisplayName;
     
 }

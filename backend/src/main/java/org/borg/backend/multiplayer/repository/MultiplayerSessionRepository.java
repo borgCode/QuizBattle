@@ -1,5 +1,6 @@
-package org.borg.backend.multiplayer;
+package org.borg.backend.multiplayer.repository;
 
+import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

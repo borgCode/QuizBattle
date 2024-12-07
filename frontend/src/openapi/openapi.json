@@ -65,30 +65,6 @@
         }
       }
     },
-    "/multiplayer/matchmaking/find/{playerId}": {
-      "post": {
-        "tags": [
-          "Multiplayer"
-        ],
-        "operationId": "findMatch",
-        "parameters": [
-          {
-            "name": "playerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/auth/register": {
       "post": {
         "tags": [

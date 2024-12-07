@@ -9,6 +9,11 @@ import {WebSocketService} from '../../services/websocket/web-socket.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatchFoundDialogComponent} from './dialog/match-found-dialog/match-found-dialog.component';
 
+interface MatchDecision {
+  pendingSessionId: number;
+  playerId: number;
+}
+
 @Component({
   selector: 'app-multiplayer',
   imports: [
@@ -58,39 +63,45 @@ export class MultiplayerComponent implements OnInit {
   findGame() {
     this.isSearching = true;
 
+    this.webSocketService.sendMessage('/app/matchmaking/find', this.player.id);
+
+
     this.webSocketService.subscribe('/topic/match' + this.player.id,
       (matchUpdate) => {
         console.log("Match update received", matchUpdate);
-        if (matchUpdate.matchStatus === 'MATCHED') {
-          console.log("Match was found")
-          this.isSearching = false;
-
-          this.openMatchFoundDialog(matchUpdate.opponentDisplayName)
+        switch (matchUpdate.matchStatus) {
+          case 'MATCHED':
+            console.log("Match was found")
+            this.isSearching = false;
+            this.openMatchFoundDialog(matchUpdate.pendingSessionId, matchUpdate.opponentDisplayName)
+            break;
+          case 'ACCEPTED':
+            break;
+          case 'DECLINED':
+            break;
         }
       });
 
-    this.multiplayerService.findMatch({playerId: this.player.id}).subscribe({
-      next: response => {
-        console.log("Matchmaking initiated", response);
-      },
-      error: err => {
-        console.error('Error initiating matchmaking:', err)
-        this.isSearching = false;
-      }
-    })
   }
 
-  private openMatchFoundDialog(opponentName: string) {
+  private openMatchFoundDialog(pendingSessionId: number, opponentDisplayName: string) {
     const dialogRef = this.matchFoundDialog.open(MatchFoundDialogComponent, {
-      data: {opponentName},
+      data: {opponentName: opponentDisplayName},
       width: '300px',
       disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      const decision: MatchDecision = {
+        pendingSessionId: pendingSessionId,
+        playerId: this.player.id
+      }
+
       if (result === true) {
+        this.webSocketService.sendMessage('/app/matchmaking/accept', decision);
         console.log("Match accepted")
       } else {
+        this.webSocketService.sendMessage('/app/matchmaking/decline', decision);
         console.log("Match declined")
       }
     })
