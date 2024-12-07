@@ -30,6 +30,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     private questionService: QuestionsService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+
   ) {
   }
 
