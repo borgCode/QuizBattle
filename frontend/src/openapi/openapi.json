@@ -84,14 +84,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MatchmakingResponse"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -439,25 +432,6 @@
           },
           "correct": {
             "type": "boolean"
-          }
-        }
-      },
-      "MatchmakingResponse": {
-        "type": "object",
-        "properties": {
-          "matchStatus": {
-            "type": "string",
-            "enum": [
-              "WAITING",
-              "MATCHED",
-              "CANCELLED",
-              "ERROR",
-              "TIMEOUT"
-            ]
-          },
-          "sessionId": {
-            "type": "integer",
-            "format": "int64"
           }
         }
       },

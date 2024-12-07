@@ -2,11 +2,13 @@ package org.borg.backend.multiplayer;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("multiplayer")
 @RequiredArgsConstructor
@@ -20,9 +22,10 @@ public class MultiplayerController {
     }
 
     @PostMapping("/matchmaking/find/{playerId}")
-    public ResponseEntity<MatchmakingResponse> findMatch(
-            @PathVariable Long playerId) {
-        return ResponseEntity.ok(multiplayerService.findMatch(playerId));
+    public ResponseEntity<Void> findMatch(@PathVariable Long playerId) {
+        log.warn("Receiving matchmaking request");
+        multiplayerService.findMatch(playerId);
+        return ResponseEntity.ok().build();
     }
     
     @DeleteMapping("/matchmaking/cancel/{playerId}")

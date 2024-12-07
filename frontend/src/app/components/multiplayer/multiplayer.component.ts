@@ -5,6 +5,7 @@ import {MultiplayerService} from '../../services/services/multiplayer.service';
 import {MultiplayerSessionDto} from '../../services/models/multiplayer-session-dto';
 import {NgForOf, NgIf, NgStyle, NgSwitch, NgSwitchCase} from '@angular/common';
 import {Router} from '@angular/router';
+import {WebSocketService} from '../../services/websocket/web-socket.service';
 
 @Component({
   selector: 'app-multiplayer',
@@ -26,6 +27,7 @@ export class MultiplayerComponent implements OnInit {
   constructor(
     private loginStateService: LoginStateService,
     private multiplayerService: MultiplayerService,
+    private webSocketService: WebSocketService,
     private router: Router,
   ) {
   }
@@ -55,7 +57,23 @@ export class MultiplayerComponent implements OnInit {
 
     this.multiplayerService.findMatch({playerId: this.player.id}).subscribe({
       next: response => {
+        console.log("Matchmaking initiated", response);
 
+        this.webSocketService.subscribe('/topic/match' + this.player.id,
+          (matchUpdate) => {
+            console.log("Match update received", matchUpdate);
+            if (matchUpdate.matchStatus === 'MATCHED') {
+              console.log("Match was found")
+              this.isSearching = false;
+
+              //TODO Handle match found logic
+            }
+          });
+
+      },
+      error: err => {
+        console.error('Error initiating matchmaking:', err)
+        this.isSearching = false;
       }
     })
   }

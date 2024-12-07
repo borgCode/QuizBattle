@@ -1,45 +1,60 @@
 package org.borg.backend.multiplayer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.Player;
 import org.borg.backend.player.PlayerMapper;
 import org.borg.backend.player.PlayerRepository;
 import org.borg.backend.question.Question;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MultiplayerService {
     private final List<Long> matchmakingQueue = Collections.synchronizedList(new ArrayList<>());
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final PlayerRepository playerRepository;
-    
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public MatchmakingResponse findMatch(Long playerId) {
+
+    public void findMatch(Long playerId) {
         synchronized (matchmakingQueue) {
+            log.warn("Finding first player in queue");
             Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
 
             if (opponentId.isPresent()) {
+                log.warn("Found opponent in queue");
                 matchmakingQueue.remove(opponentId.get());
-
+                
                 Player requestingPlayer = playerRepository.findById(playerId)
                         .orElseThrow(() -> new NoSuchElementException("Requesting player not found"));
                 Player opponent = playerRepository.findById(opponentId.get())
                         .orElseThrow(() -> new NoSuchElementException("Opponent not found"));
 
                 //Randomly choose who starts
-                
+
                 Player startingPlayer = Math.random() < 0.5 ? requestingPlayer : opponent;
 
                 MultiplayerSession session = new MultiplayerSession(requestingPlayer, opponent, startingPlayer);
                 multiplayerSessionRepository.save(session);
-                return new MatchmakingResponse(MatchStatus.MATCHED, session.getId());
-            }
+                
+                log.warn("Sending matched status to both players");
+                
+                messagingTemplate.convertAndSend("/topic/match" + requestingPlayer.getId(),
+                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId()));
+                messagingTemplate.convertAndSend("/topic/match" + opponent.getId(),
+                        new MatchmakingResponse(MatchStatus.MATCHED, session.getId()));
 
-            matchmakingQueue.add(playerId);
-            return new MatchmakingResponse(MatchStatus.WAITING, null);
+            } else {
+                log.warn("Sending waiting to players");
+                matchmakingQueue.add(playerId);
+                messagingTemplate.convertAndSend("/topic/match" + playerId,
+                        new MatchmakingResponse(MatchStatus.WAITING, null));
+            }
         }
     }
 
@@ -64,14 +79,14 @@ public class MultiplayerService {
     public synchronized void updateGameState(Long sessionId, Long playerId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-        
+
         //Increment score if answer was correct
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
             Integer playerScore = scores.getOrDefault(playerId, 0);
             scores.put(playerId, playerScore + 1);
         }
-        
+
         //Update questions answered
         Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
         questionsAnswered.put(playerId, questionsAnswered.get(playerId) + 1);
@@ -81,8 +96,8 @@ public class MultiplayerService {
                 .filter(player -> !player.getId().equals(playerId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No opponent found in session"));
-        
-        if(isGameComplete(questionsAnswered)) {
+
+        if (isGameComplete(questionsAnswered)) {
             session.setStatus(GameStatus.COMPLETED);
         } else {
             //Update question index to manage turns
@@ -95,9 +110,9 @@ public class MultiplayerService {
                 }
             }
         }
-        
+
         multiplayerSessionRepository.save(session);
-        
+
     }
 
     private boolean isGameComplete(Map<Long, Integer> questionsAnswered) {
@@ -108,7 +123,7 @@ public class MultiplayerService {
     public void updateSessionQuestionsAndCategory(Long sessionId, List<Question> questions, String selectedCategory) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-        
+
         session.getQuestionIds().clear();
         for (Question question : questions) {
             session.getQuestionIds().add(question.getId());
