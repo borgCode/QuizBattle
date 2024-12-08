@@ -1,16 +1,18 @@
 import { Routes } from '@angular/router';
-import {LoginComponent} from './components/login/login.component';
-import {PlayerProfileComponent} from './components/player-profile/player-profile.component';
-import {ModeSelectionComponent} from './components/mode-selection/mode-selection.component';
-import {RegisterComponent} from './components/register/register.component';
-import {authGuard} from './services/guard/auth.guard';
-import {MultiplayerComponent} from './components/multiplayer/multiplayer.component';
-import {
-  MultiplayerScoreWindowComponent
-} from './components/multiplayer/multiplayer-score-window/multiplayer-score-window.component';
+import {LoginComponent} from './features/auth/login/login.component';
+import {PlayerProfileComponent} from './features/profile/player-profile/player-profile.component';
+import {ModeSelectionComponent} from './features/game/mode-selection/mode-selection.component';
+import {RegisterComponent} from './features/auth/register/register.component';
+import {authGuard} from './core/guard/auth.guard';
+
 import {
   MultiplayerPlayRoundComponent
-} from './components/multiplayer/multiplayer-play-round/multiplayer-play-round.component';
+} from './features/game/multiplayer/multiplayer-play-round/multiplayer-play-round.component';
+import {MultiplayerComponent} from './features/game/multiplayer/multiplayer.component';
+import {
+  MultiplayerScoreWindowComponent
+} from './features/game/multiplayer/multiplayer-score-window/multiplayer-score-window.component';
+
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},

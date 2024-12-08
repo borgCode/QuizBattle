@@ -65,6 +65,66 @@
         }
       }
     },
+    "/friendship/block": {
+      "post": {
+        "tags": [
+          "Friendship"
+        ],
+        "operationId": "blockPlayer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerInteraction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friendship/add": {
+      "post": {
+        "tags": [
+          "Friendship"
+        ],
+        "operationId": "addFriend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerInteraction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -367,6 +427,40 @@
         }
       }
     },
+    "/friendship/friends/{playerId}": {
+      "get": {
+        "tags": [
+          "Friendship"
+        ],
+        "operationId": "getFriends",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlayerDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/multiplayer/matchmaking/cancel/{playerId}": {
       "delete": {
         "tags": [
@@ -445,6 +539,18 @@
           },
           "correct": {
             "type": "boolean"
+          }
+        }
+      },
+      "PlayerInteraction": {
+        "type": "object",
+        "properties": {
+          "senderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "receiverUsername": {
+            "type": "string"
           }
         }
       },

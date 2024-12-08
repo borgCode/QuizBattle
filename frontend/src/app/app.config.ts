@@ -3,7 +3,7 @@ import {provideRouter} from '@angular/router';
 
 import {routes} from './app.routes';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-import {HttpTokenInterceptor} from './services/interceptor/http-token.interceptor';
+import {HttpTokenInterceptor} from './core/interceptor/http-token.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [

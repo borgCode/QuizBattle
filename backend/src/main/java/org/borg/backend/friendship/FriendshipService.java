@@ -1,6 +1,7 @@
 package org.borg.backend.friendship;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.handler.BusinessErrorCodes;
 import org.borg.backend.handler.FriendshipException;
 import org.borg.backend.player.Player;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FriendshipService {
@@ -85,6 +87,7 @@ public class FriendshipService {
     }
 
     public List<PlayerDTO> getFriends(Long playerId) {
+        log.warn("Calling repository method");
         return PlayerMapper.multipleToDTO(friendshipRepository.getAllByPlayerId(playerId));
     }
 }

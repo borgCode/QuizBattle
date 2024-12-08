@@ -1,0 +1,76 @@
+<div class="container p-5" xmlns:cursor="http://www.w3.org/1999/xhtml">
+  <div class="container g-4">
+    <div class="row mb-4 g-3">
+      <div class="col-md-3">
+        <app-player-card [playerDisplayName]="player.displayName"></app-player-card>
+      </div>
+      <div class="col-md-3 align-content-center">
+        <div (click)="!isSearching && findGame()"
+             class="btn btn-success btn-lg"
+             [class.disabled]="isSearching"
+             [ngStyle]="{'cursor': isSearching ? 'not-allowed' : 'pointer'}">
+          {{ isSearching ? 'Finding Game' : 'Find Game' }}
+          <span *ngIf="isSearching" class="loading-dots"></span>
+        </div>
+      </div>
+      <div class="col-md-3 align-content-center">
+        <div (click)="!isSearching && openFriendDialog()"
+             class="btn btn-success btn-lg">
+          Sent invite to friend
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white py-3">
+          <h5 class="mb-0 text-center">Games</h5>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group mb-3">
+            <ng-container *ngFor="let gameSession of gameSessions">
+              <li (click)="openGame(gameSession.id)" class="list-group-item ju" style="cursor: pointer;">
+                <div class="row align-items-center">
+                  <!-- Player 1 Section -->
+                  <div class="col-md-4 d-flex align-items-center">
+                    <div class="player-avatar bg-light rounded-circle p-2 me-3">
+                      <img src="https://placehold.co/40" alt="Player 1" class="rounded-circle"/>
+                    </div>
+                    <div class="player-info">
+                      <div class="fw-bold">{{ gameSession.playerDTOList[0].displayName }}</div>
+                      <div class="text-primary fs-4">{{ gameSession.score[gameSession.playerDTOList[0].id] }}</div>
+                    </div>
+                  </div>
+
+                  <!-- VS Section -->
+                  <div class="col-md-4 text-center">
+                    <div class="versus-badge">
+                      <span class="badge bg-light text-dark px-4 py-2">VS</span>
+                    </div>
+                    <div class="mt-2">
+                      <!--                      TODO win/loss instead of complete-->
+                      <ng-container [ngSwitch]="gameSession.status">
+                        <span *ngSwitchCase="'ACTIVE'" class="badge bg-primary rounded-pill px-3">Active</span>
+                        <span *ngSwitchCase="'COMPLETED'" class="badge bg-success rounded-pill px-3">Completed</span>
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <!-- Player 2 Section -->
+                  <div class="col-md-4 d-flex align-items-center justify-content-end">
+                    <div class="player-info text-end">
+                      <div class="fw-bold">{{ gameSession.playerDTOList[1].displayName }}</div>
+                      <div class="text-primary fs-4">{{ gameSession.score[gameSession.playerDTOList[1].id] }}</div>
+                    </div>
+                    <div class="player-avatar bg-light rounded-circle p-2 ms-3">
+                      <img src="https://placehold.co/40" alt="Player 2" class="rounded-circle"/>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ng-container>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>Friends List</h1>
+<div mat-dialog-content style="max-height: 400px; overflow-y: auto;">
+  <mat-list>
+    <ng-container *ngIf="data.friends.length > 0; else noFriends">
+      <mat-list-item *ngFor="let friend of data.friends">
+        {{ friend.displayName }}
+      </mat-list-item>
+    </ng-container>
+    <ng-template #noFriends>
+      <mat-list-item>No friends in list!</mat-list-item>
+    </ng-template>
+  </mat-list>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="closeDialog()">Close</button>
+</div>
