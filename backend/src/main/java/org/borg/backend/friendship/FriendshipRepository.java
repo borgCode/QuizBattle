@@ -14,7 +14,8 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     Optional<Friendship> findByPlayer1AndPlayer2(Player player1, Player player2);
 
     @Query("SELECT DISTINCT p FROM Player p " +
-            "JOIN Friendship f ON (f.player1.id = :playerId AND p = f.player2) " +
-            "OR (f.player2.id = :playerId AND p = f.player1)")
-    List<Player> getAllByPlayerId(Long playerId);
+            "JOIN Friendship f ON ((f.player1.id = :playerId AND p = f.player2) " +
+            "OR (f.player2.id = :playerId AND p = f.player1))" +
+            "AND f.status = :status")
+    List<Player> getAllByPlayerId(Long playerId, FriendshipStatus status);
 }

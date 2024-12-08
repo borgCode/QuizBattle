@@ -18,14 +18,14 @@ public class FriendshipController {
     private final FriendshipService friendshipService;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addFriend(@RequestBody PlayerInteraction request) {
+    public ResponseEntity<Void> addFriend(@RequestBody PlayerInteraction request) {
         friendshipService.sendFriendRequest(request);
-        return ResponseEntity.ok("Friend request sent");
+        return ResponseEntity.ok().build();
     }
     @PostMapping("/block")
-    public ResponseEntity<String> blockPlayer(@RequestBody PlayerInteraction request) {
+    public ResponseEntity<Void> blockPlayer(@RequestBody PlayerInteraction request) {
         friendshipService.blockPlayer(request);
-        return ResponseEntity.ok("Player blocked");
+        return ResponseEntity.ok().build();
     }
     
     @GetMapping("/friends/{playerId}")

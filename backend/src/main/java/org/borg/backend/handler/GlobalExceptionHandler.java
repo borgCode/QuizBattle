@@ -1,5 +1,6 @@
 package org.borg.backend.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -72,16 +73,18 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(FriendshipException.class)
     public ResponseEntity<ExceptionResponse> handleException(FriendshipException exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .businessErrorCode(exception.getErrorCode().getCode())
+                .businessErrorDescription(exception.getErrorCode().getDescription())
+                .error(exception.getMessage())
+                .build();
+
+        log.debug("Responding with: {}", response); // Log the response for verification
         return ResponseEntity
                 .status(exception.getErrorCode().getHttpStatus())
-                .body(
-                        ExceptionResponse.builder()
-                                .businessErrorCode(exception.getErrorCode().getCode())
-                                .businessErrorDescription(exception.getErrorCode().getDescription())
-                                .error(exception.getMessage())
-                                .build()
-                );
+                .body(response);
     }
+    
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception exception) {

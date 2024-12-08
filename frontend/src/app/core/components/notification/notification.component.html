@@ -1,0 +1,5 @@
+<div *ngIf="message" class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+  <div class="alert" [ngClass]="{'alert-success': type === 'success', 'alert-danger': type === 'error'}" role="alert">
+    {{ message }}
+  </div>
+</div>

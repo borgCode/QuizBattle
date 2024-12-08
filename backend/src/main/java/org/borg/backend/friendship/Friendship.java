@@ -1,16 +1,15 @@
 package org.borg.backend.friendship;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.borg.backend.player.Player;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Friendship {

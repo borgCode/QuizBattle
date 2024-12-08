@@ -9,6 +9,7 @@ import org.borg.backend.player.PlayerDTO;
 import org.borg.backend.player.PlayerMapper;
 import org.borg.backend.player.PlayerRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,6 +23,7 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final PlayerRepository playerRepository;
 
+    @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
@@ -30,27 +32,27 @@ public class FriendshipService {
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
+
         if (existingFriendship.isPresent()) {
             Friendship friendship = existingFriendship.get();
-            if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
-                throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
-            }
-            if (friendship.getStatus() == FriendshipStatus.PENDING) {
-                throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
-            }
-            if (friendship.getStatus() == FriendshipStatus.FRIENDS) {
-                throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+            switch (friendship.getStatus()) {
+                case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
+                case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
+                case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
             }
         }
-
-        friendshipRepository.save(new Friendship(
-                sendingPlayer,
-                receivingPlayer,
-                LocalDate.now(),
-                FriendshipStatus.PENDING
-        ));
+        
+        friendshipRepository.save(Friendship.builder()
+                .player1(sendingPlayer)
+                .player2(receivingPlayer)
+                .friendShipDate(LocalDate.now())
+                .status(FriendshipStatus.PENDING)
+                .build());
     }
 
+
+
+//TODO refactor code
     public void blockPlayer(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
@@ -70,7 +72,7 @@ public class FriendshipService {
                 return;
 
             }
-            if (friendship.getStatus() == FriendshipStatus.FRIENDS) {
+            if (friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 friendship.setStatus(FriendshipStatus.BLOCKED);
                 friendshipRepository.save(friendship);
                 return;
@@ -88,6 +90,6 @@ public class FriendshipService {
 
     public List<PlayerDTO> getFriends(Long playerId) {
         log.warn("Calling repository method");
-        return PlayerMapper.multipleToDTO(friendshipRepository.getAllByPlayerId(playerId));
+        return PlayerMapper.multipleToDTO(friendshipRepository.getAllByPlayerId(playerId, FriendshipStatus.ACTIVE));
     }
 }

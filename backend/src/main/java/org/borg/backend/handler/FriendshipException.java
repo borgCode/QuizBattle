@@ -1,5 +1,10 @@
 package org.borg.backend.handler;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
 public class FriendshipException extends RuntimeException {
     private final BusinessErrorCodes errorCode;
 
@@ -7,8 +12,5 @@ public class FriendshipException extends RuntimeException {
         super(errorCode.getDescription());
         this.errorCode = errorCode;
     }
-    
-    public BusinessErrorCodes getErrorCode() {
-        return errorCode;
-    }
+
 }

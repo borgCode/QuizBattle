@@ -5,6 +5,8 @@ import {GameStateResponse} from '../../../../api/generated/models/game-state-res
 import {PlayerQuestionResult} from '../../../../api/generated/models/player-question-result';
 import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
 import {PlayerCardComponent} from '../../../../shared/components/player-card/player-card-component';
+import {FriendshipService} from '../../../../api/generated/services/friendship.service';
+import {NotificationService} from '../../../../core/services/notification.service';
 
 interface Box {
   color: string;
@@ -35,17 +37,16 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   constructor(
     private multiplayerService: MultiplayerService,
+    private friendshipService: FriendshipService,
+    private notificationService: NotificationService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) {
   }
 
   ngOnInit() {
-    console.log("Init player ID in score screen")
     this.initStoredPlayerId();
-    console.log("Init boxes");
     this.initBoxes();
-    console.log("Getting name state")
     this.getGameState();
 
   }
@@ -60,8 +61,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   private initBoxes() {
     for (let i = 0; i < 6; i++) {
       this.boxes.push({
-        left: Array.from({ length: 3 }, () => ({ color: '#ccc' })),
-        right: Array.from({ length: 3 }, () => ({ color: '#ccc' }))
+        left: Array.from({length: 3}, () => ({color: '#ccc'})),
+        right: Array.from({length: 3}, () => ({color: '#ccc'}))
       });
     }
   }
@@ -78,24 +79,14 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             player.id !== this.storedPlayerId
           );
 
-
           this.results = this.gameState.results
-          for (const result of this.results) {
-            console.log(result)
-          }
-
 
           this.results.forEach((result) => {
-              console.log(`Result playerId: ${result.playerId}, Stored playerId: ${this.storedPlayerId}`);
               if (result.playerId == this.storedPlayerId) {
                 const position = this.indexToBoxPosition(result.questionIndex);
-                console.log(`Index: ${result.questionIndex}, Position: Row ${position.rowIndex}, Col ${position.colIndex}`);
-                console.log(`Result Correct: ${result.correct}, Side: ${result.playerId === this.storedPlayerId ? 'left' : 'right'}`);
                 this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct)
               } else {
                 const position = this.indexToBoxPosition(result.questionIndex);
-                console.log(`Index: ${result.questionIndex}, Position: Row ${position.rowIndex}, Col ${position.colIndex}`);
-                console.log(`Result Correct: ${result.correct}, Side: ${result.playerId === this.storedPlayerId ? 'left' : 'right'}`);
                 this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct);
               }
             }
@@ -114,12 +105,9 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   updateBoxColor(side: "left" | "right", rowIndex: number, colIndex: number, correct: boolean) {
-    console.log("Result is: " + correct);
     if (correct) {
-      console.log("Result in green is: " + correct)
       this.boxes[rowIndex][side][colIndex].color = '#66FF00'
     } else {
-      console.log("Result in red is: " + correct)
       this.boxes[rowIndex][side][colIndex].color = '#EF0107'
     }
 
@@ -137,7 +125,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   //When player should play the same category as the other player
   openPlayQuestions() {
 
-    console.log("Open play questions: " + this.gameState.questionIds)
     this.router.navigate(['multiplayer', this.sessionId, 'play'],
       {state: {questionIds: this.gameState.questionIds}});
   }
@@ -147,5 +134,15 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
 
+  sendFriendRequest(username: string) {
+    this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverUsername: username}}).subscribe({
+      next: () => this.notificationService.show('Friend reqeust sent successfully', 'success'),
+      error: (err) => this.notificationService.show(err.message, 'error')
 
+    });
+  }
+
+  private showPopup(message: string, type: 'success' | 'error') {
+    console.log(`${type.toUpperCase()}: ${message}`);
+  }
 }
