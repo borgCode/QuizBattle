@@ -38,7 +38,7 @@ public class SecurityConfig {
                                         "/auth/**",
                                         "/api/**",
                                         "/user/**",
-                                        "/friendship/**",
+                                        "/notification/**",
                                         "/socket/**",
                                         "/v3/api-docs",
                                         "/v3/api-docs/**",
