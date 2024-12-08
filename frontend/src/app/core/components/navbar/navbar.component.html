@@ -6,23 +6,38 @@
     </button>
     <div class="collapse navbar-collapse" id="navmenu">
       <ul class="navbar-nav ms-auto">
-<!--        Public routes-->
+        <!--        Public routes-->
         <ng-container *ngIf="!(loginStateService.isLoggedIn$ | async)">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
-        </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
+          </li>
         </ng-container>
 
-<!--        Protected routes-->
+        <!--        Protected routes-->
         <ng-container *ngIf="loginStateService.isLoggedIn$ | async">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/profile" routerLinkActive="active">My profile</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" (click)="logout()" style="cursor: pointer;">Logout</a>
-        </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/profile" routerLinkActive="active">My profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="logout()" style="cursor: pointer;">Logout</a>
+          </li>
         </ng-container>
       </ul>
+      <ng-container *ngIf="loginStateService.isLoggedIn$ | async">
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge badge rounded-pill bg-danger">1</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">Some news</a></li>
+              <li><a class="dropdown-item" href="#">Another news</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+        </ul>
+      </ng-container>
     </div>
   </div>
 </nav>

@@ -1,24 +1,8 @@
-/*nav {*/
-/*  background-color: #333;*/
-/*  color: white;*/
-/*  padding: 10px;*/
-/*}*/
+a:hover {
+  text-decoration: underline;
+}
 
-/*ul {*/
-/*  list-style: none;*/
-/*  display: flex;*/
-/*  gap: 20px;*/
-/*}*/
 
-/*li {*/
-/*  display: inline;*/
-/*}*/
-
-/*a {*/
-/*  color: white;*/
-/*  text-decoration: none;*/
-/*}*/
-
-/*a:hover {*/
-/*  text-decoration: underline;*/
-/*}*/
+.notification-badge {
+  transform: translate(-10px, -10px) scale(0.75);
+}

@@ -6,7 +6,7 @@ import {PlayerQuestionResult} from '../../../../api/generated/models/player-ques
 import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
 import {PlayerCardComponent} from '../../../../shared/components/player-card/player-card-component';
 import {FriendshipService} from '../../../../api/generated/services/friendship.service';
-import {NotificationService} from '../../../../core/services/notification.service';
+import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
 
 interface Box {
   color: string;
@@ -38,7 +38,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   constructor(
     private multiplayerService: MultiplayerService,
     private friendshipService: FriendshipService,
-    private notificationService: NotificationService,
+    private alertMessageService: AlertMessageService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) {
@@ -136,8 +136,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   sendFriendRequest(username: string) {
     this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverUsername: username}}).subscribe({
-      next: () => this.notificationService.show('Friend reqeust sent successfully', 'success'),
-      error: (err) => this.notificationService.show(err.message, 'error')
+      next: () => this.alertMessageService.show('Friend reqeust sent successfully', 'success'),
+      error: (err) => this.alertMessageService.show(err.message, 'error')
 
     });
   }

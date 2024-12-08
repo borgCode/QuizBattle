@@ -15,21 +15,6 @@ export class ErrorInterceptor implements HttpInterceptor {
         let errorMessage = 'An unexpected error occurred';
         if (err.error?.businessErrorCode) {
           switch (err.error.businessErrorCode) {
-            case 300:
-              errorMessage = 'Current password is incorrect';
-              break;
-            case 301:
-              errorMessage = 'New password does not match';
-              break;
-            case 302:
-              errorMessage = 'Your account is locked';
-              break;
-            case 303:
-              errorMessage = 'Your account is disabled';
-              break;
-            case 304:
-              errorMessage = 'Incorrect username or password';
-              break;
             case 305:
               errorMessage = 'Cannot send friend request to a blocked user';
               break;
