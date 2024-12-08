@@ -7,6 +7,7 @@ import {LoginStateService} from '../../../core/services/login-state-service/logi
 import {AuthRequest} from '../../../api/generated/models/auth-request';
 import {AuthenticationService} from '../../../api/generated/services/authentication.service';
 import {AuthResponse} from '../../../api/generated/models/auth-response';
+import {NotificationService} from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -27,6 +28,7 @@ export class LoginComponent {
     private authService: AuthenticationService,
     private tokenService: TokenService,
     private loginStateService: LoginStateService,
+    private notificationService: NotificationService,
   ) {
   }
 
