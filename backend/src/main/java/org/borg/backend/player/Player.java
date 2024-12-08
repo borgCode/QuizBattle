@@ -2,6 +2,7 @@ package org.borg.backend.player;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.borg.backend.friendship.Friendship;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.role.Role;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,7 +10,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -36,6 +39,12 @@ public class Player implements UserDetails {
     private boolean enabled;
     @ManyToMany(mappedBy = "players")
     private List<MultiplayerSession> session;
+    
+    @OneToMany(mappedBy = "player1", cascade = CascadeType.ALL)
+    private Set<Friendship> friendshipsInitiated = new HashSet<>();
+    
+    @OneToMany(mappedBy = "player2", cascade = CascadeType.ALL)
+    private Set<Friendship> friendshipsReceived = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;

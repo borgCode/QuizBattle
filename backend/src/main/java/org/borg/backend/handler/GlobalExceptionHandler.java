@@ -69,6 +69,19 @@ public class GlobalExceptionHandler {
                         .validationErrors(validationErrors)
                         .build());
     }
+    
+    @ExceptionHandler(FriendshipException.class)
+    public ResponseEntity<ExceptionResponse> handleException(FriendshipException exception) {
+        return ResponseEntity
+                .status(exception.getErrorCode().getHttpStatus())
+                .body(
+                        ExceptionResponse.builder()
+                                .businessErrorCode(exception.getErrorCode().getCode())
+                                .businessErrorDescription(exception.getErrorCode().getDescription())
+                                .error(exception.getMessage())
+                                .build()
+                );
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
@@ -79,4 +92,5 @@ public class GlobalExceptionHandler {
                         .error(exception.getMessage())
                         .build());
     }
+    
 }
