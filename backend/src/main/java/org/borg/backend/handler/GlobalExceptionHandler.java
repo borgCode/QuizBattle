@@ -45,8 +45,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ExceptionResponse> handleException(BadCredentialsException exception) {
+
+        log.warn("Authentication failed: {}", exception.getMessage());
         return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
+                .status(BusinessErrorCodes.BAD_CREDENTIALS.getHttpStatus())
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrorCode(BusinessErrorCodes.BAD_CREDENTIALS.getCode())

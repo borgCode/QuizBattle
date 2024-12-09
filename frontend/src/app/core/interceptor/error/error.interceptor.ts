@@ -1,10 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
+import {AlertMessageService} from '../../services/alert-message/alert-message.service';
 
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
+  constructor(private alertMessageService: AlertMessageService) {
+  }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
@@ -27,14 +30,29 @@ export class ErrorInterceptor implements HttpInterceptor {
         let errorMessage = 'An unexpected error occurred';
         if (errorBody.businessErrorCode) {
           switch (errorBody.businessErrorCode) {
+            case 300:
+              this.alertMessageService.show('Current password is incorrect', 'error');
+              break;
+            case 301:
+              this.alertMessageService.show('New password does not match', 'error');
+              break;
+            case 302:
+              this.alertMessageService.show('Your account has been locked', 'error');
+              break;
+            case 303:
+              this.alertMessageService.show('Your account has been disabled', 'error');
+              break;
+            case 304:
+              this.alertMessageService.show('Username and/or password is incorrect', 'error');
+              break;
             case 305:
-              errorMessage = 'Cannot send friend request to a blocked user';
+              this.alertMessageService.show('Cannot send friend request to a blocked user', 'error');
               break;
             case 306:
-              errorMessage = 'Friend request is already pending';
+              this.alertMessageService.show('Friend request is already pending', 'error');
               break;
             case 307:
-              errorMessage = 'You are already friends with this user';
+              this.alertMessageService.show('You are already friends with this user', 'error');
               break;
           }
         } else if (err.status) {
@@ -54,7 +72,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           }
         }
 
-        throw new Error(errorMessage);
+        return throwError(() => errorMessage)
 
       })
     )
