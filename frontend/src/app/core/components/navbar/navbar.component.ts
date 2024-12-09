@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NavigationEnd, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {TokenService} from '../../services/token/token.service';
 import {NotificationService} from '../../../api/generated/services/notification.service';
 import {BehaviorSubject, takeUntil} from 'rxjs';
@@ -15,7 +15,9 @@ import {filter} from 'rxjs/operators';
     RouterLink,
     NgIf,
     AsyncPipe,
-    NgForOf
+    NgForOf,
+    NgSwitch,
+    NgSwitchCase
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'

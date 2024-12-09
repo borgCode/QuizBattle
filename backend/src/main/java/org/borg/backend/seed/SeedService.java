@@ -1,4 +1,4 @@
-package org.borg.backend;
+package org.borg.backend.seed;
 
 import org.springframework.stereotype.Service;
 

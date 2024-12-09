@@ -10,11 +10,23 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((err: HttpErrorResponse) => {
         if (err.error?.validationErrors) {
+          console.log("Throwing early error")
           return throwError(() => err);
         }
+
+        //Parse the JSON format error
+        let errorBody = err.error;
+        if (typeof err.error === 'string') {
+          try {
+            errorBody = JSON.parse(err.error);
+          } catch (e) {
+            console.error('Failed to parse error response:', e);
+          }
+        }
+
         let errorMessage = 'An unexpected error occurred';
-        if (err.error?.businessErrorCode) {
-          switch (err.error.businessErrorCode) {
+        if (errorBody.businessErrorCode) {
+          switch (errorBody.businessErrorCode) {
             case 305:
               errorMessage = 'Cannot send friend request to a blocked user';
               break;

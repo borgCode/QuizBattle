@@ -1,4 +1,4 @@
-package org.borg.backend;
+package org.borg.backend.seed;
 
 import com.github.javafaker.Faker;
 import org.borg.backend.multiplayer.model.GameStatus;
@@ -115,7 +115,7 @@ public class QuizGameSeeder {
     }
 
     private List<Question> createQuestions(int count) {
-        List<String> categories = Arrays.asList("History", "Science", "Geography", "Entertainment", "Sports");
+        List<String> categories = Arrays.asList("History", "Science", "Geography", "Entertainment", "Sports", "Literature", "Culture");
         List<Question> questions = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {

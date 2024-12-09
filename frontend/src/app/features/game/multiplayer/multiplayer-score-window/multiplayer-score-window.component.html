@@ -4,7 +4,10 @@
       <app-player-card
         [playerDisplayName]="gameState.playerDTOS[(opponentIndex + 1) % 2].displayName"></app-player-card>
     </div>
-    <div class="col-6 col-md-3 offset-md-6">
+    <div class="score-panel col-md-4 offset-md-1 align-content-center text-center">
+      <p>{{gameState.scores[gameState.playerDTOS[(opponentIndex + 1) % 2].id]}} - {{gameState.scores[gameState.playerDTOS[opponentIndex].id]}}</p>
+    </div>
+    <div class="col-6 col-md-3 offset-md-1">
       <app-player-card
         [playerDisplayName]="gameState.playerDTOS[opponentIndex].displayName"></app-player-card>
       <div (click)="sendFriendRequest(gameState.playerDTOS[opponentIndex].username)" class="btn btn-primary mt-2">Send friend request</div>

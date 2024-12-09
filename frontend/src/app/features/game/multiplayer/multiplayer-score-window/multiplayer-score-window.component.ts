@@ -17,6 +17,7 @@ interface BoxRow {
   right: Box[];
 }
 
+
 @Component({
   selector: 'app-multiplayer-score-window',
   imports: [
@@ -79,7 +80,9 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             player.id !== this.storedPlayerId
           );
 
+
           this.results = this.gameState.results
+
 
           this.results.forEach((result) => {
               if (result.playerId == this.storedPlayerId) {
@@ -136,13 +139,11 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   sendFriendRequest(username: string) {
     this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverUsername: username}}).subscribe({
-      next: () => this.alertMessageService.show('Friend reqeust sent successfully', 'success'),
+      next: () => this.alertMessageService.show('Friend request sent successfully', 'success'),
       error: (err) => this.alertMessageService.show(err.message, 'error')
 
     });
   }
 
-  private showPopup(message: string, type: 'success' | 'error') {
-    console.log(`${type.toUpperCase()}: ${message}`);
-  }
+  protected readonly Object = Object;
 }

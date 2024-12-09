@@ -4,3 +4,7 @@
   background-color: #ccc;
   border: 1px solid #999;
 }
+
+.score-panel {
+  font-size: 60px;
+}

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.handler.BusinessErrorCodes;
 import org.borg.backend.handler.FriendshipException;
+import org.borg.backend.notification.NotificationService;
 import org.borg.backend.player.Player;
 import org.borg.backend.player.PlayerDTO;
 import org.borg.backend.player.PlayerMapper;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final PlayerRepository playerRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
@@ -48,6 +50,10 @@ public class FriendshipService {
                 .friendShipDate(LocalDate.now())
                 .status(FriendshipStatus.PENDING)
                 .build());
+        
+        //Send notification to receiving player
+        
+        notificationService.sendFriendRequestNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName());
     }
 
 
