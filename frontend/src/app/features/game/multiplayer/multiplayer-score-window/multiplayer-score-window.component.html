@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="col-2 d-flex align-items-center justify-content-center">
-      <h5>Row {{ i + 1 }} Label</h5>
+      <h5>{{gameState.roundCategories[i]}}</h5>
     </div>
     <div class="col-5">
       <div class="row">
@@ -50,7 +50,7 @@
         </ng-template>
       </div>
       <ng-template #gameOverBlock>
-        <div class="btn btn-success btn-lg me-5">
+        <div class="btn btn-success btn-lg me-5" (click)="backToMultiplayerPage()">
           Back to menu
         </div>
         <div class="btn btn-success btn-lg">

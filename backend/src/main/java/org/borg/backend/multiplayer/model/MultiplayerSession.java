@@ -57,6 +57,9 @@ public class MultiplayerSession {
     @ElementCollection
     private Set<String> playedCategories;
     
+    @ElementCollection
+    private List<String> roundCategories;
+    
 
     public MultiplayerSession(Player player1, Player player2, Player currentPlayerTurn) {
         players = new ArrayList<>(List.of(player1, player2));

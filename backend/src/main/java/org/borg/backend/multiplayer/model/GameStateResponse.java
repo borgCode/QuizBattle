@@ -21,4 +21,5 @@ public class GameStateResponse {
     private GameStatus status;
     private Set<PlayerQuestionResult> results;
     private List<Long> questionIds;
+    private List<String> roundCategories;
 }

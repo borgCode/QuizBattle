@@ -191,4 +191,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
     });
   }
+
+  backToMultiplayerPage() {
+    this.router.navigate(['multiplayer']);
+  }
 }

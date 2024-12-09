@@ -35,7 +35,8 @@ public class MultiplayerService {
                 multiplayerSession.getScore(),
                 multiplayerSession.getStatus(),
                 multiplayerSession.getQuestionResults(),
-                multiplayerSession.getQuestionIds()
+                multiplayerSession.getQuestionIds(),
+                multiplayerSession.getRoundCategories()
         );
     }
 
@@ -121,6 +122,8 @@ public class MultiplayerService {
         for (String playedCategory : session.getPlayedCategories()) {
             log.warn("Played categories: {}", playedCategory);
         }
+        
+        session.getRoundCategories().add(selectedCategory);
         multiplayerSessionRepository.save(session);
     }
 

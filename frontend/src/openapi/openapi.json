@@ -798,6 +798,12 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          "roundCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
