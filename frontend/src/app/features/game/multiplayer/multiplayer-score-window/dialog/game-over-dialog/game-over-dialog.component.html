@@ -1,0 +1,18 @@
+<div class="game-over-dialog">
+  <h2 mat-dialog-title>Game over!</h2>
+  <mat-dialog-content>
+    <div *ngIf="data.isWon; else elseBlock">
+      <div class="won-message">
+        You won against
+        <span class="opponent-name">{{ data.opponentName }}</span>
+      </div>
+    </div>
+    <ng-template #elseBlock>
+      You lost against
+      <span class="opponent-name">{{ data.opponentName }}</span>
+    </ng-template>
+    <div>
+      <button class="confirm-button" (click)="onConfirm()">OK</button>
+    </div>
+  </mat-dialog-content>
+</div>

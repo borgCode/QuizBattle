@@ -7,6 +7,8 @@ import {MultiplayerService} from '../../../../api/generated/services/multiplayer
 import {PlayerCardComponent} from '../../../../shared/components/player-card/player-card-component';
 import {FriendshipService} from '../../../../api/generated/services/friendship.service';
 import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
+import {MatDialog} from '@angular/material/dialog';
+import {GameOverDialogComponent} from './dialog/game-over-dialog/game-over-dialog.component';
 
 interface Box {
   color: string;
@@ -15,6 +17,12 @@ interface Box {
 interface BoxRow {
   left: Box[];
   right: Box[];
+}
+
+enum GameResult {
+  WIN,
+  LOSS,
+  TIE
 }
 
 
@@ -35,6 +43,10 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   results: Array<PlayerQuestionResult> = [];
   storedPlayerId: number;
   sessionId: number;
+  isGameOver: boolean = false;
+  playerTotalScore: number;
+  opponentTotalScore: number;
+  opponentDisplayName: string;
 
   constructor(
     private multiplayerService: MultiplayerService,
@@ -42,6 +54,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     private alertMessageService: AlertMessageService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private gameOverDialog: MatDialog,
   ) {
   }
 
@@ -80,9 +93,12 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             player.id !== this.storedPlayerId
           );
 
+          this.playerTotalScore = gameState.scores[gameState.playerDTOS[(this.opponentIndex + 1) % 2].id];
+          this.opponentTotalScore = gameState.scores[gameState.playerDTOS[this.opponentIndex].id];
+
+          this.opponentDisplayName = gameState.playerDTOS[this.opponentIndex].displayName;
 
           this.results = this.gameState.results
-
 
           this.results.forEach((result) => {
               if (result.playerId == this.storedPlayerId) {
@@ -94,10 +110,16 @@ export class MultiplayerScoreWindowComponent implements OnInit {
               }
             }
           )
+
+          if (gameState.status == 'COMPLETED') {
+            this.handleGameOver();
+          }
         }
+
       })
     });
   }
+
 
   private indexToBoxPosition(questionIndex: number) {
     const width = 3;
@@ -114,6 +136,31 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       this.boxes[rowIndex][side][colIndex].color = '#EF0107'
     }
 
+  }
+
+  private handleGameOver() {
+    this.isGameOver = true;
+
+    const gameResult: GameResult = (() => {
+      if (this.playerTotalScore > this.opponentTotalScore) {
+        return GameResult.WIN;
+      } else if (this.playerTotalScore < this.opponentTotalScore) {
+        return GameResult.LOSS
+      } else {
+        return GameResult.TIE
+      }
+    })();
+
+    this.showGameOverDialog(gameResult);
+  }
+
+  private showGameOverDialog(gameResult: GameResult) {
+    this.gameOverDialog.open(GameOverDialogComponent, {
+      data: {gameResult: gameResult, opponentName: this.opponentDisplayName},
+      width: '300px',
+      disableClose: true,
+      autoFocus: false
+    })
   }
 
   handleButtonClick() {
@@ -144,6 +191,4 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
     });
   }
-
-  protected readonly Object = Object;
 }

@@ -17,8 +17,7 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 export class MatchConfirmedDialogComponent {
 
   constructor(
-      public dialogRef: MatDialogRef<MatchConfirmedDialogComponent>,
-      @Inject(MAT_DIALOG_DATA)public data: {opponentName: string}
+    @Inject(MAT_DIALOG_DATA)public data: {opponentName: string}
   ) {
   }
 

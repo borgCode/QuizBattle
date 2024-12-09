@@ -1,0 +1,13 @@
+.game-over-dialog {
+  padding: 20px;
+  text-align: center;
+}
+
+.confirm-button {
+  margin-top: 20px;
+  border-radius: 5px;
+  background: #1d980d;
+  width: 50px;
+  transform: scale(1.2)
+
+}
