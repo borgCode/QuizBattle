@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NavigationEnd, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {TokenService} from '../../services/token/token.service';
 import {NotificationService} from '../../../api/generated/services/notification.service';
 import {BehaviorSubject, takeUntil} from 'rxjs';
@@ -14,7 +14,8 @@ import {filter} from 'rxjs/operators';
     RouterLinkActive,
     RouterLink,
     NgIf,
-    AsyncPipe
+    AsyncPipe,
+    NgForOf
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
@@ -63,4 +64,5 @@ export class NavbarComponent implements OnInit {
   }
 
 
+  protected readonly length = length;
 }
