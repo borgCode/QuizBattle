@@ -1,0 +1,10 @@
+<h3 class="text-center">Friends</h3>
+<ng-container *ngFor="let friend of friendsList">
+  <div class="row align-items-center bg-light">
+    <div class="player-avatar col 6  p-2 me-3">
+      <img src="https://placehold.co/40" alt="player avatar" class="rounded-circle"/>
+    </div>
+    <div class="player-name col 6 fw-bold">{{ friend.displayName }}</div>
+
+  </div>
+</ng-container>

@@ -33,32 +33,43 @@ public class FriendshipService {
         Player receivingPlayer = playerRepository.findByUsername(request.getReceiverUsername())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
+        List<Friendship> existingFriendships = friendshipRepository.
+                findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
+                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
 
-        if (existingFriendship.isPresent()) {
-            Friendship friendship = existingFriendship.get();
-            switch (friendship.getStatus()) {
-                case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
-                case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
-                case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+        if (existingFriendships.isEmpty()) {
+            friendshipRepository.save(Friendship.builder()
+                    .player1(sendingPlayer)
+                    .player2(receivingPlayer)
+                    .friendShipDate(LocalDate.now())
+                    .status(FriendshipStatus.PENDING)
+                    .build());
+
+            //Send notification to receiving player
+
+            notificationService.sendFriendRequestNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName());
+        } else {
+            Friendship friendship = existingFriendships.get(0);
+            if (friendship.getPlayer1().equals(sendingPlayer)) {
+                switch (friendship.getStatus()) {
+                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
+                    case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
+                    case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+                }
+            } else {
+                if (friendship.getStatus() == FriendshipStatus.PENDING) {
+                    friendship.setStatus(FriendshipStatus.ACTIVE);
+                    friendshipRepository.save(friendship);
+                    
+                    //TODO Notification for accepted friend
+                }
             }
         }
-        
-        friendshipRepository.save(Friendship.builder()
-                .player1(sendingPlayer)
-                .player2(receivingPlayer)
-                .friendShipDate(LocalDate.now())
-                .status(FriendshipStatus.PENDING)
-                .build());
-        
-        //Send notification to receiving player
-        
-        notificationService.sendFriendRequestNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName());
+
     }
 
 
-
-//TODO refactor code
+    //TODO refactor code
     public void blockPlayer(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
