@@ -3,7 +3,7 @@ package org.borg.backend.multiplayer.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.player.PlayerDTO;
+import org.borg.backend.player.model.PlayerDTO;
 
 import java.util.List;
 import java.util.Map;

@@ -3,7 +3,7 @@ package org.borg.backend.role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.player.Player;
+import org.borg.backend.player.model.Player;
 
 import java.util.List;
 

@@ -1,5 +1,8 @@
 package org.borg.backend.player;
 
+import org.borg.backend.player.model.Player;
+import org.borg.backend.player.model.PlayerDTO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +16,7 @@ public class PlayerMapper {
                 .id(player.getId())
                 .username(player.getUsername())
                 .displayName(player.getDisplayName())
-                .numOfGames(player.getNumOfGames())
-                .numOfWins(player.getNumOfWins())
-                .numOfLosses(player.getNumOfLosses())
+                .stats(player.getStats())
                 .build();
     }
     
@@ -26,9 +27,7 @@ public class PlayerMapper {
                     .id(player.getId())
                     .username(player.getUsername())
                     .displayName(player.getDisplayName())
-                    .numOfGames(player.getNumOfGames())
-                    .numOfWins(player.getNumOfWins())
-                    .numOfLosses(player.getNumOfLosses())
+                    .stats(player.getStats())
                     .build();
             dtoList.add(playerDTO);
         }

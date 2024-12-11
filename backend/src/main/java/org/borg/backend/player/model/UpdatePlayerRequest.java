@@ -1,4 +1,4 @@
-package org.borg.backend.player;
+package org.borg.backend.player.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

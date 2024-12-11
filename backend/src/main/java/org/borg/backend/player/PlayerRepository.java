@@ -1,5 +1,6 @@
 package org.borg.backend.player;
 
+import org.borg.backend.player.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

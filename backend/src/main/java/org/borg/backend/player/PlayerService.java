@@ -1,6 +1,9 @@
 package org.borg.backend.player;
 
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.player.model.Player;
+import org.borg.backend.player.model.PlayerDTO;
+import org.borg.backend.player.model.UpdatePlayerRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;

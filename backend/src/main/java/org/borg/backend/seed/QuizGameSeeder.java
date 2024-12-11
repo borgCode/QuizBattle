@@ -4,8 +4,10 @@ import com.github.javafaker.Faker;
 import org.borg.backend.multiplayer.model.GameStatus;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.player.Player;
+import org.borg.backend.player.model.CategoryStats;
+import org.borg.backend.player.model.Player;
 import org.borg.backend.player.PlayerRepository;
+import org.borg.backend.player.model.Stats;
 import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;
 import org.borg.backend.question.QuestionRepository;
@@ -46,14 +48,17 @@ public class QuizGameSeeder {
 
     @Transactional
     public void seedDatabase(int numPlayers, int numQuestions, int numSessions) {
+
+        List<String> categories = Arrays.asList("History", "Science", "Geography", "Entertainment", "Sports", "Literature", "Culture");
+        
         // Create roles first
         List<Role> roles = createRoles();
 
         // Create players
-        List<Player> players = createPlayers(numPlayers, roles);
+        List<Player> players = createPlayers(numPlayers, roles, categories);
 
         // Create questions
-        List<Question> questions = createQuestions(numQuestions);
+        List<Question> questions = createQuestions(numQuestions, categories);
 
         // Create multiplayer sessions with more sessions per player
         createMultiplayerSessions(numSessions, players, questions);
@@ -72,7 +77,7 @@ public class QuizGameSeeder {
                 .collect(Collectors.toList());
     }
 
-    private List<Player> createPlayers(int count, List<Role> roles) {
+    private List<Player> createPlayers(int count, List<Role> roles, List<String> categories) {
         Role userRole = roles.stream()
                 .filter(r -> r.getName().equals("USER"))
                 .findFirst()
@@ -85,12 +90,28 @@ public class QuizGameSeeder {
         testUser.setUsername("testuser");
         testUser.setPassword(passwordEncoder.encode("password"));
         testUser.setDisplayName("Test User");
-        testUser.setNumOfGames(10);
-        testUser.setNumOfWins(5);
-        testUser.setNumOfLosses(5);
         testUser.setAccountLocked(false);
         testUser.setEnabled(true);
         testUser.setRoles(Collections.singletonList(userRole));
+
+        Stats testStats = new Stats();
+        testStats.setPlayer(testUser);
+        testStats.setNumOfGames(10);
+        testStats.setNumOfWins(5);
+        testStats.setNumOfLosses(5);
+
+        Map<String, CategoryStats> testCategoryStatsMap = new HashMap<>();
+        for (String category : categories) {
+            CategoryStats categoryStats = new CategoryStats();
+            categoryStats.setStats(testStats);
+            categoryStats.setWins(random.nextInt(10)); // Example: Random wins for the category
+            categoryStats.setLosses(random.nextInt(10)); // Example: Random losses for the category
+            testCategoryStatsMap.put(category, categoryStats);
+        }
+
+        testStats.setCategoryStats(testCategoryStatsMap);
+        testUser.setStats(testStats);
+
         players.add(playerRepository.save(testUser));
 
         for (int i = 0; i < count; i++) {
@@ -98,24 +119,35 @@ public class QuizGameSeeder {
             player.setUsername(faker.name().username() + random.nextInt(1000));
             player.setPassword("$2a$10$" + faker.crypto().sha256().substring(0, 50));
             player.setDisplayName(faker.superhero().name());
-            player.setNumOfGames(random.nextInt(50));
-            if (player.getNumOfGames() > 0) {
-                player.setNumOfWins(random.nextInt(player.getNumOfGames()));
-            } else {
-                player.setNumOfWins(0);
-            }
-            player.setNumOfLosses(player.getNumOfGames() - player.getNumOfWins());
             player.setAccountLocked(false);
             player.setEnabled(true);
             player.setRoles(Collections.singletonList(userRole));
+
+            Stats stats = new Stats();
+            stats.setPlayer(player);
+            stats.setNumOfGames(0); // Initialize with 0 games
+            stats.setNumOfWins(0); // Initialize with 0 wins
+            stats.setNumOfLosses(0); // Initialize with 0 losses
+
+            Map<String, CategoryStats> categoryStatsMap = new HashMap<>();
+            for (String category : categories) {
+                CategoryStats categoryStats = new CategoryStats();
+                categoryStats.setStats(stats);
+                categoryStats.setWins(random.nextInt(10)); // Example: Random wins for the category
+                categoryStats.setLosses(random.nextInt(10)); // Example: Random losses for the category
+                categoryStatsMap.put(category, categoryStats);
+            }
+
+            stats.setCategoryStats(categoryStatsMap);
+            player.setStats(stats);
 
             players.add(playerRepository.save(player));
         }
         return players;
     }
 
-    private List<Question> createQuestions(int count) {
-        List<String> categories = Arrays.asList("History", "Science", "Geography", "Entertainment", "Sports", "Literature", "Culture");
+    private List<Question> createQuestions(int count, List<String> categories) {
+        
         List<Question> questions = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {

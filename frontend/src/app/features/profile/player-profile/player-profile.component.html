@@ -1,50 +1,37 @@
-<!--<div class="user-profile-section">-->
-<!--&lt;!&ndash;  <input type="file" (change)="onFileSelected($event)" accept="image/*">&ndash;&gt;-->
-<!--&lt;!&ndash;  <img [src]="profileImageUrl || '/api/placeholder/150/150'" alt="Profile Picture">&ndash;&gt;-->
-<!--  <h1>{{user.displayName}}</h1>-->
-<!--</div>-->
-
-<!--<div class="stats">-->
-<!--  <h2>Game Statistics</h2>-->
-<!--  <div class="match-stats">-->
-<!--    <h3>Match Statistics</h3>-->
-<!--    <p>Total Matches: {{user.numOfGames}}</p>-->
-<!--    <p>Wins: {{user.numOfWins}}</p>-->
-<!--    <p>Losses: {{user.numOfLosses}}</p>-->
-<!--&lt;!&ndash;    <p>Win Rate: {{winRate}}%</p>&ndash;&gt;-->
-<!--  </div>-->
-<!--</div>-->
-
 
 <div class="container p-5">
   <div class="container">
-  <div class="row text-center g-4">
-    <div class="col-md">
-      <div class="card">
-        <img src="https://placehold.co/400" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">{{ player?.displayName }}</h5>
-          <a href="#" class="btn btn-primary">Edit Profile</a>
+    <div class="row text-center g-4">
+      <div class="col-md-4">
+        <div class="card">
+          <img src="https://placehold.co/400" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">{{ player?.displayName }}</h5>
+            <a href="#" class="btn btn-primary">Edit Profile</a>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-md">
-      <div class="card">
-        <div class="card-header">Stats</div>
-        <div class="card-body">
-          <ul class="list-group">
-            <li class="list-group-item">Total games played: {{ player?.numOfGames }}</li>
-            <li class="list-group-item">Wins: {{ player?.numOfWins }}</li>
-            <li class="list-group-item">Losses: {{ player?.numOfLosses }}</li>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">Stats</div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li class="list-group-item">Total games played: {{ player?.stats.numOfGames }}</li>
+              <li class="list-group-item">Wins: {{ player?.stats.numOfWins }}</li>
+              <li class="list-group-item">Losses: {{ player?.stats.numOfLosses }}</li>
 
-<!--            //TODO win rate for userDTO-->
-<!--            <li class="list-group-item">Win rate: {{ user?.numOfLosses }}</li>-->
-          </ul>
+              <!--            //TODO win rate for userDTO-->
+              <!--            <li class="list-group-item">Win rate: {{ user?.numOfLosses }}</li>-->
+            </ul>
+          </div>
         </div>
       </div>
+      <div class="col-md-4">Friends?</div>
     </div>
-    <div class="col-md">Friends?</div>
+    <div class="row">
+      <div class="col-md-5 offset-md-4"></div>
+    </div>
   </div>
 </div>
-</div>
+<app-category-pie-chart></app-category-pie-chart>
 

@@ -1,4 +1,4 @@
-package org.borg.backend.player;
+package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,13 +28,14 @@ public class Player implements UserDetails {
     
     @Column(unique = true)
     private String username;
+    
     private String password;
     private String displayName;
-    private int numOfGames;
-    private int numOfWins;
-    private int numOfLosses;
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
+    private Stats stats;
     private boolean accountLocked;
     private boolean enabled;
+    
     @ManyToMany(mappedBy = "players")
     private List<MultiplayerSession> session;
     

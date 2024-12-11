@@ -7,7 +7,7 @@ import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.model.PendingSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.multiplayer.repository.PendingSessionRepository;
-import org.borg.backend.player.Player;
+import org.borg.backend.player.model.Player;
 import org.borg.backend.player.PlayerRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

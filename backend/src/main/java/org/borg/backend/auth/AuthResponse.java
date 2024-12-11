@@ -3,7 +3,7 @@ package org.borg.backend.auth;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.player.PlayerDTO;
+import org.borg.backend.player.model.PlayerDTO;
 
 @Getter
 @Setter

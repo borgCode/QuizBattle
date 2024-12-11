@@ -646,6 +646,23 @@
           }
         }
       },
+      "CategoryStats": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wins": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "losses": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "PlayerDTO": {
         "type": "object",
         "properties": {
@@ -659,6 +676,18 @@
           "displayName": {
             "type": "string"
           },
+          "stats": {
+            "$ref": "#/components/schemas/Stats"
+          }
+        }
+      },
+      "Stats": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
           "numOfGames": {
             "type": "integer",
             "format": "int32"
@@ -670,6 +699,12 @@
           "numOfLosses": {
             "type": "integer",
             "format": "int32"
+          },
+          "categoryStats": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryStats"
+            }
           }
         }
       },

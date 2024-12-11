@@ -2,7 +2,7 @@ package org.borg.backend.friendship;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.player.Player;
+import org.borg.backend.player.model.Player;
 
 import java.time.LocalDate;
 

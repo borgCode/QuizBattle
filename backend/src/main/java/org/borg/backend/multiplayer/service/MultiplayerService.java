@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.model.*;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.multiplayer.util.MultiplayerGameConstants;
-import org.borg.backend.player.Player;
+import org.borg.backend.player.model.Player;
 import org.borg.backend.player.PlayerMapper;
 import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;

@@ -2,6 +2,8 @@ package org.borg.backend.player;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.player.model.PlayerDTO;
+import org.borg.backend.player.model.UpdatePlayerRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
