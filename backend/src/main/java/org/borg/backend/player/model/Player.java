@@ -36,6 +36,8 @@ public class Player implements UserDetails {
     private boolean accountLocked;
     private boolean enabled;
     
+    private String avatarPath;
+    
     @ManyToMany(mappedBy = "players")
     private List<MultiplayerSession> session;
     

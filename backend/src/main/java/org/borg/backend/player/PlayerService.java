@@ -49,7 +49,8 @@ public class PlayerService {
         log.warn("Saving profile pic");
         String profilePicturePath = fileStorageService.saveProfilePicture(file, playerId);
         log.warn("SAved + {}", profilePicturePath);
-        
+        player.setAvatarPath(profilePicturePath);
+        playerRepository.save(player);
     }
 }
 

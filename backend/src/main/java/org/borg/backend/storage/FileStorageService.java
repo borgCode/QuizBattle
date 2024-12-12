@@ -31,19 +31,18 @@ public class FileStorageService {
             return null;
         }
         
-        
         final String fileExtension = getFileExtension(file.getOriginalFilename());
         String savedFileName = System.currentTimeMillis() + "." + fileExtension;
 
-        Path targetPath= Paths.get(fullProfilePicDirectory + File.separator + savedFileName);
+        Path targetPath = Paths.get(fullProfilePicDirectory + File.separator + savedFileName);
         
         try {
             Files.write(targetPath, file.getBytes());
         } catch (IOException e) {
             log.error("File was not saved", e);
         }
-
-        return null;
+        
+        return playerId + File.separator + savedFileName;
 
     }
 
@@ -58,10 +57,5 @@ public class FileStorageService {
         return originalFilename.substring(lastDotIndex + 1).toLowerCase();
     }
 
-    private void resizeImages(String profilePicSubPath) {
-        
-        
-    }
-
-    //TODO 300x300 for profile pic
+    
 }
