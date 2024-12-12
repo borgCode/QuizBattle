@@ -44,7 +44,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     });
 
     let questionIds = (history.state as any).questionIds;
-    console.log(questionIds);
 
     if (questionIds) {
       this.questionService.getCurrentQuestions({currentQuestionIds: questionIds}).subscribe({
@@ -86,10 +85,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   }
 
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
-    console.log("QuestionID: " + selectedAnswer.questionId);
-    console.log("Answer: " + selectedAnswer.answer);
-    console.log("Sending session: " + this.sessionId);
-    console.log("Sending playerId: " + this.storedPlayerId);
+
     const validationRequest = {
       body: {
         questionId: selectedAnswer.questionId,
@@ -99,12 +95,10 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       }
     }
 
-    console.log("Sending answer for validation")
     this.questionService.validateAnswer(validationRequest).subscribe({
       next: (response: AnswerValidationResponse) => {
         this.answerIsCorrect = response.correct;
         this.correctAnswerIndex = response.correctAnswerIndex
-
       }
     })
 

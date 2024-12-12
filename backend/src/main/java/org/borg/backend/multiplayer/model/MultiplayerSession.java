@@ -19,11 +19,9 @@ public class MultiplayerSession {
     private Long id;
     
     @ManyToMany
-    @JoinTable(
-            name = "session_players",
+    @JoinTable(name = "session_players",
             joinColumns = @JoinColumn(name = "session_id"),
-            inverseJoinColumns = @JoinColumn(name = "player_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "player_id"))
     private List<Player> players;
     
     private Integer currentQuestionIndex;
@@ -59,11 +57,19 @@ public class MultiplayerSession {
     
     @ElementCollection
     private List<String> roundCategories;
+
+    @ElementCollection
+    @CollectionTable(name = "player_acknowledgment")
+    @MapKeyColumn(name = "player_id")
+    @Column(name = "has_acknowledged_game_over")
+    private Map<Long, Boolean> playerAcknowledgment;
+    
     
 
     public MultiplayerSession(Player player1, Player player2, Player currentPlayerTurn) {
         players = new ArrayList<>(List.of(player1, player2));
         score = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
+        playerAcknowledgment = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
         status = GameStatus.ACTIVE;
         this.currentQuestionIndex = 0;
         this.currentPlayerTurn = currentPlayerTurn;

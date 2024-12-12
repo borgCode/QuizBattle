@@ -22,4 +22,5 @@ public class GameStateResponse {
     private Set<PlayerQuestionResult> results;
     private List<Long> questionIds;
     private List<String> roundCategories;
+    private Map<Long, Boolean> playerAcknowledgment;
 }

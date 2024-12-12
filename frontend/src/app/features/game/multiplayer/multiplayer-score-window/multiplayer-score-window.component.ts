@@ -48,6 +48,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   opponentTotalScore: number;
   opponentDisplayName: string;
   opponentAvatar: string = '';
+  hasAcknowledgedGameOver: boolean;
 
   constructor(
     private multiplayerService: MultiplayerService,
@@ -56,6 +57,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private gameOverDialog: MatDialog,
+
   ) {
   }
 
@@ -113,8 +115,15 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             }
           )
 
+          this.hasAcknowledgedGameOver = gameState.playerAcknowledgment[this.storedPlayerId];
+
           if (gameState.status == 'COMPLETED') {
-            this.handleGameOver();
+            this.isGameOver = true;
+
+            if (!this.hasAcknowledgedGameOver) {
+              this.handleGameOver();
+            }
+
           }
         }
 
@@ -141,7 +150,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   private handleGameOver() {
-    this.isGameOver = true;
+
+
 
     const gameResult: GameResult = (() => {
       if (this.playerTotalScore > this.opponentTotalScore) {
@@ -154,6 +164,12 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     })();
 
     this.showGameOverDialog(gameResult);
+
+    console.log("Sending complete game")
+    this.multiplayerService.acknowledgeGameOver({ sessionId: this.sessionId, playerId: this.storedPlayerId }).subscribe({
+      next: () => console.log('Request successful!'),
+      error: (err) => console.error('Error occurred:', err),
+    });
   }
 
   private showGameOverDialog(gameResult: GameResult) {

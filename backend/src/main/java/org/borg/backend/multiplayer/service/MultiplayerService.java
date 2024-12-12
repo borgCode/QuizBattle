@@ -36,7 +36,8 @@ public class MultiplayerService {
                 multiplayerSession.getStatus(),
                 multiplayerSession.getQuestionResults(),
                 multiplayerSession.getQuestionIds(),
-                multiplayerSession.getRoundCategories()
+                multiplayerSession.getRoundCategories(),
+                multiplayerSession.getPlayerAcknowledgment()
         );
     }
 
@@ -143,5 +144,12 @@ public class MultiplayerService {
         return multiplayerSessionDTOS;
     }
 
+    public void acknowledgeGameOver(Long sessionId, Long playerId) {
+        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+        
+        session.getPlayerAcknowledgment().put(playerId, true);
+        multiplayerSessionRepository.save(session);
+    }
 }
             

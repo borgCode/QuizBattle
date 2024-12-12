@@ -138,6 +138,39 @@
         }
       }
     },
+    "/multiplayer/session/{sessionId}/complete/{playerId}": {
+      "post": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "acknowledgeGameOver",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/friendship/block": {
       "post": {
         "tags": [
@@ -890,6 +923,12 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "playerAcknowledgment": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
             }
           }
         }

@@ -48,7 +48,6 @@ public class MultiplayerController {
     }
     
     
-    
     @DeleteMapping("/matchmaking/cancel/{playerId}")
     public ResponseEntity<Void> cancelMatchmaking(@PathVariable Long playerId) {
         matchMakingService.cancelMatchmaking(playerId);
@@ -60,6 +59,13 @@ public class MultiplayerController {
     public ResponseEntity<GameStateResponse> getGameState(@PathVariable Long sessionId) {
         log.warn("Getting game state");
         return ResponseEntity.ok(multiplayerService.getGameState(sessionId));
+    }
+    
+    @PostMapping("/session/{sessionId}/complete/{playerId}")
+    public ResponseEntity<Void> acknowledgeGameOver(@PathVariable Long sessionId, @PathVariable Long playerId) {
+        log.warn("Called complete game");
+        multiplayerService.acknowledgeGameOver(sessionId, playerId);
+        return ResponseEntity.ok().build();
     }
     
     
