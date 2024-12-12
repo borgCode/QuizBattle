@@ -1,6 +1,6 @@
 <div class="container p-2">
   <div class="row" style="height: 350px">
-    <div class="col-8 col-sm-3 h-75">
+    <div class="col-8 col-sm-3 h-100">
       <app-player-card
         [playerAvatar]="'data:image/jpeg;base64,' + gameState.playerDTOS[(opponentIndex + 1) % 2].base64Image"
         [playerDisplayName]="gameState.playerDTOS[(opponentIndex + 1) % 2].displayName"></app-player-card>

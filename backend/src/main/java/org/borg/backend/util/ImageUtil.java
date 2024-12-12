@@ -16,7 +16,13 @@ public class ImageUtil {
         String basePath = "backend/src/main/java/org/borg/backend/storage/profile-pics/";
 
         if (subFilePath == null || subFilePath.isEmpty()) {
-            return null;
+            try {
+                Path path = Paths.get("backend/src/main/java/org/borg/backend/storage/player-pics/placeholder/placeholder.jpg");
+                byte[] imageBytes = Files.readAllBytes(path);
+                return Base64.getEncoder().encodeToString(imageBytes);
+            } catch (IOException e) {
+                //TODO error handling
+            }
         }
 
         try {
