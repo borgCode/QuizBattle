@@ -2,6 +2,7 @@ package org.borg.backend.player;
 
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerDTO;
+import org.borg.backend.util.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ public class PlayerMapper {
                 .username(player.getUsername())
                 .displayName(player.getDisplayName())
                 .stats(player.getStats())
+                .base64Image(ImageUtil.encodeImageFileToBase64(player.getAvatarPath()))
                 .build();
     }
     
@@ -28,6 +30,7 @@ public class PlayerMapper {
                     .username(player.getUsername())
                     .displayName(player.getDisplayName())
                     .stats(player.getStats())
+                    .base64Image(ImageUtil.encodeImageFileToBase64(player.getAvatarPath()))
                     .build();
             dtoList.add(playerDTO);
         }

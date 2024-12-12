@@ -56,6 +56,8 @@ public class FileStorageService {
         }
         return originalFilename.substring(lastDotIndex + 1).toLowerCase();
     }
+    
+    
 
     
 }

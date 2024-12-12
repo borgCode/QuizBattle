@@ -1,6 +1,7 @@
 package org.borg.backend.auth;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.role.Role;
 import org.borg.backend.role.RoleRepository;
 import org.borg.backend.security.JwtService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -53,6 +55,8 @@ public class AuthService {
         //Return userDTO if login is successful
 
         PlayerDTO playerDTO = PlayerMapper.toDTO(player);
+        
+        log.warn("Avatar image: " + playerDTO.getBase64Image());
 
         return AuthResponse.builder()
                 .message("Login successful")

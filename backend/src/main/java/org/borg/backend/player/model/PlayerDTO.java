@@ -12,4 +12,5 @@ public class PlayerDTO {
     private String username;
     private String displayName;
     private Stats stats;
+    private String base64Image;
 }
