@@ -1,11 +1,13 @@
 package org.borg.backend.player;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.player.model.PlayerDTO;
 import org.borg.backend.player.model.UpdatePlayerRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("player")
@@ -16,7 +18,7 @@ public class PlayerController {
     private final PlayerService playerService;
 
     @GetMapping("/{username}")
-    public PlayerDTO getPlayerById(@PathVariable String username) {
+    public PlayerDTO getPlayerByUsername(@PathVariable String username) {
         return playerService.getPlayerByName(username);
     }
 
@@ -25,6 +27,14 @@ public class PlayerController {
         playerService.updatePlayer(request);
         return ResponseEntity.ok().build();  
     }
+    
+    @PostMapping(value = "/{playerId}/profile-picture-upload", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadProfilePicture(@PathVariable Long playerId, @Parameter() @RequestPart("file") MultipartFile file) {
+        playerService.uploadProfilePicture(playerId, file);
+        return ResponseEntity.accepted().build();
+    }
+    
+    
     
     //TODO add friend mapping
     

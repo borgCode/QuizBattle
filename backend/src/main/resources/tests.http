@@ -20,3 +20,13 @@ Content-Type: application/json
   "username": "testuser",
   "password": "password123"
 }
+### Upload image
+POST http://localhost:8080/player/1/profile-picture-upload
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="cat.jpg"
+Content-Type: image/jpeg
+
+./backend/src/test-image/cat.jpg
+--boundary--

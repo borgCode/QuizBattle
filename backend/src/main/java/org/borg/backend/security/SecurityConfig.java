@@ -38,6 +38,7 @@ public class SecurityConfig {
                                         "/auth/**",
                                         "/api/**",
                                         "/user/**",
+                                        "/player/**",
                                         "/notification/**",
                                         "/socket/**",
                                         "/v3/api-docs",
