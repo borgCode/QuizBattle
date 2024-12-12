@@ -17,6 +17,7 @@ import {FriendshipService} from '../../../api/generated/services/friendship.serv
 export class PlayerProfileComponent implements OnInit {
   player!: PlayerDto;
   friendsList!: PlayerDto[]
+  image: string = '';
 
   constructor(
     private loginStateService: LoginStateService,
@@ -30,6 +31,7 @@ export class PlayerProfileComponent implements OnInit {
     if (!this.player) {
       console.warn('No logged-in user found!');
     }
+    this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
 
     this.getFriends();
   }

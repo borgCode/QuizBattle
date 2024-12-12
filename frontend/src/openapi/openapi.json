@@ -65,6 +65,55 @@
         }
       }
     },
+    "/player/{playerId}/profile-picture-upload": {
+      "post": {
+        "tags": [
+          "Player"
+        ],
+        "operationId": "uploadProfilePicture",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/notification/send/{playerId}": {
       "post": {
         "tags": [
@@ -347,7 +396,7 @@
         "tags": [
           "Player"
         ],
-        "operationId": "getPlayerById",
+        "operationId": "getPlayerByUsername",
         "parameters": [
           {
             "name": "username",
@@ -678,6 +727,9 @@
           },
           "stats": {
             "$ref": "#/components/schemas/Stats"
+          },
+          "base64Image": {
+            "type": "string"
           }
         }
       },
