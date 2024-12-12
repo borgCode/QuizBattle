@@ -2,7 +2,10 @@
   <div class="container g-4">
     <div class="row mb-4 g-3">
       <div class="col-md-3">
-        <app-player-card [playerDisplayName]="player.displayName"></app-player-card>
+        <app-player-card
+          [playerDisplayName]="player.displayName"
+          [playerAvatar]="image"
+        ></app-player-card>
       </div>
       <div class="col-md-3 align-content-center">
         <div (click)="!isSearching && findGame()"

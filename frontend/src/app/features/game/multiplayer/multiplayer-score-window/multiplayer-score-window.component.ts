@@ -47,6 +47,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   playerTotalScore: number;
   opponentTotalScore: number;
   opponentDisplayName: string;
+  opponentAvatar: string = '';
 
   constructor(
     private multiplayerService: MultiplayerService,
@@ -97,6 +98,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
           this.opponentTotalScore = gameState.scores[gameState.playerDTOS[this.opponentIndex].id];
 
           this.opponentDisplayName = gameState.playerDTOS[this.opponentIndex].displayName;
+          this.opponentAvatar = 'data:image/jpeg;base64,' + gameState.playerDTOS[this.opponentIndex].base64Image;
 
           this.results = this.gameState.results
 

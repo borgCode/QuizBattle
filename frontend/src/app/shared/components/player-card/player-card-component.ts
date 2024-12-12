@@ -8,5 +8,6 @@ import {Component, Input} from '@angular/core';
 })
 export class PlayerCardComponent {
   @Input() playerDisplayName: string;
+  @Input() playerAvatar: string;
 
 }

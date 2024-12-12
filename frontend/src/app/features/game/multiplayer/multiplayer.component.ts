@@ -39,6 +39,7 @@ export class MultiplayerComponent implements OnInit {
   gameSessions: Array<MultiplayerSessionDto> = [];
   isSearching: boolean = false;
   friends: PlayerDto[] = [];
+  image: string = '';
 
   constructor(
     private loginStateService: LoginStateService,
@@ -59,6 +60,8 @@ export class MultiplayerComponent implements OnInit {
     if (!this.player) {
       console.warn('No logged-in user found!');
     }
+
+    this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
 
     this.getFriends();
 
