@@ -424,19 +424,20 @@
         }
       }
     },
-    "/player/{username}": {
+    "/player/{playerId}": {
       "get": {
         "tags": [
           "Player"
         ],
-        "operationId": "getPlayerByUsername",
+        "operationId": "getPlayerById",
         "parameters": [
           {
-            "name": "username",
+            "name": "playerId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int64"
             }
           }
         ],

@@ -19,8 +19,10 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final FileStorageService fileStorageService;
 
-    public PlayerDTO getPlayerByName(String username) {
-        Player player = playerRepository.findByUsername(username)
+
+
+    public PlayerDTO getPlayerById(Long playerId) {
+        Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new RuntimeException("Player not found"));
         return PlayerMapper.toDTO(player);
     }

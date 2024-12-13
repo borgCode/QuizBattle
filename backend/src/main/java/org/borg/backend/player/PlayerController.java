@@ -17,9 +17,9 @@ public class PlayerController {
     
     private final PlayerService playerService;
 
-    @GetMapping("/{username}")
-    public PlayerDTO getPlayerByUsername(@PathVariable String username) {
-        return playerService.getPlayerByName(username);
+    @GetMapping("/{playerId}")
+    public PlayerDTO getPlayerById(@PathVariable Long playerId) {
+        return playerService.getPlayerById(playerId);
     }
 
     @PutMapping("/update")

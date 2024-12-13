@@ -83,6 +83,12 @@ export class EditProfileComponent implements OnInit {
       }
 
       this.selectedFile = null;
+
+      this.playerService.getPlayerById({playerId: this.player.id}).subscribe({
+        next: value => {
+          this.loginStateService.loggedInUser = value;
+        }
+      })
       //TODO refresh player data
 
 
