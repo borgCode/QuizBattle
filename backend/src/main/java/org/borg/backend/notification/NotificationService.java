@@ -24,7 +24,7 @@ public class NotificationService {
     public void sendFriendRequestNotification(Long receiverId, String senderDisplayName) {
         log.warn("Sending notification from {} to {}", receiverId, senderDisplayName);
         notificationRepository.save(Notification.builder()
-                .receiverId(receiverId)
+                .playerId(receiverId)
                 .type(NotificationType.FRIEND_REQUEST)
                 .message(senderDisplayName + " sent you a friend request!")
                 .isRead(false)
@@ -34,7 +34,7 @@ public class NotificationService {
 
     public void sendRematchStartedNotification(Long receivingId, String senderDisplayName) {
         notificationRepository.save(Notification.builder()
-                .receiverId(receivingId)
+                .playerId(receivingId)
                 .type(NotificationType.REMATCH_ACCEPTED)
                 .message("Your rematch request against " + senderDisplayName + " was accepted!")
                 .isRead(false)
@@ -45,7 +45,7 @@ public class NotificationService {
     public void sendRematchRequestNotification(
             Long receivingId, Long pendingSessionId, String senderDisplayName) {
         notificationRepository.save(Notification.builder()
-                .receiverId(receivingId)
+                .playerId(receivingId)
                 .type(NotificationType.REMATCH_REQUEST)
                 .message(senderDisplayName + " request a rematch against you!")
                 .pendingSessionId(pendingSessionId)
