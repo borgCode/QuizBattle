@@ -10,6 +10,5 @@ import lombok.Setter;
 public class UpdatePlayerRequest {
     private Long playerId;
     private UpdateField updateField;
-    private String newUsername;
     private String newDisplayName;
 }

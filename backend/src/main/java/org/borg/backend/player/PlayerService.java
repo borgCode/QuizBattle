@@ -30,9 +30,6 @@ public class PlayerService {
                 .orElseThrow(() -> new NoSuchElementException("Player not found"));
 
         switch (request.getUpdateField()) {
-            case USERNAME:
-                player.setUsername(request.getNewUsername());
-                break;
             case DISPLAY_NAME:
                 player.setDisplayName(request.getNewDisplayName());
                 break;

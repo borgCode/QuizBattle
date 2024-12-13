@@ -3,6 +3,7 @@ import {PlayerDto} from '../../../api/generated/models/player-dto';
 import {LoginStateService} from '../../../core/services/login-state-service/login-state.service';
 import {PlayerService} from '../../../api/generated/services/player.service';
 import {PlayerCardComponent} from '../../../shared/components/player-card/player-card-component';
+import {firstValueFrom} from 'rxjs';
 
 
 @Component({
@@ -18,6 +19,9 @@ import {PlayerCardComponent} from '../../../shared/components/player-card/player
 export class EditProfileComponent implements OnInit {
   player!: PlayerDto;
   image: string = '';
+  selectedFile: File | null = null;
+  displayName: string;
+  isSaving: boolean;
 
   constructor(
     private loginStateService: LoginStateService,
@@ -32,32 +36,66 @@ export class EditProfileComponent implements OnInit {
     if (!this.player) {
       console.warn('No logged-in user found!');
     }
+
     this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
+    this.displayName = this.player.displayName;
   }
 
-  protected readonly handleImageChange = handleImageChange;
 
-  updatePlayerChanges() {
+  handleImageChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile = input.files?.[0];
 
-  }
-}
-
-
-
-function handleImageChange(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (event: ProgressEvent<FileReader>): void => {
-      if (event.target?.result) {
-        this.image = event.target.result as string;
+    if (this.selectedFile) {
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>): void => {
+        if (event.target?.result) {
+          this.image = event.target.result as string;
+        }
       }
+      reader.readAsDataURL(this.selectedFile);
     }
-    reader.readAsDataURL(file);
+
+
   }
 
+  async updatePlayerChanges() {
+    if (this.displayName.trim() == this.player.displayName && !this.selectedFile) return;
 
+    //TODO validate form input
+    try {
+      this.isSaving = true;
+
+      if (this.selectedFile) {
+        await firstValueFrom(this.playerService.uploadProfilePicture({
+          playerId: this.player.id, body: {
+            file: this.selectedFile
+          }
+        }))
+      }
+
+      if (this.displayName !== this.player.displayName) {
+        await firstValueFrom(
+          this.playerService.updatePlayer({
+            body: {playerId: this.player.id, updateField: "DISPLAY_NAME", newDisplayName: this.displayName}
+          })
+        )
+      }
+
+      this.selectedFile = null;
+      //TODO refresh player data
+
+
+    } catch (error) {
+
+    } finally {
+      this.isSaving = false;
+    }
+
+  }
 }
+
+
+
+
 

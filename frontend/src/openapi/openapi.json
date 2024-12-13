@@ -624,12 +624,8 @@
           "updateField": {
             "type": "string",
             "enum": [
-              "USERNAME",
               "DISPLAY_NAME"
             ]
-          },
-          "newUsername": {
-            "type": "string"
           },
           "newDisplayName": {
             "type": "string"
