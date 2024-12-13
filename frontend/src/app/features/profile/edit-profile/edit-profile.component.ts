@@ -49,7 +49,6 @@ export class EditProfileComponent implements OnInit {
     ]);
   }
 
-
   handleImageChange(event: Event) {
     const input = event.target as HTMLInputElement;
     this.selectedFile = input.files?.[0];
@@ -63,8 +62,6 @@ export class EditProfileComponent implements OnInit {
       }
       reader.readAsDataURL(this.selectedFile);
     }
-
-
   }
 
   async updatePlayerChanges() {
@@ -103,9 +100,6 @@ export class EditProfileComponent implements OnInit {
           this.loginStateService.loggedInUser = value;
         }
       })
-
-
-
     } catch (error) {
       console.log(error)
     } finally {

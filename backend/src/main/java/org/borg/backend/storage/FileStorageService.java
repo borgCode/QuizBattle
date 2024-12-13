@@ -31,6 +31,13 @@ public class FileStorageService {
             return null;
         }
         
+        //Clean old profile
+        for (File listFile : profilePicDirectory.listFiles()) {
+            if (!listFile.isDirectory()) {
+                listFile.delete();
+            }
+        }
+        
         final String fileExtension = getFileExtension(file.getOriginalFilename());
         String savedFileName = System.currentTimeMillis() + "." + fileExtension;
 
