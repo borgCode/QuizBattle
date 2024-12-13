@@ -15,6 +15,7 @@ public enum BusinessErrorCodes {
     FRIENDSHIP_ALREADY_BLOCKED(305, HttpStatus.BAD_REQUEST, "Cannot send friend request to blocked user"),
     FRIENDSHIP_REQUEST_PENDING(306, HttpStatus.BAD_REQUEST, "Friend request is already pending"),
     FRIENDSHIP_ALREADY_EXISTS(307, HttpStatus.BAD_REQUEST, "Friendship already exists"),
+    PROFILE_PIC_TOO_LARGE(413, HttpStatus.PAYLOAD_TOO_LARGE, "File size exceeds the maximum allowed limit of 500KB")
     ;
 
     private final int code;

@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,6 +72,19 @@ public class GlobalExceptionHandler {
                 .body(ExceptionResponse.builder()
                         .validationErrors(validationErrors)
                         .build());
+    }
+    
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ExceptionResponse> handleMaxSizeException(MaxUploadSizeExceededException e) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(
+                        ExceptionResponse.builder()
+                                .businessErrorCode(BusinessErrorCodes.PROFILE_PIC_TOO_LARGE.getCode())
+                                .businessErrorDescription(BusinessErrorCodes.PROFILE_PIC_TOO_LARGE.getDescription())
+                                .error(e.getMessage())
+                                .build()
+                );
     }
     
     @ExceptionHandler(FriendshipException.class)

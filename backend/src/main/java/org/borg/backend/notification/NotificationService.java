@@ -16,9 +16,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public List<Notification> getPlayerNotifications(Long playerId) {
-        List<Notification> notifications = notificationRepository.findByPlayerIdAndIsReadFalse(playerId);
-        log.warn("Notification list size is {}", notifications.size());
-        return notifications;
+        return notificationRepository.findByPlayerIdAndIsReadFalse(playerId);
     }
 
     public void sendFriendRequestNotification(Long id, String displayName) {

@@ -54,6 +54,9 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 307:
               this.alertMessageService.show('You are already friends with this user', 'error');
               break;
+            case 413:
+              this.alertMessageService.show('The file size is too big! Max 500kb', 'error');
+              break;
           }
         } else if (err.status) {
           switch (err.status) {

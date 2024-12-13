@@ -87,7 +87,7 @@ export class EditProfileComponent implements OnInit {
 
 
     } catch (error) {
-
+      console.log(error)
     } finally {
       this.isSaving = false;
     }
