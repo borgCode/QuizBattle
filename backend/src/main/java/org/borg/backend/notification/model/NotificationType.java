@@ -1,4 +1,4 @@
-package org.borg.backend.notification;
+package org.borg.backend.notification.model;
 
 public enum NotificationType {
     FRIEND_REQUEST,

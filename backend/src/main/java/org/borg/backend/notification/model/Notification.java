@@ -1,4 +1,4 @@
-package org.borg.backend.notification;
+package org.borg.backend.notification.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +17,7 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long playerId;
+    private Long receiverId;
     @Enumerated(EnumType.STRING)
     private NotificationType type;
     private Long pendingSessionId;

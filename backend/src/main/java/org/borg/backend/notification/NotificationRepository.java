@@ -1,5 +1,6 @@
 package org.borg.backend.notification;
 
+import org.borg.backend.notification.model.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

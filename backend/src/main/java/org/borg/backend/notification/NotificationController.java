@@ -2,6 +2,7 @@ package org.borg.backend.notification;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.notification.model.Notification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

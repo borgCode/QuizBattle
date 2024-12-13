@@ -3,7 +3,8 @@ package org.borg.backend.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.multiplayer.model.PendingSession;
+import org.borg.backend.notification.model.Notification;
+import org.borg.backend.notification.model.NotificationType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public class NotificationService {
     public void sendFriendRequestNotification(Long receiverId, String senderDisplayName) {
         log.warn("Sending notification from {} to {}", receiverId, senderDisplayName);
         notificationRepository.save(Notification.builder()
-                .playerId(receiverId)
+                .receiverId(receiverId)
                 .type(NotificationType.FRIEND_REQUEST)
                 .message(senderDisplayName + " sent you a friend request!")
                 .isRead(false)
@@ -33,7 +34,7 @@ public class NotificationService {
 
     public void sendRematchStartedNotification(Long receivingId, String senderDisplayName) {
         notificationRepository.save(Notification.builder()
-                .playerId(receivingId)
+                .receiverId(receivingId)
                 .type(NotificationType.REMATCH_ACCEPTED)
                 .message("Your rematch request against " + senderDisplayName + " was accepted!")
                 .isRead(false)
@@ -44,7 +45,7 @@ public class NotificationService {
     public void sendRematchRequestNotification(
             Long receivingId, Long pendingSessionId, String senderDisplayName) {
         notificationRepository.save(Notification.builder()
-                .playerId(receivingId)
+                .receiverId(receivingId)
                 .type(NotificationType.REMATCH_REQUEST)
                 .message(senderDisplayName + " request a rematch against you!")
                 .pendingSessionId(pendingSessionId)

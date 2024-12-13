@@ -22,6 +22,12 @@ public class FriendshipController {
         friendshipService.sendFriendRequest(request);
         return ResponseEntity.ok().build();
     }
+    @PostMapping("/accept")
+    public ResponseEntity<Void> acceptFriend(@RequestBody PlayerInteraction request) {
+        friendshipService.acceptFriend(request);
+        return ResponseEntity.ok().build();
+    }
+    
     @PostMapping("/block")
     public ResponseEntity<Void> blockPlayer(@RequestBody PlayerInteraction request) {
         friendshipService.blockPlayer(request);

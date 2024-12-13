@@ -68,8 +68,14 @@ public class FriendshipService {
 
     }
 
-
+    public void acceptFriend(PlayerInteraction request) {
+        
+    }
+    
+    
+    
     //TODO refactor code
+
     public void blockPlayer(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));

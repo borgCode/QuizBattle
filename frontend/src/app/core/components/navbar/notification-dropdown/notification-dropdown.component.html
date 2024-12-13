@@ -1,0 +1,46 @@
+<ul class="navbar-nav">
+  <li class="nav-item dropdown">
+    <a class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fas fa-bell"></i>
+      <ng-container *ngIf="notifications$ | async as notifications">
+                <span *ngIf="notifications.length > 0"
+                      class="notification-badge badge rounded-pill bg-danger">{{ notifications.length }}</span>
+      </ng-container>
+    </a>
+    <ng-container *ngIf="notifications$ | async as notifications">
+      <ul class="notification-list dropdown-menu dropdown-menu-end">
+        <div *ngFor="let notification of notifications">
+          <ng-container [ngSwitch]="notification.type">
+            <li *ngSwitchCase="'FRIEND_REQUEST'" class="friend-request dropdown-item">
+              <i class="fa-solid fa-exclamation icon"></i>
+              <span>{{ notification.message }}</span>
+              <button type="button" class="btn-accept-friend btn btn-success fa-regular fa-circle-check"
+              data-bs-toggle="tooltip" title="Accept friends request"
+              (click)="acceptFriendRequest()"></button>
+              <div class="btn-decline-friend btn btn-danger fa-solid fa-xmark"
+                   data-bs-toggle="tooltip" title="Decline friend request"
+              (click)="declineFriendRequest()"></div>
+            </li>
+            <li *ngSwitchCase="'REMATCH_REQUEST'" class="rematch-request dropdown-item">
+              <i class="fa-solid fa-gamepad icon"></i>
+              <span>{{ notification.message }}</span>
+            </li>
+            <li *ngSwitchCase="'REMATCH_ACCEPTED'" class="rematch-accepted dropdown-item">
+              <i class="fa-solid fa-check icon"></i>
+              <span>{{ notification.message }}</span>
+            </li>
+            <li *ngSwitchCase="'GAME_WON'" class="game-won dropdown-item">
+              <i class="fa-solid fa-trophy icon"></i>
+              <span>{{ notification.message }}</span>
+            </li>
+            <li *ngSwitchCase="'GAME_LOST'" class="game-lost dropdown-item">
+              <i class="fa-solid fa-thumbs-down icon"></i>
+              <span>{{ notification.message }}</span>
+            </li>
+          </ng-container>
+          <div class="dropdown-divider"></div>
+        </div>
+      </ul>
+    </ng-container>
+  </li>
+</ul>
