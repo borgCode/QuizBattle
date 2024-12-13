@@ -1,0 +1,25 @@
+<div class="container p-5">
+  <div class="row">
+    <div class="col-12 col-md-4 text-center">
+      <app-player-card
+        [playerAvatar]="image"
+        [playerDisplayName]="player.displayName">
+      </app-player-card>
+      <div class="mb-3 mt-3">
+        <input type="file" class="d-none" id="profilePicInput" accept="image/*" (change)="handleImageChange($event)">
+        <label for="profilePicInput" class="btn btn-primary">
+          <i class="bi bi-upload"></i> Upload Profile Picture
+        </label>
+      </div>
+    </div>
+    <div class="col-12 col-md-8">
+      <div class="form-group mb-0">
+        <label for="inputField" class="form-label">Display name</label>
+        <input type="text" class="form-control" id="inputField" placeholder="{{player.displayName}}">
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-success mt-4" (click)="updatePlayerChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>

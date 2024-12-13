@@ -4,6 +4,7 @@ import {PlayerDto} from '../../../api/generated/models/player-dto';
 import {CategoryPieChartComponent} from './category-pie-chart/category-pie-chart.component';
 import {FriendsPanelComponent} from './friends-panel/friends-panel.component';
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-user-profile',
@@ -21,13 +22,14 @@ export class PlayerProfileComponent implements OnInit {
 
   constructor(
     private loginStateService: LoginStateService,
-    private friendshipService: FriendshipService
+    private friendshipService: FriendshipService,
+    private router: Router
   ) {
   }
 
   ngOnInit() {
     this.player = this.loginStateService.loggedInUser;
-    //TODO show user error
+
     if (!this.player) {
       console.warn('No logged-in user found!');
     }
@@ -43,5 +45,9 @@ export class PlayerProfileComponent implements OnInit {
         console.log(this.friendsList)
       }
     })
+  }
+
+  openEditProfile() {
+    this.router.navigate(['edit-profile']);
   }
 }

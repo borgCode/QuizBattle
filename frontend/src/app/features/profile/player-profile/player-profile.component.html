@@ -7,7 +7,7 @@
           <img [src]="image" class="card-img-top" style="max-height: 340px" alt="...">
           <div class="card-body py-1">
             <h5 class="card-title">{{ player?.displayName }}</h5>
-            <a href="#" class="btn btn-primary">Edit Profile</a>
+            <a (click)="openEditProfile()" class="btn btn-primary">Edit Profile</a>
           </div>
         </div>
       </div>

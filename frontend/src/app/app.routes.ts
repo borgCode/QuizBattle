@@ -12,12 +12,14 @@ import {MultiplayerComponent} from './features/game/multiplayer/multiplayer.comp
 import {
   MultiplayerScoreWindowComponent
 } from './features/game/multiplayer/multiplayer-score-window/multiplayer-score-window.component';
+import {EditProfileComponent} from './features/profile/edit-profile/edit-profile.component';
 
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'profile', component: PlayerProfileComponent, canActivate:[authGuard]},
+  {path: 'edit-profile', component: EditProfileComponent, canActivate:[authGuard]},
   {path: 'multiplayer', component: MultiplayerComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId', component: MultiplayerScoreWindowComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId/play', component: MultiplayerPlayRoundComponent, canActivate:[authGuard]},
