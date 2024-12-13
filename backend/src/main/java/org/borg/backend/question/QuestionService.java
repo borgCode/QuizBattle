@@ -1,6 +1,7 @@
 package org.borg.backend.question;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.service.MultiplayerService;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
@@ -29,14 +31,22 @@ public class QuestionService {
     }
 
     public AnswerValidationResponse validateAnswer(AnswerValidationRequest request) {
-        if (request == null || request.getAnswer() == null) {
-            throw new IllegalArgumentException("Request or answer cannot be null");
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
         }
 
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
 
-        boolean isCorrect = question.getCorrectAnswer().equals(request.getAnswer());
+        boolean isCorrect;
+        
+        if (request.getAnswer() == null) {
+            log.warn("Answer is null, setting correct to false");
+            isCorrect = false;
+        } else {
+            isCorrect = question.getCorrectAnswer().equals(request.getAnswer());
+        }
+        
         multiplayerService.updateGameState(
                 request.getSessionId(),
                 request.getPlayerId(),

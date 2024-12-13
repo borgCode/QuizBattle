@@ -9,15 +9,22 @@
   <div class="row">
     <div *ngFor="let option of questions[currentQuestionIndex]?.options; let i = index"
          class="col-12 col-md-6 col-lg-4 mb-3">
-      <div  class="answer-box p-3 border rounded text-center"
-            [class.correct]="i === correctAnswerIndex && hasClickedOption"
-            [class.incorrect]="i === selectedAnswerIndex && !isCorrect && hasClickedOption"
-           [class.isDisabled]="hasClickedOption"
-           [attr.aria-disabled]="hasClickedOption"
+      <div class="answer-box p-3 border rounded text-center"
+           [class.correct]="i === correctAnswerIndex && (hasClickedOption || timerHasRanOut)"
+           [class.incorrect]="i === selectedAnswerIndex && !isCorrect && (hasClickedOption || timerHasRanOut)"
+           [class.isDisabled]="hasClickedOption || timerHasRanOut"
+           [attr.aria-disabled]="hasClickedOption || timerHasRanOut"
            (click)="!hasClickedOption && selectAnswer(option, i)">
         {{ option }}
       </div>
     </div>
+    <app-timer
+      [userClickedOption]="hasClickedOption"
+      [userClickedNext]="userClickedNext"
+      (timerRanOut)="onTimerRanOut()"
+    ></app-timer>
   </div>
-  <button type="button" class="btn btn-primary btn-block mt-3" (click)="goToNextQuestion()" [disabled]="!hasClickedOption">Next!</button>
+  <button type="button" class="btn btn-primary btn-block mt-3" (click)="goToNextQuestion()"
+          [disabled]="!(hasClickedOption || timerHasRanOut)">Next!
+  </button>
 </div>

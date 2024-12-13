@@ -9,5 +9,6 @@
   [correctAnswerIndex]="correctAnswerIndex"
   *ngIf="selectedCategory || hasQuestions"
   (answerSelected)="onAnswerSelected($event)"
+  (timerRanOut)="onTimerRanOut($event)"
   (navigateBackToScoreScreen)="onNavigateBack()"
 ></app-multiplayer-questions>

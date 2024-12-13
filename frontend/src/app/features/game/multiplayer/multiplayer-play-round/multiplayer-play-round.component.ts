@@ -104,7 +104,25 @@ export class MultiplayerPlayRoundComponent implements OnInit {
 
   }
 
+  onTimerRanOut($event: { questionId: number }) {
+    const validationRequest = {
+      body: {
+        questionId: $event.questionId,
+        sessionId: this.sessionId,
+        answer: null,
+        playerId: this.storedPlayerId
+      }
+    }
+    this.questionService.validateAnswer(validationRequest).subscribe({
+      next: (response: AnswerValidationResponse) => {
+        this.answerIsCorrect = response.correct;
+        this.correctAnswerIndex = response.correctAnswerIndex
+      }
+    })
+  }
+
   onNavigateBack() {
     this.router.navigate(['multiplayer', this.sessionId]);
   }
+
 }

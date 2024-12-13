@@ -56,7 +56,6 @@ public class AuthService {
 
         PlayerDTO playerDTO = PlayerMapper.toDTO(player);
         
-        log.warn("Avatar image: " + playerDTO.getBase64Image());
 
         return AuthResponse.builder()
                 .message("Login successful")

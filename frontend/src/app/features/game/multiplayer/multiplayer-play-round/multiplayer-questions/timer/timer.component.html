@@ -1,0 +1,10 @@
+<div class="timer-container">
+  <div class="progress" style="height: 20px; max-width: 500px">
+    <div class="progress-bar"
+         role="progressbar"
+         [style.width.%]="progressPercentage"
+         [class.bg-warning]="progressPercentage < 50"
+         [class.bg-danger]="progressPercentage < 20">
+    </div>
+  </div>
+</div>
