@@ -63,6 +63,12 @@ public class MultiplayerSession {
     @MapKeyColumn(name = "player_id")
     @Column(name = "has_acknowledged_game_over")
     private Map<Long, Boolean> playerAcknowledgment;
+
+    @ElementCollection
+    @CollectionTable(name = "player_rematch")
+    @MapKeyColumn(name = "player_id")
+    @Column(name = "wants_rematch")
+    private Map<Long, Boolean> playerWantsRematch;
     
     
 
@@ -70,6 +76,7 @@ public class MultiplayerSession {
         players = new ArrayList<>(List.of(player1, player2));
         score = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
         playerAcknowledgment = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
+        playerWantsRematch = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
         status = GameStatus.ACTIVE;
         this.currentQuestionIndex = 0;
         this.currentPlayerTurn = currentPlayerTurn;

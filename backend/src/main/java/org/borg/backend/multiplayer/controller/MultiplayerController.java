@@ -23,7 +23,7 @@ import java.util.List;
 public class MultiplayerController {
     private final MultiplayerService multiplayerService;
     private final MatchMakingService matchMakingService;
-    
+
     @GetMapping("{playerId}")
     public List<MultiplayerSessionDTO> getPlayerSessions(@PathVariable Long playerId) {
         return multiplayerService.getMultiplayerSessionsById(playerId);
@@ -34,7 +34,7 @@ public class MultiplayerController {
         log.warn("Receiving matchmaking request for player: {}", playerId);
         matchMakingService.findMatch(playerId);
     }
-    
+
     @MessageMapping("/matchmaking/accept")
     public void acceptMatch(@Payload MatchDecision matchDecision) {
         log.warn("{}: has accepted session: {}", matchDecision.getPlayerId(), matchDecision.getPendingSessionId());
@@ -46,21 +46,27 @@ public class MultiplayerController {
         log.warn("{}: has declined session: {}", matchDecision.getPlayerId(), matchDecision.getPendingSessionId());
         matchMakingService.handleMatchResponse(matchDecision.getPendingSessionId(), matchDecision.getPlayerId(), false);
     }
-    
-    
+
+
     @DeleteMapping("/matchmaking/cancel/{playerId}")
     public ResponseEntity<Void> cancelMatchmaking(@PathVariable Long playerId) {
         matchMakingService.cancelMatchmaking(playerId);
         return ResponseEntity.noContent().build();
-    } 
-    
-    
+    }
+
+
     @GetMapping("/session/{sessionId}")
     public ResponseEntity<GameStateResponse> getGameState(@PathVariable Long sessionId) {
         log.warn("Getting game state");
         return ResponseEntity.ok(multiplayerService.getGameState(sessionId));
     }
-    
+
+    @PostMapping("/session/{sessionId}/rematch-request/{playerId}")
+    public ResponseEntity<Void> requestRematch(@PathVariable Long sessionId, @PathVariable Long playerId) {
+        multiplayerService.requestRematch(sessionId, playerId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/session/{sessionId}/complete/{playerId}")
     public ResponseEntity<Void> acknowledgeGameOver(@PathVariable Long sessionId, @PathVariable Long playerId) {
         log.warn("Called complete game");
@@ -68,11 +74,13 @@ public class MultiplayerController {
         return ResponseEntity.ok().build();
     }
     
+    @PostMapping("/{sessionId}/complete/{playerId}")
+    public ResponseEntity<Void> giveUp(@PathVariable Long sessionId, @PathVariable Long playerId) {
+        log.warn("Giving up game");
+        multiplayerService.handleGiveUp(sessionId, playerId);
+        return ResponseEntity.ok().build();
+    }
     
     
-    //TODO Give up mapping
-    
-    
-    
-    
+
 }

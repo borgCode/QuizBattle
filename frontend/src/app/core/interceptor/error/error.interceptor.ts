@@ -26,6 +26,7 @@ export class ErrorInterceptor implements HttpInterceptor {
             console.error('Failed to parse error response:', e);
           }
         }
+        console.log(err.error)
 
         let errorMessage = 'An unexpected error occurred';
         if (errorBody.businessErrorCode) {
@@ -54,6 +55,9 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 307:
               this.alertMessageService.show('You are already friends with this user', 'error');
               break;
+            case 310:
+              this.alertMessageService.show('You already sent a rematch request!', 'error');
+              break;
             case 413:
               this.alertMessageService.show('The file size is too big! Max 500kb', 'error');
               break;
@@ -74,6 +78,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               break;
           }
         }
+
 
         return throwError(() => errorMessage)
 

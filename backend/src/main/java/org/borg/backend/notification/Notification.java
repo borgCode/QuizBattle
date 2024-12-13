@@ -20,6 +20,7 @@ public class Notification {
     private Long playerId;
     @Enumerated(EnumType.STRING)
     private NotificationType type;
+    private Long pendingSessionId;
     private String message;
     private boolean isRead;
     private LocalDateTime createdAt;

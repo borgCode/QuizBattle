@@ -73,6 +73,19 @@ public class GlobalExceptionHandler {
                         .validationErrors(validationErrors)
                         .build());
     }
+
+    @ExceptionHandler(GameException.class)
+    public ResponseEntity<ExceptionResponse> handleException(GameException exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .businessErrorCode(exception.getErrorCode().getCode())
+                .businessErrorDescription(exception.getErrorCode().getDescription())
+                .error(exception.getMessage())
+                .build();
+        
+        return ResponseEntity
+                .status(exception.getErrorCode().getHttpStatus())
+                .body(response);
+    }
     
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ExceptionResponse> handleMaxSizeException(MaxUploadSizeExceededException e) {
@@ -94,8 +107,7 @@ public class GlobalExceptionHandler {
                 .businessErrorDescription(exception.getErrorCode().getDescription())
                 .error(exception.getMessage())
                 .build();
-
-        log.debug("Responding with: {}", response); // Log the response for verification
+        
         return ResponseEntity
                 .status(exception.getErrorCode().getHttpStatus())
                 .body(response);

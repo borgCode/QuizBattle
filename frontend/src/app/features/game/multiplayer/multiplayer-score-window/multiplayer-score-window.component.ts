@@ -25,7 +25,6 @@ enum GameResult {
   TIE
 }
 
-
 @Component({
   selector: 'app-multiplayer-score-window',
   imports: [
@@ -130,8 +129,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       })
     });
   }
-
-
   private indexToBoxPosition(questionIndex: number) {
     const width = 3;
     return {
@@ -205,12 +202,16 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   sendFriendRequest(username: string) {
     this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverUsername: username}}).subscribe({
       next: () => this.alertMessageService.show('Friend request sent successfully', 'success'),
-      error: (err) => this.alertMessageService.show(err.message, 'error')
-
     });
   }
 
   backToMultiplayerPage() {
     this.router.navigate(['multiplayer']);
+  }
+
+  sendRematchRequest() {
+    this.multiplayerService.requestRematch({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
+      next: () => this.alertMessageService.show('Send rematch request!', 'success'),
+    })
   }
 }

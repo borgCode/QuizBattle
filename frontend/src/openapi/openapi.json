@@ -138,6 +138,72 @@
         }
       }
     },
+    "/multiplayer/{sessionId}/complete/{playerId}": {
+      "post": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "giveUp",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/multiplayer/session/{sessionId}/rematch-request/{playerId}": {
+      "post": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "requestRematch",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/multiplayer/session/{sessionId}/complete/{playerId}": {
       "post": {
         "tags": [
@@ -823,9 +889,15 @@
             "type": "string",
             "enum": [
               "FRIEND_REQUEST",
+              "REMATCH_REQUEST",
+              "REMATCH_ACCEPTED",
               "GAME_WON",
               "GAME_LOST"
             ]
+          },
+          "pendingSessionId": {
+            "type": "integer",
+            "format": "int64"
           },
           "message": {
             "type": "string"

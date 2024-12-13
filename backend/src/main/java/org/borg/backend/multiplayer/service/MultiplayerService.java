@@ -2,14 +2,19 @@ package org.borg.backend.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.handler.BusinessErrorCodes;
+import org.borg.backend.handler.GameException;
 import org.borg.backend.multiplayer.model.*;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.multiplayer.util.MultiplayerGameConstants;
+import org.borg.backend.notification.NotificationService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.PlayerMapper;
 import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -19,6 +24,8 @@ import java.util.*;
 public class MultiplayerService {
 
     private final MultiplayerSessionRepository multiplayerSessionRepository;
+    private final NotificationService notificationService;
+    private final PendingSessionRepository pendingSessionRepository;
 
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
@@ -122,6 +129,54 @@ public class MultiplayerService {
         
         session.getPlayerAcknowledgment().put(playerId, true);
         multiplayerSessionRepository.save(session);
+    }
+
+    @Transactional
+    public void requestRematch(Long sessionId, Long playerId) {
+        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+
+        Map<Long, Boolean> playerWantsRematch = session.getPlayerWantsRematch();
+        if (playerWantsRematch.get(playerId)) {
+            throw new GameException(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT);
+        }
+        playerWantsRematch.put(playerId, true);
+        
+        Long opponentId = playerWantsRematch.keySet().stream()
+                .filter(id -> !id.equals(playerId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No opponent found in session"));
+
+        String playerDisplayName = session.getPlayers().stream()
+                .filter(player -> player.getId().equals(playerId))
+                .findFirst()
+                .map(Player::getDisplayName)
+                .orElseThrow(() -> new IllegalStateException("Player not found in session"));
+        
+        if (playerWantsRematch.values().stream().allMatch(Boolean::booleanValue)) {
+            createRematchSession(session);
+            notificationService.sendRematchStartedNotification(opponentId, playerDisplayName);
+        } else {
+            
+            PendingSession pendingSession = pendingSessionRepository.save(new PendingSession(playerId, opponentId));
+            
+            notificationService.sendRematchRequestNotification(opponentId, pendingSession.getId(), playerDisplayName);
+        }
+        
+    }
+
+    private void createRematchSession(MultiplayerSession session) {
+        List<Player> players = session.getPlayers();
+        
+        Player startingPlayer = Math.random() < 0.5 ? players.get(0) : players.get(1);
+        
+        
+        MultiplayerSession multiplayerSession = new MultiplayerSession(players.get(0), players.get(1), startingPlayer);
+        multiplayerSessionRepository.save(multiplayerSession);
+    }
+
+    public void handleGiveUp(Long sessionId, Long playerId) {
+        
     }
 }
             

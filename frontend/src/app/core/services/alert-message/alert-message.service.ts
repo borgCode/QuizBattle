@@ -15,6 +15,7 @@ export class AlertMessageService {
   alertMessage$ = this.alertMessage.asObservable();
 
   show(message: string, type: 'success' | 'error') {
+    console.log("Showing alert")
     this.alertMessage.next({message, type});
   }
 }
