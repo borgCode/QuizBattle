@@ -106,7 +106,6 @@ public class FriendshipService {
     }
 
     public List<PlayerDTO> getFriends(Long playerId) {
-        log.warn("Calling repository method");
         return PlayerMapper.multipleToDTO(friendshipRepository.getAllByPlayerId(playerId, FriendshipStatus.ACTIVE));
     }
 }

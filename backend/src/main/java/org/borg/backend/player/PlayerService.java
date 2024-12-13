@@ -30,14 +30,17 @@ public class PlayerService {
     public void updatePlayer(UpdatePlayerRequest request) {
         Player player = playerRepository.findById(request.getPlayerId())
                 .orElseThrow(() -> new NoSuchElementException("Player not found"));
+        log.warn("Updating player: " + player.getUsername());
 
         switch (request.getUpdateField()) {
             case DISPLAY_NAME:
+                log.warn("Setting display name");
                 player.setDisplayName(request.getNewDisplayName());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid update field");
         }
+        log.warn("SAving to repo");
 
         playerRepository.save(player);
     }

@@ -23,11 +23,7 @@ public class MultiplayerService {
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-
-        for (Long questionId : multiplayerSession.getQuestionIds()) {
-            log.warn("Question ID: " + questionId);
-        }
-
+        
         return new GameStateResponse(
                 multiplayerSession.getCurrentPlayerTurn().getId(),
                 PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()),

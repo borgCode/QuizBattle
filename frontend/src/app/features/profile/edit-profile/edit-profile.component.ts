@@ -4,12 +4,17 @@ import {LoginStateService} from '../../../core/services/login-state-service/logi
 import {PlayerService} from '../../../api/generated/services/player.service';
 import {PlayerCardComponent} from '../../../shared/components/player-card/player-card-component';
 import {firstValueFrom} from 'rxjs';
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NgIf} from '@angular/common';
 
 
 @Component({
   selector: 'app-edit-profile',
   imports: [
-    PlayerCardComponent
+    PlayerCardComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './edit-profile.component.html',
   styleUrl: './edit-profile.component.css'
@@ -20,8 +25,8 @@ export class EditProfileComponent implements OnInit {
   player!: PlayerDto;
   image: string = '';
   selectedFile: File | null = null;
-  displayName: string;
   isSaving: boolean;
+  displayName: FormControl;
 
   constructor(
     private loginStateService: LoginStateService,
@@ -38,7 +43,10 @@ export class EditProfileComponent implements OnInit {
     }
 
     this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
-    this.displayName = this.player.displayName;
+
+    this.displayName = new FormControl(this.player.displayName, [
+      Validators.required
+    ]);
   }
 
 
@@ -60,9 +68,15 @@ export class EditProfileComponent implements OnInit {
   }
 
   async updatePlayerChanges() {
-    if (this.displayName.trim() == this.player.displayName && !this.selectedFile) return;
+    const displayNameValue = this.displayName.value.trim();
 
-    //TODO validate form input
+    if (!displayNameValue) {
+      console.error("Display name cannot be blank");
+      return;
+    }
+
+    if (displayNameValue === this.player.displayName && !this.selectedFile) return;
+
     try {
       this.isSaving = true;
 
@@ -74,10 +88,10 @@ export class EditProfileComponent implements OnInit {
         }))
       }
 
-      if (this.displayName !== this.player.displayName) {
+      if (displayNameValue !== this.player.displayName) {
         await firstValueFrom(
           this.playerService.updatePlayer({
-            body: {playerId: this.player.id, updateField: "DISPLAY_NAME", newDisplayName: this.displayName}
+            body: {playerId: this.player.id, updateField: "DISPLAY_NAME", newDisplayName: displayNameValue}
           })
         )
       }
@@ -89,7 +103,7 @@ export class EditProfileComponent implements OnInit {
           this.loginStateService.loggedInUser = value;
         }
       })
-      //TODO refresh player data
+
 
 
     } catch (error) {

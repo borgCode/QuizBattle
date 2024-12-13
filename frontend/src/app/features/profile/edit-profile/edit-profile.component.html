@@ -3,7 +3,7 @@
     <div class="col-12 col-md-4 text-center">
       <app-player-card
         [playerAvatar]="image"
-        [playerDisplayName]="displayName">
+        [playerDisplayName]="player.displayName">
       </app-player-card>
       <div class="mb-3 mt-3">
         <input type="file" class="d-none" id="profilePicInput" accept="image/*" (change)="handleImageChange($event)">
@@ -14,11 +14,19 @@
     </div>
     <div class="col-12 col-md-8">
       <div class="form-group mb-0">
-        <label for="inputField" class="form-label">Display name</label>
-        <input type="text" class="form-control" id="inputField" value="{{player.displayName}}" >
+        <label for="displayName" class="form-label">Display name</label>
+        <input type="text"
+               class="form-control"
+               id="displayName"
+               [formControl]="displayName">
+        <small *ngIf="displayName.invalid" class="text-danger">
+          Display name is required.
+        </small>
       </div>
       <div class="col-md-4">
-        <button class="btn btn-success mt-4" (click)="updatePlayerChanges()">{{ isSaving ? 'Saving Changes...' : 'Save Changes' }}</button>
+        <button class="btn btn-success mt-4"
+                (click)="updatePlayerChanges()">{{ isSaving ? 'Saving Changes...' : 'Save Changes' }}
+        </button>
       </div>
     </div>
   </div>
