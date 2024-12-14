@@ -40,6 +40,9 @@
   <div class="row mt-3">
     <div class="col-12 text-center">
       <div *ngIf="!isGameOver; else gameOverBlock">
+        <div class="btn btn-danger btn-lg me-5" data-bs-toggle="modal" data-bs-target="#giveUpModal">
+          Give up
+        </div>
         <div *ngIf="gameState.playerTurn === storedPlayerId; else elseBlock"
              (click)="handleButtonClick()"
              class="btn btn-success btn-lg">
@@ -59,6 +62,24 @@
           Play again
         </div>
       </ng-template>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="giveUpModal" >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Give up</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to give up?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" (click)="giveUpClick()" data-bs-dismiss="modal">Yes</button>
+      </div>
     </div>
   </div>
 </div>

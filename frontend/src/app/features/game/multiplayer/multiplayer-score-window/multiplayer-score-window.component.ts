@@ -219,4 +219,15 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       next: () => this.alertMessageService.show('Send rematch request!', 'success'),
     })
   }
+
+  giveUpClick() {
+    this.multiplayerService.giveUp({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
+      next: () => {
+        const currentUrl = this.router.url;
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigate([currentUrl]);
+        });
+      }
+    })
+  }
 }
