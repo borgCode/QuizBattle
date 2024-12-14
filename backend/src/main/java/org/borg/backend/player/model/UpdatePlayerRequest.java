@@ -3,6 +3,7 @@ package org.borg.backend.player.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.borg.backend.player.enums.UpdateField;
 
 @Getter
 @Setter

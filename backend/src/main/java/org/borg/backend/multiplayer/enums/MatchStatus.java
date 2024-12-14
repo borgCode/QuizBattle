@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.model;
+package org.borg.backend.multiplayer.enums;
 
 public enum MatchStatus {
     WAITING,

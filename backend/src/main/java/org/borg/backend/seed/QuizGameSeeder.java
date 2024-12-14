@@ -1,7 +1,7 @@
 package org.borg.backend.seed;
 
 import com.github.javafaker.Faker;
-import org.borg.backend.multiplayer.model.GameStatus;
+import org.borg.backend.multiplayer.enums.GameStatus;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.player.model.CategoryStats;

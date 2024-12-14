@@ -1,10 +1,11 @@
-package org.borg.backend.notification.model;
+package org.borg.backend.notification.enums;
 
 public enum NotificationType {
     FRIEND_REQUEST,
     FRIEND_ACCEPTED,
     REMATCH_REQUEST,
     REMATCH_ACCEPTED,
+    REMATCH_DECLINED,
     GAME_WON,
     GAME_LOST,
     

@@ -264,6 +264,29 @@
         }
       }
     },
+    "/multiplayer/session/rematch-response": {
+      "post": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "rematchResponse",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RematchResponse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/friendship/reject": {
       "post": {
         "tags": [
@@ -804,6 +827,29 @@
           }
         }
       },
+      "RematchResponse": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "playerDisplayName": {
+            "type": "string"
+          },
+          "pendingSessionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "notificationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasAccepted": {
+            "type": "boolean"
+          }
+        }
+      },
       "PlayerInteractionResponse": {
         "type": "object",
         "properties": {
@@ -987,6 +1033,7 @@
               "FRIEND_ACCEPTED",
               "REMATCH_REQUEST",
               "REMATCH_ACCEPTED",
+              "REMATCH_DECLINED",
               "GAME_WON",
               "GAME_LOST"
             ]

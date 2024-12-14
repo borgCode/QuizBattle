@@ -3,6 +3,7 @@ package org.borg.backend.multiplayer.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.borg.backend.multiplayer.enums.MatchStatus;
 
 /**
  * Response object for matchmaking operations.

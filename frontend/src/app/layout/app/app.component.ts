@@ -13,6 +13,6 @@ import {AlertMessageComponent} from '../../core/alert-message/notification/alert
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'quiz-clash-fe';
+  title = 'Quiz Battle';
 
 }

@@ -2,6 +2,7 @@ package org.borg.backend.friendship.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.borg.backend.friendship.enums.FriendshipStatus;
 import org.borg.backend.player.model.Player;
 
 import java.time.LocalDate;

@@ -4,7 +4,7 @@ package org.borg.backend.notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.notification.model.Notification;
-import org.borg.backend.notification.model.NotificationType;
+import org.borg.backend.notification.enums.NotificationType;
 import org.borg.backend.player.model.Player;
 import org.springframework.stereotype.Service;
 
@@ -55,11 +55,12 @@ public class NotificationService {
     }
 
     public void sendRematchRequestNotification(
-            Long receivingId, Long pendingSessionId, String senderDisplayName) {
+            Long receivingId, Long pendingSessionId, String senderDisplayName, Long senderId) {
         notificationRepository.save(Notification.builder()
                 .playerId(receivingId)
+                .senderId(senderId)
                 .type(NotificationType.REMATCH_REQUEST)
-                .message(senderDisplayName + " request a rematch against you!")
+                .message(senderDisplayName + " requested a rematch against you!")
                 .pendingSessionId(pendingSessionId)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
@@ -75,5 +76,29 @@ public class NotificationService {
 
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {
         notificationRepository.deleteByPlayerIdAndSenderIdAndType(id, id1, NotificationType.FRIEND_REQUEST);
+    }
+
+    public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
+        notificationRepository.deleteById(notificationId);
+
+        notificationRepository.save(Notification.builder()
+                .playerId(playerToNotify)
+                .type(NotificationType.REMATCH_ACCEPTED)
+                .message(playerDisplayName + " accepted your request for a rematch!")
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build());
+    }
+
+    public void sendRematchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
+        notificationRepository.deleteById(notificationId);
+
+        notificationRepository.save(Notification.builder()
+                .playerId(playerToNotify)
+                .type(NotificationType.REMATCH_DECLINED)
+                .message("Your rematch request against " + playerDisplayName + " was declined!")
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build());
     }
 }

@@ -31,6 +31,12 @@
             <li *ngSwitchCase="'REMATCH_REQUEST'" class="rematch-request dropdown-item">
               <i class="fa-solid fa-gamepad icon"></i>
               <span>{{ notification.message }}</span>
+              <button type="button" class="btn-accept-rematch btn btn-success fa-regular fa-circle-check"
+                      data-bs-toggle="tooltip" title="Accept rematch"
+                      (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)"></button>
+              <div class="btn-decline-rematch btn btn-danger fa-solid fa-xmark"
+                   data-bs-toggle="tooltip" title="Decline rematch"
+                   (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)"></div>
             </li>
             <li *ngSwitchCase="'REMATCH_ACCEPTED'" class="rematch-accepted dropdown-item">
               <i class="fa-solid fa-check icon"></i>

@@ -3,7 +3,7 @@ package org.borg.backend.friendship;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.friendship.model.Friendship;
-import org.borg.backend.friendship.model.FriendshipStatus;
+import org.borg.backend.friendship.enums.FriendshipStatus;
 import org.borg.backend.friendship.model.PlayerInteraction;
 import org.borg.backend.friendship.model.PlayerInteractionResponse;
 import org.borg.backend.handler.BusinessErrorCodes;

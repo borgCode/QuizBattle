@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.model.GameStateResponse;
 import org.borg.backend.multiplayer.model.MatchDecision;
+import org.borg.backend.multiplayer.model.RematchResponse;
 import org.borg.backend.multiplayer.service.MatchMakingService;
 import org.borg.backend.multiplayer.service.MultiplayerService;
 import org.borg.backend.multiplayer.model.MultiplayerSessionDTO;
@@ -63,6 +64,12 @@ public class MultiplayerController {
     @PostMapping("/session/{sessionId}/rematch-request/{playerId}")
     public ResponseEntity<Void> requestRematch(@PathVariable Long sessionId, @PathVariable Long playerId) {
         multiplayerService.requestRematch(sessionId, playerId);
+        return ResponseEntity.ok().build();
+    }
+    
+    @PostMapping("/session/rematch-response")
+    public ResponseEntity<Void> rematchResponse(@RequestBody RematchResponse response) {
+        multiplayerService.handleRematchResponse(response);
         return ResponseEntity.ok().build();
     }
 

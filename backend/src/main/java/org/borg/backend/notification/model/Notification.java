@@ -2,6 +2,7 @@ package org.borg.backend.notification.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.borg.backend.notification.enums.NotificationType;
 
 import java.time.LocalDateTime;
 

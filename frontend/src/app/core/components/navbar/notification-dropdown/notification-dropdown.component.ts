@@ -8,6 +8,7 @@ import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
 import {FriendshipService} from '../../../../api/generated/services/friendship.service';
 import {AlertMessageService} from '../../../services/alert-message/alert-message.service';
+import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
 
 declare var bootstrap: any;
 
@@ -34,6 +35,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     private loginStateService: LoginStateService,
     private friendshipService: FriendshipService,
     private alertMessageService: AlertMessageService,
+    private multiplayerService: MultiplayerService,
     private router: Router
   ) {
   }
@@ -87,8 +89,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
   declineFriendRequest(originalSender: number, notificationId: number) {
     this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId)
-    )
+      this.notifications.value.filter(n => n.id !== notificationId))
+
     this.friendshipService.rejectFriendship({
       body: {
         senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
@@ -97,6 +99,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
       next: () => this.alertMessageService.show("Friend request rejected!", 'success'),
     })
   }
+
+
 
   markAsRead(notificationId: number) {
     this.notifications.next(
@@ -118,4 +122,32 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
       )
     }
   }
+
+  acceptRematch(senderId: number, pendingSessionId: number, notificationId: number) {
+    console.log(senderId)
+    this.sendRematchResponse(senderId, pendingSessionId, notificationId, true, 'You accepted the rematch!')
+  }
+
+  declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
+    console.log(senderId)
+    this.sendRematchResponse(senderId, pendingSessionId, notificationId, false, 'You declined the rematch!')
+  }
+
+  sendRematchResponse(senderId: number, pendingSessionId: number, notificationId: number, hasAccepted: boolean, alertMessage: string) {
+    this.notifications.next(
+      this.notifications.value.filter(n => n.id !== notificationId))
+
+    this.multiplayerService.rematchResponse({
+      body: {
+        playerId: senderId,
+        hasAccepted: hasAccepted,
+        notificationId: notificationId,
+        pendingSessionId: pendingSessionId,
+        playerDisplayName: this.loginStateService.loggedInUser.displayName
+      }
+    }).subscribe({
+      next: () => this.alertMessageService.show(alertMessage, 'success'),
+    })
+  }
+
 }

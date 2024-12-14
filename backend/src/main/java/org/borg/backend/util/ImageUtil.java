@@ -17,7 +17,7 @@ public class ImageUtil {
 
         if (subFilePath == null || subFilePath.isEmpty()) {
             try {
-                Path path = Paths.get("backend/src/main/java/org/borg/backend/storage/player-pics/placeholder/placeholder.jpg");
+                Path path = Paths.get("backend/src/main/java/org/borg/backend/storage/profile-pics/placeholder/placeholder.jpg");
                 byte[] imageBytes = Files.readAllBytes(path);
                 return Base64.getEncoder().encodeToString(imageBytes);
             } catch (IOException e) {
