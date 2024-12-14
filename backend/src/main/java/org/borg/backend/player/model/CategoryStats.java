@@ -20,9 +20,20 @@ public class CategoryStats {
     @JoinColumn(name = "stats_id")
     @JsonIgnore
     private Stats stats;
-    private int wins;
-    private int losses;
     
+    private String category;
+    private int correct;
+    private int questionsAnswered;
 
-    
+    public CategoryStats(String category) {
+        this.category = category;
+    }
+
+    public void incrementQuestionsAnswered() {
+        this.questionsAnswered++;
+    }
+
+    public void incrementCorrectAnswers() {
+        this.correct++;
+    }
 }

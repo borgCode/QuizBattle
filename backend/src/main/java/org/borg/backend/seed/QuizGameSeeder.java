@@ -104,8 +104,8 @@ public class QuizGameSeeder {
         for (String category : categories) {
             CategoryStats categoryStats = new CategoryStats();
             categoryStats.setStats(testStats);
-            categoryStats.setWins(random.nextInt(10)); // Example: Random wins for the category
-            categoryStats.setLosses(random.nextInt(10)); // Example: Random losses for the category
+            categoryStats.setCorrect(random.nextInt(10)); // Example: Random wins for the category
+            categoryStats.setQuestionsAnswered(random.nextInt(10)); // Example: Random losses for the category
             testCategoryStatsMap.put(category, categoryStats);
         }
 
@@ -133,8 +133,8 @@ public class QuizGameSeeder {
             for (String category : categories) {
                 CategoryStats categoryStats = new CategoryStats();
                 categoryStats.setStats(stats);
-                categoryStats.setWins(random.nextInt(10)); // Example: Random wins for the category
-                categoryStats.setLosses(random.nextInt(10)); // Example: Random losses for the category
+                categoryStats.setCorrect(random.nextInt(10)); // Example: Random wins for the category
+                categoryStats.setQuestionsAnswered(random.nextInt(10)); // Example: Random losses for the category
                 categoryStatsMap.put(category, categoryStats);
             }
 

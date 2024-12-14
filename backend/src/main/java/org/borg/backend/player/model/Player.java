@@ -48,25 +48,14 @@ public class Player implements UserDetails {
     private List<Role> roles;
 
     @PrePersist
+    @PreUpdate
     public void prePersist() {
         if (this.stats == null) {
-            initializeStats();
+            this.stats = new Stats();
+            this.stats.setPlayer(this);
         }
     }
-
-    @PreUpdate
-    public void preUpdate() {
-        if (this.stats == null) {
-            initializeStats();
-        }
-    }
-
-    private void initializeStats() {
-        this.stats = new Stats();
-        this.stats.setCategoryStats(new HashMap<>());
-        this.stats.setPlayer(this);
     
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

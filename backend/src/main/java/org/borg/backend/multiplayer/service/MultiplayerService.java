@@ -16,6 +16,7 @@ import org.borg.backend.player.PlayerMapper;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;
+import org.borg.backend.question.QuestionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class MultiplayerService {
     private final NotificationService notificationService;
     private final PendingSessionRepository pendingSessionRepository;
     private final PlayerRepository playerRepository;
+    private final QuestionRepository questionRepository;
 
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
@@ -66,11 +68,21 @@ public class MultiplayerService {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new NoSuchElementException("Player not found"));
+        
+        String category = questionRepository.findById(questionId)
+                .map(Question::getCategory)
+                .orElseThrow(() -> new NoSuchElementException("Question not found"));
+        Stats stats = player.getStats();
+        
+        stats.incrementQuestionsAnswered(category);
         //Increment score if answer was correct
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
             Integer playerScore = scores.getOrDefault(playerId, 0);
             scores.put(playerId, playerScore + 1);
+            stats.incrementCorrectAnswer(category);
         }
 
         //Update questions answered
@@ -81,7 +93,7 @@ public class MultiplayerService {
         session.getQuestionResults().add(new PlayerQuestionResult(playerId, questionId, session.getQuestionsAnswered().get(playerId) - 1, isCorrect));
         //Find opponent in session
         Player opponent = session.getPlayers().stream()
-                .filter(player -> !player.getId().equals(playerId))
+                .filter(p -> !p.getId().equals(playerId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No opponent found in session"));
 
@@ -149,6 +161,8 @@ public class MultiplayerService {
             player1Stats.incrementTies();
             player2Stats.incrementTies();
         }
+        
+        
         
         players.get(0).setStats(player1Stats);
         players.get(1).setStats(player2Stats);
