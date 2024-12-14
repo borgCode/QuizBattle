@@ -985,6 +985,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "numOfTies": {
+            "type": "integer",
+            "format": "int32"
+          },
           "categoryStats": {
             "type": "object",
             "additionalProperties": {
@@ -1142,6 +1146,21 @@
             "additionalProperties": {
               "type": "boolean"
             }
+          },
+          "playerWhoGaveUp": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "winnerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "loserId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "isTie": {
+            "type": "boolean"
           }
         }
       },

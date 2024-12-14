@@ -9,10 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Builder
@@ -23,32 +20,53 @@ import java.util.stream.Collectors;
 @Table(name = "players")
 public class Player implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true)
     private String username;
-    
+
     private String password;
     private String displayName;
     @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
     private Stats stats;
     private boolean accountLocked;
     private boolean enabled;
-    
+
     private String avatarPath;
-    
+
     @ManyToMany(mappedBy = "players")
     private List<MultiplayerSession> session;
-    
+
     @OneToMany(mappedBy = "player1", cascade = CascadeType.ALL)
     private Set<Friendship> friendshipsInitiated = new HashSet<>();
-    
+
     @OneToMany(mappedBy = "player2", cascade = CascadeType.ALL)
     private Set<Friendship> friendshipsReceived = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.stats == null) {
+            initializeStats();
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.stats == null) {
+            initializeStats();
+        }
+    }
+
+    private void initializeStats() {
+        this.stats = new Stats();
+        this.stats.setCategoryStats(new HashMap<>());
+        this.stats.setPlayer(this);
+    
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

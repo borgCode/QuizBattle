@@ -13,6 +13,7 @@ import org.borg.backend.notification.NotificationService;
 import org.borg.backend.player.PlayerRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.PlayerMapper;
+import org.borg.backend.player.model.Stats;
 import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;
 import org.springframework.stereotype.Service;
@@ -34,19 +35,33 @@ public class MultiplayerService {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
-        return new GameStateResponse(
-                multiplayerSession.getCurrentPlayerTurn().getId(),
-                PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()),
-                multiplayerSession.getCurrentQuestionIndex(),
-                multiplayerSession.getScore(),
-                multiplayerSession.getStatus(),
-                multiplayerSession.getQuestionResults(),
-                multiplayerSession.getQuestionIds(),
-                multiplayerSession.getRoundCategories(),
-                multiplayerSession.getPlayerAcknowledgment()
-        );
+
+        Long playerWhoGaveUp = multiplayerSession.getPlayerHasGivenUp().entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+        
+        
+        return GameStateResponse.builder()
+                .playerTurn(multiplayerSession.getCurrentPlayerTurn().getId())
+                .playerDTOS(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
+                .currentQuestionIndex(multiplayerSession.getCurrentQuestionIndex())
+                .scores(multiplayerSession.getScore())
+                .status(multiplayerSession.getStatus())
+                .results(multiplayerSession.getQuestionResults())
+                .questionIds(multiplayerSession.getQuestionIds())
+                .roundCategories(multiplayerSession.getRoundCategories())
+                .playerAcknowledgment(multiplayerSession.getPlayerAcknowledgment())
+                .playerWhoGaveUp(playerWhoGaveUp)
+                .winnerId(multiplayerSession.getWinnerId())
+                .loserId(multiplayerSession.getLoserId())
+                .isTie(multiplayerSession.getIsTie())
+                .build();
+
     }
 
+    @Transactional
     public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
@@ -72,6 +87,8 @@ public class MultiplayerService {
 
         if (isGameComplete(questionsAnswered)) {
             session.setStatus(GameStatus.COMPLETED);
+            determineGameOutcome(session);
+            
         } else {
             //Update question index to manage turns
             session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
@@ -94,6 +111,50 @@ public class MultiplayerService {
     private boolean isGameComplete(Map<Long, Integer> questionsAnswered) {
         return questionsAnswered.values().stream()
                 .allMatch(count -> count == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER);
+    }
+
+    private void determineGameOutcome(MultiplayerSession session) {
+        List<Player> players = session.getPlayers();
+        Stats player1Stats = players.get(0).getStats();
+        Stats player2Stats = players.get(1).getStats();
+        
+        Long player1Id = players.get(0).getId();
+        Long player2Id = players.get(1).getId();
+        
+        Map<Long, Integer> scores = session.getScore();
+        int score1 = scores.get(player1Id);
+        int score2 = scores.get(player2Id);
+        
+        
+        
+        if (score1 > score2) {
+            session.setWinnerId(player1Id);
+            session.setLoserId(player2Id);
+            session.setIsTie(false);
+            
+            player1Stats.incrementWins();
+            player2Stats.incrementLosses();
+            
+            
+        } else if (score1 < score2) {
+            session.setWinnerId(player2Id);
+            session.setLoserId(player1Id);
+            session.setIsTie(false);
+
+            player1Stats.incrementLosses();
+            player2Stats.incrementWins();
+        } else {
+            session.setIsTie(true);
+
+            player1Stats.incrementTies();
+            player2Stats.incrementTies();
+        }
+        
+        players.get(0).setStats(player1Stats);
+        players.get(1).setStats(player2Stats);
+        
+        playerRepository.saveAll(players);
+        
     }
 
     public void updateSessionQuestionsAndCategory(Long sessionId, List<Question> questions, String selectedCategory) {
@@ -193,7 +254,7 @@ public class MultiplayerService {
         if (response.isHasAccepted()) {
             notificationService.sendRematchAcceptedNotification(playerToNotify, response.getPlayerDisplayName(), response.getNotificationId());
             createMultiplayerSession(pendingSession);
-            
+
         } else {
             notificationService.sendRematchRejectedNotification(playerToNotify, response.getPlayerDisplayName(), response.getNotificationId());
         }
@@ -216,8 +277,27 @@ public class MultiplayerService {
     }
 
 
+    @Transactional
     public void handleGiveUp(Long sessionId, Long playerId) {
-
+        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+        
+        session.getPlayerHasGivenUp().put(playerId, true);
+        session.setStatus(GameStatus.COMPLETED);
+        multiplayerSessionRepository.save(session);
+        
+        List<Player> players = session.getPlayers();
+        
+        if (players.get(0).getId().equals(playerId)) {
+            players.get(0).getStats().incrementLosses();
+            players.get(1).getStats().incrementWins();
+        } else {
+            players.get(1).getStats().incrementLosses();
+            players.get(0).getStats().incrementWins();  
+        }
+        
+        playerRepository.saveAll(players);
+        
     }
 
 

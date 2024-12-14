@@ -100,8 +100,6 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     })
   }
 
-
-
   markAsRead(notificationId: number) {
     this.notifications.next(
       this.notifications.value.filter(n => n.id !== notificationId)
@@ -149,5 +147,4 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
       next: () => this.alertMessageService.show(alertMessage, 'success'),
     })
   }
-
 }

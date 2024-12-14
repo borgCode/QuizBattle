@@ -70,6 +70,16 @@ public class MultiplayerSession {
     @MapKeyColumn(name = "player_id")
     @Column(name = "wants_rematch")
     private Map<Long, Boolean> playerWantsRematch;
+
+    @ElementCollection
+    @CollectionTable(name = "player_giving_up")
+    @MapKeyColumn(name = "player_id")
+    @Column(name = "has_given_up")
+    private Map<Long, Boolean> playerHasGivenUp;
+    
+    private Long winnerId = null;
+    private Long loserId = null;
+    private Boolean isTie = null;
     
     
 
@@ -78,6 +88,7 @@ public class MultiplayerSession {
         score = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
         playerAcknowledgment = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
         playerWantsRematch = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
+        playerHasGivenUp = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
         status = GameStatus.ACTIVE;
         this.currentQuestionIndex = 0;
         this.currentPlayerTurn = currentPlayerTurn;

@@ -9,6 +9,7 @@ import {FriendshipService} from '../../../../api/generated/services/friendship.s
 import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverDialogComponent} from './dialog/game-over-dialog/game-over-dialog.component';
+import {GameResult} from '../../../../shared/enums/game-result';
 
 interface Box {
   color: string;
@@ -17,12 +18,6 @@ interface Box {
 interface BoxRow {
   left: Box[];
   right: Box[];
-}
-
-enum GameResult {
-  WIN,
-  LOSS,
-  TIE
 }
 
 @Component({
@@ -56,7 +51,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private gameOverDialog: MatDialog,
-
   ) {
   }
 
@@ -114,6 +108,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             }
           )
 
+
           this.hasAcknowledgedGameOver = gameState.playerAcknowledgment[this.storedPlayerId];
 
           if (gameState.status == 'COMPLETED') {
@@ -129,6 +124,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       })
     });
   }
+
   private indexToBoxPosition(questionIndex: number) {
     const width = 3;
     return {
@@ -149,11 +145,20 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   private handleGameOver() {
 
 
-
     const gameResult: GameResult = (() => {
-      if (this.playerTotalScore > this.opponentTotalScore) {
+      if (this.gameState.playerWhoGaveUp) {
+        console.log("A player gave up: " + this.gameState.playerWhoGaveUp)
+        if (this.storedPlayerId == this.gameState.playerWhoGaveUp) {
+          console.log("Player gave up")
+          return GameResult.PLAYER_GAVE_UP
+        } else {
+          console.log("Opponent gave up")
+          return GameResult.OPPONENT_GAVE_UP
+        }
+      }
+      if (this.storedPlayerId == this.gameState.winnerId) {
         return GameResult.WIN;
-      } else if (this.playerTotalScore < this.opponentTotalScore) {
+      } else if (this.storedPlayerId == this.gameState.loserId) {
         return GameResult.LOSS
       } else {
         return GameResult.TIE
@@ -163,7 +168,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     this.showGameOverDialog(gameResult);
 
     console.log("Sending complete game")
-    this.multiplayerService.acknowledgeGameOver({ sessionId: this.sessionId, playerId: this.storedPlayerId }).subscribe({
+    this.multiplayerService.acknowledgeGameOver({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
       next: () => console.log('Request successful!'),
       error: (err) => console.error('Error occurred:', err),
     });
