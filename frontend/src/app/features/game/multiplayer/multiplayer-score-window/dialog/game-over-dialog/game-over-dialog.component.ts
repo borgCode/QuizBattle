@@ -9,7 +9,6 @@ import {GameResult} from '../../../../../../shared/enums/game-result';
   selector: 'app-game-over-dialog',
   imports: [
     MatDialogTitle,
-    NgIf,
     MatDialogContent
   ],
   templateUrl: './game-over-dialog.component.html',

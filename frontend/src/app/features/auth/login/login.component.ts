@@ -28,7 +28,6 @@ export class LoginComponent {
     private authService: AuthenticationService,
     private tokenService: TokenService,
     private loginStateService: LoginStateService,
-    private alertMessageService: AlertMessageService,
   ) {
   }
 
@@ -54,4 +53,5 @@ export class LoginComponent {
   register() {
     this.router.navigate(['register'])
   }
+
 }
