@@ -27,8 +27,8 @@ export class CategoryPieChartComponent implements OnInit {
       data: {
         labels: this.mapKeys,
         datasets: [{
-          label: 'Wins',
-          data: this.mapKeys.map(key => this.categoryStats[key].wins),
+          label: 'Correct',
+          data: this.mapKeys.map(key => this.categoryStats[key].correct),
           backgroundColor: [
             '#FF0000',
             '#00FF00',

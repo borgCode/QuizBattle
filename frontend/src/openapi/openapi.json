@@ -935,11 +935,14 @@
             "type": "integer",
             "format": "int64"
           },
-          "wins": {
+          "category": {
+            "type": "string"
+          },
+          "correct": {
             "type": "integer",
             "format": "int32"
           },
-          "losses": {
+          "questionsAnswered": {
             "type": "integer",
             "format": "int32"
           }
