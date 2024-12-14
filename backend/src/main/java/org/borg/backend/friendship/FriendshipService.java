@@ -111,9 +111,7 @@ public class FriendshipService {
         notificationService.markAsRead(Collections.singletonList(response.getNotificationId()));
     }
 
-
-    //TODO refactor code
-
+    
     public void blockPlayer(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
@@ -127,25 +125,17 @@ public class FriendshipService {
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
                 throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
             }
-            if (friendship.getStatus() == FriendshipStatus.PENDING) {
+            if (friendship.getStatus() == FriendshipStatus.PENDING || friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 friendship.setStatus(FriendshipStatus.BLOCKED);
                 friendshipRepository.save(friendship);
-                return;
-
             }
-            if (friendship.getStatus() == FriendshipStatus.ACTIVE) {
-                friendship.setStatus(FriendshipStatus.BLOCKED);
-                friendshipRepository.save(friendship);
-                return;
-            }
-
+        } else {
             friendshipRepository.save(new Friendship(
                     sendingPlayer,
                     receivingPlayer,
                     LocalDate.now(),
                     FriendshipStatus.BLOCKED
             ));
-
         }
     }
 
