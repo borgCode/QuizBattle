@@ -1,8 +1,15 @@
 .square {
-  width: 80%;
-  padding-bottom: 50%;
+  width: 80px;
+  height: 80px;
   background-color: #ccc;
   border: 1px solid #999;
+}
+
+@media (max-width: 768px) {
+  .square {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .score-panel {

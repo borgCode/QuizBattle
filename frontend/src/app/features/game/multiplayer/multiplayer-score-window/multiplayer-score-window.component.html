@@ -1,15 +1,15 @@
 <div class="container p-2">
-  <div class="row" style="height: 350px">
-    <div class="col-8 col-sm-3 h-100">
+  <div class="row align-items-center h-100" style="height: 350px">
+    <div class="col-4 col-sm-4 d-flex justify-content-center">
       <app-player-card
         [playerAvatar]="'data:image/jpeg;base64,' + gameState.playerDTOS[(opponentIndex + 1) % 2].base64Image"
         [playerDisplayName]="gameState.playerDTOS[(opponentIndex + 1) % 2].displayName"></app-player-card>
     </div>
-    <div class="score-panel col-sm-4 offset-sm-1 align-content-center text-center">
+    <div class="score-panel col-4 col-sm-4 align-content-center text-center">
       <p>{{ playerTotalScore }}
         - {{ opponentTotalScore }}</p>
     </div>
-    <div class="col-8 offset-4 col-sm-3 offset-sm-1 h-75">
+    <div class="col-4 col-sm-4 d-flex flex-column justify-content-center h-75">
       <app-player-card
         [playerAvatar]="opponentAvatar"
         [playerDisplayName]="opponentDisplayName"></app-player-card>
@@ -18,21 +18,23 @@
       </div>
     </div>
   </div>
-  <div class="row" *ngFor="let row of boxes; let i = index">
-    <div class="col-5">
-      <div class="row">
-        <div class="col-4 mb-3" *ngFor="let box of row.left">
-          <div class="square" [style.background-color]="box.color"></div>
+  <div class="container p-2">
+    <div class="row align-items-center mt-3" *ngFor="let row of boxes; let i = index">
+      <div class="col-4 d-flex justify-content-end">
+        <div
+          class="square mx-1"
+          *ngFor="let box of row.left"
+          [style.background-color]="box.color">
         </div>
       </div>
-    </div>
-    <div class="col-2 d-flex align-items-center justify-content-center">
-      <h5>{{gameState.roundCategories[i]}}</h5>
-    </div>
-    <div class="col-5">
-      <div class="row">
-        <div class="col-4 mb-3" *ngFor="let box of row.right">
-          <div class="square" [style.background-color]="box.color"></div>
+      <div class="col-4 text-center">
+        <h5 class="category-text">{{ gameState.roundCategories[i] }}</h5>
+      </div>
+      <div class="col-4 d-flex justify-content-start">
+        <div
+          class="square mx-1"
+          *ngFor="let box of row.right"
+          [style.background-color]="box.color">
         </div>
       </div>
     </div>
@@ -66,7 +68,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="giveUpModal" >
+<div class="modal fade" id="giveUpModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
