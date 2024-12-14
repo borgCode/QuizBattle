@@ -35,6 +35,10 @@
   color: #3da70c;
 }
 
+.notification-list .friend-accepted .icon {
+  color: #3da70c;
+}
+
 
 .notification-list .dropdown-item:hover {
   background-color: #f8f9fa;

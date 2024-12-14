@@ -42,6 +42,7 @@ public class FriendshipService {
                         sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
 
         if (existingFriendships.isEmpty()) {
+
             friendshipRepository.save(Friendship.builder()
                     .player1(sendingPlayer)
                     .player2(receivingPlayer)
@@ -54,22 +55,30 @@ public class FriendshipService {
             notificationService.sendFriendRequestNotification(receivingPlayer.getId(), sendingPlayer);
         } else {
             Friendship friendship = existingFriendships.get(0);
+            log.warn("Friendship status: " + friendship.getStatus());
             if (friendship.getPlayer1().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
                     case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
                     case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
                     case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
                 }
-            } else {
-                if (friendship.getStatus() == FriendshipStatus.PENDING) {
-                    friendship.setStatus(FriendshipStatus.ACTIVE);
-                    friendshipRepository.save(friendship);
-
-                    //TODO Notification for accepted friend
+            } else if (friendship.getPlayer2().equals(sendingPlayer)) {
+                switch (friendship.getStatus()) {
+                    case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
+                    case PENDING -> {
+                        friendship.setStatus(FriendshipStatus.ACTIVE);
+                        friendshipRepository.save(friendship);
+                        notificationService.sendFriendAcceptedNotification(friendship.getPlayer1().getId(), sendingPlayer);
+                        notificationService.sendFriendAcceptedNotification(friendship.getPlayer2().getId(), receivingPlayer);
+                        
+                        //Clean up the friend request notif in the case of both sending a request
+                        notificationService.deleteFriendRequestByPlayerIds(sendingPlayer.getId(), receivingPlayer.getId());
+                    }
                 }
             }
-        }
 
+        }
     }
 
     @Transactional

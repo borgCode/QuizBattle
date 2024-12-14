@@ -34,6 +34,16 @@ public class NotificationService {
                 .build());
     }
 
+    public void sendFriendAcceptedNotification(Long receiverId, Player sendingPlayer) {
+        notificationRepository.save(Notification.builder()
+                .playerId(receiverId)
+                .type(NotificationType.FRIEND_ACCEPTED)
+                .message(sendingPlayer.getDisplayName() + " accepted your friend request!")
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build());
+    }
+
     public void sendRematchStartedNotification(Long receivingId, String senderDisplayName) {
         notificationRepository.save(Notification.builder()
                 .playerId(receivingId)
@@ -60,5 +70,9 @@ public class NotificationService {
         if (notificationId != null) {
             notificationRepository.deleteById(notificationId);
         }
+    }
+
+    public void deleteFriendRequestByPlayerIds(Long id, Long id1) {
+        notificationRepository.deleteByPlayerIdAndSenderIdAndType(id, id1, NotificationType.FRIEND_REQUEST);
     }
 }

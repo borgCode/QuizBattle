@@ -83,7 +83,6 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     })
   }
 
-
   declineFriendRequest(originalSender: number, notificationId: number) {
     this.notifications.next(
       this.notifications.value.filter(n => n.id !== notificationId)
