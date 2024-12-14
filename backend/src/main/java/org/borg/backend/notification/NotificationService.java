@@ -66,10 +66,11 @@ public class NotificationService {
                 .build());
     }
 
-    public void markAsRead(Long notificationId) {
-        if (notificationId != null) {
-            notificationRepository.deleteById(notificationId);
+    public void markAsRead(List<Long> notificationIds) {
+        if (notificationIds.isEmpty()) {
+            return;
         }
+        notificationRepository.deleteAllById(notificationIds);
     }
 
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {

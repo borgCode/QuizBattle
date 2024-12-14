@@ -138,6 +138,33 @@
         }
       }
     },
+    "/notification/read": {
+      "post": {
+        "tags": [
+          "Notification"
+        ],
+        "operationId": "markAsRead",
+        "parameters": [
+          {
+            "name": "notificationIds",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/multiplayer/{sessionId}/complete/{playerId}": {
       "post": {
         "tags": [
@@ -957,6 +984,7 @@
             "type": "string",
             "enum": [
               "FRIEND_REQUEST",
+              "FRIEND_ACCEPTED",
               "REMATCH_REQUEST",
               "REMATCH_ACCEPTED",
               "GAME_WON",

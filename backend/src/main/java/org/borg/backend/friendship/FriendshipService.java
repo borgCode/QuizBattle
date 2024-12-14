@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -110,7 +108,7 @@ public class FriendshipService {
             friendshipRepository.delete(friendship);
         }
         
-        notificationService.markAsRead(response.getNotificationId());
+        notificationService.markAsRead(Collections.singletonList(response.getNotificationId()));
     }
 
 

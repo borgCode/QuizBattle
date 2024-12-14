@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {Notification} from '../../../../api/generated/models/notification';
 import {NotificationService} from '../../../../api/generated/services/notification.service';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
@@ -8,7 +8,6 @@ import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
 import {FriendshipService} from '../../../../api/generated/services/friendship.service';
 import {AlertMessageService} from '../../../services/alert-message/alert-message.service';
-import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 declare var bootstrap: any;
 
@@ -27,6 +26,8 @@ declare var bootstrap: any;
 export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   private notifications = new BehaviorSubject<Notification[]>([]);
   notifications$ = this.notifications.asObservable();
+
+  private readNotificationList = new Set<number>();
 
   constructor(
     protected notificationService: NotificationService,
@@ -49,6 +50,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)).subscribe(() => {
       if (this.loginStateService.isLoggedIn$) {
+        this.syncReadNotifications();
         this.fetchNotifications();
       }
     })
@@ -94,5 +96,26 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     }).subscribe({
       next: () => this.alertMessageService.show("Friend request rejected!", 'success'),
     })
+  }
+
+  markAsRead(notificationId: number) {
+    this.notifications.next(
+      this.notifications.value.filter(n => n.id !== notificationId)
+    )
+
+    this.readNotificationList.add(notificationId);
+  }
+
+  private syncReadNotifications() {
+    if (this.readNotificationList.size > 0) {
+      const idsToSync = Array.from(this.readNotificationList);
+
+      this.notificationService.markAsRead({notificationIds: idsToSync}).subscribe({
+          next: () => {
+            this.readNotificationList.clear();
+          }
+        }
+      )
+    }
   }
 }

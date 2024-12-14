@@ -13,4 +13,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     
     void deleteByPlayerIdAndSenderIdAndType(Long id, Long id1, NotificationType notificationType);
+    
 }

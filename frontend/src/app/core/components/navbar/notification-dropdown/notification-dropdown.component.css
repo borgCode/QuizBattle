@@ -39,6 +39,11 @@
   color: #3da70c;
 }
 
+.notification-list .btn-mark-as-read {
+  transform: scale(60%);
+  margin-left: 5px;
+}
+
 
 .notification-list .dropdown-item:hover {
   background-color: #f8f9fa;
