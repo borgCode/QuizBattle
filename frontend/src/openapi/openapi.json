@@ -237,6 +237,29 @@
         }
       }
     },
+    "/friendship/reject": {
+      "post": {
+        "tags": [
+          "Friendship"
+        ],
+        "operationId": "rejectFriendship",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerInteractionResponse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/friendship/block": {
       "post": {
         "tags": [
@@ -754,19 +777,6 @@
           }
         }
       },
-      "PlayerInteraction": {
-        "type": "object",
-        "properties": {
-          "senderId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "receiverId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "PlayerInteractionResponse": {
         "type": "object",
         "properties": {
@@ -779,6 +789,19 @@
             "format": "int64"
           },
           "notificationId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PlayerInteraction": {
+        "type": "object",
+        "properties": {
+          "senderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "receiverId": {
             "type": "integer",
             "format": "int64"
           }

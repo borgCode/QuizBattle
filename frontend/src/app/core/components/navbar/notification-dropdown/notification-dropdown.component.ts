@@ -70,10 +70,10 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   acceptFriendRequest(originalSender: number, notificationId: number) {
+    //Remove value from notif bell
     this.notifications.next(
       this.notifications.value.filter(n => n.id !== notificationId)
     )
-
     this.friendshipService.acceptFriend({
       body: {
         senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
@@ -84,7 +84,16 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
 
-  declineFriendRequest() {
-
+  declineFriendRequest(originalSender: number, notificationId: number) {
+    this.notifications.next(
+      this.notifications.value.filter(n => n.id !== notificationId)
+    )
+    this.friendshipService.rejectFriendship({
+      body: {
+        senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
+      }
+    }).subscribe({
+      next: () => this.alertMessageService.show("Friend request rejected!", 'success'),
+    })
   }
 }

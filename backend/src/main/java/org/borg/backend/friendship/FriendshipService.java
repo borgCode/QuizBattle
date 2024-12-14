@@ -102,7 +102,6 @@ public class FriendshipService {
         }
         
         notificationService.markAsRead(response.getNotificationId());
-                
     }
 
 

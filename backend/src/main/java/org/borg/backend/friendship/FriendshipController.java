@@ -31,6 +31,12 @@ public class FriendshipController {
         friendshipService.handleFriendshipResponse(response, true);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/reject")
+    public ResponseEntity<Void> rejectFriendship(@RequestBody PlayerInteractionResponse response) {
+        friendshipService.handleFriendshipResponse(response, false);
+        return ResponseEntity.ok().build();
+    }
     
     @PostMapping("/block")
     public ResponseEntity<Void> blockPlayer(@RequestBody PlayerInteraction request) {
