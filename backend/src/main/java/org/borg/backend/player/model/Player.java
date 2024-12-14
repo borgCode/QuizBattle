@@ -2,7 +2,7 @@ package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.friendship.Friendship;
+import org.borg.backend.friendship.model.Friendship;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.role.Role;
 import org.springframework.security.core.GrantedAuthority;

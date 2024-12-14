@@ -6,6 +6,10 @@ import {NotificationService} from '../../../../api/generated/services/notificati
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
+import {FriendshipService} from '../../../../api/generated/services/friendship.service';
+import {AlertMessageService} from '../../../services/alert-message/alert-message.service';
+import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
+
 declare var bootstrap: any;
 
 @Component({
@@ -20,13 +24,15 @@ declare var bootstrap: any;
   templateUrl: './notification-dropdown.component.html',
   styleUrl: './notification-dropdown.component.css'
 })
-export class NotificationDropdownComponent implements OnInit, AfterViewInit{
+export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   private notifications = new BehaviorSubject<Notification[]>([]);
   notifications$ = this.notifications.asObservable();
 
   constructor(
     protected notificationService: NotificationService,
-    protected loginStateService: LoginStateService,
+    private loginStateService: LoginStateService,
+    private friendshipService: FriendshipService,
+    private alertMessageService: AlertMessageService,
     private router: Router
   ) {
   }
@@ -63,9 +69,20 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit{
     }
   }
 
-  acceptFriendRequest() {
+  acceptFriendRequest(originalSender: number, notificationId: number) {
+    this.notifications.next(
+      this.notifications.value.filter(n => n.id !== notificationId)
+    )
 
+    this.friendshipService.acceptFriend({
+      body: {
+        senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
+      }
+    }).subscribe({
+      next: () => this.alertMessageService.show("Accepted friend request!", 'success'),
+    })
   }
+
 
   declineFriendRequest() {
 

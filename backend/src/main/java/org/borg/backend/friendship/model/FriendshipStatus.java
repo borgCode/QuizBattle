@@ -1,4 +1,4 @@
-package org.borg.backend.friendship;
+package org.borg.backend.friendship.model;
 
 public enum FriendshipStatus {
     PENDING,

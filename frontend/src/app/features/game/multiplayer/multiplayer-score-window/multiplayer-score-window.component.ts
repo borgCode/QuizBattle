@@ -199,8 +199,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
 
-  sendFriendRequest(username: string) {
-    this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverUsername: username}}).subscribe({
+  sendFriendRequest(opponentId: number) {
+    this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverId: opponentId}}).subscribe({
       next: () => this.alertMessageService.show('Friend request sent successfully', 'success'),
     });
   }

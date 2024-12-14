@@ -2,6 +2,10 @@ package org.borg.backend.friendship;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.friendship.model.Friendship;
+import org.borg.backend.friendship.model.FriendshipStatus;
+import org.borg.backend.friendship.model.PlayerInteraction;
+import org.borg.backend.friendship.model.PlayerInteractionResponse;
 import org.borg.backend.handler.BusinessErrorCodes;
 import org.borg.backend.handler.FriendshipException;
 import org.borg.backend.notification.NotificationService;
@@ -30,7 +34,7 @@ public class FriendshipService {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        Player receivingPlayer = playerRepository.findByUsername(request.getReceiverUsername())
+        Player receivingPlayer = playerRepository.findById(request.getReceiverId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         List<Friendship> existingFriendships = friendshipRepository.
@@ -47,7 +51,7 @@ public class FriendshipService {
 
             //Send notification to receiving player
 
-            notificationService.sendFriendRequestNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName());
+            notificationService.sendFriendRequestNotification(receivingPlayer.getId(), sendingPlayer);
         } else {
             Friendship friendship = existingFriendships.get(0);
             if (friendship.getPlayer1().equals(sendingPlayer)) {
@@ -60,7 +64,7 @@ public class FriendshipService {
                 if (friendship.getStatus() == FriendshipStatus.PENDING) {
                     friendship.setStatus(FriendshipStatus.ACTIVE);
                     friendshipRepository.save(friendship);
-                    
+
                     //TODO Notification for accepted friend
                 }
             }
@@ -68,19 +72,47 @@ public class FriendshipService {
 
     }
 
-    public void acceptFriend(PlayerInteraction request) {
+    @Transactional
+    public void handleFriendshipResponse(PlayerInteractionResponse response, boolean wantsFriendship) {
+        Player sendingPlayer = playerRepository.findById(response.getSenderId())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        Player receivingPlayer = playerRepository.findById(response.getReceiverId())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        List<Friendship> existingFriendships = friendshipRepository.
+                findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
+                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
+
+        if (existingFriendships.isEmpty()) {
+            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
+        }
+
+        Friendship friendship = existingFriendships.get(0);
+
+        if (friendship.getStatus().equals(FriendshipStatus.ACTIVE)) {
+            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+        }
+
+        if (wantsFriendship) {
+            friendship.setStatus(FriendshipStatus.ACTIVE);
+            friendshipRepository.save(friendship);
+        } else {
+            friendshipRepository.delete(friendship);
+        }
         
+        notificationService.markAsRead(response.getNotificationId());
+                
     }
-    
-    
-    
+
+
     //TODO refactor code
 
     public void blockPlayer(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        Player receivingPlayer = playerRepository.findByUsername(request.getReceiverUsername())
+        Player receivingPlayer = playerRepository.findById(request.getReceiverId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);

@@ -283,6 +283,29 @@
         }
       }
     },
+    "/friendship/accept": {
+      "post": {
+        "tags": [
+          "Friendship"
+        ],
+        "operationId": "acceptFriend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerInteractionResponse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -738,8 +761,26 @@
             "type": "integer",
             "format": "int64"
           },
-          "receiverUsername": {
-            "type": "string"
+          "receiverId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PlayerInteractionResponse": {
+        "type": "object",
+        "properties": {
+          "senderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "receiverId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "notificationId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -882,6 +923,10 @@
             "format": "int64"
           },
           "playerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "senderId": {
             "type": "integer",
             "format": "int64"
           },

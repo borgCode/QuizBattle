@@ -13,7 +13,7 @@
       <app-player-card
         [playerAvatar]="opponentAvatar"
         [playerDisplayName]="opponentDisplayName"></app-player-card>
-      <div (click)="sendFriendRequest(gameState.playerDTOS[opponentIndex].username)" class="btn btn-primary mt-2">Send
+      <div (click)="sendFriendRequest(gameState.playerDTOS[opponentIndex].id)" class="btn btn-primary mt-2">Send
         friend request
       </div>
     </div>

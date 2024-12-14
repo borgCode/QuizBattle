@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.model.NotificationType;
+import org.borg.backend.player.model.Player;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,12 +22,13 @@ public class NotificationService {
         return notificationRepository.findByPlayerIdAndIsReadFalse(playerId);
     }
 
-    public void sendFriendRequestNotification(Long receiverId, String senderDisplayName) {
-        log.warn("Sending notification from {} to {}", receiverId, senderDisplayName);
+    public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer) {
+        log.warn("Sending notification from {} to {}", receiverId, sendingPlayer.getDisplayName());
         notificationRepository.save(Notification.builder()
                 .playerId(receiverId)
+                .senderId(sendingPlayer.getId())
                 .type(NotificationType.FRIEND_REQUEST)
-                .message(senderDisplayName + " sent you a friend request!")
+                .message(sendingPlayer.getDisplayName() + " sent you a friend request!")
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build());
@@ -52,5 +54,11 @@ public class NotificationService {
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build());
+    }
+
+    public void markAsRead(Long notificationId) {
+        if (notificationId != null) {
+            notificationRepository.deleteById(notificationId);
+        }
     }
 }

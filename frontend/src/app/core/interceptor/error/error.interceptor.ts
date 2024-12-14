@@ -55,6 +55,9 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 307:
               this.alertMessageService.show('You are already friends with this user', 'error');
               break;
+            case 308:
+              this.alertMessageService.show('This friend request is no longer available', 'error');
+              break;
             case 310:
               this.alertMessageService.show('You already sent a rematch request!', 'error');
               break;

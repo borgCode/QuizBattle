@@ -18,6 +18,7 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long playerId;
+    private Long senderId;
     @Enumerated(EnumType.STRING)
     private NotificationType type;
     private Long pendingSessionId;

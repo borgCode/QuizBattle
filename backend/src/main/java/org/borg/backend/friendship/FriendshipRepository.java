@@ -1,5 +1,7 @@
 package org.borg.backend.friendship;
 
+import org.borg.backend.friendship.model.Friendship;
+import org.borg.backend.friendship.model.FriendshipStatus;
 import org.borg.backend.player.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

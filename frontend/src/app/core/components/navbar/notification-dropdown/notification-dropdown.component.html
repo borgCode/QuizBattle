@@ -16,7 +16,7 @@
               <span>{{ notification.message }}</span>
               <button type="button" class="btn-accept-friend btn btn-success fa-regular fa-circle-check"
               data-bs-toggle="tooltip" title="Accept friends request"
-              (click)="acceptFriendRequest()"></button>
+              (click)="acceptFriendRequest(notification.senderId, notification.id)"></button>
               <div class="btn-decline-friend btn btn-danger fa-solid fa-xmark"
                    data-bs-toggle="tooltip" title="Decline friend request"
               (click)="declineFriendRequest()"></div>

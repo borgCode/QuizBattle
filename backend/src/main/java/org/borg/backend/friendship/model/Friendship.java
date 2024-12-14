@@ -1,4 +1,4 @@
-package org.borg.backend.friendship;
+package org.borg.backend.friendship.model;
 
 import jakarta.persistence.*;
 import lombok.*;
