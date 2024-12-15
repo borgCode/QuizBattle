@@ -37,11 +37,6 @@ public class Chapter {
     
     private String unlockCondition;
     private String rewardText;
-    private String base64Image;
-    private LocalDate startedAt;
-    private LocalDate lastPlayedAt;
-    private LocalDate completedAt;
+    private String imagePath;
     
-    @Enumerated(EnumType.STRING)
-    private ProgressStatus progressStatus;
 }

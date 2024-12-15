@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.borg.backend.player.model.Player;
+import org.borg.backend.singleplayer.enums.ProgressStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -27,8 +29,15 @@ public class PlayerProgress {
     @ManyToOne
     @JoinColumn(name = "story_id")
     private Story story;
-    private Long currentId;
+    private Long currentChapterId;
 
     @ElementCollection
     private List<Long> completedChapters;
+
+    private LocalDate startedAt;
+    private LocalDate lastPlayed;
+    private LocalDate completedAt;
+
+    @Enumerated(EnumType.STRING)
+    private ProgressStatus progressStatus;
 }
