@@ -3,7 +3,8 @@
     <div class="col-4 col-sm-3 offset-sm-1 d-flex flex-column justify-content-center">
       <app-player-card
         [playerAvatar]="'data:image/jpeg;base64,' + gameState.playerDTOS[(opponentIndex + 1) % 2].base64Image"
-        [playerDisplayName]="gameState.playerDTOS[(opponentIndex + 1) % 2].displayName"></app-player-card>
+        [playerDisplayName]="gameState.playerDTOS[(opponentIndex + 1) % 2].displayName"
+      maxHeight="150px"></app-player-card>
     </div>
     <div class="score-panel col-4 col-sm-4 align-content-center text-center">
       <p>{{ playerTotalScore }}
@@ -12,7 +13,8 @@
     <div class="col-4 col-sm-3 offset-sm-1 d-flex flex-column justify-content-center">
       <app-player-card
         [playerAvatar]="opponentAvatar"
-        [playerDisplayName]="opponentDisplayName"></app-player-card>
+        [playerDisplayName]="opponentDisplayName"
+        maxHeight="150px"></app-player-card>
       <div (click)="sendFriendRequest(gameState.playerDTOS[opponentIndex].id)" class="btn btn-primary mt-2">Send
         friend request
       </div>

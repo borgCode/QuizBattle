@@ -5,6 +5,7 @@ import {CategoryPieChartComponent} from './category-pie-chart/category-pie-chart
 import {FriendsPanelComponent} from './friends-panel/friends-panel.component';
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
 import {Router} from '@angular/router';
+import {PlayerService} from '../../../api/generated/services/player.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -22,6 +23,7 @@ export class PlayerProfileComponent implements OnInit {
 
   constructor(
     private loginStateService: LoginStateService,
+    private playerService: PlayerService,
     private friendshipService: FriendshipService,
     private router: Router
   ) {
@@ -33,9 +35,18 @@ export class PlayerProfileComponent implements OnInit {
     if (!this.player) {
       console.warn('No logged-in user found!');
     }
-    this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
+    this.playerService.getPlayerById({playerId: this.player.id}).subscribe({
+      next: value => {
+        this.player = value;
+        this.loginStateService.loggedInUser = value;
 
-    this.getFriends();
+        this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
+
+        this.getFriends();
+
+      }
+    })
+
   }
 
   private getFriends() {
