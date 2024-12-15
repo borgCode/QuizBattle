@@ -216,11 +216,13 @@ public class MultiplayerService {
         session.getPlayerAcknowledgment().put(playerId, true);
         multiplayerSessionRepository.save(session);
     }
-
+    
     @Transactional
-    public void requestRematch(Long sessionId, Long playerId) {
-        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+    public void requestRematch(RematchRequest rematchRequest) {
+        MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+        
+        Long playerId = rematchRequest.getPlayerId();
 
         Map<Long, Boolean> playerWantsRematch = session.getPlayerWantsRematch();
         if (playerWantsRematch.get(playerId)) {
@@ -247,6 +249,8 @@ public class MultiplayerService {
 
             notificationService.sendRematchRequestNotification(opponentId, pendingSession.getId(), sendingPlayer.getDisplayName(), sendingPlayer.getId());
         }
+        
+        notificationService.markAsRead(rematchRequest.getNotificationId());
 
     }
 
@@ -260,7 +264,7 @@ public class MultiplayerService {
                 new MultiplayerSession(players.get(0), players.get(1), startingPlayer));
         return multiplayerSession.getId();
     }
-    
+
     @Transactional
     public Long handleRematchAccept(RematchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())

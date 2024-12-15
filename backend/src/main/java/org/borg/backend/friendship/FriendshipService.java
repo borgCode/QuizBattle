@@ -109,7 +109,9 @@ public class FriendshipService {
             friendshipRepository.delete(friendship);
         }
         
-        notificationService.markAsRead(Collections.singletonList(response.getNotificationId()));
+        if (response.getNotificationId() != null) {
+            notificationService.markAsRead(response.getNotificationId());
+        }
     }
 
     

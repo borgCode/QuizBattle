@@ -3,12 +3,9 @@ package org.borg.backend.multiplayer.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.multiplayer.model.GameStateResponse;
-import org.borg.backend.multiplayer.model.MatchDecision;
-import org.borg.backend.multiplayer.model.RematchResponse;
+import org.borg.backend.multiplayer.model.*;
 import org.borg.backend.multiplayer.service.MatchMakingService;
 import org.borg.backend.multiplayer.service.MultiplayerService;
-import org.borg.backend.multiplayer.model.MultiplayerSessionDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -61,9 +58,9 @@ public class MultiplayerController {
         return ResponseEntity.ok(multiplayerService.getGameState(sessionId));
     }
 
-    @PostMapping("/session/{sessionId}/rematch-request/{playerId}")
-    public ResponseEntity<Void> requestRematch(@PathVariable Long sessionId, @PathVariable Long playerId) {
-        multiplayerService.requestRematch(sessionId, playerId);
+    @PostMapping("/session/rematch-request")
+    public ResponseEntity<Void> requestRematch(@RequestBody RematchRequest rematchRequest) {
+        multiplayerService.requestRematch(rematchRequest);
         return ResponseEntity.ok().build();
     }
     

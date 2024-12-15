@@ -71,11 +71,9 @@ public class NotificationService {
                 .build());
     }
 
-    public void markAsRead(List<Long> notificationIds) {
-        if (notificationIds.isEmpty()) {
-            return;
-        }
-        notificationRepository.deleteAllById(notificationIds);
+    public void markAsRead(Long notificationId) {
+        log.warn("Marking as read");
+        notificationRepository.deleteById(notificationId);
     }
 
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {

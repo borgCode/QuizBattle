@@ -2,6 +2,7 @@ package org.borg.backend.notification;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
 import org.borg.backend.notification.model.Notification;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController()
 @RequestMapping("notification")
 @RequiredArgsConstructor
@@ -28,9 +30,10 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
     
-    @PostMapping("/read")
-    public ResponseEntity<Void> markAsRead(@RequestParam List<Long> notificationIds) {
-        notificationService.markAsRead(notificationIds);
+    @PostMapping("/read/{notificationId}")
+    public ResponseEntity<Void> markAsRead(@PathVariable Long notificationId) {
+        log.warn("Marking as read");
+        notificationService.markAsRead(notificationId);
         return ResponseEntity.ok().build();
     }
 }

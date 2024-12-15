@@ -215,7 +215,13 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   sendRematchRequest() {
-    this.multiplayerService.requestRematch({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
+    this.multiplayerService.requestRematch({
+      body: {
+        sessionId: this.sessionId,
+        playerId: this.storedPlayerId,
+        notificationId: null
+      }
+    }).subscribe({
       next: () => this.alertMessageService.show('Send rematch request!', 'success'),
     })
   }
@@ -224,7 +230,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     this.multiplayerService.giveUp({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
       next: () => {
         const currentUrl = this.router.url;
-        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
           this.router.navigate([currentUrl]);
         });
       }
