@@ -264,12 +264,12 @@
         }
       }
     },
-    "/multiplayer/session/rematch-response": {
+    "/multiplayer/session/reject": {
       "post": {
         "tags": [
           "Multiplayer"
         ],
-        "operationId": "rematchResponse",
+        "operationId": "rejectRematch",
         "requestBody": {
           "content": {
             "application/json": {
@@ -283,6 +283,37 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/multiplayer/session/accept": {
+      "post": {
+        "tags": [
+          "Multiplayer"
+        ],
+        "operationId": "acceptRematch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RematchResponse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
           }
         }
       }
@@ -830,7 +861,7 @@
       "RematchResponse": {
         "type": "object",
         "properties": {
-          "playerId": {
+          "originalSenderId": {
             "type": "integer",
             "format": "int64"
           },
@@ -844,9 +875,6 @@
           "notificationId": {
             "type": "integer",
             "format": "int64"
-          },
-          "hasAccepted": {
-            "type": "boolean"
           }
         }
       },
@@ -1042,10 +1070,19 @@
               "REMATCH_ACCEPTED",
               "REMATCH_DECLINED",
               "GAME_WON",
-              "GAME_LOST"
+              "GAME_LOST",
+              "GAME_TIED"
             ]
           },
           "pendingSessionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "startedSessionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "opponentId": {
             "type": "integer",
             "format": "int64"
           },

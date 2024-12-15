@@ -12,53 +12,133 @@
         <div *ngFor="let notification of notifications">
           <ng-container [ngSwitch]="notification.type">
             <li *ngSwitchCase="'FRIEND_REQUEST'" class="friend-request dropdown-item">
-              <i class="fa-solid fa-exclamation icon"></i>
+              <i class="fa-solid fa-user-group icon"></i>
               <span>{{ notification.message }}</span>
-              <button type="button" class="btn-accept-friend btn btn-success fa-regular fa-circle-check"
-              data-bs-toggle="tooltip" title="Accept friends request"
-              (click)="acceptFriendRequest(notification.senderId, notification.id)"></button>
-              <div class="btn-decline-friend btn btn-danger fa-solid fa-xmark"
-                   data-bs-toggle="tooltip" title="Decline friend request"
-              (click)="declineFriendRequest(notification.senderId, notification.id)"></div>
+              <div class="notification-actions d-flex align-items-center">
+                <button type="button"
+                        class="btn-primary-action btn btn-success fa-regular fa-circle-check"
+                        data-bs-toggle="tooltip"
+                        title="Accept friends request"
+                        (click)="acceptFriendRequest(notification.senderId, notification.id)"></button>
+                <button class="btn-primary-action btn btn-danger fa-solid fa-xmark"
+                        data-bs-toggle="tooltip" title="Decline friend request"
+                        (click)="declineFriendRequest(notification.senderId, notification.id)"></button>
+              </div>
             </li>
             <li *ngSwitchCase="'FRIEND_ACCEPTED'" class="friend-accepted dropdown-item">
               <i class="fa-solid fa-check icon"></i>
               <span>{{ notification.message }}</span>
-              <div class="btn-mark-as-read btn btn-primary fa-solid fa-check"
-                   data-bs-toggle="tooltip" title="Mark as read"
-              (click)="markAsRead(notification.id)"></div>
+              <div class="notification-actions d-flex align-items-center justify-content-end">
+                <button class="btn-secondary-action btn btn-secondary fa-solid fa-check"
+                        data-bs-toggle="tooltip" title="Mark as read"
+                        (click)="markAsRead(notification.id)"></button>
+              </div>
             </li>
             <li *ngSwitchCase="'REMATCH_REQUEST'" class="rematch-request dropdown-item">
               <i class="fa-solid fa-gamepad icon"></i>
               <span>{{ notification.message }}</span>
-              <button type="button" class="btn-accept-rematch btn btn-success fa-regular fa-circle-check"
-                      data-bs-toggle="tooltip" title="Accept rematch"
-                      (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)"></button>
-              <div class="btn-decline-rematch btn btn-danger fa-solid fa-xmark"
-                   data-bs-toggle="tooltip" title="Decline rematch"
-                   (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)"></div>
+              <div class="notification-actions d-flex align-items-center">
+                <button type="button" class="btn-primary-action btn btn-success fa-regular fa-circle-check"
+                        data-bs-toggle="tooltip" title="Accept rematch"
+                        (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)"></button>
+                <button class="btn-primary-action btn btn-danger fa-solid fa-xmark"
+                        data-bs-toggle="tooltip" title="Decline rematch"
+                        (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)"></button>
+              </div>
             </li>
             <li *ngSwitchCase="'REMATCH_ACCEPTED'" class="rematch-accepted dropdown-item">
               <i class="fa-solid fa-check icon"></i>
               <span>{{ notification.message }}</span>
-              <div class="btn-mark-as-read btn btn-primary fa-solid fa-check"
-                   data-bs-toggle="tooltip" title="Mark as read"
-                   (click)="markAsRead(notification.id)"
-              ></div>
+              <div class="notification-actions d-flex justify-content-between align-items-center">
+                <div class="primary-actions">
+                  <button type="button"
+                          class="btn-primary-action btn btn-success fa-solid fa-arrow-circle-right"
+                          data-bs-toggle="tooltip"
+                          title="Go to game"
+                          (click)="goToGame(notification.id, notification.startedSessionId)"></button>
+                </div>
+                <div class="secondary-actions">
+                  <button class="btn-secondary-action btn btn-secondary fa-solid fa-check"
+                          data-bs-toggle="tooltip" title="Mark as read"
+                          (click)="markAsRead(notification.id)"
+                  ></button>
+                </div>
+              </div>
             </li>
             <li *ngSwitchCase="'GAME_WON'" class="game-won dropdown-item">
               <i class="fa-solid fa-trophy icon"></i>
               <span>{{ notification.message }}</span>
-              <div class="btn-mark-as-read btn btn-primary fa-solid fa-check"
-                   data-bs-toggle="tooltip" title="Mark as read"
-                   (click)="markAsRead(notification.id)"></div>
+              <div class="notification-actions d-flex justify-content-between align-items-center">
+                <div class="primary-actions">
+                  <button type="button"
+                          class="btn-primary-action btn btn-primary fa-regular fa-question-circle"
+                          data-bs-toggle="tooltip"
+                          title="Go to score window"
+                          (click)="goToGame(notification.id, notification.startedSessionId)"></button>
+                  <button type="button"
+                          class="btn-primary-action btn fa-solid fa-sync-alt"
+                          style="color: #6f42c1; border: solid 1px #6f42c1;"
+                          data-bs-toggle="tooltip"
+                          title="Request rematch"
+                          (click)="requestRematch(notification.id, notification.startedSessionId)"></button>
+                </div>
+                <div class="secondary-actions">
+                  <button class="btn-secondary-action btn btn-secondary fa-solid fa-check"
+                          data-bs-toggle="tooltip" title="Mark as read"
+                          (click)="markAsRead(notification.id)"
+                  ></button>
+                </div>
+              </div>
             </li>
             <li *ngSwitchCase="'GAME_LOST'" class="game-lost dropdown-item">
               <i class="fa-solid fa-thumbs-down icon"></i>
               <span>{{ notification.message }}</span>
-              <div class="btn-mark-as-read btn btn-primary fa-solid fa-check"
-                   data-bs-toggle="tooltip" title="Mark as read"
-                   (click)="markAsRead(notification.id)"></div>
+              <div class="notification-actions d-flex justify-content-between align-items-center">
+                <div class="primary-actions">
+                  <button type="button"
+                          class="btn-primary-action btn btn-primary fa-regular fa-question-circle"
+                          data-bs-toggle="tooltip"
+                          title="Go to score window"
+                          (click)="goToGame(notification.id, notification.startedSessionId)"></button>
+                  <button type="button"
+                          class="btn-primary-action btn fa-solid fa-sync-alt"
+                          style="color: #6f42c1; border: solid 1px #6f42c1;"
+                          data-bs-toggle="tooltip"
+                          title="Request rematch"
+                          (click)="requestRematch(notification.id, notification.startedSessionId)"></button>
+                </div>
+                <div class="secondary-actions">
+                  <button class="btn-secondary-action btn btn-secondary fa-solid fa-check"
+                          data-bs-toggle="tooltip" title="Mark as read"
+                          (click)="markAsRead(notification.id)"
+                  ></button>
+                </div>
+              </div>
+            </li>
+            <li *ngSwitchCase="'GAME_TIED'" class="game-won dropdown-item">
+              <i class="fa-solid fa-handshake icon"></i>
+              <span>{{ notification.message }}</span>
+              <div class="notification-actions d-flex justify-content-between align-items-center">
+                <div class="primary-actions">
+                  <button type="button"
+                          class="btn-primary-action btn btn-primary fa-regular fa-question-circle"
+                          data-bs-toggle="tooltip"
+                          title="Go to score window"
+                          (click)="goToGame(notification.id, notification.startedSessionId)"></button>
+                  <button type="button"
+                          class="btn-primary-action btn fa-solid fa-sync-alt"
+                          style="color: #6f42c1; border: solid 1px #6f42c1;"
+                          data-bs-toggle="tooltip"
+                          title="Request rematch"
+                          (click)="requestRematch(notification.id, notification.startedSessionId)"></button>
+                </div>
+                <div class="secondary-actions">
+                  <button class="btn-secondary-action btn btn-secondary fa-solid fa-check"
+                          data-bs-toggle="tooltip" title="Mark as read"
+                          (click)="markAsRead(notification.id)"
+                  ></button>
+                </div>
+              </div>
             </li>
           </ng-container>
           <div class="dropdown-divider"></div>
@@ -67,3 +147,22 @@
     </ng-container>
   </li>
 </ul>
+
+
+<div class="modal fade" id="goToGameModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Rematch accepted</h5>
+        <button type="button" class="btn-close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to go to the accepted game? You can find it in the list of active games or directly go there now</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="stay-button">Stay</button>
+        <button type="button" class="btn btn-primary" id="go-to-game-button">Go to game</button>
+      </div>
+    </div>
+  </div>
+</div>

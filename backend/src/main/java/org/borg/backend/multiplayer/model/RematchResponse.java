@@ -9,9 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class RematchResponse {
-    private Long playerId;
+    private Long originalSenderId;
     private String playerDisplayName;
     private Long pendingSessionId;
     private Long notificationId;
-    private boolean hasAccepted;
 }

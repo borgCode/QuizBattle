@@ -67,9 +67,14 @@ public class MultiplayerController {
         return ResponseEntity.ok().build();
     }
     
-    @PostMapping("/session/rematch-response")
-    public ResponseEntity<Void> rematchResponse(@RequestBody RematchResponse response) {
-        multiplayerService.handleRematchResponse(response);
+    @PostMapping("/session/accept")
+    public ResponseEntity<Long> acceptRematch(@RequestBody RematchResponse response) {
+        return ResponseEntity.ok(multiplayerService.handleRematchAccept(response));
+    }
+
+    @PostMapping("/session/reject")
+    public ResponseEntity<Void> rejectRematch(@RequestBody RematchResponse response) {
+        multiplayerService.handleRematchReject(response);
         return ResponseEntity.ok().build();
     }
 

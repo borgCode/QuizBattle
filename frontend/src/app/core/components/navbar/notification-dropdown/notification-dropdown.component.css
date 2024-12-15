@@ -2,16 +2,6 @@
   transform: translate(-10px, -10px) scale(0.75);
 }
 
-.notification-list .dropdown-item {
-  align-items: center;
-  padding: 10px 15px;
-  border-bottom: 1px solid #ddd;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
 
 .notification-list .dropdown-item:last-child {
   border-bottom: none;
@@ -22,25 +12,26 @@
   font-size: 18px;
 }
 
-.notification-list .friend-request .icon {
-  color: #20cdd9;
-}
-
-.btn-accept-friend {
+.btn-primary-action {
   margin-left: 10px;
   margin-right: 10px;
 }
 
-.notification-list .rematch-accepted .icon {
-  color: #3da70c;
+
+.btn-success.btn-primary-action {
+
+  background-color: #28a745;
+
 }
 
-.notification-list .friend-accepted .icon {
-  color: #3da70c;
+.btn-danger.btn-primary-action {
+  background-color: #dc3545;
 }
 
-.notification-list .btn-mark-as-read {
+
+.btn-secondary-action {
   transform: scale(60%);
+  opacity: 0.8;
   margin-left: 5px;
 }
 
@@ -48,9 +39,4 @@
 .notification-list .dropdown-item:hover {
   background-color: #f8f9fa;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.notification-list .dropdown-item span {
-  flex: 1;
-  text-align: left;
 }

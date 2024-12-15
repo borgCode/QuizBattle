@@ -23,7 +23,7 @@ public class PlayerService {
 
     public PlayerDTO getPlayerById(Long playerId) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new RuntimeException("Player not found"));
+                .orElseThrow(() -> new NoSuchElementException("Player not found"));
         return PlayerMapper.toDTO(player);
     }
 

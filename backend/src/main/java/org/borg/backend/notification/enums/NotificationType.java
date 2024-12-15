@@ -8,6 +8,7 @@ public enum NotificationType {
     REMATCH_DECLINED,
     GAME_WON,
     GAME_LOST,
+    GAME_TIED,
     
     
 }

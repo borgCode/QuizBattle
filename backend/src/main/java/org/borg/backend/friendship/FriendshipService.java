@@ -104,6 +104,7 @@ public class FriendshipService {
         if (wantsFriendship) {
             friendship.setStatus(FriendshipStatus.ACTIVE);
             friendshipRepository.save(friendship);
+            notificationService.sendFriendAcceptedNotification(response.getReceiverId(), sendingPlayer);
         } else {
             friendshipRepository.delete(friendship);
         }

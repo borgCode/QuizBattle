@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @ToString
 @Entity
 public class Notification {
+    
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,8 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     private NotificationType type;
     private Long pendingSessionId;
+    private Long startedSessionId;
+    private Long opponentId;
     private String message;
     private boolean isRead;
     private LocalDateTime createdAt;

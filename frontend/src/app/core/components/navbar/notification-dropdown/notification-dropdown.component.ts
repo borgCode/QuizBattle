@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, lastValueFrom} from 'rxjs';
 import {Notification} from '../../../../api/generated/models/notification';
 import {NotificationService} from '../../../../api/generated/services/notification.service';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
@@ -65,6 +65,18 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     });
   }
 
+  private async syncReadNotifications() {
+    if (this.readNotificationList.size > 0) {
+      const idsToSync = Array.from(this.readNotificationList);
+
+      await lastValueFrom(this.notificationService.markAsRead({notificationIds: idsToSync}));
+
+      this.readNotificationList.clear();
+
+
+    }
+  }
+
   private fetchNotifications() {
     if (this.loginStateService.loggedInUser.id) {
       this.notificationService.getPlayerNotifications({playerId: this.loginStateService.loggedInUser.id}).subscribe(
@@ -101,50 +113,82 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   markAsRead(notificationId: number) {
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId)
-    )
-
-    this.readNotificationList.add(notificationId);
-  }
-
-  private syncReadNotifications() {
-    if (this.readNotificationList.size > 0) {
-      const idsToSync = Array.from(this.readNotificationList);
-
-      this.notificationService.markAsRead({notificationIds: idsToSync}).subscribe({
-          next: () => {
-            this.readNotificationList.clear();
-          }
-        }
-      )
-    }
+    this.removeNotification(notificationId);
   }
 
   acceptRematch(senderId: number, pendingSessionId: number, notificationId: number) {
-    console.log(senderId)
-    this.sendRematchResponse(senderId, pendingSessionId, notificationId, true, 'You accepted the rematch!')
-  }
+    this.removeNotification(notificationId);
 
-  declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
-    console.log(senderId)
-    this.sendRematchResponse(senderId, pendingSessionId, notificationId, false, 'You declined the rematch!')
-  }
-
-  sendRematchResponse(senderId: number, pendingSessionId: number, notificationId: number, hasAccepted: boolean, alertMessage: string) {
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId))
-
-    this.multiplayerService.rematchResponse({
+    this.multiplayerService.acceptRematch({
       body: {
-        playerId: senderId,
-        hasAccepted: hasAccepted,
+        originalSenderId: senderId,
         notificationId: notificationId,
         pendingSessionId: pendingSessionId,
         playerDisplayName: this.loginStateService.loggedInUser.displayName
       }
     }).subscribe({
-      next: () => this.alertMessageService.show(alertMessage, 'success'),
+      next: sessionId => {
+        const modal = document.getElementById('goToGameModal');
+        modal.classList.add('show')
+        modal.style.display = 'block';
+
+        const stayButton = document.getElementById('stay-button')
+        const goToGameButton = document.getElementById('go-to-game-button')
+
+        stayButton.addEventListener('click', () => {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        })
+
+        goToGameButton.addEventListener('click', () => {
+          this.router.navigate(['multiplayer', sessionId]);
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        })
+      }
     })
+  }
+
+  declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
+    this.removeNotification(notificationId);
+
+    this.multiplayerService.rejectRematch({
+      body: {
+        originalSenderId: senderId,
+        notificationId: notificationId,
+        pendingSessionId: pendingSessionId,
+        playerDisplayName: this.loginStateService.loggedInUser.displayName
+      }
+    }).subscribe({
+      next: () => this.alertMessageService.show("You declined the rematch!", 'success'),
+    })
+  }
+
+  async goToGame(notificationId: number, startedSessionId: number) {
+    this.removeNotification(notificationId)
+
+    await this.syncReadNotifications();
+
+    this.router.navigate(['multiplayer', startedSessionId]);
+  }
+
+  requestRematch(notificationId: number, startedSessionId: number) {
+    this.removeNotification(notificationId);
+
+    this.multiplayerService.requestRematch({
+      sessionId: startedSessionId, playerId: this.loginStateService.loggedInUser.id
+    }).subscribe({
+      next: () => {
+        console.log("Success")
+        this.alertMessageService.show('Send rematch request!', 'success')
+      }
+    })
+  }
+
+  private removeNotification(notificationId: number) {
+    this.notifications.next(
+      this.notifications.value.filter(n => n.id !== notificationId))
+
+    this.readNotificationList.add(notificationId);
   }
 }
