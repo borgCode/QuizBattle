@@ -2,10 +2,7 @@ package org.borg.backend.singleplayer.model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.borg.backend.question.Question;
 import org.borg.backend.singleplayer.enums.ProgressStatus;
 
@@ -16,6 +13,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "chapters")
 public class Chapter {
