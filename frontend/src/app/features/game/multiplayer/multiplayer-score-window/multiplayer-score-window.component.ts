@@ -219,7 +219,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       body: {
         sessionId: this.sessionId,
         playerId: this.storedPlayerId,
-        notificationId: null
+        notificationId: -1
       }
     }).subscribe({
       next: () => this.alertMessageService.show('Send rematch request!', 'success'),

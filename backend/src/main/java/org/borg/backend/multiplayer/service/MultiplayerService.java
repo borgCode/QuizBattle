@@ -250,7 +250,10 @@ public class MultiplayerService {
             notificationService.sendRematchRequestNotification(opponentId, pendingSession.getId(), sendingPlayer.getDisplayName(), sendingPlayer.getId());
         }
         
-        notificationService.markAsRead(rematchRequest.getNotificationId());
+        if (rematchRequest.getNotificationId() != -1) {
+            notificationService.markAsRead(rematchRequest.getNotificationId());
+        }
+        
 
     }
 
