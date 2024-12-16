@@ -167,4 +167,10 @@ public class NotificationService {
                 .createdAt(LocalDateTime.now())
                 .build());
     }
+
+    public void deleteMatchRequestNotification(Long playerId, Long pendingSessionId) {
+        notificationRepository.delete(notificationRepository.findByPlayerIdAndPendingSessionId(playerId, pendingSessionId));
+        
+        
+    }
 }
