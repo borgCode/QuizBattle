@@ -2,6 +2,8 @@ package org.borg.backend.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.handler.BusinessErrorCodes;
+import org.borg.backend.handler.UserNameAlreadyTakenException;
 import org.borg.backend.role.Role;
 import org.borg.backend.role.RoleRepository;
 import org.borg.backend.security.JwtService;
@@ -9,6 +11,7 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerDTO;
 import org.borg.backend.player.PlayerMapper;
 import org.borg.backend.player.PlayerRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,7 +41,13 @@ public class AuthService {
                 .enabled(true)
                 .roles(List.of(userRole))
                 .build();
-        playerRepository.save(player);
+        
+        try {
+            playerRepository.save(player);
+        } catch (DataIntegrityViolationException e) {
+            throw new UserNameAlreadyTakenException(BusinessErrorCodes.USERNAME_TAKEN);
+        }
+       
     }
 
     public AuthResponse authenticate(AuthRequest authRequest) {

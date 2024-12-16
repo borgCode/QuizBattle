@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
+import {MAT_DIALOG_DATA, MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({

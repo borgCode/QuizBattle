@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PendingSessionRepository extends JpaRepository<PendingSession, Long> {
+    boolean existsByRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long opponentId);
+
+
+    PendingSession findByRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long opponentId);
 }

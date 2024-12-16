@@ -224,36 +224,49 @@ public class MultiplayerService {
         
         Long playerId = rematchRequest.getPlayerId();
 
-        Map<Long, Boolean> playerWantsRematch = session.getPlayerWantsRematch();
-        if (playerWantsRematch.get(playerId)) {
-            throw new GameException(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT);
-        }
-        playerWantsRematch.put(playerId, true);
-
-        Long opponentId = playerWantsRematch.keySet().stream()
-                .filter(id -> !id.equals(playerId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No opponent found in session"));
-
         Player sendingPlayer = session.getPlayers().stream()
                 .filter(player -> player.getId().equals(playerId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Player not found in session"));
+        
+        Player opponentPlayer = session.getPlayers().stream()
+                .filter(player -> !player.equals(sendingPlayer))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Opponent not found in session"));
+        
+        if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), opponentPlayer.getId())) {
+            throw new GameException(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT);
+        }
+        
 
-        if (playerWantsRematch.values().stream().allMatch(Boolean::booleanValue)) {
+        PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(opponentPlayer.getId(), sendingPlayer.getId());
+        log.warn("Pending session is: " + pendingSession);
+        
+        if (pendingSession != null) {
+            
+           
             Long newSessionId = createRematchSession(session);
-            notificationService.sendRematchStartedNotification(opponentId, sendingPlayer.getDisplayName(), newSessionId);
+            
+            
+            
+            //Delete original notification
+            notificationService.deleteMatchRequestNotification(playerId, pendingSession.getId());
+
+            pendingSessionRepository.delete(pendingSession);
+            
+            notificationService.sendRematchStartedNotification(playerId, opponentPlayer.getDisplayName(), newSessionId);
+            notificationService.sendRematchStartedNotification(opponentPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
+            
+            
         } else {
-
-            PendingSession pendingSession = pendingSessionRepository.save(new PendingSession(playerId, opponentId));
-
-            notificationService.sendRematchRequestNotification(opponentId, pendingSession.getId(), sendingPlayer.getDisplayName(), sendingPlayer.getId());
+            log.warn("No existing session, creating new pending");
+            
+            PendingSession newSession = pendingSessionRepository.save(new PendingSession(playerId, opponentPlayer.getId()));
+            notificationService.sendRematchRequestNotification(opponentPlayer.getId(), newSession.getId(), sendingPlayer.getDisplayName(), sendingPlayer.getId());
         }
+        log.warn("Marking as read");
         
-        if (rematchRequest.getNotificationId() != -1) {
-            notificationService.markAsRead(rematchRequest.getNotificationId());
-        }
-        
+        notificationService.markAsRead(rematchRequest.getNotificationId());
 
     }
 

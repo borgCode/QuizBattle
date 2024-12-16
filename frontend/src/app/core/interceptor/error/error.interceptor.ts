@@ -47,18 +47,21 @@ export class ErrorInterceptor implements HttpInterceptor {
               this.alertMessageService.show('Username and/or password is incorrect', 'error');
               break;
             case 305:
+              this.alertMessageService.show("Username is already taken", 'error');
+              break;
+            case 320:
               this.alertMessageService.show('Cannot send friend request to a blocked user', 'error');
               break;
-            case 306:
+            case 321:
               this.alertMessageService.show('Friend request is already pending', 'error');
               break;
-            case 307:
+            case 322:
               this.alertMessageService.show('You are already friends with this user', 'error');
               break;
-            case 308:
+            case 323:
               this.alertMessageService.show('This friend request is no longer available', 'error');
               break;
-            case 310:
+            case 324:
               this.alertMessageService.show('You already sent a rematch request!', 'error');
               break;
             case 413:
@@ -81,8 +84,6 @@ export class ErrorInterceptor implements HttpInterceptor {
               break;
           }
         }
-
-
         return throwError(() => errorMessage)
 
       })

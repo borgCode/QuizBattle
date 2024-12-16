@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {NgForOf, NgIf} from '@angular/common';
@@ -7,7 +7,6 @@ import {LoginStateService} from '../../../core/services/login-state-service/logi
 import {AuthRequest} from '../../../api/generated/models/auth-request';
 import {AuthenticationService} from '../../../api/generated/services/authentication.service';
 import {AuthResponse} from '../../../api/generated/models/auth-response';
-import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
 
 @Component({
   selector: 'app-login',
@@ -45,6 +44,7 @@ export class LoginComponent {
         console.log(err);
         if (err.error.validationErrors) {
           this.errorMsg = err.error.validationErrors
+          console.log(this.errorMsg)
         }
       }
     })

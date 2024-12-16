@@ -7,6 +7,9 @@
       maxHeight="150px"></app-player-card>
     </div>
     <div class="score-panel col-4 col-sm-4 align-content-center text-center">
+      <div (click)="sendFriendRequest(gameState.playerDTOS[opponentIndex].id)" class="btn btn-primary mt-2">Send
+        friend request
+      </div>
       <p>{{ playerTotalScore }}
         - {{ opponentTotalScore }}</p>
     </div>
@@ -15,9 +18,7 @@
         [playerAvatar]="opponentAvatar"
         [playerDisplayName]="opponentDisplayName"
         maxHeight="150px"></app-player-card>
-      <div (click)="sendFriendRequest(gameState.playerDTOS[opponentIndex].id)" class="btn btn-primary mt-2">Send
-        friend request
-      </div>
+
     </div>
   </div>
   <div class="container p-2">

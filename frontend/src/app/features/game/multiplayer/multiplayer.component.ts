@@ -141,7 +141,7 @@ export class MultiplayerComponent implements OnInit {
     setTimeout(() => {
       dialogRef.close();
       console.log("Closing confirmation dialog")
-    }, 3000)
+    }, 1000)
 
   }
 

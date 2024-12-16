@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col-12 col-md-4 text-center">
       <app-player-card
+        maxHeight="250px"
         [playerAvatar]="image"
         [playerDisplayName]="player.displayName">
       </app-player-card>
@@ -18,6 +19,7 @@
         <input type="text"
                class="form-control"
                id="displayName"
+               maxlength="15"
                [formControl]="displayName">
         <small *ngIf="displayName.invalid" class="text-danger">
           Display name is required.

@@ -2,30 +2,24 @@ package org.borg.backend.seed;
 
 import org.borg.backend.role.RoleRepository;
 import org.borg.backend.player.PlayerRepository;
-import org.borg.backend.singleplayer.model.Chapter;
-import org.borg.backend.singleplayer.model.Story;
-import org.borg.backend.singleplayer.model.StoryQuestion;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
+@RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
     private final PlayerRepository playerRepository;
     private final RoleRepository roleRepository;
     private final SeedService seedService;
+    private final QuestionRepository questionRepository;
 
-
-    public DataLoader(PlayerRepository playerRepository, RoleRepository roleRepository, SeedService seedService) {
-        this.playerRepository = playerRepository;
-        this.roleRepository = roleRepository;
-        this.seedService = seedService;
-    }
 
     @Override
     public void run(String... args) {
+
+//        List<Role> roles = createRoles();
+//
+//        readQuestions();
 
 //        seedService.seedTestData();
         initStories();
@@ -121,5 +115,45 @@ public class DataLoader implements CommandLineRunner {
                 .build();
 
 
+    }
+
+    private List<Role> createRoles() {
+        List<String> roleNames = List.of("USER");
+        return roleNames.stream()
+                .map(name -> {
+                    Role role = new Role();
+                    role.setName(name);
+                    return roleRepository.save(role);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private void readQuestions() {
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("backend/src/main/java/org/borg/backend/seed/questionsData"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+
+                String[] parts = line.split(",", -1);
+
+                if (parts.length == 4) {
+                    String category = parts[0].trim();
+                    String question = parts[1].trim();
+                    String optionsLine = parts[2].trim();
+                    List<String> options = Arrays.asList(optionsLine.split(";"));
+                    String correctAnswer = parts[3].trim();
+
+                    Question questionObj = new Question();
+                    questionObj.setCategory(category);
+                    questionObj.setQuestion(question);
+                    questionObj.setOptions(options);
+                    questionObj.setCorrectAnswer(correctAnswer);
+                    questionRepository.save(questionObj);
+                }
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

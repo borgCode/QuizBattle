@@ -6,6 +6,7 @@ import {PlayerCardComponent} from '../../../shared/components/player-card/player
 import {firstValueFrom} from 'rxjs';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgIf} from '@angular/common';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -30,7 +31,8 @@ export class EditProfileComponent implements OnInit {
 
   constructor(
     private loginStateService: LoginStateService,
-    private playerService: PlayerService) {
+    private playerService: PlayerService,
+    private router: Router) {
   }
 
 
@@ -98,6 +100,7 @@ export class EditProfileComponent implements OnInit {
       this.playerService.getPlayerById({playerId: this.player.id}).subscribe({
         next: value => {
           this.loginStateService.loggedInUser = value;
+          this.router.navigate(['/profile'])
         }
       })
     } catch (error) {
