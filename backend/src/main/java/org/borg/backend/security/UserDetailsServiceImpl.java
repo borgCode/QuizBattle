@@ -1,7 +1,7 @@
 package org.borg.backend.security;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.player.PlayerRepository;
+import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

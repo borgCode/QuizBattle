@@ -1,0 +1,26 @@
+package org.borg.backend.auth.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+import org.borg.backend.player.model.Player;
+
+import java.util.List;
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(unique = true)
+    private String name;
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
+    private List<Player> players;
+
+}

@@ -3,7 +3,7 @@ package org.borg.backend.multiplayer.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.multiplayer.model.*;
+import org.borg.backend.multiplayer.dto.*;
 import org.borg.backend.multiplayer.service.MatchMakingService;
 import org.borg.backend.multiplayer.service.MultiplayerService;
 import org.springframework.http.ResponseEntity;

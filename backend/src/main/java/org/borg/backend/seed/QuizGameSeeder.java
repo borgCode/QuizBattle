@@ -1,18 +1,18 @@
 package org.borg.backend.seed;
 
 import com.github.javafaker.Faker;
-import org.borg.backend.multiplayer.enums.GameStatus;
+import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.player.model.CategoryStats;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.PlayerRepository;
+import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.question.PlayerQuestionResult;
 import org.borg.backend.question.Question;
 import org.borg.backend.question.QuestionRepository;
-import org.borg.backend.role.Role;
-import org.borg.backend.role.RoleRepository;
+import org.borg.backend.auth.model.Role;
+import org.borg.backend.auth.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
