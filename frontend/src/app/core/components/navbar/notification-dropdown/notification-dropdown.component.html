@@ -65,6 +65,15 @@
                 </div>
               </div>
             </li>
+            <li *ngSwitchCase="'REMATCH_DECLINED'" class="rematch-declined dropdown-item">
+              <i class="fa-solid fa-ban icon"></i>
+              <span>{{ notification.message }}</span>
+              <div class="notification-actions d-flex align-items-center justify-content-end">
+                <button class="btn-secondary-action btn btn-secondary fa-solid fa-check"
+                        data-bs-toggle="tooltip" title="Mark as read"
+                        (click)="markAsRead(notification.id)"></button>
+              </div>
+            </li>
             <li *ngSwitchCase="'GAME_WON'" class="game-won dropdown-item">
               <i class="fa-solid fa-trophy icon"></i>
               <span>{{ notification.message }}</span>
