@@ -12,11 +12,12 @@ public enum BusinessErrorCodes {
     ACCOUNT_LOCKED(302, HttpStatus.FORBIDDEN, "User account is locked"),
     ACCOUNT_DISABLED(303, HttpStatus.FORBIDDEN, "User account is disabled"),
     BAD_CREDENTIALS(304, HttpStatus.FORBIDDEN, "Username and/or password is incorrect"),
-    FRIENDSHIP_ALREADY_BLOCKED(305, HttpStatus.BAD_REQUEST, "Cannot send friend request to blocked user"),
-    FRIENDSHIP_REQUEST_PENDING(306, HttpStatus.BAD_REQUEST, "Friend request is already pending"),
-    FRIENDSHIP_ALREADY_EXISTS(307, HttpStatus.BAD_REQUEST, "Friendship already exists"),
-    FRIENDSHIP_NOT_FOUND(308, HttpStatus.BAD_REQUEST, "The friendship was not found"),
-    REMATCH_REQUEST_ALREADY_SENT(310, HttpStatus.BAD_REQUEST, "Rematch request already sent"),
+    USERNAME_TAKEN(305, HttpStatus.BAD_REQUEST, "Username is taken"),
+    FRIENDSHIP_ALREADY_BLOCKED(320, HttpStatus.BAD_REQUEST, "Cannot send friend request to blocked user"),
+    FRIENDSHIP_REQUEST_PENDING(321, HttpStatus.BAD_REQUEST, "Friend request is already pending"),
+    FRIENDSHIP_ALREADY_EXISTS(322, HttpStatus.BAD_REQUEST, "Friendship already exists"),
+    FRIENDSHIP_NOT_FOUND(323, HttpStatus.BAD_REQUEST, "The friendship was not found"),
+    REMATCH_REQUEST_ALREADY_SENT(324, HttpStatus.BAD_REQUEST, "Rematch request already sent"),
     PROFILE_PIC_TOO_LARGE(413, HttpStatus.PAYLOAD_TOO_LARGE, "File size exceeds the maximum allowed limit of 500KB")
     ;
 

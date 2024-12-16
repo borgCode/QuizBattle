@@ -66,6 +66,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toSet());
+        log.warn("Validation errors: " + validationErrors);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -73,6 +74,8 @@ public class GlobalExceptionHandler {
                         .validationErrors(validationErrors)
                         .build());
     }
+
+
 
     @ExceptionHandler(GameException.class)
     public ResponseEntity<ExceptionResponse> handleException(GameException exception) {
@@ -86,7 +89,17 @@ public class GlobalExceptionHandler {
                 .status(exception.getErrorCode().getHttpStatus())
                 .body(response);
     }
-    
+
+    @ExceptionHandler(UserNameAlreadyTakenException.class)
+    public ResponseEntity<ExceptionResponse> handleUsernameTaken(UserNameAlreadyTakenException exception) {
+        return ResponseEntity.status(exception.getErrorCode().getHttpStatus())
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(exception.getErrorCode().getCode())
+                        .businessErrorDescription(exception.getErrorCode().getDescription())
+                        .error(exception.getMessage())
+                        .build());
+    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ExceptionResponse> handleMaxSizeException(MaxUploadSizeExceededException e) {
         return ResponseEntity
