@@ -1,4 +1,4 @@
-package org.borg.backend.chapter;
+package org.borg.backend.chapter.model;
 
 
 import jakarta.persistence.*;

@@ -2,7 +2,7 @@ package org.borg.backend.question;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.chapter.Chapter;
+import org.borg.backend.chapter.model.Chapter;
 
 import java.util.List;
 
