@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.notification.model.Notification;
-import org.borg.backend.notification.enums.NotificationType;
+import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.springframework.stereotype.Service;

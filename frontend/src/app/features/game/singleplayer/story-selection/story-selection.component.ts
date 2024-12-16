@@ -1,8 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {Story} from '../../../../api/generated/models/story';
 import {StoryService} from '../../../../api/generated/services/story.service';
 import {StoryCardComponent} from './components/story-card/story-card.component';
 import {NgForOf} from '@angular/common';
+import {StoryDto} from '../../../../api/generated/models/story-dto';
+
+import {MatDialog} from '@angular/material/dialog';
+import {StartStoryDialogComponent} from './components/start-story-dialog/start-story-dialog.component';
 
 @Component({
   selector: 'app-story-selection',
@@ -14,10 +17,11 @@ import {NgForOf} from '@angular/common';
   styleUrl: './story-selection.component.css'
 })
 export class StorySelectionComponent implements OnInit{
-  stories: Story[]
+  stories: StoryDto[]
 
   constructor(
     private storyService: StoryService,
+    private startDialog: MatDialog,
   ) {
   }
 
@@ -30,4 +34,21 @@ export class StorySelectionComponent implements OnInit{
 
   }
 
+  showStartStoryDialog(title: string, id: number) {
+    const dialogRef = this.startDialog.open(StartStoryDialogComponent, {
+      data: {storyTitle: title},
+      maxHeight: '90vh',
+      width: '300px',
+    })
+
+
+    console.log(title)
+    dialogRef.afterClosed().subscribe((result)  => {
+      if (result === "yes") {
+        console.log("accepted")
+      } else {
+        console.log("declined")
+      }
+    })
+  }
 }

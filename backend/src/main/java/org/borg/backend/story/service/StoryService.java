@@ -1,6 +1,7 @@
 package org.borg.backend.story.service;
 
-import org.borg.backend.story.model.Story;
+import org.borg.backend.story.dto.StoryDTO;
+import org.borg.backend.story.mapper.StoryMapper;
 import org.borg.backend.story.repository.StoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,8 @@ public class StoryService {
         this.storyRepository = storyRepository;
     }
 
-    public List<Story> getAllStories() {
-        return storyRepository.findAll();
+    public List<StoryDTO> getAllStories() {
+        return StoryMapper.multipleToDTO(storyRepository.findAll());
+        
     }
 }

@@ -471,7 +471,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Story"
+                    "$ref": "#/components/schemas/StoryDTO"
                   }
                 }
               }
@@ -1055,7 +1055,7 @@
           }
         }
       },
-      "Story": {
+      "StoryDTO": {
         "type": "object",
         "properties": {
           "id": {
@@ -1071,12 +1071,12 @@
           "introText": {
             "type": "string"
           },
-          "imagePath": {
-            "type": "string"
-          },
           "numOfChapters": {
             "type": "integer",
             "format": "int32"
+          },
+          "base64Image": {
+            "type": "string"
           }
         }
       },

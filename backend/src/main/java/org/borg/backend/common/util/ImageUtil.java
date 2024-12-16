@@ -9,7 +9,7 @@ import java.util.Base64;
 public class ImageUtil {
 
 
-    public static String encodeImageFileToBase64(String subFilePath) {
+    public static String encodeAvatarImageFileToBase64(String subFilePath) {
         String basePath = "backend/src/main/java/org/borg/backend/storage/profile-pics/";
 
         if (subFilePath == null || subFilePath.isEmpty()) {
@@ -28,6 +28,22 @@ public class ImageUtil {
             return Base64.getEncoder().encodeToString(imageBytes);
         } catch (IOException e) {
             
+            //TODO error handling
+            System.err.println("Error encoding image file: " + subFilePath);
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static String encodeStoryImageToBase64(String subFilePath) {
+        String basePath = "backend/src/main/java/org/borg/backend/storage/story/";
+
+        try {
+            Path path = Paths.get(basePath + subFilePath);
+            byte[] imageBytes = Files.readAllBytes(path);
+            return Base64.getEncoder().encodeToString(imageBytes);
+        } catch (IOException e) {
+
             //TODO error handling
             System.err.println("Error encoding image file: " + subFilePath);
             e.printStackTrace();

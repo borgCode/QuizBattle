@@ -18,7 +18,7 @@ public class PlayerMapper {
                 .username(player.getUsername())
                 .displayName(player.getDisplayName())
                 .stats(player.getStats())
-                .base64Image(ImageUtil.encodeImageFileToBase64(player.getAvatarPath()))
+                .base64Image(ImageUtil.encodeAvatarImageFileToBase64(player.getAvatarPath()))
                 .build();
     }
     
@@ -30,7 +30,7 @@ public class PlayerMapper {
                     .username(player.getUsername())
                     .displayName(player.getDisplayName())
                     .stats(player.getStats())
-                    .base64Image(ImageUtil.encodeImageFileToBase64(player.getAvatarPath()))
+                    .base64Image(ImageUtil.encodeAvatarImageFileToBase64(player.getAvatarPath()))
                     .build();
             dtoList.add(playerDTO);
         }

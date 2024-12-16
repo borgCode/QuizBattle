@@ -86,7 +86,7 @@ public class DataLoader implements CommandLineRunner {
         story1.setTitle("The Dragon's Hoard");
         story1.setDescription("A daring adventurer journeys across dangerous lands to steal a dragon’s legendary treasure. From treacherous forests to fiery mountains, every step is fraught with peril. But the greatest test awaits at the dragon's lair.");
         story1.setIntroText("Legends speak of a dragon’s hoard, hidden deep within the heart of a distant land. Many have tried to claim it, none have returned. Now, a lone adventurer sets out to prove the myths true, braving the dangers of unknown realms for glory and wealth.");
-        story1.setImagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/story_image.png");
+        story1.setImagePath("dragon_hoard/story_image.png");
         story1.setNumOfChapters(7);
         storyRepository.save(story1);
         
@@ -98,7 +98,7 @@ public class DataLoader implements CommandLineRunner {
                 .questions(getChapterQuestions(new String[]{"Science & Nature", "Sports", "Geography"}))
                 .unlockCondition("NONE")
                 .rewardText("You’ve answered the call. The journey is long, and the road is dangerous, but you’ve taken the first step towards the treasure. Stay vigilant.")
-                .imagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/chapter1.jpeg")
+                .imagePath("dragon_hoard/chapter1.jpeg")
                 .build();
         
         
@@ -110,7 +110,7 @@ public class DataLoader implements CommandLineRunner {
                 .questions(getChapterQuestions(new String[]{"Film", "Books", "Geography"}))
                 .unlockCondition("CHAPTER_1_COMPLETE")
                 .rewardText("Surviving the forest wasn’t easy, but you’ve proved your resilience. The path forward becomes clearer with each victory.")
-                .imagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/chapter2.jpeg")
+                .imagePath("dragon_hoard/chapter2.jpeg")
                 .build();
         
         Chapter chapter3 = Chapter.builder()
@@ -121,7 +121,7 @@ public class DataLoader implements CommandLineRunner {
                 .questions(getChapterQuestions(new String[]{"General Knowledge", "Music", "Sports", "Animals"}))
                 .unlockCondition("CHAPTER_2_COMPLETE")
                 .rewardText("The heat may have tested your endurance, but you’ve endured. Your determination is a weapon just as powerful as any sword.")
-                .imagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/chapter3.jpeg")
+                .imagePath("dragon_hoard/chapter3.jpeg")
                 .build();
 
         Chapter chapter4 = Chapter.builder()
@@ -132,7 +132,7 @@ public class DataLoader implements CommandLineRunner {
                 .questions(getChapterQuestions(new String[]{"General Knowledge", "Television", "History", "Science & Nature"}))
                 .unlockCondition("CHAPTER_3_COMPLETE")
                 .rewardText("You’ve braved the haunted peaks, where few dare to tread. Each challenge you face is one step closer to your ultimate goal.")
-                .imagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/chapter4.jpeg")
+                .imagePath("dragon_hoard/chapter4.jpeg")
                 .build();
 
         Chapter chapter5 = Chapter.builder()
@@ -143,7 +143,7 @@ public class DataLoader implements CommandLineRunner {
                 .questions(getChapterQuestions(new String[]{"Japanese Anime & Manga", "General Knowledge", "Geography", "Film"}))
                 .unlockCondition("CHAPTER_4_COMPLETE")
                 .rewardText("Victory over the bandits proves your skill and resourcefulness. Now, you’re one step closer to the dragon’s lair.")
-                .imagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/chapter5.jpeg")
+                .imagePath("dragon_hoard/chapter5.jpeg")
                 .build();
 
         Chapter chapter6 = Chapter.builder()
@@ -154,7 +154,7 @@ public class DataLoader implements CommandLineRunner {
                 .questions(getChapterQuestions(new String[]{"Books", "Music", "Film", "Science & Nature", "Animals"}))
                 .unlockCondition("CHAPTER_5_COMPLETE")
                 .rewardText("You’ve reached the lair, but the hardest challenge lies ahead. The dragon’s treasure is within your grasp, but can you claim it?")
-                .imagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/story_image.png")
+                .imagePath("dragon_hoard/story_image.png")
                 .build();
 
         Chapter chapter7 = Chapter.builder()
@@ -165,7 +165,7 @@ public class DataLoader implements CommandLineRunner {
                 .questions(getChapterQuestions(new String[]{"General Knowledge", "Music", "Japanese Anime & Manga", "Geography", "History"}))
                 .unlockCondition("CHAPTER_6_COMPLETE")
                 .rewardText("Treasure claimed, but the journey has changed you. What began as a quest for riches has become something much more. What will you do with your newfound wealth?")
-                .imagePath("backend/src/main/java/org/borg/backend/storage/story/dragon_hoard/chapter7.jpeg")
+                .imagePath("dragon_hoard/chapter7.jpeg")
                 .build();
         
         

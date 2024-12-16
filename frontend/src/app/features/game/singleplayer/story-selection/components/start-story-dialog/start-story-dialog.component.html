@@ -1,0 +1,11 @@
+
+<h2 mat-dialog-title>{{data.storyTitle}}</h2>
+<mat-dialog-content>
+  Would you like to start this story?
+</mat-dialog-content>
+<mat-dialog-actions>
+  <div cdkTrapFocus cdkTrapFocusAutoCapture="true">
+  <button mat-button mat-dialog-close>No</button>
+  <button mat-button mat-dialog-close="yes" cdkFocusInitial>Yes</button>
+  </div>
+</mat-dialog-actions>

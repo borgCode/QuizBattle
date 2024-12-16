@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
-import { Story } from '../../../../../../api/generated/models';
+import {Component, Input, OnInit} from '@angular/core';
+import {StoryDto} from '../../../../../../api/generated/models/story-dto';
+
 
 @Component({
   selector: 'app-story-card',
@@ -7,7 +8,11 @@ import { Story } from '../../../../../../api/generated/models';
   templateUrl: './story-card.component.html',
   styleUrl: './story-card.component.css'
 })
-export class StoryCardComponent {
-  @Input() story!: Story;
+export class StoryCardComponent implements OnInit{
+  @Input() story!: StoryDto;
+
+  ngOnInit() {
+    console.log(this.story)
+  }
 
 }
