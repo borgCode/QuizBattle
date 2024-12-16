@@ -16,4 +16,8 @@ export class ModeSelectionComponent {
   openMultiplayer() {
     this.router.navigate(['multiplayer']);
   }
+
+  openStoryMode() {
+    this.router.navigate(['singleplayer'])
+  }
 }

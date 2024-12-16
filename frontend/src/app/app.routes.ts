@@ -13,6 +13,7 @@ import {
   MultiplayerScoreWindowComponent
 } from './features/game/multiplayer/multiplayer-score-window/multiplayer-score-window.component';
 import {EditProfileComponent} from './features/profile/edit-profile/edit-profile.component';
+import {StorySelectionComponent} from './features/game/singleplayer/story-selection/story-selection.component';
 
 
 export const routes: Routes = [
@@ -23,5 +24,6 @@ export const routes: Routes = [
   {path: 'multiplayer', component: MultiplayerComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId', component: MultiplayerScoreWindowComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId/play', component: MultiplayerPlayRoundComponent, canActivate:[authGuard]},
+  {path: 'singleplayer', component: StorySelectionComponent, canActivate:[authGuard]},
   {path: '', component: ModeSelectionComponent}
 ];
