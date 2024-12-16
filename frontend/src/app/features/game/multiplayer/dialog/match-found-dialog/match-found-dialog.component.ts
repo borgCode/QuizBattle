@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
   selector: 'app-match-found-dialog',
   imports: [],
   templateUrl: './match-found-dialog.component.html',
+  standalone: true,
   styleUrl: './match-found-dialog.component.css'
 })
 export class MatchFoundDialogComponent {
