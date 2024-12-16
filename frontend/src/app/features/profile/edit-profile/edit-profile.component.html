@@ -19,6 +19,7 @@
         <input type="text"
                class="form-control"
                id="displayName"
+               maxlength="15"
                [formControl]="displayName">
         <small *ngIf="displayName.invalid" class="text-danger">
           Display name is required.
