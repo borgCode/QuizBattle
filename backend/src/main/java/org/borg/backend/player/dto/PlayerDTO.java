@@ -1,8 +1,9 @@
-package org.borg.backend.player.model;
+package org.borg.backend.player.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.borg.backend.player.model.Stats;
 
 @Getter
 @Setter

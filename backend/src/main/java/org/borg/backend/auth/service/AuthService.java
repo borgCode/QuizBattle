@@ -11,7 +11,7 @@ import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.security.JwtService;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.PlayerDTO;
+import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.dao.DataIntegrityViolationException;

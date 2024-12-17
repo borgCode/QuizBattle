@@ -5,7 +5,6 @@ import org.borg.backend.common.util.ImageUtil;
 import org.borg.backend.story.dto.StoryDTO;
 import org.borg.backend.story.model.Story;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,4 +44,5 @@ public class StoryMapper {
 
         return dtoList;
     }
+    
 }

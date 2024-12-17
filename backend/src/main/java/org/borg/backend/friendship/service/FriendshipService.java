@@ -11,7 +11,7 @@ import org.borg.backend.common.exceptions.FriendshipException;
 import org.borg.backend.friendship.repository.FriendshipRepository;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.PlayerDTO;
+import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;

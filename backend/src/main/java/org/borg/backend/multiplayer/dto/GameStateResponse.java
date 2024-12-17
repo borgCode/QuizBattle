@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.borg.backend.common.enums.GameStatus;
-import org.borg.backend.player.model.PlayerDTO;
+import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.question.PlayerQuestionResult;
 
 import java.util.Map;

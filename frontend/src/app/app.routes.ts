@@ -25,5 +25,6 @@ export const routes: Routes = [
   {path: 'multiplayer/:sessionId', component: MultiplayerScoreWindowComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId/play', component: MultiplayerPlayRoundComponent, canActivate:[authGuard]},
   {path: 'singleplayer', component: StorySelectionComponent, canActivate:[authGuard]},
+  {path: 'singleplayer/story/:storyId', component: StorySelectionComponent, canActivate:[authGuard]},
   {path: '', component: ModeSelectionComponent}
 ];

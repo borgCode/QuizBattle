@@ -1,7 +1,8 @@
 package org.borg.backend.player.mapper;
 
+import org.borg.backend.player.dto.PlayerProgressDTO;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.PlayerDTO;
+import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.common.util.ImageUtil;
 
 import java.util.ArrayList;
@@ -37,5 +38,7 @@ public class PlayerMapper {
         
         return dtoList;
     }
+
+    
 
 }

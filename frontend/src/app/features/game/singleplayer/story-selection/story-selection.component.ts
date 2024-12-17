@@ -6,6 +6,7 @@ import {StoryDto} from '../../../../api/generated/models/story-dto';
 
 import {MatDialog} from '@angular/material/dialog';
 import {StartStoryDialogComponent} from './components/start-story-dialog/start-story-dialog.component';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-story-selection',
@@ -19,9 +20,11 @@ import {StartStoryDialogComponent} from './components/start-story-dialog/start-s
 export class StorySelectionComponent implements OnInit{
   stories: StoryDto[]
 
+
   constructor(
     private storyService: StoryService,
     private startDialog: MatDialog,
+    private router: Router
   ) {
   }
 
@@ -45,9 +48,7 @@ export class StorySelectionComponent implements OnInit{
     console.log(title)
     dialogRef.afterClosed().subscribe((result)  => {
       if (result === "yes") {
-        console.log("accepted")
-      } else {
-        console.log("declined")
+        this.router.navigate(['singleplayer/story', id])
       }
     })
   }

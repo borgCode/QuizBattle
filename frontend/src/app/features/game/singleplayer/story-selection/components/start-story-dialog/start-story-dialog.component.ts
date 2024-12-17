@@ -26,16 +26,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 export class StartStoryDialogComponent {
 
   constructor(
-    private dialogRef: MatDialogRef<StartStoryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { storyTitle: string }
-
   ) {
-
-    console.log(data.storyTitle)
-  }
-
-
-  onNoClick() {
-    this.dialogRef.close();
   }
 }
