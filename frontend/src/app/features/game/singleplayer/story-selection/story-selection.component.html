@@ -1,9 +1,9 @@
 <div class="container g-2 p-2">
-  <ng-container *ngFor="let story of stories">
+  <ng-container *ngFor="let story of stories; let i = index">
     <div class="div col-md-4">
       <app-story-card
         [story]="story"
-      (click)="showStartStoryDialog(story.title, story.id)"></app-story-card>
+      (click)="showStartStoryDialog(story.title, story.id, i)"></app-story-card>
     </div>
   </ng-container>
 </div>

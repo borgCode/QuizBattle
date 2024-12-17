@@ -3,18 +3,18 @@ package org.borg.backend.story.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.story.dto.AllStoriesDTO;
 import org.borg.backend.story.dto.StoryDTO;
 import org.borg.backend.story.dto.StoryOverviewDTO;
 import org.borg.backend.story.dto.StoryOverviewRequest;
 import org.borg.backend.story.service.StoryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("story")
@@ -23,13 +23,14 @@ public class StoryController {
 
     private final StoryService storyService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<StoryDTO>> getAllStories() {
-        return ResponseEntity.ok().body(storyService.getAllStories());
+    @PostMapping("/all/{playerId}")
+    public ResponseEntity<AllStoriesDTO> getAllStories(@PathVariable Long playerId) {
+        return ResponseEntity.ok().body(storyService.getAllStories(playerId));
     }
     
-    @GetMapping("/story-overview")
+    @PostMapping("/story-overview")
     public ResponseEntity<StoryOverviewDTO> getStoryOverview(@RequestBody StoryOverviewRequest request) {
+        log.warn("Request: "  + request.getStoryId());
         return ResponseEntity.ok().body(storyService.getStoryOverview(request));
     }
 }

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {StoryDto} from '../../../../../../api/generated/models/story-dto';
 
 
@@ -8,11 +8,7 @@ import {StoryDto} from '../../../../../../api/generated/models/story-dto';
   templateUrl: './story-card.component.html',
   styleUrl: './story-card.component.css'
 })
-export class StoryCardComponent implements OnInit{
+export class StoryCardComponent {
   @Input() story!: StoryDto;
-
-  ngOnInit() {
-    console.log(this.story)
-  }
 
 }

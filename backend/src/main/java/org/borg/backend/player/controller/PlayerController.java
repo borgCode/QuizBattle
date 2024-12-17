@@ -37,6 +37,8 @@ public class PlayerController {
     
     
     
+    
+    
     //TODO add friend mapping
     
     //TODO send message mapping

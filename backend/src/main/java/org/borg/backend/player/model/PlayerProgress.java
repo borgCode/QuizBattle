@@ -1,10 +1,7 @@
 package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.borg.backend.common.enums.ProgressStatus;
 import org.borg.backend.story.model.Story;
 
@@ -13,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -30,9 +28,8 @@ public class PlayerProgress {
     @JoinColumn(name = "story_id")
     private Story story;
     private Long currentChapterId;
-
-    @ElementCollection
-    private List<Long> completedChapters;
+    
+    private Integer completedChapters;
 
     private LocalDate startedAt;
     private LocalDate lastPlayed;

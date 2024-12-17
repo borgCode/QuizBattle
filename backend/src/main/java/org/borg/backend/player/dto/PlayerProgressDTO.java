@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class PlayerProgressDTO {
     private Long currentChapterId;
-    private List<Long> completedChapters;
+    private Integer completedChapters;
     private LocalDate startedAt;
     private LocalDate lastPlayed;
     private LocalDate completedAt;

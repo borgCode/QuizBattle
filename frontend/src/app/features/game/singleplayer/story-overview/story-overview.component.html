@@ -1,1 +1,20 @@
-<p>story-overview works!</p>
+<div class="container g-2 p-2">
+  <div class="row g-2">
+    <ng-container *ngFor="let chapter of chapters; let i = index">
+      <div class="col-md-4">
+        <div class="chapter-card">
+          <ng-container *ngIf="i > playerProgress.completedChapters" class="lock-overlay">
+            <div class="lock-overlay">
+            <i class="fas fa-lock"></i>
+            </div>
+          </ng-container>
+          <app-chapter-card
+            [chapter]="chapter"
+          ></app-chapter-card>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!--(click)="showStartStoryDialog(chapter.title, chapter.id)"-->

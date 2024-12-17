@@ -35,6 +35,67 @@
         }
       }
     },
+    "/story/story-overview": {
+      "post": {
+        "tags": [
+          "Story"
+        ],
+        "operationId": "getStoryOverview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryOverviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOverviewDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/story/all/{playerId}": {
+      "post": {
+        "tags": [
+          "Story"
+        ],
+        "operationId": "getAllStories",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllStoriesDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions/validate-answer": {
       "post": {
         "tags": [
@@ -457,29 +518,6 @@
         }
       }
     },
-    "/story/all": {
-      "get": {
-        "tags": [
-          "Story"
-        ],
-        "operationId": "getAllStories",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StoryDTO"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/questions/{sessionId}/category-selection": {
       "get": {
         "tags": [
@@ -836,6 +874,141 @@
           }
         }
       },
+      "StoryOverviewRequest": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "storyId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ChapterDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "chapterNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "unlockCondition": {
+            "type": "string"
+          },
+          "base64Image": {
+            "type": "string"
+          }
+        }
+      },
+      "PlayerProgressDTO": {
+        "type": "object",
+        "properties": {
+          "currentChapterId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "completedChapters": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date"
+          },
+          "lastPlayed": {
+            "type": "string",
+            "format": "date"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date"
+          },
+          "progressStatus": {
+            "type": "string",
+            "enum": [
+              "NOT_STARTED",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "LOCKED"
+            ]
+          }
+        }
+      },
+      "StoryOverviewDTO": {
+        "type": "object",
+        "properties": {
+          "storyId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "chapters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChapterDTO"
+            }
+          },
+          "playerProgress": {
+            "$ref": "#/components/schemas/PlayerProgressDTO"
+          }
+        }
+      },
+      "AllStoriesDTO": {
+        "type": "object",
+        "properties": {
+          "stories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StoryDTO"
+            }
+          },
+          "playerProgressList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerProgressDTO"
+            }
+          }
+        }
+      },
+      "StoryDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "introText": {
+            "type": "string"
+          },
+          "numOfChapters": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "base64Image": {
+            "type": "string"
+          }
+        }
+      },
       "AnswerValidationRequest": {
         "type": "object",
         "properties": {
@@ -1052,31 +1225,6 @@
             "additionalProperties": {
               "$ref": "#/components/schemas/CategoryStats"
             }
-          }
-        }
-      },
-      "StoryDTO": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "introText": {
-            "type": "string"
-          },
-          "numOfChapters": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "base64Image": {
-            "type": "string"
           }
         }
       },

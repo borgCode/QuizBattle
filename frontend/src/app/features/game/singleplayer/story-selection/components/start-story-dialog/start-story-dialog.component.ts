@@ -26,7 +26,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 export class StartStoryDialogComponent {
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { storyTitle: string }
+    @Inject(MAT_DIALOG_DATA) public data: { storyTitle: string, message: string}
   ) {
   }
 }
