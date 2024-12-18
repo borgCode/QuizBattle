@@ -1,10 +1,13 @@
-package org.borg.backend.question;
+package org.borg.backend.question.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.service.MultiplayerService;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.question.repository.QuestionRepository;
+import org.borg.backend.question.dto.*;
+import org.borg.backend.question.mapper.QuestionMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

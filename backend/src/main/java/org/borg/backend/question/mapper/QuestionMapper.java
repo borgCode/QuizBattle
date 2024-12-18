@@ -1,5 +1,8 @@
-package org.borg.backend.question;
+package org.borg.backend.question.mapper;
 
+
+import org.borg.backend.question.dto.Question;
+import org.borg.backend.question.dto.QuestionDTO;
 
 import java.util.ArrayList;
 import java.util.List;

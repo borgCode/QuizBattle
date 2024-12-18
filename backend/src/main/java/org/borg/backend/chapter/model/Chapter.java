@@ -3,12 +3,9 @@ package org.borg.backend.chapter.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.question.Question;
 import org.borg.backend.story.model.Story;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Setter

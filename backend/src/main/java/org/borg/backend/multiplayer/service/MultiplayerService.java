@@ -18,9 +18,9 @@ import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Stats;
-import org.borg.backend.question.PlayerQuestionResult;
-import org.borg.backend.question.Question;
-import org.borg.backend.question.QuestionRepository;
+import org.borg.backend.question.dto.PlayerQuestionResult;
+import org.borg.backend.question.dto.Question;
+import org.borg.backend.question.repository.QuestionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

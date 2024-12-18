@@ -1,4 +1,4 @@
-package org.borg.backend.question;
+package org.borg.backend.question.dto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

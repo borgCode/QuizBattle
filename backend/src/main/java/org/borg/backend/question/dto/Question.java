@@ -1,8 +1,7 @@
-package org.borg.backend.question;
+package org.borg.backend.question.dto;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.chapter.model.Chapter;
 
 import java.util.List;
 
