@@ -4,12 +4,12 @@
 
   &.correct {
     background-color: #4caf50;
-  color: white;
+    color: white;
   }
 
   &.incorrect {
     background-color: #f44336;
-  color: white;
+    color: white;
   }
 
   &.isDisabled {

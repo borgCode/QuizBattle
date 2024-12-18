@@ -1,18 +1,19 @@
 import {Component, OnInit} from '@angular/core';
 import {MultiplayerCategoryComponent} from './multiplayer-category/multiplayer-category.component';
 import {ActivatedRoute, Router} from '@angular/router';
-import {MultiplayerQuestionsComponent} from './multiplayer-questions/multiplayer-questions.component';
 import {NgIf} from '@angular/common';
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
 import {QuestionsService} from '../../../../api/generated/services/questions.service';
 import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
+import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
 
 @Component({
   selector: 'app-multiplayer-play-round',
   imports: [
     MultiplayerCategoryComponent,
-    MultiplayerQuestionsComponent,
-    NgIf
+    QuestionPanelComponent,
+    NgIf,
+    QuestionPanelComponent
   ],
   templateUrl: './multiplayer-play-round.component.html',
   styleUrl: './multiplayer-play-round.component.css'

@@ -15,7 +15,13 @@
   <div class="row justify-content-center">
     <div class="col-12">
       <app-question-panel
-      [questions]="questions"></app-question-panel>
+        [questions]="questions"></app-question-panel>
+<!--        [isCorrect]="answerIsCorrect"-->
+<!--        [correctAnswerIndex]="correctAnswerIndex"-->
+<!--        *ngIf="selectedCategory || hasQuestions"-->
+<!--        (answerSelected)="onAnswerSelected($event)"-->
+<!--        (timerRanOut)="onTimerRanOut($event)"-->
+
     </div>
   </div>
 </div>

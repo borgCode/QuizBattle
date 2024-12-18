@@ -2,9 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
 import {ChapterService} from '../../../../api/generated/services/chapter.service';
-import {QuestionPanelComponent} from './components/question-panel/question-panel.component';
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
 import {QuestionsService} from '../../../../api/generated/services/questions.service';
+import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
 
 @Component({
   selector: 'app-play-chapter',

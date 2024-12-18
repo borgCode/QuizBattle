@@ -1,25 +1,25 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
-import {QuestionDto} from '../../../../../api/generated/models/question-dto';
+import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {TimerComponent} from './timer/timer.component';
+import {QuestionDto} from '../../../api/generated/models/question-dto';
+import {NgForOf} from '@angular/common';
 
 @Component({
-  selector: 'app-multiplayer-questions',
+  selector: 'app-question-panel',
   imports: [
     NgForOf,
-    TimerComponent,
+    TimerComponent
   ],
-  templateUrl: './multiplayer-questions.component.html',
-  styleUrl: './multiplayer-questions.component.css'
+  templateUrl: './question-panel.component.html',
+  styleUrl: './question-panel.component.css'
 })
-export class MultiplayerQuestionsComponent {
+export class QuestionPanelComponent {
   @ViewChild(TimerComponent) timerComponent!: TimerComponent;
   @Input() questions: QuestionDto[] = [];
   @Input() isCorrect: boolean | null = null;
   @Input() correctAnswerIndex: number | null = null;
   @Output() answerSelected = new EventEmitter<{ questionId: number, answer: string }>
   @Output() navigateBackToScoreScreen = new EventEmitter<void>();
-  @Output() timerRanOut = new EventEmitter<{questionId: number}>;
+  @Output() timerRanOut = new EventEmitter<{ questionId: number }>;
 
   currentQuestionIndex = 0;
   selectedAnswerIndex: number | null = null;
@@ -60,5 +60,6 @@ export class MultiplayerQuestionsComponent {
       this.timerRanOut.emit({questionId: this.questions[this.currentQuestionIndex].questionId});
     }
   }
+
 
 }
