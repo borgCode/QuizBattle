@@ -90,13 +90,12 @@ export class PlayChapterComponent implements OnInit {
     const validationRequest = {
       body: {
         questionId: selectedAnswer.questionId,
-        sessionId: -1,
         answer: selectedAnswer.answer,
         playerId: this.storedPlayerId
       }
     }
 
-    this.questionService.validateAnswer(validationRequest).subscribe({
+    this.questionService.validateSingleplayerAnswer(validationRequest).subscribe({
       next: (response: AnswerValidationResponse) => {
         this.answerIsCorrect = response.correct;
         this.correctAnswerIndex = response.correctAnswerIndex
@@ -109,12 +108,11 @@ export class PlayChapterComponent implements OnInit {
     const validationRequest = {
       body: {
         questionId: $event.questionId,
-        sessionId: -1,
         answer: null,
         playerId: this.storedPlayerId
       }
     }
-    this.questionService.validateAnswer(validationRequest).subscribe({
+    this.questionService.validateSingleplayerAnswer(validationRequest).subscribe({
       next: (response: AnswerValidationResponse) => {
         this.answerIsCorrect = response.correct;
         this.correctAnswerIndex = response.correctAnswerIndex

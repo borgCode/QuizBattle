@@ -30,7 +30,7 @@ public class QuestionController {
     }
 
     @PostMapping("/session/validate-answer")
-    public ResponseEntity<AnswerValidationResponse> validateAnswer(@RequestBody MultiplayerAnswerValidationRequest request) {
+    public ResponseEntity<AnswerValidationResponse> validateMultiplayerAnswer(@RequestBody MultiplayerAnswerValidationRequest request) {
         return ResponseEntity.ok(questionService.validateMultiplayerAnswer(request));
     }
 
@@ -50,7 +50,7 @@ public class QuestionController {
     }
 
     @PostMapping("/chapter/validate-answer")
-    public ResponseEntity<AnswerValidationResponse> validateAnswer(@RequestBody SinglePlayerAnswerValidationRequest request) {
+    public ResponseEntity<AnswerValidationResponse> validateSingleplayerAnswer(@RequestBody SinglePlayerAnswerValidationRequest request) {
         return ResponseEntity.ok(questionService.validateSingleplayerAnswer(request));
     }
 }

@@ -101,7 +101,7 @@
         "tags": [
           "Questions"
         ],
-        "operationId": "validateAnswer",
+        "operationId": "validateMultiplayerAnswer",
         "requestBody": {
           "content": {
             "application/json": {
@@ -131,7 +131,7 @@
         "tags": [
           "Questions"
         ],
-        "operationId": "validateAnswer_1",
+        "operationId": "validateSingleplayerAnswer",
         "requestBody": {
           "content": {
             "application/json": {

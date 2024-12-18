@@ -93,7 +93,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       }
     }
 
-    this.questionService.validateAnswer(validationRequest).subscribe({
+    this.questionService.validateMultiplayerAnswer(validationRequest).subscribe({
       next: (response: AnswerValidationResponse) => {
         this.answerIsCorrect = response.correct;
         this.correctAnswerIndex = response.correctAnswerIndex
@@ -111,7 +111,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
         playerId: this.storedPlayerId
       }
     }
-    this.questionService.validateAnswer(validationRequest).subscribe({
+    this.questionService.validateMultiplayerAnswer(validationRequest).subscribe({
       next: (response: AnswerValidationResponse) => {
         this.answerIsCorrect = response.correct;
         this.correctAnswerIndex = response.correctAnswerIndex
