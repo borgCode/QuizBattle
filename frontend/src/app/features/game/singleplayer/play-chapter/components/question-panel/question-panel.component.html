@@ -6,28 +6,23 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-6 col-md-6 p-2">
-      <div class="border text-center rounded">
-        {{ questions[currentQuestionIndex].options[0]}}
+  <div class="row mb-3">
+    <ng-container *ngFor="let option of questions[currentQuestionIndex]?.options.slice(0,2); let i = index">
+      <div class="col-6">
+        <div class="answer-box p-3 border rounded text-center">
+          {{ option }}
+        </div>
       </div>
-    </div>
-    <div class="col-6 col-md-6 p-2">
-      <div class="border text-center rounded">
-        {{ questions[currentQuestionIndex].options[1]}}
-      </div>
-    </div>
+    </ng-container>
+
   </div>
   <div class="row">
-    <div class="col-6 col-md-6 p-2">
-      <div class="border text-center rounded">
-        {{ questions[currentQuestionIndex].options[2]}}
+    <ng-container *ngFor="let option of questions[currentQuestionIndex]?.options.slice(2, 4); let i = index">
+      <div class="col-6">
+        <div class="answer-box p-3 border rounded text-center">
+          {{ option }}
+        </div>
       </div>
-    </div>
-    <div class="col-6 col-md-6 p-2">
-      <div class="border text-center rounded">
-        {{ questions[currentQuestionIndex].options[3]}}
-      </div>
-    </div>
+    </ng-container>
   </div>
 </div>
