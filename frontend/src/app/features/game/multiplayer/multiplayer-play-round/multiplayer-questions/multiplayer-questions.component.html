@@ -6,24 +6,40 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div *ngFor="let option of questions[currentQuestionIndex]?.options; let i = index"
-         class="col-12 col-md-6 col-lg-4 mb-3">
-      <div class="answer-box p-3 border rounded text-center"
-           [class.correct]="i === correctAnswerIndex && (hasClickedOption || timerHasRanOut)"
-           [class.incorrect]="i === selectedAnswerIndex && !isCorrect && (hasClickedOption || timerHasRanOut)"
-           [class.isDisabled]="hasClickedOption || timerHasRanOut"
-           [attr.aria-disabled]="hasClickedOption || timerHasRanOut"
-           (click)="!hasClickedOption && selectAnswer(option, i)">
-        {{ option }}
+  <div class="row mb-3">
+    <ng-container *ngFor="let option of questions[currentQuestionIndex]?.options.slice(0,2); let i = index">
+      <div class="col-6">
+        <div class="answer-box p-3 border rounded text-center"
+             [class.correct]="i === correctAnswerIndex && (hasClickedOption || timerHasRanOut)"
+             [class.incorrect]="i === selectedAnswerIndex && !isCorrect && (hasClickedOption || timerHasRanOut)"
+             [class.isDisabled]="hasClickedOption || timerHasRanOut"
+             [attr.aria-disabled]="hasClickedOption || timerHasRanOut"
+             (click)="!hasClickedOption && selectAnswer(option, i)">
+          {{ option }}
+        </div>
       </div>
-    </div>
-    <app-timer
-      [userClickedOption]="hasClickedOption"
-      [userClickedNext]="userClickedNext"
-      (timerRanOut)="onTimerRanOut()"
-    ></app-timer>
+    </ng-container>
+
   </div>
+  <div class="row">
+    <ng-container *ngFor="let option of questions[currentQuestionIndex]?.options.slice(2, 4); let i = index">
+      <div class="col-6">
+        <div class="answer-box p-3 border rounded text-center"
+             [class.correct]="(i + 2) === correctAnswerIndex && (hasClickedOption || timerHasRanOut)"
+             [class.incorrect]="(i + 2) === selectedAnswerIndex && !isCorrect && (hasClickedOption || timerHasRanOut)"
+             [class.isDisabled]="hasClickedOption || timerHasRanOut"
+             [attr.aria-disabled]="hasClickedOption || timerHasRanOut"
+             (click)="!hasClickedOption && selectAnswer(option, i + 2)">
+          {{ option }}
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  <app-timer
+    [userClickedOption]="hasClickedOption"
+    [userClickedNext]="userClickedNext"
+    (timerRanOut)="onTimerRanOut()"
+  ></app-timer>
   <button type="button" class="btn btn-primary btn-block mt-3" (click)="goToNextQuestion()"
           [disabled]="!(hasClickedOption || timerHasRanOut)">Next!
   </button>
