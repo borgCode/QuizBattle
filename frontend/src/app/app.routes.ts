@@ -15,6 +15,7 @@ import {
 import {EditProfileComponent} from './features/profile/edit-profile/edit-profile.component';
 import {StorySelectionComponent} from './features/game/singleplayer/story-selection/story-selection.component';
 import {StoryOverviewComponent} from './features/game/singleplayer/story-overview/story-overview.component';
+import {PlayChapterComponent} from './features/game/singleplayer/play-chapter/play-chapter.component';
 
 
 export const routes: Routes = [
@@ -27,5 +28,6 @@ export const routes: Routes = [
   {path: 'multiplayer/:sessionId/play', component: MultiplayerPlayRoundComponent, canActivate:[authGuard]},
   {path: 'singleplayer', component: StorySelectionComponent, canActivate:[authGuard]},
   {path: 'singleplayer/story/:storyId', component: StoryOverviewComponent, canActivate:[authGuard]},
+  {path: 'singleplayer/story/chapter/:chapterId', component: PlayChapterComponent, canActivate: [authGuard]},
   {path: '', component: ModeSelectionComponent}
 ];

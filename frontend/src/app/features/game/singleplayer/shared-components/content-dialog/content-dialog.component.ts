@@ -8,6 +8,7 @@ import {
 } from '@angular/material/dialog';
 import {MatButton} from '@angular/material/button';
 import {A11yModule} from '@angular/cdk/a11y';
+import {NgIf} from '@angular/common';
 
 
 @Component({
@@ -18,15 +19,16 @@ import {A11yModule} from '@angular/cdk/a11y';
     MatDialogActions,
     MatButton,
     MatDialogClose,
-    A11yModule
+    A11yModule,
+    NgIf
   ],
-  templateUrl: './start-story-dialog.component.html',
-  styleUrl: './start-story-dialog.component.css'
+  templateUrl: './content-dialog.component.html',
+  styleUrl: './content-dialog.component.css'
 })
-export class StartStoryDialogComponent {
+export class ContentDialogComponent {
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { storyTitle: string, message: string}
+    @Inject(MAT_DIALOG_DATA) public data: { storyTitle: string, message: string, isLocked?: boolean}
   ) {
   }
 }

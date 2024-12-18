@@ -1,11 +1,10 @@
-
 <h2 mat-dialog-title>{{data.storyTitle}}</h2>
 <mat-dialog-content>
   {{data.message}}
 </mat-dialog-content>
 <mat-dialog-actions>
   <div cdkTrapFocus cdkTrapFocusAutoCapture="true">
-  <button mat-button mat-dialog-close>No</button>
-  <button mat-button mat-dialog-close="yes" cdkFocusInitial>Yes</button>
+  <button *ngIf="!data.isLocked" mat-button mat-dialog-close>No</button>
+  <button mat-button mat-dialog-close="yes" cdkFocusInitial>{{ data.isLocked ? 'OK' : 'YES' }}</button>
   </div>
 </mat-dialog-actions>

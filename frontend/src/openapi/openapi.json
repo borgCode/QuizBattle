@@ -829,6 +829,37 @@
         }
       }
     },
+    "/chapter/{chapterId}": {
+      "get": {
+        "tags": [
+          "chapter-controller"
+        ],
+        "operationId": "getChapter",
+        "parameters": [
+          {
+            "name": "chapterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chapter"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/multiplayer/matchmaking/cancel/{playerId}": {
       "delete": {
         "tags": [
@@ -1421,6 +1452,95 @@
           },
           "correct": {
             "type": "boolean"
+          }
+        }
+      },
+      "Chapter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "story": {
+            "$ref": "#/components/schemas/Story"
+          },
+          "chapterNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          },
+          "unlockCondition": {
+            "type": "string"
+          },
+          "rewardText": {
+            "type": "string"
+          },
+          "imagePath": {
+            "type": "string"
+          }
+        }
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "category": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correctAnswer": {
+            "type": "string"
+          },
+          "chapter": {
+            "$ref": "#/components/schemas/Chapter"
+          }
+        }
+      },
+      "Story": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "introText": {
+            "type": "string"
+          },
+          "imagePath": {
+            "type": "string"
+          },
+          "numOfChapters": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       }

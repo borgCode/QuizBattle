@@ -5,7 +5,7 @@ import {NgForOf} from '@angular/common';
 import {StoryDto} from '../../../../api/generated/models/story-dto';
 
 import {MatDialog} from '@angular/material/dialog';
-import {StartStoryDialogComponent} from './components/start-story-dialog/start-story-dialog.component';
+import {ContentDialogComponent} from '../shared-components/content-dialog/content-dialog.component';
 import {Router} from '@angular/router';
 import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
@@ -56,14 +56,13 @@ export class StorySelectionComponent implements OnInit {
         message = "You've already completed this story, do you want to play it again?"
         break;
     }
-    const dialogRef = this.startDialog.open(StartStoryDialogComponent, {
+    const dialogRef = this.startDialog.open(ContentDialogComponent, {
       data: {storyTitle: title, message: message},
       maxHeight: '90vh',
       width: '300px',
     })
 
 
-    console.log(title)
     dialogRef.afterClosed().subscribe((result) => {
       if (result === "yes") {
         this.router.navigate(['singleplayer/story', id])

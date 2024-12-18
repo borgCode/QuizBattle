@@ -108,7 +108,7 @@ public class DataLoader implements CommandLineRunner {
                 .title("The Enchanted Forest")
                 .description("The dense, mystical forest is rumored to be home to ancient creatures and hidden traps. As the protagonist delves deeper, strange noises echo through the trees. They must rely on their skills and cunning to survive the forest’s dangers.")
                 .questions(getChapterQuestions(new String[]{"Film", "Books", "Geography"}))
-                .unlockCondition("CHAPTER_1_COMPLETE")
+                .unlockCondition("You must complete chapter 1 in order to play this chapter")
                 .rewardText("Surviving the forest wasn’t easy, but you’ve proved your resilience. The path forward becomes clearer with each victory.")
                 .imagePath("dragon_hoard/chapter2.jpeg")
                 .build();
@@ -119,7 +119,7 @@ public class DataLoader implements CommandLineRunner {
                 .title("The Desert of Flames")
                 .description("A vast, scorching desert stretches before the adventurer, where the sun beats down mercilessly. Hidden dangers lurk beneath the sand, and every step forward feels like a battle for survival. The thirst for the dragon’s treasure drives them onward.")
                 .questions(getChapterQuestions(new String[]{"General Knowledge", "Music", "Sports", "Animals"}))
-                .unlockCondition("CHAPTER_2_COMPLETE")
+                .unlockCondition("You must complete chapter 2 in order to play this chapter")
                 .rewardText("The heat may have tested your endurance, but you’ve endured. Your determination is a weapon just as powerful as any sword.")
                 .imagePath("dragon_hoard/chapter3.jpeg")
                 .build();
@@ -130,7 +130,7 @@ public class DataLoader implements CommandLineRunner {
                 .title("The Haunted Peaks")
                 .description("Towering, mist-covered mountains are rumored to be haunted by spirits of the long-dead. Every step taken on these perilous cliffs feels like walking through a world of nightmares. But the adventurer’s resolve is unwavering, knowing the treasure lies ahead.")
                 .questions(getChapterQuestions(new String[]{"General Knowledge", "Television", "History", "Science & Nature"}))
-                .unlockCondition("CHAPTER_3_COMPLETE")
+                .unlockCondition("You must complete chapter 3 in order to play this chapter")
                 .rewardText("You’ve braved the haunted peaks, where few dare to tread. Each challenge you face is one step closer to your ultimate goal.")
                 .imagePath("dragon_hoard/chapter4.jpeg")
                 .build();
@@ -141,7 +141,7 @@ public class DataLoader implements CommandLineRunner {
                 .title("The Bandit’s Pass")
                 .description("Narrow roads cut through jagged cliffs, where ruthless bandits lie in wait. The adventurer must outsmart these dangerous foes or fight their way through, knowing that the treasures ahead are guarded by far worse dangers.")
                 .questions(getChapterQuestions(new String[]{"Japanese Anime & Manga", "General Knowledge", "Geography", "Film"}))
-                .unlockCondition("CHAPTER_4_COMPLETE")
+                .unlockCondition("You must complete chapter 4 in order to play this chapter")
                 .rewardText("Victory over the bandits proves your skill and resourcefulness. Now, you’re one step closer to the dragon’s lair.")
                 .imagePath("dragon_hoard/chapter5.jpeg")
                 .build();
@@ -152,7 +152,7 @@ public class DataLoader implements CommandLineRunner {
                 .title("The Dragon’s Lair")
                 .description("The final region looms: the lair of Ardrak, the dragon. The air is thick with the scent of smoke and fear. The hero must prepare for the ultimate confrontation—whether by stealth, trickery, or sheer force of will.")
                 .questions(getChapterQuestions(new String[]{"Books", "Music", "Film", "Science & Nature", "Animals"}))
-                .unlockCondition("CHAPTER_5_COMPLETE")
+                .unlockCondition("You must complete chapter 5 in order to play this chapter")
                 .rewardText("You’ve reached the lair, but the hardest challenge lies ahead. The dragon’s treasure is within your grasp, but can you claim it?")
                 .imagePath("dragon_hoard/story_image.png")
                 .build();
@@ -163,7 +163,7 @@ public class DataLoader implements CommandLineRunner {
                 .title("The Treasure")
                 .description("With the dragon defeated or outwitted, the treasure is finally within reach. But what lies within the hoard? Gold and jewels? Or something more dangerous? The adventurer must decide whether the riches are worth the cost.")
                 .questions(getChapterQuestions(new String[]{"General Knowledge", "Music", "Japanese Anime & Manga", "Geography", "History"}))
-                .unlockCondition("CHAPTER_6_COMPLETE")
+                .unlockCondition("You must complete chapter 6 in order to play this chapter")
                 .rewardText("Treasure claimed, but the journey has changed you. What began as a quest for riches has become something much more. What will you do with your newfound wealth?")
                 .imagePath("dragon_hoard/chapter7.jpeg")
                 .build();
