@@ -4,7 +4,7 @@ package org.borg.backend.story.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.chapter.dto.ChapterDTO;
+import org.borg.backend.chapter.dto.ChapterNoCategoriesDTO;
 import org.borg.backend.player.dto.PlayerProgressDTO;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 public class StoryOverviewDTO {
     private Long storyId;
     private String title;
-    private List<ChapterDTO> chapters;
+    private List<ChapterNoCategoriesDTO> chapters;
     private PlayerProgressDTO playerProgress;
     
 }

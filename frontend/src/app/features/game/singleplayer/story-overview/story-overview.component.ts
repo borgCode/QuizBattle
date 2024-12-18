@@ -1,14 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {StoryService} from '../../../../api/generated/services/story.service';
 import {NgForOf, NgIf} from '@angular/common';
-import {ChapterDto} from '../../../../api/generated/models/chapter-dto';
 import {ChapterCardComponent} from './components/chapter-card/chapter-card.component';
 import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
 import {MatDialog} from '@angular/material/dialog';
 import {ContentDialogComponent} from '../shared-components/content-dialog/content-dialog.component';
-import {state} from '@angular/animations';
+import {ChapterNoCategoriesDto} from '../../../../api/generated/models/chapter-no-categories-dto';
 
 @Component({
   selector: 'app-story-overview',
@@ -21,7 +20,7 @@ import {state} from '@angular/animations';
   styleUrl: './story-overview.component.css'
 })
 export class StoryOverviewComponent implements OnInit {
-  chapters: ChapterDto[]
+  chapters: ChapterNoCategoriesDto[]
   playerProgress: PlayerProgressDto;
   storyTitle: string;
   storyId: number

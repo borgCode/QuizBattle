@@ -95,7 +95,7 @@ public class StoryService {
         return StoryOverviewDTO.builder()
                 .storyId(story.getId())
                 .title(story.getTitle())
-                .chapters(ChapterMapper.multipleToDTO(chapters))
+                .chapters(ChapterMapper.multipleToNoCategoriesDTO(chapters))
                 .playerProgress(PlayerProgressMapper.toDTO(playerProgress)).
                 build();
     }

@@ -7,7 +7,9 @@ import org.borg.backend.question.Question;
 import org.borg.backend.story.model.Story;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -33,6 +35,11 @@ public class Chapter {
     
     @OneToMany(mappedBy = "chapter", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
+
+    @ElementCollection()
+    @CollectionTable(name = "chapter_categories", joinColumns = @JoinColumn(name = "chapter_id"))
+    @Column(name = "category")
+    private Set<String> categories = new HashSet<>();
     
     private String unlockCondition;
     private String rewardText;

@@ -14,7 +14,7 @@ export class PlayChapterComponent implements OnInit {
   playerProgress: PlayerProgressDto;
   storyTitle: string;
   chapterId: number;
-  questions: QuestionDto[]
+  categories: string[];
   rewardText: string;
   chapterTitle: string;
 
@@ -36,10 +36,11 @@ export class PlayChapterComponent implements OnInit {
 
     this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
       next: chapter => {
-        this.questions = chapter.questions
+        this.categories = chapter.categories;
         this.rewardText = chapter.rewardText
         this.chapterTitle = chapter.title
-        console.log(this.questions)
+
+
       }
     })
 

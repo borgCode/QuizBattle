@@ -852,7 +852,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Chapter"
+                  "$ref": "#/components/schemas/ChapterDTO"
                 }
               }
             }
@@ -918,7 +918,7 @@
           }
         }
       },
-      "ChapterDTO": {
+      "ChapterNoCategoriesDTO": {
         "type": "object",
         "properties": {
           "id": {
@@ -990,7 +990,7 @@
           "chapters": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ChapterDTO"
+              "$ref": "#/components/schemas/ChapterNoCategoriesDTO"
             }
           },
           "playerProgress": {
@@ -1455,15 +1455,12 @@
           }
         }
       },
-      "Chapter": {
+      "ChapterDTO": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "format": "int64"
-          },
-          "story": {
-            "$ref": "#/components/schemas/Story"
           },
           "chapterNumber": {
             "type": "integer",
@@ -1472,75 +1469,18 @@
           "title": {
             "type": "string"
           },
-          "description": {
-            "type": "string"
-          },
-          "questions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Question"
-            }
-          },
-          "unlockCondition": {
-            "type": "string"
-          },
           "rewardText": {
             "type": "string"
           },
-          "imagePath": {
-            "type": "string"
-          }
-        }
-      },
-      "Question": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "category": {
+          "base64Image": {
             "type": "string"
           },
-          "question": {
-            "type": "string"
-          },
-          "options": {
+          "categories": {
+            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"
             }
-          },
-          "correctAnswer": {
-            "type": "string"
-          },
-          "chapter": {
-            "$ref": "#/components/schemas/Chapter"
-          }
-        }
-      },
-      "Story": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "introText": {
-            "type": "string"
-          },
-          "imagePath": {
-            "type": "string"
-          },
-          "numOfChapters": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       }
