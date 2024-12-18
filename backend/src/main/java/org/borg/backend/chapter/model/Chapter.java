@@ -31,7 +31,7 @@ public class Chapter {
     @Column(columnDefinition = "TEXT")
     private String description;
     
-    @OneToMany(mappedBy = "chapter", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "chapter", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
     
     private String unlockCondition;

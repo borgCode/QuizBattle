@@ -832,7 +832,7 @@
     "/chapter/{chapterId}": {
       "get": {
         "tags": [
-          "chapter-controller"
+          "Chapter"
         ],
         "operationId": "getChapter",
         "parameters": [

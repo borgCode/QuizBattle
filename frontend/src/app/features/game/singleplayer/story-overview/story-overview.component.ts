@@ -8,6 +8,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
 import {MatDialog} from '@angular/material/dialog';
 import {ContentDialogComponent} from '../shared-components/content-dialog/content-dialog.component';
+import {state} from '@angular/animations';
 
 @Component({
   selector: 'app-story-overview',
@@ -80,7 +81,7 @@ export class StoryOverviewComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result === "yes") {
-        this.router.navigate(['singleplayer/story/chapter', id])
+        this.router.navigate(['singleplayer/story/chapter', id], {state: {playerProgress: this.playerProgress, storyTitle: this.storyTitle}})
       }
     })
   }

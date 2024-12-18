@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
+import {ChapterService} from '../../../../api/generated/services/chapter.service';
+import {QuestionDto} from '../../../../api/generated/models/question-dto';
 
 @Component({
   selector: 'app-play-chapter',
@@ -6,6 +10,41 @@ import { Component } from '@angular/core';
   templateUrl: './play-chapter.component.html',
   styleUrl: './play-chapter.component.css'
 })
-export class PlayChapterComponent {
+export class PlayChapterComponent implements OnInit {
+  playerProgress: PlayerProgressDto;
+  storyTitle: string;
+  chapterId: number;
+  questions: QuestionDto[]
+  rewardText: string;
+  chapterTitle: string;
+
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private chapterService: ChapterService
+
+  ) {
+    this.playerProgress = this.router.getCurrentNavigation().extras.state?.['playerProgress'];
+    this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
+    console.log(this.storyTitle)
+  }
+
+  ngOnInit() {
+    this.activatedRoute.paramMap.subscribe((params) => {
+      this.chapterId = +params.get("chapterId");
+    })
+
+    this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
+      next: chapter => {
+        this.questions = chapter.questions
+        this.rewardText = chapter.rewardText
+        this.chapterTitle = chapter.title
+        console.log(this.questions)
+      }
+    })
+
+
+
+  }
 
 }
