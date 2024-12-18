@@ -39,4 +39,11 @@ export class LoginStateService {
     localStorage.removeItem('loggedInUser');
     this.isLoggedInSubject.next(false);
   }
+
+  get userId() {
+    const storedPlayer = localStorage.getItem('loggedInUser');
+    if (storedPlayer) {
+      return JSON.parse(storedPlayer).id;
+    }
+  }
 }

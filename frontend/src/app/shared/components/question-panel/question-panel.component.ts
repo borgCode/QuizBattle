@@ -18,7 +18,7 @@ export class QuestionPanelComponent {
   @Input() isCorrect: boolean | null = null;
   @Input() correctAnswerIndex: number | null = null;
   @Output() answerSelected = new EventEmitter<{ questionId: number, answer: string }>
-  @Output() navigateBackToScoreScreen = new EventEmitter<void>();
+  @Output() navigateBackToScoreScreen? = new EventEmitter<void>();
   @Output() timerRanOut = new EventEmitter<{ questionId: number }>;
 
   currentQuestionIndex = 0;

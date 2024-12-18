@@ -7,7 +7,6 @@ import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,32 +29,39 @@ public class QuestionService {
         return QuestionMapper.multipleToDTO(questions);
     }
 
-    public AnswerValidationResponse validateAnswer(AnswerValidationRequest request) {
+    public AnswerValidationResponse validateMultiplayerAnswer(MultiplayerAnswerValidationRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
-
-        Question question = questionRepository.findById(request.getQuestionId())
-                .orElseThrow(() -> new NoSuchElementException("Question not found"));
-
-        boolean isCorrect;
-        
-        if (request.getAnswer() == null) {
-            isCorrect = false;
-        } else {
-            isCorrect = question.getCorrectAnswer().equals(request.getAnswer());
-        }
+       
+        AnswerValidationResponse validationResponse = validateAnswer(request.getQuestionId(), request.getAnswer());
         
         multiplayerService.updateGameState(
                 request.getSessionId(),
                 request.getPlayerId(),
                 request.getQuestionId(),
-                isCorrect
+                validationResponse.isCorrect()
         );
+        
+        return validationResponse;
+        
+    }
 
+    private AnswerValidationResponse validateAnswer(Long questionId, String answer) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new NoSuchElementException("Question not found"));
+
+        boolean isCorrect;
+
+        if (answer == null) {
+            isCorrect = false;
+        } else {
+            isCorrect = question.getCorrectAnswer().equals(answer);
+        }
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
+        
     }
 
     public List<QuestionDTO> getQuestionsForSession(Long sessionId) {
@@ -89,5 +95,22 @@ public class QuestionService {
 
     public List<QuestionDTO> getFiveQuestionsByCategory(String category) {
         return QuestionMapper.multipleToDTO(questionRepository.findFiveRandomQuestionsByCategory(category));
+    }
+
+
+    public AnswerValidationResponse validateSingleplayerAnswer(SinglePlayerAnswerValidationRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+
+        AnswerValidationResponse validationResponse = validateAnswer(request.getQuestionId(), request.getAnswer());
+
+        
+        //TODO handle singleplayer logic
+        
+        
+        
+        
+        return validationResponse;
     }
 }

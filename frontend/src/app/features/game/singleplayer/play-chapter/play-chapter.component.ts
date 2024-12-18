@@ -5,11 +5,15 @@ import {ChapterService} from '../../../../api/generated/services/chapter.service
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
 import {QuestionsService} from '../../../../api/generated/services/questions.service';
 import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
+import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
+import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-play-chapter',
   imports: [
-    QuestionPanelComponent
+    QuestionPanelComponent,
+    NgIf
   ],
   templateUrl: './play-chapter.component.html',
   styleUrl: './play-chapter.component.css'
@@ -22,6 +26,11 @@ export class PlayChapterComponent implements OnInit {
   rewardText: string;
   chapterTitle: string;
   questions: QuestionDto[];
+
+  storedPlayerId: number;
+  answerIsCorrect: boolean = null;
+  correctAnswerIndex: number;
+
   health: number = 3;
   round: number = 0;
 
@@ -29,8 +38,8 @@ export class PlayChapterComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private chapterService: ChapterService,
-    private questionService: QuestionsService
-
+    private questionService: QuestionsService,
+    private loginStateService: LoginStateService
   ) {
     this.playerProgress = this.router.getCurrentNavigation().extras.state?.['playerProgress'];
     this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
@@ -38,6 +47,8 @@ export class PlayChapterComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.storedPlayerId = this.loginStateService.userId;
+
 
     this.activatedRoute.paramMap.subscribe((params) => {
       this.chapterId = +params.get("chapterId");
@@ -49,12 +60,64 @@ export class PlayChapterComponent implements OnInit {
         this.rewardText = chapter.rewardText
         this.chapterTitle = chapter.title
 
-        this.questionService.getFiveQuestionsByCategory({category: this.categories[this.round]}).subscribe( {
+        this.questionService.getFiveQuestionsByCategory({category: this.categories[this.round]}).subscribe({
           next: questions => {
             this.questions = questions;
           }
         })
 
+      }
+    })
+
+  }
+
+  get hasQuestions(): boolean {
+    return this.questions.length > 0;
+  }
+
+  private fetchQuestions(category: string) {
+
+    this.questionService.getFiveQuestionsByCategory({category: category}).subscribe({
+      next: data => {
+        this.questions = data;
+      }
+    });
+
+  }
+
+  onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
+
+    const validationRequest = {
+      body: {
+        questionId: selectedAnswer.questionId,
+        sessionId: -1,
+        answer: selectedAnswer.answer,
+        playerId: this.storedPlayerId
+      }
+    }
+
+    this.questionService.validateAnswer(validationRequest).subscribe({
+      next: (response: AnswerValidationResponse) => {
+        this.answerIsCorrect = response.correct;
+        this.correctAnswerIndex = response.correctAnswerIndex
+      }
+    })
+
+  }
+
+  onTimerRanOut($event: { questionId: number }) {
+    const validationRequest = {
+      body: {
+        questionId: $event.questionId,
+        sessionId: -1,
+        answer: null,
+        playerId: this.storedPlayerId
+      }
+    }
+    this.questionService.validateAnswer(validationRequest).subscribe({
+      next: (response: AnswerValidationResponse) => {
+        this.answerIsCorrect = response.correct;
+        this.correctAnswerIndex = response.correctAnswerIndex
       }
     })
 

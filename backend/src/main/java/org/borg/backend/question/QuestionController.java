@@ -29,9 +29,9 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getThreeQuestionsByCategory(category, sessionId));
     }
 
-    @PostMapping("/validate-answer")
-    public ResponseEntity<AnswerValidationResponse> validateAnswer(@RequestBody AnswerValidationRequest request) {
-        return ResponseEntity.ok(questionService.validateAnswer(request));
+    @PostMapping("/session/validate-answer")
+    public ResponseEntity<AnswerValidationResponse> validateAnswer(@RequestBody MultiplayerAnswerValidationRequest request) {
+        return ResponseEntity.ok(questionService.validateMultiplayerAnswer(request));
     }
 
     @GetMapping("/session/{sessionId}")
@@ -47,5 +47,10 @@ public class QuestionController {
     public ResponseEntity<List<QuestionDTO>> getFiveQuestionsByCategory(@PathVariable String category) {
         log.warn("Controller");
         return ResponseEntity.ok(questionService.getFiveQuestionsByCategory(category));
+    }
+
+    @PostMapping("/chapter/validate-answer")
+    public ResponseEntity<AnswerValidationResponse> validateAnswer(@RequestBody SinglePlayerAnswerValidationRequest request) {
+        return ResponseEntity.ok(questionService.validateSingleplayerAnswer(request));
     }
 }

@@ -1,6 +1,5 @@
 package org.borg.backend.question;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AnswerValidationRequest {
+public class SinglePlayerAnswerValidationRequest {
     private Long questionId;
-    private Long sessionId;
     private String answer;
     private Long playerId;
 }

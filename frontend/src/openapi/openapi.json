@@ -96,7 +96,7 @@
         }
       }
     },
-    "/questions/validate-answer": {
+    "/questions/session/validate-answer": {
       "post": {
         "tags": [
           "Questions"
@@ -106,7 +106,37 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AnswerValidationRequest"
+                "$ref": "#/components/schemas/MultiplayerAnswerValidationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerValidationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/chapter/validate-answer": {
+      "post": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "validateAnswer_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SinglePlayerAnswerValidationRequest"
               }
             }
           },
@@ -1073,7 +1103,7 @@
           }
         }
       },
-      "AnswerValidationRequest": {
+      "MultiplayerAnswerValidationRequest": {
         "type": "object",
         "properties": {
           "questionId": {
@@ -1102,6 +1132,22 @@
           },
           "correct": {
             "type": "boolean"
+          }
+        }
+      },
+      "SinglePlayerAnswerValidationRequest": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

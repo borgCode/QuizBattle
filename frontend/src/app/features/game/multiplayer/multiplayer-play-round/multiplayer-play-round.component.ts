@@ -6,6 +6,7 @@ import {QuestionDto} from '../../../../api/generated/models/question-dto';
 import {QuestionsService} from '../../../../api/generated/services/questions.service';
 import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
 import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
+import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 
 @Component({
   selector: 'app-multiplayer-play-round',
@@ -33,13 +34,15 @@ export class MultiplayerPlayRoundComponent implements OnInit {
 
   constructor(
     private questionService: QuestionsService,
+    private loginStateService: LoginStateService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) {
   }
 
   ngOnInit() {
-    this.initStoredPlayerId();
+    this.storedPlayerId = this.loginStateService.userId;
+
     this.activatedRoute.params.subscribe(value => {
       this.sessionId = value['sessionId'];
     });
@@ -63,12 +66,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
 
   }
 
-  private initStoredPlayerId() {
-    const storedPlayer = localStorage.getItem('loggedInUser');
-    if (storedPlayer) {
-      this.storedPlayerId = JSON.parse(storedPlayer).id;
-    }
-  }
 
   onCategorySelected(category: string) {
     this.selectedCategory = category;
