@@ -2,11 +2,13 @@ package org.borg.backend.question;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/questions")
@@ -20,12 +22,11 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getThreeRandomCategories(sessionId));
     }
 
-    @GetMapping("/random-questions")
+    @GetMapping("/session/random-questions")
     public ResponseEntity<List<QuestionDTO>> getThreeQuestionsByCategory(
             @RequestParam String category,
             @RequestParam Long sessionId) {
-        CategorySelectionRequest request = new CategorySelectionRequest(category, sessionId);
-        return ResponseEntity.ok(questionService.getThreeQuestionsByCategory(request));
+        return ResponseEntity.ok(questionService.getThreeQuestionsByCategory(category, sessionId));
     }
 
     @PostMapping("/validate-answer")
@@ -41,5 +42,10 @@ public class QuestionController {
     @GetMapping("/session/current-questions")
     public ResponseEntity<List<QuestionDTO>> getCurrentQuestions(@RequestParam List<Long> currentQuestionIds) {
         return ResponseEntity.ok(questionService.getCurrentQuestions(currentQuestionIds));
+    }
+    @GetMapping("/chapter/random-questions/{category}")
+    public ResponseEntity<List<QuestionDTO>> getFiveQuestionsByCategory(@PathVariable String category) {
+        log.warn("Controller");
+        return ResponseEntity.ok(questionService.getFiveQuestionsByCategory(category));
     }
 }

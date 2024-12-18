@@ -32,9 +32,6 @@ public class Chapter {
     private String title;
     @Column(columnDefinition = "TEXT")
     private String description;
-    
-    @OneToMany(mappedBy = "chapter", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Question> questions = new ArrayList<>();
 
     @ElementCollection()
     @CollectionTable(name = "chapter_categories", joinColumns = @JoinColumn(name = "chapter_id"))

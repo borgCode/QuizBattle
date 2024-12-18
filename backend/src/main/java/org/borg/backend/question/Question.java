@@ -21,7 +21,4 @@ public class Question {
     @ElementCollection
     private List<String> options;
     private String correctAnswer;
-    @ManyToOne
-    @JoinColumn(name = "chapter_id")
-    private Chapter chapter;
 }

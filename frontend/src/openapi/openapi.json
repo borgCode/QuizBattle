@@ -586,6 +586,48 @@
         }
       }
     },
+    "/questions/session/random-questions": {
+      "get": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "getThreeQuestionsByCategory",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions/session/current-questions": {
       "get": {
         "tags": [
@@ -623,28 +665,19 @@
         }
       }
     },
-    "/questions/random-questions": {
+    "/questions/chapter/random-questions/{category}": {
       "get": {
         "tags": [
           "Questions"
         ],
-        "operationId": "getThreeQuestionsByCategory",
+        "operationId": "getFiveQuestionsByCategory",
         "parameters": [
           {
             "name": "category",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
             }
           }
         ],

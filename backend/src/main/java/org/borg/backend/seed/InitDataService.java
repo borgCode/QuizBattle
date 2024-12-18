@@ -83,12 +83,8 @@ public class InitDataService {
         Story savedStory = storyRepository.save(dragonsHoard);
 
         List<Chapter> chapters = createDragonsHoardChapters(savedStory);
-        chapters = chapterRepository.saveAll(chapters);
-
-        for (Chapter chapter : chapters) {
-            List<Question> questions = getChapterQuestions(chapter);
-            questionRepository.saveAll(questions);
-        }
+        chapterRepository.saveAll(chapters);
+        
     }
 
     private Story createDragonsHoardStory() {
@@ -177,20 +173,8 @@ public class InitDataService {
                 .categories(categories)
                 .rewardText(rewardText)
                 .imagePath(imagePath)
-                .questions(new ArrayList<>())
                 .build();
     }
-
-    private List<Question> getChapterQuestions(Chapter chapter) {
-        List<Question> questionList = new ArrayList<>();
-        for (String category : chapter.getCategories()) {
-            List<Question> subList = questionRepository.findRandomQuestionsByCategory(category);
-            for (Question question : subList) {
-                question.setChapter(chapter);
-                questionList.add(question);
-            }
-        }
-        return questionList;
-    }
+    
     
 }

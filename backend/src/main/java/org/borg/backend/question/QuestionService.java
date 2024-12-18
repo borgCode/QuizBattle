@@ -7,6 +7,7 @@ import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,10 +23,9 @@ public class QuestionService {
     private final MultiplayerSessionRepository multiplayerSessionRepository;
 
 
-    public List<QuestionDTO> getThreeQuestionsByCategory(CategorySelectionRequest request) {
-        String selectedCategory = request.getSelectedCategory();
-        List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(selectedCategory);
-        multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, selectedCategory);
+    public List<QuestionDTO> getThreeQuestionsByCategory(String category, Long sessionId) {
+        List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(category);
+        multiplayerService.updateSessionQuestionsAndCategory(sessionId, questions, category);
 
         return QuestionMapper.multipleToDTO(questions);
     }
@@ -41,7 +41,6 @@ public class QuestionService {
         boolean isCorrect;
         
         if (request.getAnswer() == null) {
-            log.warn("Answer is null, setting correct to false");
             isCorrect = false;
         } else {
             isCorrect = question.getCorrectAnswer().equals(request.getAnswer());
@@ -86,5 +85,9 @@ public class QuestionService {
 
     public List<QuestionDTO> getCurrentQuestions(List<Long> currentQuestionIds) {
         return QuestionMapper.multipleToDTO(questionRepository.findAllById(currentQuestionIds));
+    }
+
+    public List<QuestionDTO> getFiveQuestionsByCategory(String category) {
+        return QuestionMapper.multipleToDTO(questionRepository.findFiveRandomQuestionsByCategory(category));
     }
 }

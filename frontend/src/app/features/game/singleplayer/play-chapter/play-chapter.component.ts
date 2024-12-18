@@ -2,11 +2,15 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
 import {ChapterService} from '../../../../api/generated/services/chapter.service';
+import {QuestionPanelComponent} from './components/question-panel/question-panel.component';
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
+import {QuestionsService} from '../../../../api/generated/services/questions.service';
 
 @Component({
   selector: 'app-play-chapter',
-  imports: [],
+  imports: [
+    QuestionPanelComponent
+  ],
   templateUrl: './play-chapter.component.html',
   styleUrl: './play-chapter.component.css'
 })
@@ -17,11 +21,15 @@ export class PlayChapterComponent implements OnInit {
   categories: string[];
   rewardText: string;
   chapterTitle: string;
+  questions: QuestionDto[];
+  health: number = 3;
+  round: number = 0;
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private chapterService: ChapterService
+    private chapterService: ChapterService,
+    private questionService: QuestionsService
 
   ) {
     this.playerProgress = this.router.getCurrentNavigation().extras.state?.['playerProgress'];
@@ -30,6 +38,7 @@ export class PlayChapterComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.activatedRoute.paramMap.subscribe((params) => {
       this.chapterId = +params.get("chapterId");
     })
@@ -40,11 +49,14 @@ export class PlayChapterComponent implements OnInit {
         this.rewardText = chapter.rewardText
         this.chapterTitle = chapter.title
 
+        this.questionService.getFiveQuestionsByCategory({category: this.categories[this.round]}).subscribe( {
+          next: questions => {
+            this.questions = questions;
+          }
+        })
 
       }
     })
-
-
 
   }
 
