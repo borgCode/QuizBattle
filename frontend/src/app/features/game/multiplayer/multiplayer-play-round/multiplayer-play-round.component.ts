@@ -102,6 +102,11 @@ export class MultiplayerPlayRoundComponent implements OnInit {
 
   }
 
+  resetQuestionState() {
+    this.answerIsCorrect = null;
+    this.correctAnswerIndex = null;
+  }
+
   onTimerRanOut($event: { questionId: number }) {
     const validationRequest = {
       body: {
@@ -119,8 +124,8 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     })
   }
 
+
   onNavigateBack() {
     this.router.navigate(['multiplayer', this.sessionId]);
   }
-
 }

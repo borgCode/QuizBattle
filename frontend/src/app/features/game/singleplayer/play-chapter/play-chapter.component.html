@@ -35,6 +35,7 @@
           *ngIf="hasQuestions"
           (answerSelected)="onAnswerSelected($event)"
           (timerRanOut)="onTimerRanOut($event)"
+          (resetQuestionState)="resetQuestionState()"
           (handleChapterRound)="handleRoundFinished()"
         ></app-question-panel>
       </div>

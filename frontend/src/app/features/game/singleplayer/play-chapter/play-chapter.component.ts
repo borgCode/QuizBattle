@@ -146,9 +146,15 @@ export class PlayChapterComponent implements OnInit {
         this.answerIsCorrect = response.correct;
         this.correctAnswerIndex = response.correctAnswerIndex
         this.currentQuestionIndex++;
+
       }
     })
 
+  }
+
+  resetQuestionState() {
+    this.answerIsCorrect = null;
+    this.correctAnswerIndex = null;
   }
 
   handleRoundFinished() {
@@ -203,14 +209,14 @@ export class PlayChapterComponent implements OnInit {
     }
   }
 
+
   private handleLostGame() {
     //TODO proper handling with retry or back to overview
     console.log("No more hearts, navigating back to chapter overview")
     this.router.navigate(['singleplayer/story', this.storyId])
   }
-
-
   //TODO remove after testing
+
   clearResults() {
     this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe( {
 

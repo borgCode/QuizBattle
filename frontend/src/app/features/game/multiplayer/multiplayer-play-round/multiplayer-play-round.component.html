@@ -9,6 +9,7 @@
   [correctAnswerIndex]="correctAnswerIndex"
   *ngIf="selectedCategory || hasQuestions"
   (answerSelected)="onAnswerSelected($event)"
+  (resetQuestionState)="resetQuestionState();"
   (timerRanOut)="onTimerRanOut($event)"
   (navigateBackToScoreScreen)="onNavigateBack()"
 ></app-question-panel>
