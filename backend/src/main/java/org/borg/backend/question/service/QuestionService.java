@@ -9,6 +9,7 @@ import org.borg.backend.question.repository.QuestionRepository;
 import org.borg.backend.question.dto.*;
 import org.borg.backend.question.mapper.QuestionMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final MultiplayerService multiplayerService;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
+    private final QuestionSessionService questionSessionService;
 
 
     public List<QuestionDTO> getThreeQuestionsByCategory(String category, Long sessionId) {
@@ -101,6 +103,7 @@ public class QuestionService {
     }
 
 
+    @Transactional
     public AnswerValidationResponse validateSingleplayerAnswer(SinglePlayerAnswerValidationRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
@@ -108,11 +111,9 @@ public class QuestionService {
 
         AnswerValidationResponse validationResponse = validateAnswer(request.getQuestionId(), request.getAnswer());
 
+        questionSessionService.saveAnswer(request.getPlayerId(), request.getIndex(), validationResponse.isCorrect());
         
-        //TODO handle singleplayer logic
-        
-        //TODO stats
-        
+        //TODO stats when clearing answers later
         
         return validationResponse;
     }

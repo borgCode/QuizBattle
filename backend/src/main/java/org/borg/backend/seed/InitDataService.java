@@ -84,7 +84,7 @@ public class InitDataService {
 
         List<Chapter> chapters = createDragonsHoardChapters(savedStory);
         chapterRepository.saveAll(chapters);
-        
+
     }
 
     private Story createDragonsHoardStory() {
@@ -100,7 +100,7 @@ public class InitDataService {
         story.setNumOfChapters(7);
         return story;
     }
-    
+
     private List<Chapter> createDragonsHoardChapters(Story story) {
         return List.of(
                 createChapter(story, 1, "The Call to Adventure",
@@ -109,7 +109,8 @@ public class InitDataService {
                                 "The first step is always the hardest.",
                         new HashSet<>(Arrays.asList("Science & Nature", "Sports", "Geography")), "NONE",
                         "You've answered the call. The journey is long, and the road is dangerous, but you've taken the first step towards the treasure. Stay vigilant.",
-                        "dragon_hoard/chapter1.jpeg"),
+                        "dragon_hoard/chapter1.jpeg", 
+                        2),
 
                 createChapter(story, 2, "The Enchanted Forest",
                         "The dense, mystical forest is rumored to be home to ancient creatures and hidden traps. " +
@@ -118,7 +119,8 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("Film", "Books", "Geography")),
                         "You must complete chapter 1 in order to play this chapter",
                         "Surviving the forest wasn't easy, but you've proved your resilience. The path forward becomes clearer with each victory.",
-                        "dragon_hoard/chapter2.jpeg"),
+                        "dragon_hoard/chapter2.jpeg",
+                        2),
 
                 createChapter(story, 3, "The Desert of Flames",
                         "A vast, scorching desert stretches before the adventurer, where the sun beats down mercilessly. " +
@@ -126,7 +128,8 @@ public class InitDataService {
                                 "The thirst for the dragon's treasure drives them onward.",
                         new HashSet<>(Arrays.asList("General Knowledge", "Music", "Sports", "Animals")), "You must complete chapter 2 in order to play this chapter",
                         "The heat may have tested your endurance, but you've endured. Your determination is a weapon just as powerful as any sword.",
-                        "dragon_hoard/chapter3.jpeg"),
+                        "dragon_hoard/chapter3.jpeg",
+                        2),
 
                 createChapter(story, 4, "The Haunted Peaks",
                         "Towering, mist-covered mountains are rumored to be haunted by spirits of the long-dead. " +
@@ -134,7 +137,8 @@ public class InitDataService {
                                 "But the adventurer's resolve is unwavering, knowing the treasure lies ahead.",
                         new HashSet<>(Arrays.asList("General Knowledge", "Television", "History", "Science & Nature")), "You must complete chapter 3 in order to play this chapter",
                         "You've braved the haunted peaks, where few dare to tread. Each challenge you face is one step closer to your ultimate goal.",
-                        "dragon_hoard/chapter4.jpeg"),
+                        "dragon_hoard/chapter4.jpeg", 
+                        3),
 
                 createChapter(story, 5, "The Bandit's Pass",
                         "Narrow roads cut through jagged cliffs, where ruthless bandits lie in wait. " +
@@ -142,14 +146,16 @@ public class InitDataService {
                                 "knowing that the treasures ahead are guarded by far worse dangers.",
                         new HashSet<>(Arrays.asList("Japanese Anime & Manga", "General Knowledge", "Geography", "Film")), "You must complete chapter 4 in order to play this chapter",
                         "Victory over the bandits proves your skill and resourcefulness. Now, you're one step closer to the dragon's lair.",
-                        "dragon_hoard/chapter5.jpeg"),
+                        "dragon_hoard/chapter5.jpeg",
+                        3),
 
                 createChapter(story, 6, "The Dragon's Lair",
                         "The final region looms: the lair of Ardrak, the dragon. The air is thick with the scent of smoke and fear. " +
                                 "The hero must prepare for the ultimate confrontation—whether by stealth, trickery, or sheer force of will.",
                         new HashSet<>(Arrays.asList("Books", "Music", "Film", "Science & Nature", "Animals")), "You must complete chapter 5 in order to play this chapter",
                         "You've reached the lair, but the hardest challenge lies ahead. The dragon's treasure is within your grasp, but can you claim it?",
-                        "dragon_hoard/story_image.png"),
+                        "dragon_hoard/story_image.png",
+                        3),
 
                 createChapter(story, 7, "The Treasure",
                         "With the dragon defeated or outwitted, the treasure is finally within reach. " +
@@ -158,12 +164,14 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("General Knowledge", "Music", "Japanese Anime & Manga", "Geography", "History")), "You must complete chapter 6 in order to play this chapter",
                         "Treasure claimed, but the journey has changed you. What began as a quest for riches has become something much more. " +
                                 "What will you do with your newfound wealth?",
-                        "dragon_hoard/chapter7.jpeg")
+                        "dragon_hoard/chapter7.jpeg",
+                        3)
         );
     }
 
     private Chapter createChapter(Story story, int chapterNumber, String title, String description,
-                                  HashSet<String> categories, String unlockCondition, String rewardText, String imagePath) {
+                                  HashSet<String> categories, String unlockCondition, String rewardText, String imagePath,
+                                  int roundWinCondition) {
         return Chapter.builder()
                 .story(story)
                 .chapterNumber(chapterNumber)
@@ -173,8 +181,9 @@ public class InitDataService {
                 .categories(categories)
                 .rewardText(rewardText)
                 .imagePath(imagePath)
+                .roundWinCondition(roundWinCondition)
                 .build();
     }
-    
-    
+
+
 }

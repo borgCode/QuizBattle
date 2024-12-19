@@ -19,6 +19,7 @@ export class QuestionPanelComponent {
   @Input() correctAnswerIndex: number | null = null;
   @Output() answerSelected = new EventEmitter<{ questionId: number, answer: string }>
   @Output() navigateBackToScoreScreen? = new EventEmitter<void>();
+  @Output() handleChapterRound = new EventEmitter<void>();
   @Output() timerRanOut = new EventEmitter<{ questionId: number }>;
 
   currentQuestionIndex = 0;
@@ -49,7 +50,12 @@ export class QuestionPanelComponent {
       this.timerComponent.resetTimer();
       this.timerComponent.startTimer();
     } else {
+      //Multiplayer only
       this.navigateBackToScoreScreen.emit();
+
+      //Singleplayer Only
+      this.handleChapterRound.emit();
+      console.log("End of 5 questions")
     }
   }
 

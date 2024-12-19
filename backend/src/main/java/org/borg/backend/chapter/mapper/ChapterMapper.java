@@ -38,6 +38,7 @@ public class ChapterMapper {
                 .chapterNumber(chapter.getChapterNumber())
                 .title(chapter.getTitle())
                 .categories(chapter.getCategories())
+                .roundWinCondition(chapter.getRoundWinCondition())
                 .base64Image(ImageUtil.encodeStoryImageToBase64(chapter.getImagePath()))
                 .build();
 

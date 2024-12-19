@@ -1,27 +1,42 @@
 <div class="container p-5">
-  <div class="row justify-content-end">
-    <div class="title-text col-12 col-md-8">{{ chapterTitle }}</div>
-    <div class="col-6 col-md-4">
-      <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
-      <i class="ms-1 fa-solid fa-heart" style="color: #ff0000;"></i>
-      <i class="ms-1 fa-solid fa-heart" style="color: #ff0000;"></i>
+
+  <ng-container *ngIf="!showQuiz">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-5">
+        Answer at least {{ chapterWinCondition }} questions correctly to pass each category!
+      </div>
     </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-5">
-      Answer at least two of the five questions correctly
+    <div class="row justify-content-center mt-3">
+      <div class="col-12 col-md-5 text-center">
+        <button class="btn btn-primary" (click)="showQuiz = true">
+          Start
+        </button>
+      </div>
     </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-12">
-      <app-question-panel
-        [questions]="questions"
-        [isCorrect]="answerIsCorrect"
-        [correctAnswerIndex]="correctAnswerIndex"
-        *ngIf="hasQuestions"
-        (answerSelected)="onAnswerSelected($event)"
-        (timerRanOut)="onTimerRanOut($event)"
-      ></app-question-panel>
+  </ng-container>
+
+  <ng-container *ngIf="showQuiz">
+    <div class="row justify-content-end">
+      <div class="title-text col-12 col-md-8">{{ chapterTitle }}</div>
+      <div class="col-6 col-md-4">
+        <i *ngFor="let heart of [1, 2, 3]"
+           class="fa-solid fa-heart ms-1"
+        [style.color]="currentHealth >= heart ? '#ff0000' : '#000000'">
+        </i>
+      </div>
     </div>
-  </div>
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <app-question-panel
+          [questions]="questions"
+          [isCorrect]="answerIsCorrect"
+          [correctAnswerIndex]="correctAnswerIndex"
+          *ngIf="hasQuestions"
+          (answerSelected)="onAnswerSelected($event)"
+          (timerRanOut)="onTimerRanOut($event)"
+          (handleChapterRound)="handleRoundFinished()"
+        ></app-question-panel>
+      </div>
+    </div>
+  </ng-container>
 </div>

@@ -8,6 +8,7 @@ import org.borg.backend.question.dto.MultiplayerAnswerValidationRequest;
 import org.borg.backend.question.dto.QuestionDTO;
 import org.borg.backend.question.dto.SinglePlayerAnswerValidationRequest;
 import org.borg.backend.question.service.QuestionService;
+import org.borg.backend.question.service.QuestionSessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final QuestionSessionService questionSessionService;
 
     @GetMapping("/{sessionId}/category-selection")
     public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
@@ -57,5 +59,16 @@ public class QuestionController {
     @PostMapping("/chapter/validate-answer")
     public ResponseEntity<AnswerValidationResponse> validateSingleplayerAnswer(@RequestBody SinglePlayerAnswerValidationRequest request) {
         return ResponseEntity.ok(questionService.validateSingleplayerAnswer(request));
+    }
+    
+    @GetMapping("/chapter/results/{playerId}")
+    public ResponseEntity<List<Boolean>> getRoundResults(@PathVariable Long playerId) {
+        return ResponseEntity.ok(questionSessionService.getSessionAnswers(playerId));
+    }
+    
+    @PostMapping("chapter/clear-answers/{playerId}")
+    public ResponseEntity<Void> clearRoundResults(@PathVariable Long playerId) {
+        questionSessionService.finishSession(playerId);
+        return ResponseEntity.ok().build();
     }
 }

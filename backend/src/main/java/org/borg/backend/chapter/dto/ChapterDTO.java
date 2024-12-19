@@ -12,6 +12,7 @@ import java.util.Set;
 public class ChapterDTO {
     private Long id;
     private Integer chapterNumber;
+    private Integer roundWinCondition;
     private String title;
     private String rewardText;
     private String base64Image;

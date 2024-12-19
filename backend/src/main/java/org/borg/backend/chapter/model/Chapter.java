@@ -35,6 +35,8 @@ public class Chapter {
     @Column(name = "category")
     private Set<String> categories = new HashSet<>();
     
+    private Integer roundWinCondition;
+    
     private String unlockCondition;
     private String rewardText;
     private String imagePath;

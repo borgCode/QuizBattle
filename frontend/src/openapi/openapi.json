@@ -156,6 +156,30 @@
         }
       }
     },
+    "/questions/chapter/clear-answers/{playerId}": {
+      "post": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "clearRoundResults",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/player/{playerId}/profile-picture-upload": {
       "post": {
         "tags": [
@@ -695,6 +719,40 @@
         }
       }
     },
+    "/questions/chapter/results/{playerId}": {
+      "get": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "getRoundResults",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions/chapter/random-questions/{category}": {
       "get": {
         "tags": [
@@ -1142,6 +1200,10 @@
             "type": "integer",
             "format": "int64"
           },
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
           "answer": {
             "type": "string"
           },
@@ -1542,6 +1604,10 @@
             "format": "int64"
           },
           "chapterNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundWinCondition": {
             "type": "integer",
             "format": "int32"
           },
