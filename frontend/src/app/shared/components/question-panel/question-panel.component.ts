@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {TimerComponent} from './timer/timer.component';
 import {QuestionDto} from '../../../api/generated/models/question-dto';
 import {NgForOf} from '@angular/common';
@@ -12,7 +12,7 @@ import {NgForOf} from '@angular/common';
   templateUrl: './question-panel.component.html',
   styleUrl: './question-panel.component.css'
 })
-export class QuestionPanelComponent {
+export class QuestionPanelComponent implements OnChanges{
   @ViewChild(TimerComponent) timerComponent!: TimerComponent;
   @Input() questions: QuestionDto[] = [];
   @Input() isCorrect: boolean | null = null;
@@ -28,6 +28,12 @@ export class QuestionPanelComponent {
   timerHasRanOut: boolean = false;
   userClickedNext: boolean = false;
 
+
+ngOnChanges(changes: SimpleChanges) {
+  if (changes['questions'] && !changes['questions'].firstChange) {
+    this.resetQuestionPanel();
+  }
+}
 
   selectAnswer(answer: string, i: number) {
     this.selectedAnswerIndex = i;
@@ -54,7 +60,6 @@ export class QuestionPanelComponent {
       //Multiplayer only
       this.navigateBackToScoreScreen.emit();
 
-      console.log("Emitting to singleplayer")
       //Singleplayer Only
       this.handleChapterRound.emit();
     }
@@ -69,4 +74,10 @@ export class QuestionPanelComponent {
   }
 
 
+  private resetQuestionPanel() {
+
+    this.currentQuestionIndex = 0;
+    this.timerComponent.resetTimer();
+    this.timerComponent.startTimer();
+  }
 }

@@ -1,4 +1,8 @@
-
+.correct-icon, .incorrect-icon {
+  font-size: 3rem;
+  margin-left: 5px;
+  border-style: solid; border-width: 1px;
+}
 
 .correct-icon {
   color: #69cb06;
@@ -6,4 +10,8 @@
 
 .incorrect-icon {
   color: #d50707;
+}
+
+.confirm-button {
+  margin-top: 5px;
 }

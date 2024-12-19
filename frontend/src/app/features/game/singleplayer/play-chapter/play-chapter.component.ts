@@ -169,10 +169,15 @@ export class PlayChapterComponent implements OnInit {
             if (correctCount <= 2) {
               this.loseHeart();
             } else {
-              console.log("round won")
+              this.round++;
+              this.fetchQuestions();
             }
+            this.currentQuestionIndex = 0;
 
-            this.questionService.clearRoundResults({playerId: this.storedPlayerId})
+            this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
+              next: () =>
+                this.fetchQuestions()
+            })
           })
 
         }
@@ -190,5 +195,11 @@ export class PlayChapterComponent implements OnInit {
         this.lastLostHeart = null;
       }, 500)
     }
+  }
+
+  clearResults() {
+    this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe( {
+
+    })
   }
 }
