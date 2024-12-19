@@ -46,6 +46,7 @@ export class QuestionPanelComponent {
     this.timerHasRanOut = false;
     this.userClickedNext = true;
     if (this.currentQuestionIndex < this.questions.length - 1) {
+      console.log("Current question index: " + this.currentQuestionIndex)
       this.currentQuestionIndex++;
       this.timerComponent.resetTimer();
       this.timerComponent.startTimer();
@@ -53,9 +54,9 @@ export class QuestionPanelComponent {
       //Multiplayer only
       this.navigateBackToScoreScreen.emit();
 
+      console.log("Emitting to singleplayer")
       //Singleplayer Only
       this.handleChapterRound.emit();
-      console.log("End of 5 questions")
     }
   }
 

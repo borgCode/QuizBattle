@@ -52,7 +52,6 @@ public class QuestionController {
     }
     @GetMapping("/chapter/random-questions/{category}")
     public ResponseEntity<List<QuestionDTO>> getFiveQuestionsByCategory(@PathVariable String category) {
-        log.warn("Controller");
         return ResponseEntity.ok(questionService.getFiveQuestionsByCategory(category));
     }
 

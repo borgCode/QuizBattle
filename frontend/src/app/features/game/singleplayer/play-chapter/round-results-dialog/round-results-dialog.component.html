@@ -1,0 +1,12 @@
+<div class="game-over-dialog">
+  <h2 mat-dialog-title>Game over!</h2>
+  <mat-dialog-content>
+    <i class="roundResultBox" *ngFor="let result of data.roundResults"
+       [class]="result ? 'fa-solid fa-check correct-icon' : 'fa-solid fa-xmark incorrect-icon'"></i>
+    <div>
+      <button class="confirm-button" mat-dialog-close="yes">OK</button>
+    </div>
+  </mat-dialog-content>
+</div>
+
+

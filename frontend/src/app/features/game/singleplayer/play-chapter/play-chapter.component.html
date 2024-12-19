@@ -21,6 +21,7 @@
       <div class="col-6 col-md-4">
         <i *ngFor="let heart of [1, 2, 3]"
            class="fa-solid fa-heart ms-1"
+           [@heartState]="currentHealth < heart && lastLostHeart === heart ? 'lostHeart' : 'normal'"
         [style.color]="currentHealth >= heart ? '#ff0000' : '#000000'">
         </i>
       </div>

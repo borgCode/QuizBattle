@@ -29,6 +29,7 @@ public class QuestionSessionService {
     }
 
     public void finishSession(Long playerId) {
+        log.warn("Clearing round results");
         quizSessions.remove(playerId);
     }
 }

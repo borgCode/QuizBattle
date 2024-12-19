@@ -8,6 +8,9 @@ import {QuestionPanelComponent} from '../../../../shared/components/question-pan
 import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
 import {NgForOf, NgIf} from '@angular/common';
+import {animate, keyframes, style, transition, trigger} from '@angular/animations';
+import {MatDialog} from '@angular/material/dialog';
+import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
 
 @Component({
   selector: 'app-play-chapter',
@@ -17,7 +20,22 @@ import {NgForOf, NgIf} from '@angular/common';
     NgForOf
   ],
   templateUrl: './play-chapter.component.html',
-  styleUrl: './play-chapter.component.css'
+  styleUrl: './play-chapter.component.css',
+  animations: [
+    trigger("heartState", [
+      transition("* => lostHeart", [
+        animate("0.5s",
+          keyframes([
+            style({ transform: 'rotate(0)' }),
+            style({ transform: 'rotate(-15deg)' }),
+            style({ transform: 'rotate(15deg)' }),
+            style({ transform: 'rotate(-15deg)' }),
+            style({ transform: 'rotate(0)' })
+          ])
+        )
+      ])
+    ])
+  ]
 })
 export class PlayChapterComponent implements OnInit {
   playerProgress: PlayerProgressDto;
@@ -35,15 +53,20 @@ export class PlayChapterComponent implements OnInit {
   correctAnswerIndex: number;
   currentQuestionIndex: number = 0;
 
+
   currentHealth: number = 3;
+  animationState: string = "normal";
+
   round: number = 0;
+  lastLostHeart: number;
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private chapterService: ChapterService,
     private questionService: QuestionsService,
-    private loginStateService: LoginStateService
+    private loginStateService: LoginStateService,
+    private resultsDialog: MatDialog
   ) {
     this.playerProgress = this.router.getCurrentNavigation().extras.state?.['playerProgress'];
     this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
@@ -128,7 +151,44 @@ export class PlayChapterComponent implements OnInit {
 
   handleRoundFinished() {
     this.questionService.getRoundResults({playerId: this.storedPlayerId}).subscribe({
+        next: results => {
 
+          console.log("Getting round results")
+          console.log(results)
+
+          const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
+            data: {roundResults: results},
+            maxHeight: "90vh",
+            width: "300px"
+          })
+
+          dialogRef.afterClosed().subscribe(() => {
+            console.log("Dialog is closed")
+            const correctCount = results.filter(value => value).length;
+
+            if (correctCount <= 2) {
+              this.loseHeart();
+            } else {
+              console.log("round won")
+            }
+
+            this.questionService.clearRoundResults({playerId: this.storedPlayerId})
+          })
+
+        }
     })
+  }
+
+  loseHeart() {
+    if (this.currentHealth > 0) {
+      this.lastLostHeart = this.currentHealth;
+      this.currentHealth--;
+      this.animationState = "lostHeart"
+
+      setTimeout(() => {
+        this.animationState = "normal";
+        this.lastLostHeart = null;
+      }, 500)
+    }
   }
 }

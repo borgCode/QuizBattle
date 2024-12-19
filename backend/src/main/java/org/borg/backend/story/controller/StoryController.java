@@ -30,7 +30,6 @@ public class StoryController {
     
     @PostMapping("/story-overview")
     public ResponseEntity<StoryOverviewDTO> getStoryOverview(@RequestBody StoryOverviewRequest request) {
-        log.warn("Request: "  + request.getStoryId());
         return ResponseEntity.ok().body(storyService.getStoryOverview(request));
     }
 }
