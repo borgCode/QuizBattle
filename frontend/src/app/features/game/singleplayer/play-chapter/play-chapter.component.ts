@@ -40,6 +40,7 @@ import {RoundResultsDialogComponent} from './round-results-dialog/round-results-
 export class PlayChapterComponent implements OnInit {
   playerProgress: PlayerProgressDto;
   storyTitle: string;
+  storyId: number;
   chapterId: number;
   categories: string[];
   rewardText: string;
@@ -70,6 +71,7 @@ export class PlayChapterComponent implements OnInit {
   ) {
     this.playerProgress = this.router.getCurrentNavigation().extras.state?.['playerProgress'];
     this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
+    this.storyId = this.router.getCurrentNavigation().extras.state?.['storyId'];
     console.log(this.storyTitle)
   }
 
@@ -170,8 +172,12 @@ export class PlayChapterComponent implements OnInit {
               this.loseHeart();
             } else {
               this.round++;
-              this.fetchQuestions();
             }
+            if (this.currentHealth == 0) {
+              this.handleLostGame();
+            }
+
+
             this.currentQuestionIndex = 0;
 
             this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
@@ -197,6 +203,14 @@ export class PlayChapterComponent implements OnInit {
     }
   }
 
+  private handleLostGame() {
+    //TODO proper handling with retry or back to overview
+    console.log("No more hearts, navigating back to chapter overview")
+    this.router.navigate(['singleplayer/story', this.storyId])
+  }
+
+
+  //TODO remove after testing
   clearResults() {
     this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe( {
 
