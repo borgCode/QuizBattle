@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-round-results-dialog',
@@ -8,16 +8,19 @@ import {NgForOf} from '@angular/common';
     MatDialogContent,
     MatDialogTitle,
     MatDialogClose,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './round-results-dialog.component.html',
   styleUrl: './round-results-dialog.component.css'
 })
 export class RoundResultsDialogComponent {
 
+  numOfCorrect: number;
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: {roundResults: boolean[]}
+    @Inject(MAT_DIALOG_DATA) public data: {roundResults: boolean[], winCondition: number},
+
   ) {
-    console.log(data.roundResults)
+    this.numOfCorrect = data.roundResults.filter(value => value).length
   }
 }

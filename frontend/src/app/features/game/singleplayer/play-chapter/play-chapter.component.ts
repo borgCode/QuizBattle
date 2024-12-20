@@ -190,7 +190,8 @@ export class PlayChapterComponent implements OnInit {
                 console.log(results)
 
                 const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
-                    data: {roundResults: results},
+                    data: {roundResults: results,
+                    winCondition: this.chapterWinCondition},
                     maxHeight: "90vh",
                     width: "300px"
                 })

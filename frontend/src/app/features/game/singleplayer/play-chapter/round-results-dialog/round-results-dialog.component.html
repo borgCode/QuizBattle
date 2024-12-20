@@ -1,5 +1,7 @@
 <div class="game-over-dialog">
-  <h2 mat-dialog-title>Game over!</h2>
+  <h2 mat-dialog-title [innerText]="numOfCorrect >= data.winCondition ?
+   'Congratulations, you passed this category':
+   'Not enough correct answers for this category, better luck next time!'"></h2>
   <mat-dialog-content>
     <i class="roundResultBox" *ngFor="let result of data.roundResults"
        [class]="result ? 'fa-solid fa-check correct-icon' : 'fa-solid fa-xmark incorrect-icon'"></i>
