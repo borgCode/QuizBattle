@@ -50,15 +50,22 @@ public class ChapterService {
         
         Chapter chapter = chapterRepository.findById(request.getChapterId())
                 .orElseThrow(() -> new EntityNotFoundException("Chapter not found"));
+        
+        
 
-        ChapterProgress chapterProgress = ChapterProgress.builder()
-                .playerProgress(playerProgress)
-                .chapter(chapter)
-                .startedAt(LocalDate.now())
-                .progressStatus(ProgressStatus.IN_PROGRESS)
-                .build();
-                
-        chapterProgress = chapterProgressRepository.save(chapterProgress);
+        ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(request.getPlayerProgressId(), chapter.getId());
+        
+        if (chapterProgress == null) {
+            log.warn("Creating new chapter progress");
+            chapterProgress = ChapterProgress.builder()
+                    .playerProgress(playerProgress)
+                    .chapter(chapter)
+                    .startedAt(LocalDate.now())
+                    .progressStatus(ProgressStatus.IN_PROGRESS)
+                    .build();
+
+            chapterProgress = chapterProgressRepository.save(chapterProgress);
+        }
         
         log.warn("Chapter info: {}, {}, {}", chapterProgress.getChapter().getTitle(),
                 chapterProgress.getPlayerProgress().getPlayer().getDisplayName(),
