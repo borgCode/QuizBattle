@@ -512,6 +512,36 @@
         }
       }
     },
+    "/chapter/progress/start": {
+      "post": {
+        "tags": [
+          "Chapter"
+        ],
+        "operationId": "initiateProgress",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiateProgressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InitiateProgressResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -1067,6 +1097,10 @@
       "PlayerProgressDTO": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
           "currentChapterId": {
             "type": "integer",
             "format": "int64"
@@ -1275,6 +1309,40 @@
             "format": "int64"
           },
           "receiverId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "InitiateProgressRequest": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "playerProgressId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "storyId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "chapterId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "InitiateProgressResponse": {
+        "type": "object",
+        "properties": {
+          "playerProgressId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "chapterProgressId": {
             "type": "integer",
             "format": "int64"
           }

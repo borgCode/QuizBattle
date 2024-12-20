@@ -46,8 +46,10 @@ export class StoryOverviewComponent implements OnInit {
             }
         }).subscribe({
             next: data => {
+                console.log(data)
                 this.chapters = data.chapters;
                 this.playerProgress = data.playerProgress
+                console.log(this.playerProgress)
                 this.storyTitle = data.title;
                 console.log(this.playerProgress)
             }
@@ -79,6 +81,7 @@ export class StoryOverviewComponent implements OnInit {
         })
 
         dialogRef.afterClosed().subscribe((result) => {
+            console.log(this.playerProgress.id)
             if (result === "yes") {
                 this.router.navigate(['singleplayer/story/chapter', id], {
                     state: {

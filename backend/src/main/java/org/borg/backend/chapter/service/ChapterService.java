@@ -38,6 +38,8 @@ public class ChapterService {
 
     @Transactional
     public InitiateProgressResponse initiateProgress(InitiateProgressRequest request) {
+        log.warn("Request params:{}, {}, {}, {}", request.getChapterId(), request.getPlayerId(), request.getPlayerProgressId(), request.getStoryId());
+        
         PlayerProgress playerProgress = playerProgressRepository.findById(request.getPlayerProgressId())
                 .orElseThrow(() -> new EntityNotFoundException("Progress not found"));
         
@@ -57,6 +59,10 @@ public class ChapterService {
                 .build();
                 
         chapterProgress = chapterProgressRepository.save(chapterProgress);
+        
+        log.warn("Chapter info: {}, {}, {}", chapterProgress.getChapter().getTitle(),
+                chapterProgress.getPlayerProgress().getPlayer().getDisplayName(),
+                chapterProgress.getStartedAt());
         
         return new InitiateProgressResponse(playerProgress.getId(), chapterProgress.getId());
     }

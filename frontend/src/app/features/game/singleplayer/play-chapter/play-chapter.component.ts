@@ -11,221 +11,237 @@ import {NgForOf, NgIf} from '@angular/common';
 import {animate, keyframes, style, transition, trigger} from '@angular/animations';
 import {MatDialog} from '@angular/material/dialog';
 import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
+import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 
 @Component({
-  selector: 'app-play-chapter',
-  imports: [
-    QuestionPanelComponent,
-    NgIf,
-    NgForOf
-  ],
-  templateUrl: './play-chapter.component.html',
-  styleUrl: './play-chapter.component.css',
-  animations: [
-    trigger("heartState", [
-      transition("* => lostHeart", [
-        animate("0.5s",
-          keyframes([
-            style({ transform: 'rotate(0)' }),
-            style({ transform: 'rotate(-15deg)' }),
-            style({ transform: 'rotate(15deg)' }),
-            style({ transform: 'rotate(-15deg)' }),
-            style({ transform: 'rotate(0)' })
-          ])
-        )
-      ])
-    ])
-  ]
+    selector: 'app-play-chapter',
+    imports: [
+        QuestionPanelComponent,
+        NgIf,
+        NgForOf
+    ],
+    templateUrl: './play-chapter.component.html',
+    styleUrl: './play-chapter.component.css',
+    animations: [
+        trigger("heartState", [
+            transition("* => lostHeart", [
+                animate("0.5s",
+                    keyframes([
+                        style({transform: 'rotate(0)'}),
+                        style({transform: 'rotate(-15deg)'}),
+                        style({transform: 'rotate(15deg)'}),
+                        style({transform: 'rotate(-15deg)'}),
+                        style({transform: 'rotate(0)'})
+                    ])
+                )
+            ])
+        ])
+    ]
 })
 export class PlayChapterComponent implements OnInit {
-  playerProgressId: number;
-  storyTitle: string;
-  storyId: number;
-  chapterId: number;
-  categories: string[];
-  rewardText: string;
-  chapterTitle: string;
-  chapterWinCondition: number;
-  questions: QuestionDto[];
+    playerProgressId: number;
+    chapterProgressId: number;
+    storyTitle: string;
+    storyId: number;
+    chapterId: number;
+    categories: string[];
+    rewardText: string;
+    chapterTitle: string;
+    chapterWinCondition: number;
+    questions: QuestionDto[];
 
-  showQuiz: boolean;
-  storedPlayerId: number;
-  answerIsCorrect: boolean = null;
-  correctAnswerIndex: number;
-  currentQuestionIndex: number = 0;
-
-
-  currentHealth: number = 3;
-  animationState: string = "normal";
-
-  round: number = 0;
-  lastLostHeart: number;
-
-  constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private chapterService: ChapterService,
-    private questionService: QuestionsService,
-    private loginStateService: LoginStateService,
-    private resultsDialog: MatDialog
-  ) {
-    this.playerProgressId = this.router.getCurrentNavigation().extras.state?.['playerProgressId'];
-    this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
-    this.storyId = this.router.getCurrentNavigation().extras.state?.['storyId'];
-    console.log(this.storyTitle)
-  }
-
-  ngOnInit() {
-    this.storedPlayerId = this.loginStateService.userId;
+    showQuiz: boolean;
+    storedPlayerId: number;
+    answerIsCorrect: boolean = null;
+    correctAnswerIndex: number;
+    currentQuestionIndex: number = 0;
 
 
-    this.activatedRoute.paramMap.subscribe((params) => {
-      this.chapterId = +params.get("chapterId");
-    })
+    currentHealth: number = 3;
+    animationState: string = "normal";
 
-    this.initProgress();
+    round: number = 0;
+    lastLostHeart: number;
 
-    this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
-      next: chapter => {
-        this.categories = chapter.categories;
-        this.rewardText = chapter.rewardText
-        this.chapterTitle = chapter.title
-        this.chapterWinCondition = chapter.roundWinCondition;
-
-
-        this.fetchQuestions();
-      }
-    })
-
-  }
-
-  private initProgress() {
-
-  }
-
-  get hasQuestions(): boolean {
-    return this.questions.length > 0;
-  }
-
-  private fetchQuestions() {
-
-    this.questionService.getFiveQuestionsByCategory({category: this.categories[this.round]}).subscribe({
-      next: questions => {
-        this.questions = questions;
-      }
-    })
-
-  }
-
-  onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
-
-    const validationRequest = {
-      body: {
-        questionId: selectedAnswer.questionId,
-        answer: selectedAnswer.answer,
-        index: this.currentQuestionIndex,
-        playerId: this.storedPlayerId
-      }
+    constructor(
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
+        private chapterService: ChapterService,
+        private questionService: QuestionsService,
+        private loginStateService: LoginStateService,
+        private resultsDialog: MatDialog
+    ) {
+        this.playerProgressId = this.router.getCurrentNavigation().extras.state?.['playerProgressId'];
+        this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
+        this.storyId = this.router.getCurrentNavigation().extras.state?.['storyId'];
+        console.log(this.storyTitle)
     }
 
-    this.questionService.validateSingleplayerAnswer(validationRequest).subscribe({
-      next: (response: AnswerValidationResponse) => {
-        this.answerIsCorrect = response.correct;
-        this.correctAnswerIndex = response.correctAnswerIndex
-        this.currentQuestionIndex++;
-      }
-    })
+    ngOnInit() {
+        this.storedPlayerId = this.loginStateService.userId;
 
-  }
 
-  onTimerRanOut($event: { questionId: number }) {
-    const validationRequest = {
-      body: {
-        questionId: $event.questionId,
-        index: this.currentQuestionIndex,
-        answer: null,
-        playerId: this.storedPlayerId
-      }
+        this.activatedRoute.paramMap.subscribe((params) => {
+            this.chapterId = +params.get("chapterId");
+        })
+
+        this.initProgress();
+
+        this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
+            next: chapter => {
+                this.categories = chapter.categories;
+                this.rewardText = chapter.rewardText
+                this.chapterTitle = chapter.title
+                this.chapterWinCondition = chapter.roundWinCondition;
+
+
+                this.fetchQuestions();
+            }
+        })
+
     }
-    this.questionService.validateSingleplayerAnswer(validationRequest).subscribe({
-      next: (response: AnswerValidationResponse) => {
-        this.answerIsCorrect = response.correct;
-        this.correctAnswerIndex = response.correctAnswerIndex
-        this.currentQuestionIndex++;
 
-      }
-    })
-
-  }
-
-  resetQuestionState() {
-    this.answerIsCorrect = null;
-    this.correctAnswerIndex = null;
-  }
-
-  handleRoundFinished() {
-    this.questionService.getRoundResults({playerId: this.storedPlayerId}).subscribe({
-        next: results => {
-
-          console.log("Getting round results")
-          console.log(results)
-
-          const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
-            data: {roundResults: results},
-            maxHeight: "90vh",
-            width: "300px"
-          })
-
-          dialogRef.afterClosed().subscribe(() => {
-            console.log("Dialog is closed")
-            const correctCount = results.filter(value => value).length;
-
-            if (correctCount <= 2) {
-              this.loseHeart();
-            } else {
-              this.round++;
+    private initProgress() {
+        this.chapterService.initiateProgress({
+            body: {
+                playerId: this.storedPlayerId,
+                playerProgressId: this.playerProgressId,
+                storyId: this.storyId,
+                chapterId: this.chapterId
             }
-            if (this.currentHealth == 0) {
-              this.handleLostGame();
+        }).subscribe({
+            next: response => {
+                this.playerProgressId = response.playerProgressId;
+                this.chapterProgressId = response.chapterProgressId;
+            },
+            error: err => {
+                console.log(err)
             }
+        })
+    }
 
+    get hasQuestions(): boolean {
+        return this.questions.length > 0;
+    }
 
-            this.currentQuestionIndex = 0;
+    private fetchQuestions() {
 
-            this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
-              next: () =>
-                this.fetchQuestions()
-            })
-          })
+        this.questionService.getFiveQuestionsByCategory({category: this.categories[this.round]}).subscribe({
+            next: questions => {
+                this.questions = questions;
+            }
+        })
 
+    }
+
+    onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
+
+        const validationRequest = {
+            body: {
+                questionId: selectedAnswer.questionId,
+                answer: selectedAnswer.answer,
+                index: this.currentQuestionIndex,
+                playerId: this.storedPlayerId
+            }
         }
-    })
-  }
 
-  loseHeart() {
-    if (this.currentHealth > 0) {
-      this.lastLostHeart = this.currentHealth;
-      this.currentHealth--;
-      this.animationState = "lostHeart"
+        this.questionService.validateSingleplayerAnswer(validationRequest).subscribe({
+            next: (response: AnswerValidationResponse) => {
+                this.answerIsCorrect = response.correct;
+                this.correctAnswerIndex = response.correctAnswerIndex
+                this.currentQuestionIndex++;
+            }
+        })
 
-      setTimeout(() => {
-        this.animationState = "normal";
-        this.lastLostHeart = null;
-      }, 500)
     }
-  }
+
+    onTimerRanOut($event: { questionId: number }) {
+        const validationRequest = {
+            body: {
+                questionId: $event.questionId,
+                index: this.currentQuestionIndex,
+                answer: null,
+                playerId: this.storedPlayerId
+            }
+        }
+        this.questionService.validateSingleplayerAnswer(validationRequest).subscribe({
+            next: (response: AnswerValidationResponse) => {
+                this.answerIsCorrect = response.correct;
+                this.correctAnswerIndex = response.correctAnswerIndex
+                this.currentQuestionIndex++;
+
+            }
+        })
+
+    }
+
+    resetQuestionState() {
+        this.answerIsCorrect = null;
+        this.correctAnswerIndex = null;
+    }
+
+    handleRoundFinished() {
+        this.questionService.getRoundResults({playerId: this.storedPlayerId}).subscribe({
+            next: results => {
+
+                console.log("Getting round results")
+                console.log(results)
+
+                const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
+                    data: {roundResults: results},
+                    maxHeight: "90vh",
+                    width: "300px"
+                })
+
+                dialogRef.afterClosed().subscribe(() => {
+                    console.log("Dialog is closed")
+                    const correctCount = results.filter(value => value).length;
+
+                    if (correctCount <= 2) {
+                        this.loseHeart();
+                    } else {
+                        this.round++;
+                    }
+                    if (this.currentHealth == 0) {
+                        this.handleLostGame();
+                    }
 
 
-  private handleLostGame() {
-    //TODO proper handling with retry or back to overview
-    console.log("No more hearts, navigating back to chapter overview")
-    this.router.navigate(['singleplayer/story', this.storyId])
-  }
-  //TODO remove after testing
+                    this.currentQuestionIndex = 0;
 
-  clearResults() {
-    this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe( {
+                    this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
+                        next: () =>
+                            this.fetchQuestions()
+                    })
+                })
 
-    })
-  }
+            }
+        })
+    }
+
+    loseHeart() {
+        if (this.currentHealth > 0) {
+            this.lastLostHeart = this.currentHealth;
+            this.currentHealth--;
+            this.animationState = "lostHeart"
+
+            setTimeout(() => {
+                this.animationState = "normal";
+                this.lastLostHeart = null;
+            }, 500)
+        }
+    }
+
+
+    private handleLostGame() {
+        //TODO proper handling with retry or back to overview
+        console.log("No more hearts, navigating back to chapter overview")
+        this.router.navigate(['singleplayer/story', this.storyId])
+    }
+
+    //TODO remove after testing
+
+    clearResults() {
+        this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({})
+    }
 }

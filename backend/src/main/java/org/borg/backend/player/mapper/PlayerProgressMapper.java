@@ -11,6 +11,7 @@ public class PlayerProgressMapper {
         }
 
         return PlayerProgressDTO.builder()
+                .id(playerProgress.getId())
                 .currentChapterId(playerProgress.getCurrentChapterId())
                 .completedChapters(playerProgress.getCompletedChapters())
                 .startedAt(playerProgress.getStartedAt())
