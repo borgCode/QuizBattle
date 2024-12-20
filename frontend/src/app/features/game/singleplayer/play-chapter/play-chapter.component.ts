@@ -38,7 +38,7 @@ import {RoundResultsDialogComponent} from './round-results-dialog/round-results-
   ]
 })
 export class PlayChapterComponent implements OnInit {
-  playerProgress: PlayerProgressDto;
+  playerProgressId: number;
   storyTitle: string;
   storyId: number;
   chapterId: number;
@@ -69,7 +69,7 @@ export class PlayChapterComponent implements OnInit {
     private loginStateService: LoginStateService,
     private resultsDialog: MatDialog
   ) {
-    this.playerProgress = this.router.getCurrentNavigation().extras.state?.['playerProgress'];
+    this.playerProgressId = this.router.getCurrentNavigation().extras.state?.['playerProgressId'];
     this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
     this.storyId = this.router.getCurrentNavigation().extras.state?.['storyId'];
     console.log(this.storyTitle)
@@ -83,6 +83,8 @@ export class PlayChapterComponent implements OnInit {
       this.chapterId = +params.get("chapterId");
     })
 
+    this.initProgress();
+
     this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
       next: chapter => {
         this.categories = chapter.categories;
@@ -94,6 +96,10 @@ export class PlayChapterComponent implements OnInit {
         this.fetchQuestions();
       }
     })
+
+  }
+
+  private initProgress() {
 
   }
 

@@ -2,10 +2,7 @@ package org.borg.backend.chapter.model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.common.enums.ProgressStatus;
 
@@ -13,6 +10,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

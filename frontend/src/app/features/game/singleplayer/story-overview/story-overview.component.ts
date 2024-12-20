@@ -10,78 +10,84 @@ import {ContentDialogComponent} from '../shared-components/content-dialog/conten
 import {ChapterNoCategoriesDto} from '../../../../api/generated/models/chapter-no-categories-dto';
 
 @Component({
-  selector: 'app-story-overview',
-  imports: [
-    NgForOf,
-    ChapterCardComponent,
-    NgIf
-  ],
-  templateUrl: './story-overview.component.html',
-  styleUrl: './story-overview.component.css'
+    selector: 'app-story-overview',
+    imports: [
+        NgForOf,
+        ChapterCardComponent,
+        NgIf
+    ],
+    templateUrl: './story-overview.component.html',
+    styleUrl: './story-overview.component.css'
 })
 export class StoryOverviewComponent implements OnInit {
-  chapters: ChapterNoCategoriesDto[]
-  playerProgress: PlayerProgressDto;
-  storyTitle: string;
-  storyId: number
+    chapters: ChapterNoCategoriesDto[]
+    playerProgress: PlayerProgressDto;
+    storyTitle: string;
+    storyId: number
 
-  constructor(
-    private storyService: StoryService,
-    private loginStateService: LoginStateService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private chapterDialog: MatDialog
-
-  ) {
-  }
-
-  ngOnInit() {
-    this.activatedRoute.paramMap.subscribe((params) => {
-      this.storyId = +params.get('storyId')
-      console.log(this.storyId)
-    })
-
-    this.storyService.getStoryOverview({
-      body: {
-        playerId: this.loginStateService.loggedInUser.id, storyId: this.storyId}
-    }).subscribe({
-      next: data=> {
-        this.chapters = data.chapters;
-        this.playerProgress = data.playerProgress
-        this.storyTitle = data.title;
-        console.log(this.playerProgress)
-      }
-
-    })
-  }
-
-  openLockedDialog(title: string, unlockCondition: string) {
-    this.chapterDialog.open(ContentDialogComponent, {
-      data: {storyTitle: title, message: unlockCondition, isLocked: true},
-      maxHeight: '90vh',
-      width: '300px',
-    })
-  }
-
-  openChapterDialog(title: string, id: number, index: number) {
-    let message: string
-    if (this.playerProgress.completedChapters <= index) {
-      message = "Would you like to start this story?"
-    } else {
-      message = "You've already completed this story, do you want to play it again?"
+    constructor(
+        private storyService: StoryService,
+        private loginStateService: LoginStateService,
+        private activatedRoute: ActivatedRoute,
+        private router: Router,
+        private chapterDialog: MatDialog
+    ) {
     }
 
+    ngOnInit() {
+        this.activatedRoute.paramMap.subscribe((params) => {
+            this.storyId = +params.get('storyId')
+            console.log(this.storyId)
+        })
 
-    const dialogRef = this.chapterDialog.open(ContentDialogComponent, {
-      data: {storyTitle: title, message: message},
-      maxHeight: '90vh',
-      width: '300px',
-    })
+        this.storyService.getStoryOverview({
+            body: {
+                playerId: this.loginStateService.loggedInUser.id, storyId: this.storyId
+            }
+        }).subscribe({
+            next: data => {
+                this.chapters = data.chapters;
+                this.playerProgress = data.playerProgress
+                this.storyTitle = data.title;
+                console.log(this.playerProgress)
+            }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result === "yes") {
-        this.router.navigate(['singleplayer/story/chapter', id], {state: {playerProgress: this.playerProgress, storyTitle: this.storyTitle, storyId: this.storyId}})
-      }
-    })
-  }
+        })
+    }
+
+    openLockedDialog(title: string, unlockCondition: string) {
+        this.chapterDialog.open(ContentDialogComponent, {
+            data: {storyTitle: title, message: unlockCondition, isLocked: true},
+            maxHeight: '90vh',
+            width: '300px',
+        })
+    }
+
+    openChapterDialog(title: string, id: number, index: number) {
+        let message: string
+        if (this.playerProgress.completedChapters <= index) {
+            message = "Would you like to start this story?"
+        } else {
+            message = "You've already completed this story, do you want to play it again?"
+        }
+
+
+        const dialogRef = this.chapterDialog.open(ContentDialogComponent, {
+            data: {storyTitle: title, message: message},
+            maxHeight: '90vh',
+            width: '300px',
+        })
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result === "yes") {
+                this.router.navigate(['singleplayer/story/chapter', id], {
+                    state: {
+                        playerProgressId: this.playerProgress.id,
+                        storyTitle: this.storyTitle,
+                        storyId: this.storyId
+                    }
+                })
+            }
+        })
+    }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @Builder
 public class PlayerProgressDTO {
+    private Long playerProgressId;
     private Long currentChapterId;
     private Integer completedChapters;
     private LocalDate startedAt;

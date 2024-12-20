@@ -48,7 +48,7 @@ public class StoryService {
         List<PlayerProgressDTO> playerProgressDTOS = new ArrayList<>();
 
         for (Story story : stories) {
-            PlayerProgressDTO playerProgressDTO = getOrCreatePlayerProgress(playerId, story);
+            PlayerProgressDTO playerProgressDTO = PlayerProgressMapper.toDTO(getOrCreatePlayerProgress(playerId, story));
             playerProgressDTOS.add(playerProgressDTO);
             
             StoryDTO storyDTO = StoryDTO.builder()
@@ -67,7 +67,7 @@ public class StoryService {
 
     }
 
-    private PlayerProgressDTO getOrCreatePlayerProgress(Long playerId, Story story) {
+    public PlayerProgress getOrCreatePlayerProgress(Long playerId, Story story) {
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(playerId, story.getId());
         
         if (playerProgress == null) {
@@ -81,7 +81,7 @@ public class StoryService {
                     .progressStatus(ProgressStatus.NOT_STARTED)
                     .build());
         }
-        return PlayerProgressMapper.toDTO(playerProgress);
+        return playerProgress;
     }
 
     public StoryOverviewDTO getStoryOverview(StoryOverviewRequest request) {
