@@ -52,13 +52,9 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getActiveSessionQuestions(sessionId, playerId));
     }
     
-//    @GetMapping("/session/current-questions")
-//    public ResponseEntity<List<QuestionDTO>> getCurrentQuestions(@RequestParam List<Long> currentQuestionIds) {
-//        return ResponseEntity.ok(questionService.getCurrentQuestions(currentQuestionIds));
-//    }
-    @GetMapping("/chapter/random-questions")
-    public ResponseEntity<List<QuestionDTO>> getFiveQuestionsByCategory(@RequestBody SingleplayerQuestionsRequest request) {
-        return ResponseEntity.ok(questionService.getFiveQuestionsByCategory(request));
+    @PostMapping("/chapter/random-questions")
+    public ResponseEntity<List<QuestionDTO>> getSinglePlayerRoundQuestions(@RequestBody SingleplayerQuestionsRequest request) {
+        return ResponseEntity.ok(questionService.getSinglePlayerRoundQuestions(request));
     }
 
     @PostMapping("/chapter/validate-answer")

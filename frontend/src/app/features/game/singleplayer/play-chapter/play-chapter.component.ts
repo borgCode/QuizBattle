@@ -128,8 +128,8 @@ export class PlayChapterComponent implements OnInit {
 
     private fetchQuestions() {
 
-        this.questionService.getFiveQuestionsByCategory({
-            request: {
+        this.questionService.getSinglePlayerRoundQuestions({
+            body: {
                 category: this.categories[this.round],
                 playerId: this.storedPlayerId
             }

@@ -147,12 +147,9 @@ public class QuestionService {
                 .limit(3)
                 .collect(Collectors.toList());
     }
+    
 
-//    public List<QuestionDTO> getCurrentQuestions(List<Long> currentQuestionIds) {
-//        return QuestionMapper.multipleToDTO(questionRepository.findAllById(currentQuestionIds));
-//    }
-
-    public List<QuestionDTO> getFiveQuestionsByCategory(SingleplayerQuestionsRequest request) {
+    public List<QuestionDTO> getSinglePlayerRoundQuestions(SingleplayerQuestionsRequest request) {
         List<Question> questions = questionRepository.findFiveRandomQuestionsByCategory(request.getCategory());
 
         List<Long> questionIds = questions.stream()
