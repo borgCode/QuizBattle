@@ -45,6 +45,7 @@ public class ChapterService {
         
         playerProgress.setStartedAt(LocalDate.now());
         playerProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);
+        playerProgress.setCurrentChapterId(request.getChapterId());
         
         playerProgress = playerProgressRepository.save(playerProgress);
         
@@ -72,5 +73,15 @@ public class ChapterService {
                 chapterProgress.getStartedAt());
         
         return new InitiateProgressResponse(playerProgress.getId(), chapterProgress.getId());
+    }
+
+    public void updateChapterProgress(Long chapterProgressId) {
+        ChapterProgress chapterProgress = chapterProgressRepository.findById(chapterProgressId)
+                .orElseThrow(() -> new EntityNotFoundException("ChapterProgress not found"));
+        
+        chapterProgress.setCompletedAt(LocalDate.now());
+        chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
+        
+        chapterProgressRepository.save(chapterProgress);
     }
 }

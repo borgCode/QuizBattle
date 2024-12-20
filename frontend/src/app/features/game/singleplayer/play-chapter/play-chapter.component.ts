@@ -69,7 +69,7 @@ export class PlayChapterComponent implements OnInit {
         private questionService: QuestionsService,
         private loginStateService: LoginStateService,
         private resultsDialog: MatDialog,
-        private retryDialog: MatDialog
+        private endGameDialog: MatDialog
     ) {
         this.playerProgressId = this.router.getCurrentNavigation().extras.state?.['playerProgressId'];
         this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
@@ -93,6 +93,8 @@ export class PlayChapterComponent implements OnInit {
                 this.rewardText = chapter.rewardText
                 this.chapterTitle = chapter.title
                 this.chapterWinCondition = chapter.roundWinCondition;
+
+                console.log(this.rewardText)
 
 
                 this.fetchQuestions();
@@ -213,7 +215,11 @@ export class PlayChapterComponent implements OnInit {
 
                     this.currentQuestionIndex = 0;
 
-                    if (this.round > this.categories.length) {
+                    console.log(this.round)
+                    console.log(this.categories.length)
+
+                    if (this.round >= this.categories.length) {
+                        console.log("Chapter complete")
                         this.handleChapterComplete();
                     } else {
                         this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
@@ -243,10 +249,11 @@ export class PlayChapterComponent implements OnInit {
 
     private handleLostGame(): Promise<boolean> {
         return new Promise((resolve) => {
-            this.retryDialog.open(ContentDialogComponent, {
+            this.endGameDialog.open(ContentDialogComponent, {
                 data: {
                     contentTitle: "Retry Chapter",
-                    message: "Would you like to retry the current chapter?"
+                    message: "Would you like to retry the current chapter?",
+                    onlyOkButton: false
                 }
             }).afterClosed().subscribe(result => {
                 if (result === "yes") {
@@ -268,7 +275,21 @@ export class PlayChapterComponent implements OnInit {
 
 
     private handleChapterComplete() {
-
+        this.chapterService.updateChapterProgress({chapterProgressId: this.chapterProgressId}).subscribe( {
+            next: () => {
+                console.log(this.rewardText)
+                const refDialog = this.endGameDialog.open(ContentDialogComponent, {
+                    data: {
+                        contentTitle: "Chapter completed!",
+                        message: this.rewardText,
+                        onlyOkButton: true
+                    }
+                })
+                refDialog.afterClosed().subscribe(() => {
+                    this.router.navigate(['singleplayer/story', this.storyId])
+                })
+            }
+        })
     }
 
 }

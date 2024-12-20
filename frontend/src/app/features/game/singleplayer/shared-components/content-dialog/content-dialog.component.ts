@@ -28,7 +28,7 @@ import {NgIf} from '@angular/common';
 export class ContentDialogComponent {
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { contentTitle: string, message: string, isLocked?: boolean}
+    @Inject(MAT_DIALOG_DATA) public data: { contentTitle: string, message: string, onlyOkButton: boolean}
   ) {
   }
 }

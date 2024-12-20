@@ -28,4 +28,10 @@ public class ChapterController {
         return ResponseEntity.ok().body(chapterService.initiateProgress(request));
     }
     
+    @PostMapping("/progress/update/{chapterProgressId}")
+    public ResponseEntity<Void> updateChapterProgress(@PathVariable Long chapterProgressId) {
+        chapterService.updateChapterProgress(chapterProgressId);
+        return ResponseEntity.ok().build();
+    }
+    
 }

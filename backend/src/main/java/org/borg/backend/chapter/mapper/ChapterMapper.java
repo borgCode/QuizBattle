@@ -37,6 +37,7 @@ public class ChapterMapper {
                 .id(chapter.getId())
                 .chapterNumber(chapter.getChapterNumber())
                 .title(chapter.getTitle())
+                .rewardText(chapter.getRewardText())
                 .categories(chapter.getCategories())
                 .roundWinCondition(chapter.getRoundWinCondition())
                 .base64Image(ImageUtil.encodeStoryImageToBase64(chapter.getImagePath()))

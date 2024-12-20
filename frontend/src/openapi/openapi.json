@@ -512,6 +512,30 @@
         }
       }
     },
+    "/chapter/progress/update/{chapterProgressId}": {
+      "post": {
+        "tags": [
+          "Chapter"
+        ],
+        "operationId": "updateChapterProgress",
+        "parameters": [
+          {
+            "name": "chapterProgressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/chapter/progress/start": {
       "post": {
         "tags": [

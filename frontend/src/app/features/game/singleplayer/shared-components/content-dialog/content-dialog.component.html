@@ -4,7 +4,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <div cdkTrapFocus cdkTrapFocusAutoCapture="true">
-  <button *ngIf="!data.isLocked" mat-button mat-dialog-close>No</button>
-  <button mat-button mat-dialog-close="yes" cdkFocusInitial>{{ data.isLocked ? 'OK' : 'YES' }}</button>
+  <button *ngIf="!data.onlyOkButton" mat-button mat-dialog-close>No</button>
+  <button mat-button mat-dialog-close="yes" cdkFocusInitial>{{ data.onlyOkButton ? 'OK' : 'YES' }}</button>
   </div>
 </mat-dialog-actions>
