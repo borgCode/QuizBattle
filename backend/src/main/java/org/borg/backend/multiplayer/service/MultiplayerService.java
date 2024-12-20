@@ -3,28 +3,31 @@ package org.borg.backend.multiplayer.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.common.enums.BusinessErrorCodes;
-import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.common.enums.GameStatus;
+import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.multiplayer.dto.GameStateResponse;
 import org.borg.backend.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.multiplayer.dto.RematchRequest;
 import org.borg.backend.multiplayer.dto.RematchResponse;
-import org.borg.backend.multiplayer.model.*;
+import org.borg.backend.multiplayer.model.MultiplayerSession;
+import org.borg.backend.multiplayer.model.PendingSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.multiplayer.util.MultiplayerGameConstants;
 import org.borg.backend.notification.service.NotificationService;
-import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.player.model.Player;
 import org.borg.backend.player.mapper.PlayerMapper;
+import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
+import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.dto.Question;
-import org.borg.backend.question.repository.QuestionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -35,7 +38,6 @@ public class MultiplayerService {
     private final NotificationService notificationService;
     private final PendingSessionRepository pendingSessionRepository;
     private final PlayerRepository playerRepository;
-    private final QuestionRepository questionRepository;
 
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)

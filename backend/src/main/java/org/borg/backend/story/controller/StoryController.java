@@ -5,14 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.story.dto.AllStoriesDTO;
-import org.borg.backend.story.dto.StoryDTO;
 import org.borg.backend.story.dto.StoryOverviewDTO;
 import org.borg.backend.story.dto.StoryOverviewRequest;
 import org.borg.backend.story.service.StoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor

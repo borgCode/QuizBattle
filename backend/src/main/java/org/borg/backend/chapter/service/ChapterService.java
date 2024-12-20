@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,7 +31,7 @@ public class ChapterService {
 
     public ChapterDTO getChapter(Long chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId)
-                .orElseThrow(() -> new EntityNotFoundException("Chapter not found"));;
+                .orElseThrow(() -> new EntityNotFoundException("Chapter not found"));
         return ChapterMapper.toDTO(chapter);
     }
 

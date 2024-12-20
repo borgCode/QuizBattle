@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.borg.backend.chapter.dto.ChapterDTO;
 import org.borg.backend.chapter.dto.InitiateProgressRequest;
 import org.borg.backend.chapter.dto.InitiateProgressResponse;
-import org.borg.backend.chapter.model.Chapter;
 import org.borg.backend.chapter.service.ChapterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
