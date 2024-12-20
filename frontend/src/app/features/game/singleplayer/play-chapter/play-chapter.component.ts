@@ -212,24 +212,19 @@ export class PlayChapterComponent implements OnInit {
                         }
                     }
 
-
                     this.currentQuestionIndex = 0;
 
-                    console.log(this.round)
-                    console.log(this.categories.length)
-
-                    if (this.round >= this.categories.length) {
-                        console.log("Chapter complete")
-                        this.handleChapterComplete();
-                    } else {
-                        this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
-                            next: () =>
+                    this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
+                        next: () => {
+                            if (this.round >= this.categories.length) {
+                                console.log("Chapter complete")
+                                this.handleChapterComplete();
+                            } else {
                                 this.fetchQuestions()
-                        })
-                    }
-
+                            }
+                        }
+                    })
                 })
-
             }
         })
     }
@@ -275,7 +270,7 @@ export class PlayChapterComponent implements OnInit {
 
 
     private handleChapterComplete() {
-        this.chapterService.updateChapterProgress({chapterProgressId: this.chapterProgressId}).subscribe( {
+        this.chapterService.updateChapterProgress({chapterProgressId: this.chapterProgressId}).subscribe({
             next: () => {
                 console.log(this.rewardText)
                 const refDialog = this.endGameDialog.open(ContentDialogComponent, {
@@ -291,5 +286,4 @@ export class PlayChapterComponent implements OnInit {
             }
         })
     }
-
 }
