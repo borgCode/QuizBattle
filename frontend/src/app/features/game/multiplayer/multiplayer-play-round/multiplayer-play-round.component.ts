@@ -27,10 +27,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   storedPlayerId: number;
   answerIsCorrect: boolean = null;
   correctAnswerIndex: number;
-
-  get hasQuestions(): boolean {
-    return this.questions.length > 0;
-  }
+  isRestoredSession: boolean = false;
 
   constructor(
     private questionService: QuestionsService,
@@ -47,23 +44,48 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       this.sessionId = value['sessionId'];
     });
 
-    let questionIds = (history.state as any).questionIds;
+    console.log(this.storedPlayerId)
 
-    if (questionIds) {
-      this.questionService.getCurrentQuestions({currentQuestionIds: questionIds}).subscribe({
-        next: data => {
-          this.questions = data;
+    this.questionService.getPlayerSessionQuestions({playerId: this.storedPlayerId}).subscribe({
+      next: questions => {
+        console.log(questions)
+        if (questions && questions.length > 0) {
+          this.questions = questions;
+          this.isRestoredSession = true;
+        } else {
+
+          let questionIds = (history.state as any).questionIds;
+
+          if (questionIds) {
+            this.questionService.getActiveSessionQuestions({
+              sessionId: this.sessionId,
+              playerId: this.storedPlayerId
+            }).subscribe({
+              next: questions => {
+                this.questions = questions;
+                this.isRestoredSession = true;
+              }
+            })
+
+          } else {
+            // this.resetState();
+
+            console.log(this.sessionId)
+
+            this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
+              next: categories =>
+                this.categories = categories
+            })
+          }
         }
-      })
+      }
+    })
+  }
 
-    } else {
-      this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
-        next: categories =>
-          this.categories = categories
-      })
-
-    }
-
+  private resetState() {
+    this.isRestoredSession = false;
+    this.selectedCategory = null;
+    this.questions = [];
   }
 
 
@@ -73,10 +95,19 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   }
 
   private fetchQuestions(category: string) {
-
-    this.questionService.getThreeQuestionsByCategory({category, sessionId: this.sessionId}).subscribe({
+    console.log(category)
+    console.log(this.sessionId)
+    console.log(this.storedPlayerId)
+    this.questionService.getNewQuestionsForCategory({
+      body: {
+        category: category,
+        sessionId: this.sessionId,
+        playerId: this.storedPlayerId
+      }
+    }).subscribe({
       next: data => {
         this.questions = data;
+        this.isRestoredSession = true;
       }
     });
 
@@ -128,4 +159,14 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   onNavigateBack() {
     this.router.navigate(['multiplayer', this.sessionId]);
   }
+
+  get shouldShowCategories(): boolean {
+    return this.categories.length > 0 && !this.questions.length;
+  }
+
+  get shouldShowQuestions(): boolean {
+    return this.questions.length > 0;
+  }
+
+
 }

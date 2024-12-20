@@ -128,7 +128,12 @@ export class PlayChapterComponent implements OnInit {
 
     private fetchQuestions() {
 
-        this.questionService.getFiveQuestionsByCategory({category: this.categories[this.round]}).subscribe({
+        this.questionService.getFiveQuestionsByCategory({
+            request: {
+                category: this.categories[this.round],
+                playerId: this.storedPlayerId
+            }
+        }).subscribe({
             next: questions => {
                 this.questions = questions;
             }
@@ -142,7 +147,6 @@ export class PlayChapterComponent implements OnInit {
             body: {
                 questionId: selectedAnswer.questionId,
                 answer: selectedAnswer.answer,
-                index: this.currentQuestionIndex,
                 playerId: this.storedPlayerId
             }
         }
@@ -190,8 +194,10 @@ export class PlayChapterComponent implements OnInit {
                 console.log(results)
 
                 const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
-                    data: {roundResults: results,
-                    winCondition: this.chapterWinCondition},
+                    data: {
+                        roundResults: results,
+                        winCondition: this.chapterWinCondition
+                    },
                     maxHeight: "90vh",
                     width: "300px"
                 })

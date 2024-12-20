@@ -96,6 +96,30 @@
         }
       }
     },
+    "/questions/{playerId}/clear": {
+      "post": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "clearPlayerSession",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/questions/session/validate-answer": {
       "post": {
         "tags": [
@@ -119,6 +143,39 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AnswerValidationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/session/random-questions": {
+      "post": {
+        "tags": [
+          "Questions"
+        ],
+        "operationId": "getNewQuestionsForCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MultiplayerQuestionsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionDTO"
+                  }
                 }
               }
             }
@@ -660,15 +717,15 @@
         }
       }
     },
-    "/questions/session/{sessionId}": {
+    "/questions/{playerId}/questions": {
       "get": {
         "tags": [
           "Questions"
         ],
-        "operationId": "getSessionQuestions",
+        "operationId": "getPlayerSessionQuestions",
         "parameters": [
           {
-            "name": "sessionId",
+            "name": "playerId",
             "in": "path",
             "required": true,
             "schema": {
@@ -694,65 +751,29 @@
         }
       }
     },
-    "/questions/session/random-questions": {
+    "/questions/session/{sessionId}/{playerId}": {
       "get": {
         "tags": [
           "Questions"
         ],
-        "operationId": "getThreeQuestionsByCategory",
+        "operationId": "getActiveSessionQuestions",
         "parameters": [
           {
-            "name": "category",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "sessionId",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int64"
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/QuestionDTO"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/questions/session/current-questions": {
-      "get": {
-        "tags": [
-          "Questions"
-        ],
-        "operationId": "getCurrentQuestions",
-        "parameters": [
+          },
           {
-            "name": "currentQuestionIds",
-            "in": "query",
+            "name": "playerId",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "format": "int64"
-              }
+              "type": "integer",
+              "format": "int64"
             }
           }
         ],
@@ -807,7 +828,7 @@
         }
       }
     },
-    "/questions/chapter/random-questions/{category}": {
+    "/questions/chapter/random-questions": {
       "get": {
         "tags": [
           "Questions"
@@ -815,11 +836,11 @@
         "operationId": "getFiveQuestionsByCategory",
         "parameters": [
           {
-            "name": "category",
-            "in": "path",
+            "name": "request",
+            "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/SingleplayerQuestionsRequest"
             }
           }
         ],
@@ -1251,16 +1272,46 @@
           }
         }
       },
-      "SinglePlayerAnswerValidationRequest": {
+      "MultiplayerQuestionsRequest": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "QuestionDTO": {
         "type": "object",
         "properties": {
           "questionId": {
             "type": "integer",
             "format": "int64"
           },
-          "index": {
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SinglePlayerAnswerValidationRequest": {
+        "type": "object",
+        "properties": {
+          "questionId": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "answer": {
             "type": "string"
@@ -1492,21 +1543,15 @@
           }
         }
       },
-      "QuestionDTO": {
+      "SingleplayerQuestionsRequest": {
         "type": "object",
         "properties": {
-          "questionId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "question": {
+          "category": {
             "type": "string"
           },
-          "options": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "playerId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

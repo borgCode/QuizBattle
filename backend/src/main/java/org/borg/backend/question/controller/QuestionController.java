@@ -3,10 +3,7 @@ package org.borg.backend.question.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.question.dto.AnswerValidationResponse;
-import org.borg.backend.question.dto.MultiplayerAnswerValidationRequest;
-import org.borg.backend.question.dto.QuestionDTO;
-import org.borg.backend.question.dto.SinglePlayerAnswerValidationRequest;
+import org.borg.backend.question.dto.*;
 import org.borg.backend.question.service.QuestionService;
 import org.borg.backend.question.service.QuestionSessionService;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +25,21 @@ public class QuestionController {
     public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
         return ResponseEntity.ok(questionService.getThreeRandomCategories(sessionId));
     }
+    
+    @GetMapping("/{playerId}/questions")
+    public ResponseEntity<List<QuestionDTO>> getPlayerSessionQuestions(@PathVariable Long playerId) {
+        return ResponseEntity.ok(questionService.getPlayerSessionQuestions(playerId));
+    }
+    
+    @PostMapping("/{playerId}/clear")
+    public ResponseEntity<Void> clearPlayerSession(@PathVariable Long playerId) {
+        questionSessionService.finishSession(playerId);
+        return ResponseEntity.ok().build();
+    }
 
-    @GetMapping("/session/random-questions")
-    public ResponseEntity<List<QuestionDTO>> getThreeQuestionsByCategory(
-            @RequestParam String category,
-            @RequestParam Long sessionId) {
-        return ResponseEntity.ok(questionService.getThreeQuestionsByCategory(category, sessionId));
+    @PostMapping("/session/random-questions")
+    public ResponseEntity<List<QuestionDTO>> getNewQuestionsForCategory(@RequestBody MultiplayerQuestionsRequest request) {
+        return ResponseEntity.ok(questionService.getNewQuestionsForCategory(request));
     }
 
     @PostMapping("/session/validate-answer")
@@ -41,18 +47,18 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.validateMultiplayerAnswer(request));
     }
 
-    @GetMapping("/session/{sessionId}")
-    public ResponseEntity<List<QuestionDTO>> getSessionQuestions(@PathVariable Long sessionId) {
-        return ResponseEntity.ok(questionService.getQuestionsForSession(sessionId));
+    @GetMapping("/session/{sessionId}/{playerId}")
+    public ResponseEntity<List<QuestionDTO>> getActiveSessionQuestions(@PathVariable Long sessionId, @PathVariable Long playerId) {
+        return ResponseEntity.ok(questionService.getActiveSessionQuestions(sessionId, playerId));
     }
     
-    @GetMapping("/session/current-questions")
-    public ResponseEntity<List<QuestionDTO>> getCurrentQuestions(@RequestParam List<Long> currentQuestionIds) {
-        return ResponseEntity.ok(questionService.getCurrentQuestions(currentQuestionIds));
-    }
-    @GetMapping("/chapter/random-questions/{category}")
-    public ResponseEntity<List<QuestionDTO>> getFiveQuestionsByCategory(@PathVariable String category) {
-        return ResponseEntity.ok(questionService.getFiveQuestionsByCategory(category));
+//    @GetMapping("/session/current-questions")
+//    public ResponseEntity<List<QuestionDTO>> getCurrentQuestions(@RequestParam List<Long> currentQuestionIds) {
+//        return ResponseEntity.ok(questionService.getCurrentQuestions(currentQuestionIds));
+//    }
+    @GetMapping("/chapter/random-questions")
+    public ResponseEntity<List<QuestionDTO>> getFiveQuestionsByCategory(@RequestBody SingleplayerQuestionsRequest request) {
+        return ResponseEntity.ok(questionService.getFiveQuestionsByCategory(request));
     }
 
     @PostMapping("/chapter/validate-answer")

@@ -7,8 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SinglePlayerAnswerValidationRequest {
-    private Long questionId;
-    private String answer;
+public class SingleplayerQuestionsRequest {
+    private String category;
     private Long playerId;
 }

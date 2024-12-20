@@ -31,35 +31,72 @@ public class QuestionService {
     private final PlayerRepository playerRepository;
 
 
-    public List<QuestionDTO> getThreeQuestionsByCategory(String category, Long sessionId) {
-        List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(category);
-        multiplayerService.updateSessionQuestionsAndCategory(sessionId, questions, category);
+    public List<QuestionDTO> getPlayerSessionQuestions(Long playerId) {
+        List<Long> questionIds = questionSessionService.getSessionQuestions(playerId);
+        log.warn("Getting session questions");
+        
+        if (questionIds == null) {
+            return Collections.emptyList();
+        }
+        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
+    }
+    
+    public List<QuestionDTO> getNewQuestionsForCategory(MultiplayerQuestionsRequest request) {
+        List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(request.getCategory());
+
+        List<Long> questionIds = questions.stream()
+                .map(Question::getId)
+                .toList();
+        questionSessionService.initializeSession(request.getPlayerId(), questionIds);
+
+        multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, request.getCategory());
 
         return QuestionMapper.multipleToDTO(questions);
+    }
+
+    public List<QuestionDTO> getActiveSessionQuestions(Long sessionId, Long playerId) {
+        List<Long> sessionQuestions = questionSessionService.getSessionQuestions(playerId);
+        if (!sessionQuestions.isEmpty()) {
+            log.info("Player {} has ongoing session, returning those questions", playerId);
+            return QuestionMapper.multipleToDTO(questionRepository.findAllById(sessionQuestions));
+        }
+        
+        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+        List<Long> questionIds = session.getQuestionIds();
+        
+        questionSessionService.initializeSession(playerId, questionIds);
+
+        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
     }
 
     public AnswerValidationResponse validateMultiplayerAnswer(MultiplayerAnswerValidationRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
-       
+
         AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), request.getQuestionId(), request.getAnswer());
-        
+
+        boolean isLastQuestion = questionSessionService.saveMultiplayerAnswer(request.getPlayerId(), validationResponse.isCorrect());
+        if (isLastQuestion) {
+            questionSessionService.finishSession(request.getPlayerId());
+        }
+
         multiplayerService.updateGameState(
                 request.getSessionId(),
                 request.getPlayerId(),
                 request.getQuestionId(),
                 validationResponse.isCorrect()
         );
-        
+
         return validationResponse;
-        
+
     }
 
     private AnswerValidationResponse validateAnswer(Long playerId, Long questionId, String answer) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
-        
+
         boolean isCorrect;
         if (answer == null) {
             isCorrect = false;
@@ -67,11 +104,11 @@ public class QuestionService {
             isCorrect = question.getCorrectAnswer().equals(answer);
         }
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
-        
+
         updatePlayerStats(playerId, question.getCategory(), isCorrect);
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
-        
+
     }
 
     private void updatePlayerStats(Long playerId, String category, boolean isCorrect) {
@@ -87,19 +124,18 @@ public class QuestionService {
         playerRepository.save(player);
     }
 
-    public List<QuestionDTO> getQuestionsForSession(Long sessionId) {
-        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
-        List<Long> questionIds = session.getQuestionIds();
-
-        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
-    }
+    
 
     public List<String> getThreeRandomCategories(Long sessionId) {
+        log.warn("Session ID: " + sessionId);
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
         List<String> allCategories = questionRepository.findAllCategories();
+
+        for (String allCategory : allCategories) {
+            log.warn(allCategory);
+        }
 
         List<String> categoriesNotPlayed = allCategories.stream()
                 .filter(category -> !session.getPlayedCategories().contains(category))
@@ -112,12 +148,19 @@ public class QuestionService {
                 .collect(Collectors.toList());
     }
 
-    public List<QuestionDTO> getCurrentQuestions(List<Long> currentQuestionIds) {
-        return QuestionMapper.multipleToDTO(questionRepository.findAllById(currentQuestionIds));
-    }
+//    public List<QuestionDTO> getCurrentQuestions(List<Long> currentQuestionIds) {
+//        return QuestionMapper.multipleToDTO(questionRepository.findAllById(currentQuestionIds));
+//    }
 
-    public List<QuestionDTO> getFiveQuestionsByCategory(String category) {
-        return QuestionMapper.multipleToDTO(questionRepository.findFiveRandomQuestionsByCategory(category));
+    public List<QuestionDTO> getFiveQuestionsByCategory(SingleplayerQuestionsRequest request) {
+        List<Question> questions = questionRepository.findFiveRandomQuestionsByCategory(request.getCategory());
+
+        List<Long> questionIds = questions.stream()
+                .map(Question::getId)
+                .toList();
+        questionSessionService.initializeSession(request.getPlayerId(), questionIds);
+
+        return QuestionMapper.multipleToDTO(questions);
     }
 
 
@@ -129,10 +172,9 @@ public class QuestionService {
 
         AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), request.getQuestionId(), request.getAnswer());
 
-        questionSessionService.saveAnswer(request.getPlayerId(), request.getIndex(), validationResponse.isCorrect());
-        
-        //TODO stats
-        
+        questionSessionService.saveSingleplayerAnswer(request.getPlayerId(), validationResponse.isCorrect());
+
+
         return validationResponse;
     }
 }
