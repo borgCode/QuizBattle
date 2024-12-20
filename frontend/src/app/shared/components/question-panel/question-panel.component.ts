@@ -61,9 +61,9 @@ ngOnChanges(changes: SimpleChanges) {
     this.hasClickedOption = false;
     this.timerHasRanOut = false;
     this.userClickedNext = true;
+    this.resetQuestionState.emit();
     if (this.currentQuestionIndex < this.questions.length - 1) {
       console.log("Current question index: " + this.currentQuestionIndex)
-      this.resetQuestionState.emit();
       this.currentQuestionIndex++;
       this.timerComponent.resetTimer();
       this.timerComponent.startTimer();

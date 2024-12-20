@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-round-results-dialog',
@@ -8,8 +8,7 @@ import {NgForOf, NgIf} from '@angular/common';
     MatDialogContent,
     MatDialogTitle,
     MatDialogClose,
-    NgForOf,
-    NgIf
+    NgForOf
   ],
   templateUrl: './round-results-dialog.component.html',
   styleUrl: './round-results-dialog.component.css'
