@@ -55,7 +55,7 @@ Sports,"Which Italian footballer told Neuer where he's putting his shot and drag
 Sports,"Who won the ""Champions League"" in 1999?",Manchester United;Barcelona;Bayern Munich;Liverpool,Manchester United
 Sports,How many scoring zones are there on a conventional dart board?,82;62;42;102,82
 Sports,Which of the following sports is not part of the triathlon?,Horse-Riding;Cycling;Swimming;Running,Horse-Riding
-Sports,At which bridge does the annual Oxford and Cambridge boat race start?,Putney;Hammersmith;Vauxhall ;Battersea,Putney
+Sports,At which bridge does the annual Oxford and Cambridge boat race start?,Putney;Hammersmith;Vauxhall;Battersea,Putney
 Sports,What is the name of the AHL affiliate of the Toronto Maple Leafs?,Toronto Marlies;Toronto Rock;Toronto Argonauts;Toronto Wolfpack,Toronto Marlies
 Sports,Which team was the 2015-2016 NBA Champions?,Cleveland Cavaliers;Golden State Warriors;Toronto Raptors;Oklahoma City Thunders,Cleveland Cavaliers
 Sports,Which of the following Grand Slam tennis tournaments occurs LAST?,US Open;French Open;Wimbledon;Australian Open,US Open
@@ -84,7 +84,7 @@ Sports,Which year was the third Super Bowl held?,1969;1968;1971;1970,1969
 Sports,Which NBA player has the most games played over the course of their career?,Robert Parish;Kareem Abdul-Jabbar;Kevin Garnett;Kobe Bryant,Robert Parish
 Sports,Which professional wrestler fell from the rafters to his death during a live Pay-Per-View event in 1999?,Owen Hart;Chris Benoit;Lex Luger;Al Snow,Owen Hart
 Sports,Where was the Games of the XXII Olympiad held?,Moscow;Barcelona;Tokyo;Los Angeles,Moscow
-Sports,"This Canadian television sportscaster is known for his ""Hockey Night in Canada"" role, a commentary show during hockey games.",Don Cherry;Don McKellar;Don Taylor ;Donald Sutherland,Don Cherry
+Sports,"This Canadian television sportscaster is known for his ""Hockey Night in Canada"" role, a commentary show during hockey games.",Don Cherry;Don McKellar;Don Taylor;Donald Sutherland,Don Cherry
 Sports,Which year did Jenson Button won his first ever Formula One World Drivers' Championship?,2009;2010;2007;2006,2009
 Sports,Which car manufacturer won the 2016 24 Hours of Le Mans?,Porsche;Toyota;Audi;Ferrari,Porsche
 Sports,Which team won 2014 FIFA World Cup in Brazil?,Germany;Argentina;Brazil;Netherlands,Germany
@@ -125,8 +125,8 @@ History,What was the last colony the UK ceded marking the end of the British Emp
 History,Which of these facilities was not present on the Titanic?,Fainting room;Turkish bath;Kennel;Squash court,Fainting room
 History,"Which famous world leader is famed for the saying, ""Let them eat cake"", yet is rumored that he/she never said it at all?",Marie Antoinette;Czar Nicholas II;Elizabeth I;Henry VIII,Marie Antoinette
 History,What event marked the start of World War II?,Invasion of Poland (1939);Invasion of Russia (1942);Battle of Britain (1940);Invasion of Normandy (1944),Invasion of Poland (1939)
-History,What was Manfred von Richthofen's nickname?,The Red Baron;The High Flying Ace;The Blue Serpent ;The Germany Gunner,The Red Baron
-History,"During the Roman Triumvirate of 42 BCE, what region of the Roman Republic was given to Lepidus?",Hispania ;Italia;Gallia;Asia,Hispania 
+History,What was Manfred von Richthofen's nickname?,The Red Baron;The High Flying Ace;The Blue Serpent;The Germany Gunner,The Red Baron
+History,"During the Roman Triumvirate of 42 BCE, what region of the Roman Republic was given to Lepidus?",Hispania;Italia;Gallia;Asia,Hispania 
 History,"Who was among those killed in the 2010 Smolensk, Russia plane crash tragedy?",The Polish President;Pope John Paul II;Bang-Ding Ow;Albert Putin,The Polish President
 History,How long did World War II last?,6 years;4 years;5 years;7 years,6 years
 History,What disease crippled President Franklin D. Roosevelt and led him to help the nation find a cure? ,Polio;Cancer;Meningitis;HIV,Polio
@@ -167,13 +167,13 @@ Geography,Broome is a town in which state of Australia?,Western Australia;Northe
 Geography,What is the capital of Greenland?,Nuuk;Sisimiut;Narsaq;Maniitsoq,Nuuk
 Geography,What is the capital of Australia?,Canberra;Sydney;Melbourne;Brisbane,Canberra
 Geography,Which of the following Arab countries does NOT have a flag containing only Pan-Arab colours?,Qatar;Kuwait;United Arab Emirates;Jordan,Qatar
-Geography,Which state of the United States is the smallest?,Rhode Island ;Maine;Vermont;Massachusetts,Rhode Island 
+Geography,Which state of the United States is the smallest?,Rhode Island;Maine;Vermont;Massachusetts,Rhode Island
 Geography,What is the tallest mountain in Canada?,Mount Logan;Mont Tremblant;Whistler Mountain;Blue Mountain,Mount Logan
 Geography,The land mass of modern day Turkey is called what?,Anatolia;Ismuth of Ottoma;Ottoma;Ismuth of Anatolia,Anatolia
 Geography,Which of the following countries has a flag featuring a yellow lion wielding a sword on a dark red background?,Sri Lanka;Kiribati;Scotland;Bhutan,Sri Lanka
 Geography,What is the highest mountain in the world?,Mt. Everest;Mount Godwin Austen;Kangchenjunga;Annapurna,Mt. Everest
 Geography,What is the only country in the world with a flag that doesn't have four right angles?,Nepal;Panama;Angola;Egypt,Nepal
-Geography,Which is the largest freshwater lake in the world?,Lake Superior ;Caspian Sea;Lake Michigan;Lake Huron,Lake Superior 
+Geography,Which is the largest freshwater lake in the world?,Lake Superior;Caspian Sea;Lake Michigan;Lake Huron,Lake Superior
 Geography,The Pyrenees mountains are located on the border of which two countries?,France and Spain;Italy and Switzerland;Norway and Sweden;Russia and Ukraine,France and Spain
 Geography,What is the capital of South Korea?,Seoul;Pyongyang;Taegu;Kitakyushu,Seoul
 Geography,How tall is One World Trade Center in New York City?,"1,776 ft;1,888 ft;1,225 ft;1,960 ft","1,776 ft"
@@ -195,7 +195,7 @@ Geography,"Where would you find the ""Spanish Steps""?","Rome, Italy;Barcelona, 
 Geography,What is the fifth largest country by area?,Brazil;United States;Australia;India,Brazil
 Geography,Which of the following language families is the most controversial amongst modern linguists?,Altaic;Sino-Tibetan;Dravidian;Indo-European,Altaic
 Geography,Kuala Lumpur is the capital of which country?,Malaysia;Indonesia;Singapore;Thailand,Malaysia
-Geography,What is the northernmost human settlement with year round inhabitants?,"Alert, Canada;Nagurskoye, Russia;McMurdo Station, Antarctica ;Honningsv&aring;g, Norway","Alert, Canada"
+Geography,What is the northernmost human settlement with year round inhabitants?,"Alert, Canada;Nagurskoye, Russia;McMurdo Station, Antarctica;Honningsv&aring;g, Norway","Alert, Canada"
 Geography,What is the capital of the US State of New York?,Albany;Buffalo;New York;Rochester,Albany
 Geography,What is the capital city of New Zealand?,Wellington;Auckland;Christchurch;Melbourne,Wellington
 Film,"In the 1974 Christmas flick ""The Year Without a Santa Claus,"" what are the names of the two elves who help Mrs. Claus save Christmas?",Jingle & Jangle;Buddy &amp; Bobby;Holly &amp; Jolly;Snowflake &amp; Icicle,Jingle & Jangle
@@ -251,7 +251,7 @@ Film,What was Dorothy's surname in 'The Wizard Of Oz'?,Gale;Perkins;Day;Parker,G
 Books,Who wrote the novel 'Fear And Loathing In Las Vegas'?,Hunter S. Thompson;F. Scott Fitzgerald;Henry Miller;William S. Burroughs,Hunter S. Thompson
 Books,"What is the make and model of the tour vehicles in ""Jurassic Park"" (1990)?",1989 Toyota Land Cruiser;1989 Jeep Wrangler YJ Sahar;1989 Ford Explorer XLT;Mercedes M-Class,1989 Toyota Land Cruiser
 Books,Which of these does Charlie NOT read in The Perks of Being a Wallflower?,The Grapes of Wrath;Hamlet;The Great Gatsby;Peter Pan,The Grapes of Wrath
-Books,"What was the name of Captain Nemo's submarine in ""20,000 Leagues Under the Sea""?",The Nautilus;The Neptune;The Poseidon  ;The Atlantis,The Nautilus
+Books,"What was the name of Captain Nemo's submarine in ""20,000 Leagues Under the Sea""?",The Nautilus;The Neptune;The Poseidon ;The Atlantis,The Nautilus
 Books,What was the first ever entry written for the SCP Foundation collaborative writing project?,SCP-173;SCP-001;SCP-999;SCP-1459,SCP-173
 Books,"Which of the following was the author of ""Username Evie""?",Joe Sugg;Zoe Sugg;Joe Weller;Alfie Deyes,Joe Sugg
 Books,What is Ron Weasley's middle name?,Bilius;Arthur;John;Dominic,Bilius
@@ -280,7 +280,7 @@ Books,"In the Magic: The Gathering universe,  the Antiquities, Ice Age, and Alli
 Books,"Who wrote the children's story ""The Little Match Girl""?",Hans Christian Andersen;Charles Dickens;Lewis Carroll;Oscar Wilde,Hans Christian Andersen
 Books,"The novel ""Jane Eyre"" was written by what author? ",Charlotte Brontë;Emily Bront&euml;;Jane Austen;Louisa May Alcott,Charlotte Brontë
 Books,Abel Magwitch is a character from which Charles Dickens novel?,Great Expectations;The Pickwick Papers;Nicholas Nickleby;Oliver Twist,Great Expectations
-Books,"The novel ""Of Mice And Men"" was written by what author? ",John Steinbeck ;George Orwell;Mark Twain ;Harper Lee,John Steinbeck 
+Books,"The novel ""Of Mice And Men"" was written by what author? ",John Steinbeck;George Orwell;Mark Twain;Harper Lee,John Steinbeck 
 Books,What is the name of Sherlock Holmes's brother?,Mycroft Holmes;Mederi Holmes;Martin Holmes;Herbie Hancock Holmes,Mycroft Holmes
 Books,In which classic novel is there a character named Homer Simpson?,The Day of the Locust;Catch-22;Of Mice and Men;A Separate Peace,The Day of the Locust
 Books,What is the title of the first Sherlock Holmes book by Arthur Conan Doyle?,A Study in Scarlet;The Sign of the Four;A Case of Identity;The Doings of Raffles Haw,A Study in Scarlet
@@ -288,7 +288,7 @@ Books,Which is NOT a book in the Harry Potter Series?,The House Elf;The Chamber 
 Books,"Who wrote the 1967 horror novel ""Rosemary's Baby""?",Ira Levin;Stephen King;Robert Bloch;Mary Shelley,Ira Levin
 Books,"In The Lies of Locke Lamora, what title is Locke known by in the criminal world?",The Thorn of Camorr;The Rose of the Marrows;The Thorn of Emberlain;The Thorn of the Marrows,The Thorn of Camorr
 Books,Which fictional English county was the setting for Thomas Hardy's novels?,Wessex;Barsetshire;Fulchester;Ambridge,Wessex
-Books,Which famous book is sub-titled 'The Modern Prometheus'?,Frankenstein;Dracula;The Strange Case of Dr. Jekyll and Mr. Hyde ;The Legend of Sleepy Hollow,Frankenstein
+Books,Which famous book is sub-titled 'The Modern Prometheus'?,Frankenstein;Dracula;The Strange Case of Dr. Jekyll and Mr. Hyde;The Legend of Sleepy Hollow,Frankenstein
 Books,"In the book ""The Martian"", how long was Mark Watney trapped on Mars (in Sols)?",549 Days;765 Days;401 Days;324 Days,549 Days
 Books,What book series published by Jim Butcher follows a wizard in modern day Chicago?,The Dresden Files;A Hat in Time;The Cinder Spires;My Life as a Teenage Wizard,The Dresden Files
 Books,"In Michael Crichton's novel ""Jurassic Park"", John Hammond meets his demise at the claws of which dinosaur?",Procompsognathus;Dilophosaurus;Tyrannosaurus Rex;Velociraptor,Procompsognathus
@@ -310,7 +310,7 @@ Television,"Which actor portrays ""Walter White"" in the series ""Breaking Bad""
 Television,"British actor David Morrissey stars as which role in ""The Walking Dead""?",The Governor;Negan;Rick Grimes;Daryl Dixon,The Governor
 Television,"In Naruto: Shippuden, which of the following elements is a ""Kekkei Tōta?""",Particle Style;Any Doujutsu;Shadow Style;Ice Style,Particle Style
 Television,"How many seasons did the Sci-Fi television show ""Stargate Universe"" have?",2;10;5;3,2
-Television,"In ""Star Trek"", what is the Ferengi's First Rule of Acquisition?","Once you have their money, you never give it back. ;Never place friendship above profit;Greed is Eternal;Never allow family to stand in the way of opportunity","Once you have their money, you never give it back. "
+Television,"In ""Star Trek"", what is the Ferengi's First Rule of Acquisition?","Once you have their money, you never give it back.;Never place friendship above profit;Greed is Eternal;Never allow family to stand in the way of opportunity","Once you have their money, you never give it back. "
 Television,"In the Star Trek universe, what color is Vulcan blood?",Green;Blue;Red;Purple,Green
 Television,"Who was the first ever actor to play ""The Doctor"" on ""Doctor Who""?",William Hartnell;David Tennant;Peter Capaldi;Tom Baker,William Hartnell
 Television,Who was the winner of the 2016 WWE Royal Rumble?,Triple H;Roman Reigns;AJ Styles;Dean Ambrose,Triple H
@@ -391,7 +391,7 @@ General Knowledge,"Which country, not including Japan, has the most people of ja
 General Knowledge,In DC comics where does the Green Arrow (Oliver Queen) live?,Star City;Central City;Gotham City;Metropolis,Star City
 General Knowledge,"In ""Resident Evil 3"", how many inventory slots does Jill have at the start of the game?",10;6;8;12,10
 General Knowledge,How many colors are there in a rainbow?,7;8;9;10,7
-General Knowledge,Which essential condiment is also known as Japanese horseradish?,Wasabi ;Mentsuyu;Karashi;Ponzu,Wasabi 
+General Knowledge,Which essential condiment is also known as Japanese horseradish?,Wasabi;Mentsuyu;Karashi;Ponzu,Wasabi 
 General Knowledge,What was the name of the WWF professional wrestling tag team made up of the wrestlers Ax and Smash?,Demolition;The Dream Team;The Bushwhackers;The British Bulldogs,Demolition
 General Knowledge,Virtual reality company Oculus VR lost which of it's co-founders in a freak car accident in 2013?,Andrew Scott Reisse;Nate Mitchell;Jack McCauley;Palmer Luckey,Andrew Scott Reisse
 General Knowledge,Red Vines is a brand of what type of candy?,Licorice;Lollipop;Chocolate;Bubblegum,Licorice
@@ -434,7 +434,7 @@ Music,What is the opening track on Lorde's Pure Heroine?,Tennis Court;Team;Royal
 Music,"Johnny Cash did a cover of this song written by lead singer of Nine Inch Nails, Trent Reznor.",Hurt;Closer;A Warm Place;Big Man with a Gun,Hurt
 Music,"Which French duo had UK hits in 1998 with the songs 'Sexy Boy', 'Kelly Watch The Stars' & 'All I Need'?",Air;Fire;Earth;Water,Air
 Music,On which Beatles album would you find the song 'Eleanor Rigby'?,Revolver;Help!;Rubber Soul;Abbey Road,Revolver
-Music,Which of the following guitarists recorded an album as a member of the Red Hot Chili Peppers?,Dave Navarro;Tom Morello ;Billy Corgan;Ed O&#039;Brien,Dave Navarro
+Music,Which of the following guitarists recorded an album as a member of the Red Hot Chili Peppers?,Dave Navarro;Tom Morello;Billy Corgan;Ed O&#039;Brien,Dave Navarro
 Music,Artis Leon Ivey Jr. is better known as which rap artist?,Coolio;Dr Dre;Snoop Dogg;Ice T,Coolio
 Music,Which Beatle led the way across the zebra crossing on the Abbey Road album cover?,John;Paul;George;Ringo,John
 Music,Which brass instrument has the lowest pitch in an orchestra?,Tuba;Trumpet;Saxophone;Trombone,Tuba
@@ -462,7 +462,7 @@ Japanese Anime & Manga,"In ""Highschool DxD"", Koneko Toujou is from what race?"
 Japanese Anime & Manga,"In the ADV (English) Dub of the anime ""Ghost Stories"", which character is portrayed as a Pentacostal Christian?",Momoko Koigakubo;Hajime Aoyama;Satsuki Miyanoshita;Mio Itai,Momoko Koigakubo
 Japanese Anime & Manga,"In ""Toriko"", which of the following Heavenly Kings has an enhanced sense of Hearing?",Zebra;Coco;Sunny;Toriko,Zebra
 Japanese Anime & Manga,"What is the last line muttered in the anime film ""The End of Evangelion""?","""How disgusting."";&quot;Idiot, I won&#039;t let you kill me!&quot;;&quot;Nothing.&quot;;&quot;Goddammit, Shinji.&quot;","""How disgusting."""
-Japanese Anime & Manga,"In the anime series ""Full Metal Alchemist"", what do Alchemists consider the greatest taboo?",Human Transmutation ;Transmuting Lead Into Gold;Using Alchemy For Crime ;Preforming Without A Permit,Human Transmutation 
+Japanese Anime & Manga,"In the anime series ""Full Metal Alchemist"", what do Alchemists consider the greatest taboo?",Human Transmutation;Transmuting Lead Into Gold;Using Alchemy For Crime;Preforming Without A Permit,Human Transmutation 
 Japanese Anime & Manga,"What year did the anime ""Himouto! Umaru-chan"" air?",2015;2014;2012;2013,2015
 Japanese Anime & Manga,"Which of the stands from ""JoJo's Bizarre Adventure"" mimics the likeness of a tomato?",Pearl Jam;Red Hot Chili Pepper;Cream Starter;Nut King Call,Pearl Jam
 Japanese Anime & Manga,"Which animation studio produced the anime adaptation of ""xxxHolic""?",Production I.G;Sunrise;Xebec;Kyoto Animation,Production I.G
@@ -470,7 +470,7 @@ Japanese Anime & Manga,"In ""Toriko"", which of the following foods is knowingly
 Japanese Anime & Manga,Which of the following films was NOT directed by Hayao Miyazaki?,Wolf Children;Princess Mononoke;Spirited Away;Kiki&#039;s Delivery Service,Wolf Children
 Japanese Anime & Manga,"Ikki Kurogane is known by what nickname at the beginning of ""Chivalry of a Failed Knight""?",Worst One;Another One;Blazer;Princess,Worst One
 Japanese Anime & Manga,"In ""Hunter x Hunter"", what are members in Killua's family known for being?",Assassins;Bandits;Hunters;Ninjas,Assassins
-Japanese Anime & Manga,"In ""Future Diary"", what is the name of Yuno Gasai's Phone Diary?",Yukiteru Diary;Murder Diary;Escape Diary ;Justice Diary ,Yukiteru Diary
+Japanese Anime & Manga,"In ""Future Diary"", what is the name of Yuno Gasai's Phone Diary?",Yukiteru Diary;Murder Diary;Escape Diary;Justice Diary ,Yukiteru Diary
 Japanese Anime & Manga,Which of the following manga have the most tankouban volumes?,Golgo 13;JoJo&#039;s Bizarre Adventure;Detective Conan;One Piece,Golgo 13
 Japanese Anime & Manga,The main protagonist of the fourth part of JoJo's Bizarre Adventure is which of the following?,Josuke Higashikata;Yoshikage kira;Koichi Hirose;Joey JoJo,Josuke Higashikata
 Japanese Anime & Manga,The name of Junko Enoshima's imposter at the beginning of Danganronpa: Trigger Happy Havoc is?,Mukuro Ikusaba;Ryota Mitarai;Ultimate Imposter;Komaru Naegi,Mukuro Ikusaba

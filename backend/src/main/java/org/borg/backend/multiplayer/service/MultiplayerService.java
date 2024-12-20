@@ -71,22 +71,12 @@ public class MultiplayerService {
     public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
-
-        String category = questionRepository.findById(questionId)
-                .map(Question::getCategory)
-                .orElseThrow(() -> new NoSuchElementException("Question not found"));
-        Stats stats = player.getStats();
-
-        stats.incrementQuestionsAnswered(category);
+        
         //Increment score if answer was correct
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
             Integer playerScore = scores.getOrDefault(playerId, 0);
             scores.put(playerId, playerScore + 1);
-            stats.incrementCorrectAnswer(category);
         }
 
         //Update questions answered
