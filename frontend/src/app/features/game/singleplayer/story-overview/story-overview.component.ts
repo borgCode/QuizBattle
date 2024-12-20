@@ -59,7 +59,7 @@ export class StoryOverviewComponent implements OnInit {
 
     openLockedDialog(title: string, unlockCondition: string) {
         this.chapterDialog.open(ContentDialogComponent, {
-            data: {storyTitle: title, message: unlockCondition, isLocked: true},
+            data: {contentTitle: title, message: unlockCondition, isLocked: true},
             maxHeight: '90vh',
             width: '300px',
         })
@@ -75,7 +75,7 @@ export class StoryOverviewComponent implements OnInit {
 
 
         const dialogRef = this.chapterDialog.open(ContentDialogComponent, {
-            data: {storyTitle: title, message: message},
+            data: {contentTitle: title, message: message},
             maxHeight: '90vh',
             width: '300px',
         })

@@ -12,7 +12,7 @@ import {NgIf} from '@angular/common';
 
 
 @Component({
-  selector: 'app-start-story-dialog',
+  selector: 'app-content-dialog',
   imports: [
     MatDialogTitle,
     MatDialogContent,
@@ -28,7 +28,7 @@ import {NgIf} from '@angular/common';
 export class ContentDialogComponent {
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { storyTitle: string, message: string, isLocked?: boolean}
+    @Inject(MAT_DIALOG_DATA) public data: { contentTitle: string, message: string, isLocked?: boolean}
   ) {
   }
 }

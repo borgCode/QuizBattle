@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
 import {ChapterService} from '../../../../api/generated/services/chapter.service';
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
 import {QuestionsService} from '../../../../api/generated/services/questions.service';
@@ -11,7 +10,7 @@ import {NgForOf, NgIf} from '@angular/common';
 import {animate, keyframes, style, transition, trigger} from '@angular/animations';
 import {MatDialog} from '@angular/material/dialog';
 import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
-import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
+import {ContentDialogComponent} from "../shared-components/content-dialog/content-dialog.component";
 
 @Component({
     selector: 'app-play-chapter',
@@ -69,7 +68,8 @@ export class PlayChapterComponent implements OnInit {
         private chapterService: ChapterService,
         private questionService: QuestionsService,
         private loginStateService: LoginStateService,
-        private resultsDialog: MatDialog
+        private resultsDialog: MatDialog,
+        private retryDialog: MatDialog
     ) {
         this.playerProgressId = this.router.getCurrentNavigation().extras.state?.['playerProgressId'];
         this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
@@ -193,7 +193,7 @@ export class PlayChapterComponent implements OnInit {
                     width: "300px"
                 })
 
-                dialogRef.afterClosed().subscribe(() => {
+                dialogRef.afterClosed().subscribe(async () => {
                     console.log("Dialog is closed")
                     const correctCount = results.filter(value => value).length;
 
@@ -202,17 +202,26 @@ export class PlayChapterComponent implements OnInit {
                     } else {
                         this.round++;
                     }
+
                     if (this.currentHealth == 0) {
-                        this.handleLostGame();
+                        const retry = await this.handleLostGame();
+                        if (!retry) {
+                            return;
+                        }
                     }
 
 
                     this.currentQuestionIndex = 0;
 
-                    this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
-                        next: () =>
-                            this.fetchQuestions()
-                    })
+                    if (this.round > this.categories.length) {
+                        this.handleChapterComplete();
+                    } else {
+                        this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({
+                            next: () =>
+                                this.fetchQuestions()
+                        })
+                    }
+
                 })
 
             }
@@ -232,16 +241,34 @@ export class PlayChapterComponent implements OnInit {
         }
     }
 
+    private handleLostGame(): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.retryDialog.open(ContentDialogComponent, {
+                data: {
+                    contentTitle: "Retry Chapter",
+                    message: "Would you like to retry the current chapter?"
+                }
+            }).afterClosed().subscribe(result => {
+                if (result === "yes") {
+                    this.resetChapter();
+                    resolve(true);
+                } else {
+                    this.router.navigate(['singleplayer/story', this.storyId])
+                    resolve(false);
+                }
+            })
+        })
 
-    private handleLostGame() {
-        //TODO proper handling with retry or back to overview
-        console.log("No more hearts, navigating back to chapter overview")
-        this.router.navigate(['singleplayer/story', this.storyId])
     }
 
-    //TODO remove after testing
-
-    clearResults() {
-        this.questionService.clearRoundResults({playerId: this.storedPlayerId}).subscribe({})
+    private resetChapter() {
+        this.currentHealth = 3;
+        this.round = 0;
     }
+
+
+    private handleChapterComplete() {
+
+    }
+
 }

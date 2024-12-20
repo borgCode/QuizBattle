@@ -57,7 +57,7 @@ export class StorySelectionComponent implements OnInit {
         break;
     }
     const dialogRef = this.startDialog.open(ContentDialogComponent, {
-      data: {storyTitle: title, message: message},
+      data: {contentTitle: title, message: message},
       maxHeight: '90vh',
       width: '300px',
     })
