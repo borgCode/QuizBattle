@@ -87,6 +87,24 @@ public class InitDataService {
 
     }
 
+    private void initializeSunkenKingdomStory() {
+        Story sunkenKingdom = createSunkenKingdomStory();
+        Story savedStory = storyRepository.save(sunkenKingdom);
+
+        List<Chapter> chapters = createSunkenKingdomChapters(savedStory);
+        chapterRepository.saveAll(chapters);
+
+    }
+
+    private void initializeSpaceSignalStory() {
+        Story spaceSignal = createSpaceSignalStory();
+        Story savedStory = storyRepository.save(spaceSignal);
+
+        List<Chapter> chapters = createSpaceSignalChapters(savedStory);
+        chapterRepository.saveAll(chapters);
+
+    }
+
     private Story createDragonsHoardStory() {
         Story story = new Story();
         story.setTitle("The Dragon's Hoard");
@@ -165,6 +183,185 @@ public class InitDataService {
                         "Treasure claimed, but the journey has changed you. What began as a quest for riches has become something much more. " +
                                 "What will you do with your newfound wealth?",
                         "dragon_hoard/chapter7.jpeg",
+                        3)
+        );
+    }
+
+    private Story createSunkenKingdomStory() {
+        Story story = new Story();
+        story.setTitle("The Sunken Kingdom");
+        story.setDescription("Ancient texts speak of an advanced civilization that vanished beneath the waves. " +
+                "Now, cutting-edge technology has detected massive structures deep in the ocean. " +
+                "A team of experts must uncover the truth behind this legendary lost kingdom.");
+        story.setIntroText("When satellite scans reveal geometric patterns on the ocean floor, it confirms " +
+                "centuries of myths about a forgotten civilization. As part of an elite research team, " +
+                "you must dive into the depths to uncover humanity's greatest archaeological mystery.");
+        story.setImagePath("sunken_kingdom/story_image.png");
+        story.setNumOfChapters(7);
+        return story;
+    }
+
+    private List<Chapter> createSunkenKingdomChapters(Story story) {
+        return List.of(
+                createChapter(story, 1, "The Ancient Scroll",
+                        "A newly discovered manuscript provides precise coordinates for the lost kingdom. " +
+                                "As researchers decipher its cryptic symbols, they realize this civilization " +
+                                "was far more advanced than anyone imagined.",
+                        new HashSet<>(Arrays.asList("History", "Geography", "Books")), "NONE",
+                        "The scroll's secrets are revealed. Each translation brings us closer to finding " +
+                                "this legendary civilization.",
+                        "sunken_kingdom/chapter1.jpeg",
+                        2),
+
+                createChapter(story, 2, "Ocean's Gateway",
+                        "The expedition reaches the coordinates. Advanced sonar reveals a massive underwater " +
+                                "plateau with clear signs of artificial construction. The team must prepare " +
+                                "for the first descent into these mysterious waters.",
+                        new HashSet<>(Arrays.asList("Science & Nature", "Film", "Animals")),
+                        "You must complete chapter 1 in order to play this chapter",
+                        "The structures below are unlike anything in recorded history. What secrets await in the depths?",
+                        "sunken_kingdom/chapter2.jpeg",
+                        2),
+
+                createChapter(story, 3, "The First Descent",
+                        "Using state-of-the-art diving equipment, the team makes their first journey to " +
+                                "the sunken ruins. They discover perfectly preserved buildings and strange " +
+                                "symbols that pulse with an unexplained energy.",
+                        new HashSet<>(Arrays.asList("General Knowledge", "Television", "Sports", "Music")),
+                        "You must complete chapter 2 in order to play this chapter",
+                        "The descent revealed wonders beyond imagination. This is just the beginning of our discoveries.",
+                        "sunken_kingdom/chapter3.jpeg",
+                        2),
+
+                createChapter(story, 4, "City of Wonders",
+                        "The team discovers an entire city preserved in an underwater dome. Advanced technology " +
+                                "seems to keep the water at bay, but how? And more importantly, what happened " +
+                                "to the people who built all this?",
+                        new HashSet<>(Arrays.asList("Japanese Anime & Manga", "Science & Nature", "History", "Film")),
+                        "You must complete chapter 3 in order to play this chapter",
+                        "The city's technological marvels challenge everything we thought we knew about ancient civilizations.",
+                        "sunken_kingdom/story_image.png",
+                        3),
+
+                createChapter(story, 5, "The Great Archive",
+                        "Deep within the city lies a vast library of crystalline devices. Each crystal seems " +
+                                "to contain stored knowledge, but accessing it requires solving complex puzzles " +
+                                "left by the ancient inhabitants.",
+                        new HashSet<>(Arrays.asList("Books", "Geography", "General Knowledge", "Music")),
+                        "You must complete chapter 4 in order to play this chapter",
+                        "The crystals hold the history of a civilization lost to time. Their story must be told.",
+                        "sunken_kingdom/chapter5.jpeg",
+                        3),
+
+                createChapter(story, 6, "The Warning",
+                        "As the team decodes more crystals, they uncover a troubling truth. The civilization " +
+                                "didn't just vanish - they were running from something. Warning messages speak " +
+                                "of a catastrophic event that forced them to abandon their city.",
+                        new HashSet<>(Arrays.asList("Television", "Science & Nature", "Animals", "Books")),
+                        "You must complete chapter 5 in order to play this chapter",
+                        "The truth behind their disappearance is more disturbing than we imagined. Are we ready " +
+                                "to face the same challenge?",
+                        "sunken_kingdom/chapter6.jpeg",
+                        3),
+
+                createChapter(story, 7, "Legacy of the Deep",
+                        "With time running out and pressure mounting from above, the team must decide what " +
+                                "to do with their discoveries. The ancient civilization left behind both " +
+                                "remarkable knowledge and a dire warning about humanity's future.",
+                        new HashSet<>(Arrays.asList("History", "Japanese Anime & Manga", "Geography", "General Knowledge")),
+                        "You must complete chapter 6 in order to play this chapter",
+                        "The lost kingdom's legacy now rests in our hands. Their past may well be crucial to our future.",
+                        "sunken_kingdom/chapter7.jpeg",
+                        3)
+        );
+    }
+
+    private Story createSpaceSignalStory() {
+        Story story = new Story();
+        story.setTitle("The Cosmic Signal");
+        story.setDescription("A mysterious signal from deep space leads humanity's best team of explorers on an " +
+                "interstellar journey to uncover its source. As they venture further into unknown space, " +
+                "they discover that the signal might hold the key to humanity's biggest questions.");
+        story.setIntroText("When Earth's most powerful telescope detects an unusual pattern of signals from " +
+                "a distant star system, it sparks humanity's greatest space expedition. As part of an elite " +
+                "crew, you must navigate through the unknown reaches of space to find the signal's source.");
+        story.setImagePath("cosmic_signal/story_image.png");
+        story.setNumOfChapters(7);
+        return story;
+    }
+
+    private List<Chapter> createSpaceSignalChapters(Story story) {
+        return List.of(
+                createChapter(story, 1, "Launch Sequence",
+                        "The most advanced spacecraft ever built stands ready for launch. As final preparations " +
+                                "are made, the crew must ensure all systems are functioning perfectly. Every detail " +
+                                "matters when preparing for humanity's most ambitious journey.",
+                        new HashSet<>(Arrays.asList("Science & Nature", "Geography", "General Knowledge")), "NONE",
+                        "The launch was successful. As Earth shrinks behind us, the mysteries of space beckon ahead. " +
+                                "The real journey is just beginning.",
+                        "cosmic_signal/chapter1.jpeg",
+                        2),
+
+                createChapter(story, 2, "Solar System Farewell",
+                        "Navigating through our solar system presents its own challenges. The ship must thread " +
+                                "its way through asteroid fields and use planetary gravity wells to gain speed. " +
+                                "Each maneuver brings the crew closer to the edge of known space.",
+                        new HashSet<>(Arrays.asList("Science & Nature", "History", "Film")),
+                        "You must complete chapter 1 in order to play this chapter",
+                        "The familiar planets are now behind us. Ahead lies the vast unknown of interstellar space.",
+                        "cosmic_signal/chapter2.jpeg",
+                        2),
+
+                createChapter(story, 3, "The Void Between",
+                        "In the darkness between stars, the crew faces psychological and technical challenges. " +
+                                "The signal grows stronger, but strange equipment malfunctions begin to occur. " +
+                                "The ship's AI detects anomalies that defy explanation.",
+                        new HashSet<>(Arrays.asList("Books", "Television", "Music", "General Knowledge")),
+                        "You must complete chapter 2 in order to play this chapter",
+                        "The mysteries deepen, but your crew's resolve remains strong. The signal's source grows closer.",
+                        "cosmic_signal/chapter3.jpeg",
+                        2),
+
+                createChapter(story, 4, "First Contact Point",
+                        "The signal leads to an uncharted star system. Unusual energy readings suggest advanced " +
+                                "technology, but no signs of current civilization. The crew must investigate a series " +
+                                "of artificial structures orbiting a dying star.",
+                        new HashSet<>(Arrays.asList("Science & Nature", "Film", "Japanese Anime & Manga", "Sports")),
+                        "You must complete chapter 3 in order to play this chapter",
+                        "These structures hold secrets beyond our understanding. Each discovery leads to more questions.",
+                        "cosmic_signal/chapter4.jpeg",
+                        3),
+
+                createChapter(story, 5, "The Ancient Station",
+                        "The signal emanates from a massive space station, clearly built by an advanced civilization. " +
+                                "But where are they now? The crew must dock with the station and prepare to board, " +
+                                "facing unknown risks in an alien environment.",
+                        new HashSet<>(Arrays.asList("History", "Books", "Animals", "Geography")),
+                        "You must complete chapter 4 in order to play this chapter",
+                        "The station has been waiting for millennia. Now, its secrets are within reach.",
+                        "cosmic_signal/chapter5.jpeg",
+                        3),
+
+                createChapter(story, 6, "Decoding the Message",
+                        "Inside the station, the crew discovers a vast archive of alien knowledge. The signal " +
+                                "appears to be part of an automated system, but its purpose remains unclear. Time " +
+                                "is running out as the station's power systems show signs of critical failure.",
+                        new HashSet<>(Arrays.asList("General Knowledge", "Music", "Television", "Science & Nature")),
+                        "You must complete chapter 5 in order to play this chapter",
+                        "The message is more profound than anyone imagined. Humanity's understanding of the universe " +
+                                "will never be the same.",
+                        "cosmic_signal/chapter6.jpeg",
+                        3),
+
+                createChapter(story, 7, "The Return Journey",
+                        "With the station's power failing, the crew must race to preserve its knowledge and escape. " +
+                                "But the greatest challenge lies in comprehending the implications of their discovery. " +
+                                "What message will they bring back to Earth?",
+                        new HashSet<>(Arrays.asList("Film", "Geography", "Japanese Anime & Manga", "History")),
+                        "You must complete chapter 6 in order to play this chapter",
+                        "You carry humanity's greatest discovery home. The signal was just the beginning - " +
+                                "our journey to the stars has truly begun.",
+                        "cosmic_signal/chapter7.jpeg",
                         3)
         );
     }
