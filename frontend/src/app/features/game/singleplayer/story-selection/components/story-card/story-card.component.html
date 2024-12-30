@@ -1,7 +1,9 @@
-<div class="card">
-  <img [src]="'data:image/jpeg;base64,' + story.base64Image">
+<div class="card h-100">
+  <div class="ratio ratio-4x3">
+    <img [src]="'data:image/jpeg;base64,' + story.base64Image">
+  </div>
   <div class="card-body">
-    <h5 class="card-title text-center">{{story.title}}</h5>
-    <p class="card-text">{{story.description}}</p>
+    <h5 class="card-title text-center">{{ story.title }}</h5>
+    <p class="card-text">{{ story.description }}</p>
   </div>
 </div>

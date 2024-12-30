@@ -76,6 +76,8 @@ public class InitDataService {
         }
 
         initializeDragonsHoardStory();
+        initializeSpaceSignalStory();
+        initializeSunkenKingdomStory();
     }
 
     private void initializeDragonsHoardStory() {
@@ -210,7 +212,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("History", "Geography", "Books")), "NONE",
                         "The scroll's secrets are revealed. Each translation brings us closer to finding " +
                                 "this legendary civilization.",
-                        "sunken_kingdom/chapter1.jpeg",
+                        "sunken_kingdom/chapter1.jpg",
                         2),
 
                 createChapter(story, 2, "Ocean's Gateway",
@@ -220,7 +222,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("Science & Nature", "Film", "Animals")),
                         "You must complete chapter 1 in order to play this chapter",
                         "The structures below are unlike anything in recorded history. What secrets await in the depths?",
-                        "sunken_kingdom/chapter2.jpeg",
+                        "sunken_kingdom/chapter2.png",
                         2),
 
                 createChapter(story, 3, "The First Descent",
@@ -230,7 +232,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("General Knowledge", "Television", "Sports", "Music")),
                         "You must complete chapter 2 in order to play this chapter",
                         "The descent revealed wonders beyond imagination. This is just the beginning of our discoveries.",
-                        "sunken_kingdom/chapter3.jpeg",
+                        "sunken_kingdom/chapter3.jpg",
                         2),
 
                 createChapter(story, 4, "City of Wonders",
@@ -250,7 +252,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("Books", "Geography", "General Knowledge", "Music")),
                         "You must complete chapter 4 in order to play this chapter",
                         "The crystals hold the history of a civilization lost to time. Their story must be told.",
-                        "sunken_kingdom/chapter5.jpeg",
+                        "sunken_kingdom/chapter5.jpg",
                         3),
 
                 createChapter(story, 6, "The Warning",
@@ -261,7 +263,7 @@ public class InitDataService {
                         "You must complete chapter 5 in order to play this chapter",
                         "The truth behind their disappearance is more disturbing than we imagined. Are we ready " +
                                 "to face the same challenge?",
-                        "sunken_kingdom/chapter6.jpeg",
+                        "sunken_kingdom/chapter6.jpg",
                         3),
 
                 createChapter(story, 7, "Legacy of the Deep",
@@ -271,7 +273,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("History", "Japanese Anime & Manga", "Geography", "General Knowledge")),
                         "You must complete chapter 6 in order to play this chapter",
                         "The lost kingdom's legacy now rests in our hands. Their past may well be crucial to our future.",
-                        "sunken_kingdom/chapter7.jpeg",
+                        "sunken_kingdom/chapter7.jpg",
                         3)
         );
     }
@@ -285,7 +287,7 @@ public class InitDataService {
         story.setIntroText("When Earth's most powerful telescope detects an unusual pattern of signals from " +
                 "a distant star system, it sparks humanity's greatest space expedition. As part of an elite " +
                 "crew, you must navigate through the unknown reaches of space to find the signal's source.");
-        story.setImagePath("cosmic_signal/story_image.png");
+        story.setImagePath("cosmic_signal/story_image.jpg");
         story.setNumOfChapters(7);
         return story;
     }
@@ -299,7 +301,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("Science & Nature", "Geography", "General Knowledge")), "NONE",
                         "The launch was successful. As Earth shrinks behind us, the mysteries of space beckon ahead. " +
                                 "The real journey is just beginning.",
-                        "cosmic_signal/chapter1.jpeg",
+                        "cosmic_signal/chapter1.jpg",
                         2),
 
                 createChapter(story, 2, "Solar System Farewell",
@@ -309,7 +311,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("Science & Nature", "History", "Film")),
                         "You must complete chapter 1 in order to play this chapter",
                         "The familiar planets are now behind us. Ahead lies the vast unknown of interstellar space.",
-                        "cosmic_signal/chapter2.jpeg",
+                        "cosmic_signal/chapter2.jpg",
                         2),
 
                 createChapter(story, 3, "The Void Between",
@@ -319,7 +321,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("Books", "Television", "Music", "General Knowledge")),
                         "You must complete chapter 2 in order to play this chapter",
                         "The mysteries deepen, but your crew's resolve remains strong. The signal's source grows closer.",
-                        "cosmic_signal/chapter3.jpeg",
+                        "cosmic_signal/chapter3.jpg",
                         2),
 
                 createChapter(story, 4, "First Contact Point",
@@ -329,7 +331,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("Science & Nature", "Film", "Japanese Anime & Manga", "Sports")),
                         "You must complete chapter 3 in order to play this chapter",
                         "These structures hold secrets beyond our understanding. Each discovery leads to more questions.",
-                        "cosmic_signal/chapter4.jpeg",
+                        "cosmic_signal/chapter4.jpg",
                         3),
 
                 createChapter(story, 5, "The Ancient Station",
@@ -339,7 +341,7 @@ public class InitDataService {
                         new HashSet<>(Arrays.asList("History", "Books", "Animals", "Geography")),
                         "You must complete chapter 4 in order to play this chapter",
                         "The station has been waiting for millennia. Now, its secrets are within reach.",
-                        "cosmic_signal/chapter5.jpeg",
+                        "cosmic_signal/chapter5.jpg",
                         3),
 
                 createChapter(story, 6, "Decoding the Message",
@@ -350,7 +352,7 @@ public class InitDataService {
                         "You must complete chapter 5 in order to play this chapter",
                         "The message is more profound than anyone imagined. Humanity's understanding of the universe " +
                                 "will never be the same.",
-                        "cosmic_signal/chapter6.jpeg",
+                        "cosmic_signal/chapter6.jpg",
                         3),
 
                 createChapter(story, 7, "The Return Journey",
@@ -361,7 +363,7 @@ public class InitDataService {
                         "You must complete chapter 6 in order to play this chapter",
                         "You carry humanity's greatest discovery home. The signal was just the beginning - " +
                                 "our journey to the stars has truly begun.",
-                        "cosmic_signal/chapter7.jpeg",
+                        "cosmic_signal/chapter7.jpg",
                         3)
         );
     }

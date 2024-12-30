@@ -18,6 +18,7 @@ public class Story {
     private String title;
     @Column(columnDefinition = "TEXT")
     private String description;
+    @Column(columnDefinition = "TEXT")
     private String introText;
     private String imagePath;
     private Integer numOfChapters;
