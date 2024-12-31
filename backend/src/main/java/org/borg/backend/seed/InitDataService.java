@@ -391,7 +391,7 @@ public class InitDataService {
 
     public void initAchievements() {
         createAchievement(
-                "Geography Master",
+                "Geography",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Globe Trotter")
@@ -418,7 +418,7 @@ public class InitDataService {
         );
         
         createAchievement(
-                "Knowledge Seeker",
+                "General Knowledge",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Curious Mind")
@@ -445,7 +445,7 @@ public class InitDataService {
         );
         
         createAchievement(
-                "Science Explorer",
+                "Science & Nature",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Lab Assistant")
@@ -473,7 +473,7 @@ public class InitDataService {
 
  
         createAchievement(
-                "Film Buff",
+                "Film",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Movie Fan")
@@ -500,7 +500,7 @@ public class InitDataService {
         );
         
         createAchievement(
-                "History Chronicler",
+                "History",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Time Traveler")
@@ -527,7 +527,7 @@ public class InitDataService {
         );
         
         createAchievement(
-                "TV Enthusiast",
+                "Television",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Channel Surfer")
@@ -554,7 +554,7 @@ public class InitDataService {
         );
         
         createAchievement(
-                "Music Maestro",
+                "Music",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Melody Maker")
@@ -582,7 +582,7 @@ public class InitDataService {
 
 
         createAchievement(
-                "Literary Connoisseur",
+                "Books",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Bookworm")
@@ -610,7 +610,7 @@ public class InitDataService {
 
 
         createAchievement(
-                "Anime Aficionado",
+                "Japanese Anime & Manga",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Otaku Initiate")
@@ -638,7 +638,7 @@ public class InitDataService {
 
 
         createAchievement(
-                "Sports Champion",
+                "Sports",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Team Player")
@@ -665,7 +665,7 @@ public class InitDataService {
         );
         
         createAchievement(
-                "Animal Expert",
+                "Animals",
                 List.of(
                         AchievementLevel.builder()
                                 .name("Animal Friend")

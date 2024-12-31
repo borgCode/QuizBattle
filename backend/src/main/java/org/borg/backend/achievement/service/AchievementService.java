@@ -47,4 +47,10 @@ public class AchievementService {
         userUnlockedAchievementRepository.save(unlockedAchievement);
         
     }
+    
+    @EventListener
+    @Async
+    public void handleCategoryCompletedEvent(AchievementEvents.CategoryCompletedEvent event) {
+        
+    }
 }
