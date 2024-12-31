@@ -28,7 +28,7 @@ public class UserUnlockedAchievement {
     
     @ManyToOne
     @JoinColumn (name = "achievement_level_id")
-    private AchievementLevel level;
+    private AchievementLevel currentLevel;
     
     
     private LocalDateTime achievedAt;
