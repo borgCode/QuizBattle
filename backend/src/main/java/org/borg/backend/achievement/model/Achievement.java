@@ -1,4 +1,4 @@
-package org.borg.backend.achievement;
+package org.borg.backend.achievement.model;
 
 
 import jakarta.persistence.*;

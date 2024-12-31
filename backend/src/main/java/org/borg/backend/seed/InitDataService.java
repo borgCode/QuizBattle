@@ -1,9 +1,9 @@
 package org.borg.backend.seed;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.achievement.Achievement;
-import org.borg.backend.achievement.AchievementLevel;
-import org.borg.backend.achievement.AchievementRepository;
+import org.borg.backend.achievement.model.Achievement;
+import org.borg.backend.achievement.model.AchievementLevel;
+import org.borg.backend.achievement.repository.AchievementRepository;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.chapter.model.Chapter;

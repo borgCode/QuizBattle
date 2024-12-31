@@ -2,7 +2,6 @@ package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.achievement.Achievement;
 import org.borg.backend.friendship.model.Friendship;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.auth.model.Role;
