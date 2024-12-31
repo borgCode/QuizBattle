@@ -6,7 +6,6 @@ import org.borg.backend.common.enums.ProgressStatus;
 import org.borg.backend.story.model.Story;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter

@@ -1,6 +1,9 @@
 package org.borg.backend.seed;
 
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.achievement.Achievement;
+import org.borg.backend.achievement.AchievementLevel;
+import org.borg.backend.achievement.AchievementRepository;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.chapter.model.Chapter;
@@ -27,6 +30,7 @@ public class InitDataService {
     private final QuestionRepository questionRepository;
     private final StoryRepository storyRepository;
     private final ChapterRepository chapterRepository;
+    private final AchievementRepository achievementRepository;
 
 
     public void initRoles() {
@@ -385,4 +389,317 @@ public class InitDataService {
     }
 
 
+    public void initAchievements() {
+        createAchievement(
+                "Geography Master",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Globe Trotter")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 geography questions correctly")
+                                .imageUrl("/images/achievements/geography-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("World Explorer")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 geography questions correctly")
+                                .imageUrl("/images/achievements/geography-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Geography Sage")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 geography questions correctly")
+                                .imageUrl("/images/achievements/geography-3.png")
+                                .build()
+                )
+        );
+        
+        createAchievement(
+                "Knowledge Seeker",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Curious Mind")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 general knowledge questions correctly")
+                                .imageUrl("/images/achievements/knowledge-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Scholar")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 general knowledge questions correctly")
+                                .imageUrl("/images/achievements/knowledge-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Polymath")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 general knowledge questions correctly")
+                                .imageUrl("/images/achievements/knowledge-3.png")
+                                .build()
+                )
+        );
+        
+        createAchievement(
+                "Science Explorer",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Lab Assistant")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 science questions correctly")
+                                .imageUrl("/images/achievements/science-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Researcher")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 science questions correctly")
+                                .imageUrl("/images/achievements/science-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Chief Scientist")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 science questions correctly")
+                                .imageUrl("/images/achievements/science-3.png")
+                                .build()
+                )
+        );
+
+ 
+        createAchievement(
+                "Film Buff",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Movie Fan")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 film questions correctly")
+                                .imageUrl("/images/achievements/film-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Film Critic")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 film questions correctly")
+                                .imageUrl("/images/achievements/film-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Cinema Legend")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 film questions correctly")
+                                .imageUrl("/images/achievements/film-3.png")
+                                .build()
+                )
+        );
+        
+        createAchievement(
+                "History Chronicler",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Time Traveler")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 history questions correctly")
+                                .imageUrl("/images/achievements/history-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Historian")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 history questions correctly")
+                                .imageUrl("/images/achievements/history-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("History Maven")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 history questions correctly")
+                                .imageUrl("/images/achievements/history-3.png")
+                                .build()
+                )
+        );
+        
+        createAchievement(
+                "TV Enthusiast",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Channel Surfer")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 television questions correctly")
+                                .imageUrl("/images/achievements/tv-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Series Expert")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 television questions correctly")
+                                .imageUrl("/images/achievements/tv-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("TV Virtuoso")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 television questions correctly")
+                                .imageUrl("/images/achievements/tv-3.png")
+                                .build()
+                )
+        );
+        
+        createAchievement(
+                "Music Maestro",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Melody Maker")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 music questions correctly")
+                                .imageUrl("/images/achievements/music-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Harmony Master")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 music questions correctly")
+                                .imageUrl("/images/achievements/music-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Symphony Sage")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 music questions correctly")
+                                .imageUrl("/images/achievements/music-3.png")
+                                .build()
+                )
+        );
+
+
+        createAchievement(
+                "Literary Connoisseur",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Bookworm")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 book questions correctly")
+                                .imageUrl("/images/achievements/books-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Literature Lover")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 book questions correctly")
+                                .imageUrl("/images/achievements/books-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Master Bibliophile")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 book questions correctly")
+                                .imageUrl("/images/achievements/books-3.png")
+                                .build()
+                )
+        );
+
+
+        createAchievement(
+                "Anime Aficionado",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Otaku Initiate")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 anime questions correctly")
+                                .imageUrl("/images/achievements/anime-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Manga Master")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 anime questions correctly")
+                                .imageUrl("/images/achievements/anime-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Anime Sage")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 anime questions correctly")
+                                .imageUrl("/images/achievements/anime-3.png")
+                                .build()
+                )
+        );
+
+
+        createAchievement(
+                "Sports Champion",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Team Player")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 sports questions correctly")
+                                .imageUrl("/images/achievements/sports-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("MVP")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 sports questions correctly")
+                                .imageUrl("/images/achievements/sports-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Sports Legend")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 sports questions correctly")
+                                .imageUrl("/images/achievements/sports-3.png")
+                                .build()
+                )
+        );
+        
+        createAchievement(
+                "Animal Expert",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Animal Friend")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Answer 5 animal questions correctly")
+                                .imageUrl("/images/achievements/animals-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Wildlife Specialist")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Answer 10 animal questions correctly")
+                                .imageUrl("/images/achievements/animals-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Zoology Master")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Answer 15 animal questions correctly")
+                                .imageUrl("/images/achievements/animals-3.png")
+                                .build()
+                )
+        );
+    }
+
+    private void createAchievement(String name, List<AchievementLevel> levels) {
+        Achievement achievement = new Achievement();
+        achievement.setName(name);
+
+        // Set the achievement reference for each level
+        levels.forEach(level -> level.setAchievement(achievement));
+        achievement.setLevels(levels);
+
+        achievementRepository.save(achievement);
+    }
 }
