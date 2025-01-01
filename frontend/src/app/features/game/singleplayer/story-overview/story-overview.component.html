@@ -9,6 +9,11 @@
             <i class="fas fa-lock"></i>
             </div>
           </ng-container>
+          <ng-container *ngIf="i < playerProgress.completedChapters" class="completed-overlay">
+            <div class="completed-overlay">
+              <i class="fa-solid fa-check fa-lg"></i>
+            </div>
+          </ng-container>
           <app-chapter-card
             [chapter]="chapter"
           ></app-chapter-card>

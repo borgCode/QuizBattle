@@ -1,11 +1,19 @@
 <div class="container g-2 p-2">
   <div class="row g-2">
-  <ng-container *ngFor="let story of stories; let i = index">
-    <div class="div col-md-4">
-      <app-story-card
-        [story]="story"
-      (click)="showStartStoryDialog(story.title, story.id, i)"></app-story-card>
-    </div>
-  </ng-container>
+    <ng-container *ngFor="let story of stories; let i = index">
+      <div class="div col-md-4"
+           (click)="showStartStoryDialog(story.title, story.id, i)">
+        <div class="story-card">
+          <ng-container *ngIf="this.playerProgress[i].progressStatus === 'COMPLETED'" class="completed-overlay">
+            <div class="completed-overlay">
+              <i class="fa-solid fa-check fa-lg"></i>
+            </div>
+          </ng-container>
+          <app-story-card
+            [story]="story">
+          </app-story-card>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </div>

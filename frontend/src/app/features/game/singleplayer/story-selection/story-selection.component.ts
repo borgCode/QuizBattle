@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {StoryService} from '../../../../api/generated/services/story.service';
 import {StoryCardComponent} from './components/story-card/story-card.component';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {StoryDto} from '../../../../api/generated/models/story-dto';
 
 import {MatDialog} from '@angular/material/dialog';
@@ -14,7 +14,8 @@ import {PlayerProgressDto} from '../../../../api/generated/models/player-progres
   selector: 'app-story-selection',
   imports: [
     StoryCardComponent,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './story-selection.component.html',
   styleUrl: './story-selection.component.css'

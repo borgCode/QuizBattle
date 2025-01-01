@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -41,23 +42,22 @@ public class ChapterService {
     @Transactional
     public InitiateProgressResponse initiateProgress(InitiateProgressRequest request) {
         log.warn("Request params:{}, {}, {}, {}", request.getChapterId(), request.getPlayerId(), request.getPlayerProgressId(), request.getStoryId());
-        
+
         PlayerProgress playerProgress = playerProgressRepository.findById(request.getPlayerProgressId())
                 .orElseThrow(() -> new EntityNotFoundException("Progress not found"));
-        
+
         playerProgress.setStartedAt(LocalDate.now());
         playerProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);
         playerProgress.setCurrentChapterId(request.getChapterId());
-        
+
         playerProgress = playerProgressRepository.save(playerProgress);
-        
+
         Chapter chapter = chapterRepository.findById(request.getChapterId())
                 .orElseThrow(() -> new EntityNotFoundException("Chapter not found"));
-        
-        
+
 
         ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(request.getPlayerProgressId(), chapter.getId());
-        
+
         if (chapterProgress == null) {
             log.warn("Creating new chapter progress");
             chapterProgress = ChapterProgress.builder()
@@ -69,11 +69,11 @@ public class ChapterService {
 
             chapterProgress = chapterProgressRepository.save(chapterProgress);
         }
-        
+
         log.warn("Chapter info: {}, {}, {}", chapterProgress.getChapter().getTitle(),
                 chapterProgress.getPlayerProgress().getPlayer().getDisplayName(),
                 chapterProgress.getStartedAt());
-        
+
         return new InitiateProgressResponse(playerProgress.getId(), chapterProgress.getId());
     }
 
@@ -82,25 +82,30 @@ public class ChapterService {
         log.warn("Update chapter progress");
         ChapterProgress chapterProgress = chapterProgressRepository.findById(chapterProgressId)
                 .orElseThrow(() -> new EntityNotFoundException("ChapterProgress not found"));
-        
+
         chapterProgress.setCompletedAt(LocalDate.now());
         chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
-        
+
         PlayerProgress playerProgress = playerProgressRepository.findById(chapterProgress.getPlayerProgress().getId())
-                        .orElseThrow(() -> new EntityNotFoundException("PlayerProgress not found"));
+                .orElseThrow(() -> new EntityNotFoundException("PlayerProgress not found"));
         log.warn(String.valueOf(playerProgress.getCompletedChapters()));
         playerProgress.setCompletedChapters(playerProgress.getCompletedChapters() + 1);
         log.warn(String.valueOf(playerProgress.getCompletedChapters()));
-        
+
+        if (playerProgress.getCompletedChapters() >= playerProgress.getStory().getNumOfChapters()) {
+            playerProgress.setCompletedAt(LocalDate.now());
+            playerProgress.setProgressStatus(ProgressStatus.COMPLETED);
+            
+            applicationEventPublisher.publishEvent(new AchievementEvents.StoryCompletedEvent(
+                    playerProgress.getPlayer().getId(),
+                    playerProgress.getStory().getTitle()
+            ));
+        }
+
         chapterProgressRepository.save(chapterProgress);
         playerProgressRepository.save(playerProgress);
+
         
-        if (playerProgress.getCompletedChapters() >= playerProgress.getStory().getNumOfChapters()) {
-            applicationEventPublisher.publishEvent(
-                    new AchievementEvents.StoryCompletedEvent(
-                            playerProgress.getPlayer().getId(),
-                            playerProgress.getStory().getTitle()));
-        }
-        
+
     }
 }

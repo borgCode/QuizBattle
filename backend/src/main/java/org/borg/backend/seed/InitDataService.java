@@ -390,9 +390,9 @@ public class InitDataService {
 
 
     public void initAchievements() {
-//        initCategoryAchievements();
-//        initStoryAchievements();
-//        initStatsAchievements();
+        initCategoryAchievements();
+        initStoryAchievements();
+        initStatsAchievements();
     }
 
     private void initCategoryAchievements() {

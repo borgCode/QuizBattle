@@ -1,0 +1,20 @@
+.story-card {
+  position: relative;
+}
+
+.completed-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  border: solid 3px #55e81c;
+}
+
+.fa-check{
+  font-size: 6rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #55e81c;
+}
