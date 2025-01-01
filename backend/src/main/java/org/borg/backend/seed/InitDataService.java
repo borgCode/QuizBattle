@@ -392,6 +392,7 @@ public class InitDataService {
     public void initAchievements() {
 //        initCategoryAchievements();
 //        initStoryAchievements();
+//        initStatsAchievements();
     }
 
     private void initCategoryAchievements() {
@@ -731,6 +732,62 @@ public class InitDataService {
                                 .requirementValue(1)
                                 .description("Complete The Sunken Kingdom story")
                                 .imageUrl("/images/achievements/sunken")
+                                .build()
+                )
+        );
+    }
+
+    private void initStatsAchievements() {
+        createAchievement(
+                "Victories",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Victorious Beginner")
+                                .level(1)
+                                .requirementValue(5)
+                                .description("Win 5 games")
+                                .imageUrl("/images/achievements/victories-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Victory Master")
+                                .level(2)
+                                .requirementValue(10)
+                                .description("Win 10 games")
+                                .imageUrl("/images/achievements/victories-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Champion")
+                                .level(3)
+                                .requirementValue(15)
+                                .description("Win 15 games")
+                                .imageUrl("/images/achievements/victories-3.png")
+                                .build()
+                )
+        );
+        
+        createAchievement(
+                "Experience",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("Game Enthusiast")
+                                .level(1)
+                                .requirementValue(10)
+                                .description("Play 10 games")
+                                .imageUrl("/images/achievements/experience-1.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Seasoned Player")
+                                .level(2)
+                                .requirementValue(20)
+                                .description("Play 20 games")
+                                .imageUrl("/images/achievements/experience-2.png")
+                                .build(),
+                        AchievementLevel.builder()
+                                .name("Veteran")
+                                .level(3)
+                                .requirementValue(30)
+                                .description("Play 30 games")
+                                .imageUrl("/images/achievements/experience-3.png")
                                 .build()
                 )
         );

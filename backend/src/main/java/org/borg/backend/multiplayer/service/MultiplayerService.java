@@ -2,6 +2,7 @@ package org.borg.backend.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.common.exceptions.GameException;
@@ -21,6 +22,7 @@ import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.dto.Question;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,7 @@ public class MultiplayerService {
     private final NotificationService notificationService;
     private final PendingSessionRepository pendingSessionRepository;
     private final PlayerRepository playerRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
@@ -331,6 +334,7 @@ public class MultiplayerService {
             players.get(1).getStats().incrementLosses();
             players.get(0).getStats().incrementWins();
         }
+        
 
         playerRepository.saveAll(players);
 
@@ -343,6 +347,8 @@ public class MultiplayerService {
 
         notificationService.sendGameWonNotification(session);
         notificationService.sendGameLostNotification(session);
+        
+        applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
 
     }
 }

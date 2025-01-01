@@ -70,12 +70,54 @@ public class AchievementService {
         UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
 
         AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
+        handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
         
+    }
+
+    @EventListener
+    @Async
+    public void handleGameWonEvent(AchievementEvents.GameWonEvent event) {
+        Achievement achievement = achievementRepository.findByName("Victories");
+
+        Player player = playerRepository.findById(event.playerId())
+                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+
+        int numOfWins = player.getStats().getNumOfWins();
+
+        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
+
+        AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, numOfWins);
+        handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
+    }
+
+    private AchievementLevel determineNewAchievementLevel(UserUnlockedAchievement unlockedAchievement, Achievement achievement, int currentProgress) {
+        if (unlockedAchievement == null) {
+            AchievementLevel firstLevel = achievement.getLevels().get(0);
+            log.warn("First level requirement: {}", firstLevel);
+            
+            return firstLevel.getRequirementValue() <= currentProgress ? firstLevel : null;
+        }
+
+        int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
+        log.warn("Current level is: {}", currentLevel);
+        if (currentLevel >= achievement.getLevels().size() - 1) {
+            return null;
+        }
+        
+        log.warn("Checking if player is eligible for next level");
+        
+        return achievement.getLevels().stream()
+                .filter(level -> level.getLevel() == currentLevel + 1)
+                .filter(level -> currentProgress >= level.getRequirementValue())
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void handleAchievementLevelUpdate(Player player, Achievement achievement, UserUnlockedAchievement unlockedAchievement, AchievementLevel newLevel) {
         if (newLevel == null) {
             log.warn("New level is null");
             return;
         }
-        
         if (unlockedAchievement == null) {
             log.warn("Not unlocked, creating new achievement");
             unlockedAchievement = UserUnlockedAchievement.builder()
@@ -89,31 +131,9 @@ public class AchievementService {
             unlockedAchievement.setCurrentLevel(newLevel);
             unlockedAchievement.setAchievedAt(LocalDateTime.now());
         }
-        
+
         userUnlockedAchievementRepository.save(unlockedAchievement);
     }
-
-    private AchievementLevel determineNewAchievementLevel(UserUnlockedAchievement unlockedAchievement, Achievement achievement, int correctAnswers) {
-        if (unlockedAchievement == null) {
-            AchievementLevel firstLevel = achievement.getLevels().get(0);
-            log.warn("First level requirement: {}", firstLevel);
-            
-            return firstLevel.getRequirementValue() <= correctAnswers ? firstLevel : null;
-        }
-
-        int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
-        log.warn("Current level is: {}", currentLevel);
-        if (currentLevel >= achievement.getLevels().size() - 1) {
-            return null;
-        }
-        
-        log.warn("Checking if player is eligible for next level");
-        
-        return achievement.getLevels().stream()
-                .filter(level -> level.getLevel() == currentLevel + 1)
-                .filter(level -> correctAnswers >= level.getRequirementValue())
-                .findFirst()
-                .orElse(null);
-    }
+    
     
 }
