@@ -4,6 +4,7 @@ package org.borg.backend.chapter.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.chapter.dto.ChapterDTO;
 import org.borg.backend.chapter.dto.InitiateProgressRequest;
 import org.borg.backend.chapter.dto.InitiateProgressResponse;
@@ -15,6 +16,7 @@ import org.borg.backend.chapter.repository.ChapterRepository;
 import org.borg.backend.common.enums.ProgressStatus;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ public class ChapterService {
     private final ChapterRepository chapterRepository;
     private final PlayerProgressRepository playerProgressRepository;
     private final ChapterProgressRepository chapterProgressRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     public ChapterDTO getChapter(Long chapterId) {
@@ -91,6 +94,13 @@ public class ChapterService {
         
         chapterProgressRepository.save(chapterProgress);
         playerProgressRepository.save(playerProgress);
+        
+        if (playerProgress.getCompletedChapters() >= playerProgress.getStory().getNumOfChapters()) {
+            applicationEventPublisher.publishEvent(
+                    new AchievementEvents.StoryCompletedEvent(
+                            playerProgress.getPlayer().getId(),
+                            playerProgress.getStory().getTitle()));
+        }
         
     }
 }

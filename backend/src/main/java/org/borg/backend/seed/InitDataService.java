@@ -133,7 +133,7 @@ public class InitDataService {
                                 "The first step is always the hardest.",
                         new HashSet<>(Arrays.asList("Science & Nature", "Sports", "Geography")), "NONE",
                         "You've answered the call. The journey is long, and the road is dangerous, but you've taken the first step towards the treasure. Stay vigilant.",
-                        "dragon_hoard/chapter1.jpeg", 
+                        "dragon_hoard/chapter1.jpeg",
                         2),
 
                 createChapter(story, 2, "The Enchanted Forest",
@@ -161,7 +161,7 @@ public class InitDataService {
                                 "But the adventurer's resolve is unwavering, knowing the treasure lies ahead.",
                         new HashSet<>(Arrays.asList("General Knowledge", "Television", "History", "Science & Nature")), "You must complete chapter 3 in order to play this chapter",
                         "You've braved the haunted peaks, where few dare to tread. Each challenge you face is one step closer to your ultimate goal.",
-                        "dragon_hoard/chapter4.jpeg", 
+                        "dragon_hoard/chapter4.jpeg",
                         3),
 
                 createChapter(story, 5, "The Bandit's Pass",
@@ -390,6 +390,11 @@ public class InitDataService {
 
 
     public void initAchievements() {
+//        initCategoryAchievements();
+//        initStoryAchievements();
+    }
+
+    private void initCategoryAchievements() {
         createAchievement(
                 "Geography",
                 List.of(
@@ -416,7 +421,7 @@ public class InitDataService {
                                 .build()
                 )
         );
-        
+
         createAchievement(
                 "General Knowledge",
                 List.of(
@@ -443,7 +448,7 @@ public class InitDataService {
                                 .build()
                 )
         );
-        
+
         createAchievement(
                 "Science & Nature",
                 List.of(
@@ -471,7 +476,7 @@ public class InitDataService {
                 )
         );
 
- 
+
         createAchievement(
                 "Film",
                 List.of(
@@ -498,7 +503,7 @@ public class InitDataService {
                                 .build()
                 )
         );
-        
+
         createAchievement(
                 "History",
                 List.of(
@@ -525,7 +530,7 @@ public class InitDataService {
                                 .build()
                 )
         );
-        
+
         createAchievement(
                 "Television",
                 List.of(
@@ -552,7 +557,7 @@ public class InitDataService {
                                 .build()
                 )
         );
-        
+
         createAchievement(
                 "Music",
                 List.of(
@@ -663,7 +668,7 @@ public class InitDataService {
                                 .build()
                 )
         );
-        
+
         createAchievement(
                 "Animals",
                 List.of(
@@ -692,10 +697,49 @@ public class InitDataService {
         );
     }
 
+    private void initStoryAchievements() {
+        createAchievement(
+                "The Dragon's Hoard",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("")
+                                .level(1)
+                                .requirementValue(1)
+                                .description("Complete The Dragon's Hoard story")
+                                .imageUrl("/images/achievements/dragon")
+                                .build()
+                )
+        );
+        createAchievement(
+                "The Cosmic Signal",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("")
+                                .level(1)
+                                .requirementValue(1)
+                                .description("Complete The Cosmic Signal story")
+                                .imageUrl("/images/achievements/cosmic")
+                                .build()
+                )
+        );
+        createAchievement(
+                "The Sunken Kingdom",
+                List.of(
+                        AchievementLevel.builder()
+                                .name("")
+                                .level(1)
+                                .requirementValue(1)
+                                .description("Complete The Sunken Kingdom story")
+                                .imageUrl("/images/achievements/sunken")
+                                .build()
+                )
+        );
+    }
+
     private void createAchievement(String name, List<AchievementLevel> levels) {
         Achievement achievement = new Achievement();
         achievement.setName(name);
-        
+
         levels.forEach(level -> level.setAchievement(achievement));
         achievement.setLevels(levels);
 

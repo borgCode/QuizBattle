@@ -87,6 +87,7 @@ public class QuestionService {
         if (isLastQuestion) {
             log.warn("Publishing category complete event");
             applicationEventPublisher.publishEvent(new AchievementEvents.CategoryCompletedEvent(request.getPlayerId(), question.getCategory()));
+            
             questionSessionService.finishSession(request.getPlayerId());
         }
 
