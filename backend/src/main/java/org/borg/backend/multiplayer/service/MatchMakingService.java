@@ -28,17 +28,12 @@ public class MatchMakingService {
 
     public void findMatch(Long playerId) {
         synchronized (matchmakingQueue) {
-            log.warn("Finding first player in queue");
             Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
 
             if (opponentId.isPresent()) {
-                log.warn("Found opponent in queue");
                 matchmakingQueue.remove(opponentId.get());
-
                 handleMatchMakingRequest(playerId, opponentId);
-
             } else {
-                log.warn("Sending waiting to players");
                 matchmakingQueue.add(playerId);
                 messagingTemplate.convertAndSend("/topic/match" + playerId,
                         MatchmakingResponse.waiting());

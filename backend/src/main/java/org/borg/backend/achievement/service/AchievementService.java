@@ -14,10 +14,12 @@ import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Slf4j
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class AchievementService {
@@ -70,10 +72,12 @@ public class AchievementService {
         AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
         
         if (newLevel == null) {
+            log.warn("New level is null");
             return;
         }
         
         if (unlockedAchievement == null) {
+            log.warn("Not unlocked, creating new achievement");
             unlockedAchievement = UserUnlockedAchievement.builder()
                     .player(player)
                     .achievement(achievement)
@@ -81,6 +85,7 @@ public class AchievementService {
                     .achievedAt(LocalDateTime.now())
                     .build();
         } else {
+            log.warn("Already unlocked, updating to new level is applicable, {}", newLevel);
             unlockedAchievement.setCurrentLevel(newLevel);
             unlockedAchievement.setAchievedAt(LocalDateTime.now());
         }
@@ -91,13 +96,18 @@ public class AchievementService {
     private AchievementLevel determineNewAchievementLevel(UserUnlockedAchievement unlockedAchievement, Achievement achievement, int correctAnswers) {
         if (unlockedAchievement == null) {
             AchievementLevel firstLevel = achievement.getLevels().get(0);
+            log.warn("First level requirement: {}", firstLevel);
+            
             return firstLevel.getRequirementValue() <= correctAnswers ? firstLevel : null;
         }
 
         int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
+        log.warn("Current level is: {}", currentLevel);
         if (currentLevel >= achievement.getLevels().size() - 1) {
             return null;
         }
+        
+        log.warn("Checking if player is eligible for next level");
         
         return achievement.getLevels().stream()
                 .filter(level -> level.getLevel() == currentLevel + 1)

@@ -133,16 +133,11 @@ public class QuestionService {
     
 
     public List<String> getThreeRandomCategories(Long sessionId) {
-        log.warn("Session ID: " + sessionId);
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
         List<String> allCategories = questionRepository.findAllCategories();
-
-        for (String allCategory : allCategories) {
-            log.warn(allCategory);
-        }
-
+        
         List<String> categoriesNotPlayed = allCategories.stream()
                 .filter(category -> !session.getPlayedCategories().contains(category))
                 .collect(Collectors.toList());

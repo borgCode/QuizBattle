@@ -29,19 +29,16 @@ public class MultiplayerController {
 
     @MessageMapping("/matchmaking/find")
     public void findMatch(long playerId) {
-        log.warn("Receiving matchmaking request for player: {}", playerId);
         matchMakingService.findMatch(playerId);
     }
 
     @MessageMapping("/matchmaking/accept")
     public void acceptMatch(@Payload MatchDecision matchDecision) {
-        log.warn("{}: has accepted session: {}", matchDecision.getPlayerId(), matchDecision.getPendingSessionId());
         matchMakingService.handleMatchResponse(matchDecision.getPendingSessionId(), matchDecision.getPlayerId(), true);
     }
 
     @MessageMapping("/matchmaking/decline")
     public void declineMatch(@Payload MatchDecision matchDecision) {
-        log.warn("{}: has declined session: {}", matchDecision.getPlayerId(), matchDecision.getPendingSessionId());
         matchMakingService.handleMatchResponse(matchDecision.getPendingSessionId(), matchDecision.getPlayerId(), false);
     }
 
