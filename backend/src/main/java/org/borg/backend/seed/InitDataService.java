@@ -695,8 +695,7 @@ public class InitDataService {
     private void createAchievement(String name, List<AchievementLevel> levels) {
         Achievement achievement = new Achievement();
         achievement.setName(name);
-
-        // Set the achievement reference for each level
+        
         levels.forEach(level -> level.setAchievement(achievement));
         achievement.setLevels(levels);
 

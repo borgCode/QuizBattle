@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserUnlockedAchievementRepository extends JpaRepository<UserUnlockedAchievement, Long> {
     boolean existsByPlayerAndAchievement(Player player, Achievement achievement);
-
-    UserUnlockedAchievement findFirstByPlayerAndAchievementOrderByLevelDesc(Player player, Achievement achievement);
+    
+    UserUnlockedAchievement findByPlayerAndAchievement(Player player, Achievement achievement);
 }

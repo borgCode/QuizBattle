@@ -65,7 +65,7 @@ public class AchievementService {
 
         int correctAnswers = player.getStats().getCategoryStats().get(event.category()).getCorrect();
 
-        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findFirstByPlayerAndAchievementOrderByLevelDesc(player, achievement);
+        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
 
         AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
         
@@ -86,8 +86,6 @@ public class AchievementService {
         }
         
         userUnlockedAchievementRepository.save(unlockedAchievement);
-        
-
     }
 
     private AchievementLevel determineNewAchievementLevel(UserUnlockedAchievement unlockedAchievement, Achievement achievement, int correctAnswers) {
@@ -106,6 +104,6 @@ public class AchievementService {
                 .filter(level -> correctAnswers >= level.getRequirementValue())
                 .findFirst()
                 .orElse(null);
-
     }
+    
 }

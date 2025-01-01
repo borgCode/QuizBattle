@@ -3,6 +3,7 @@ package org.borg.backend.question.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.multiplayer.service.MultiplayerService;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
@@ -11,6 +12,7 @@ import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.repository.QuestionRepository;
 import org.borg.backend.question.dto.*;
 import org.borg.backend.question.mapper.QuestionMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class QuestionService {
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final QuestionSessionService questionSessionService;
     private final PlayerRepository playerRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     public List<QuestionDTO> getPlayerSessionQuestions(Long playerId) {
@@ -75,10 +78,15 @@ public class QuestionService {
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), request.getQuestionId(), request.getAnswer());
+        Question question = questionRepository.findById(request.getQuestionId())
+                .orElseThrow(() -> new NoSuchElementException("Question not found"));
+
+        AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), question, request.getAnswer());
 
         boolean isLastQuestion = questionSessionService.saveMultiplayerAnswer(request.getPlayerId(), validationResponse.isCorrect());
         if (isLastQuestion) {
+            log.warn("Publishing category complete event");
+            applicationEventPublisher.publishEvent(new AchievementEvents.CategoryCompletedEvent(request.getPlayerId(), question.getCategory()));
             questionSessionService.finishSession(request.getPlayerId());
         }
 
@@ -93,10 +101,8 @@ public class QuestionService {
 
     }
 
-    private AnswerValidationResponse validateAnswer(Long playerId, Long questionId, String answer) {
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new NoSuchElementException("Question not found"));
-
+    private AnswerValidationResponse validateAnswer(Long playerId, Question question, String answer) {
+        
         boolean isCorrect;
         if (answer == null) {
             isCorrect = false;
@@ -167,10 +173,13 @@ public class QuestionService {
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), request.getQuestionId(), request.getAnswer());
+        Question question = questionRepository.findById(request.getQuestionId())
+                .orElseThrow(() -> new NoSuchElementException("Question not found"));
+
+        AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), question, request.getAnswer());
 
         questionSessionService.saveSingleplayerAnswer(request.getPlayerId(), validationResponse.isCorrect());
-
+        
 
         return validationResponse;
     }

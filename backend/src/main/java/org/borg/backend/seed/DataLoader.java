@@ -16,7 +16,7 @@ public class DataLoader implements CommandLineRunner {
 //        initDataService.initRoles();
 //        initDataService.initQuestions();
 //        initDataService.initStoryData();
-        initDataService.initAchievements();
+//        initDataService.initAchievements();
 
     }
 }
