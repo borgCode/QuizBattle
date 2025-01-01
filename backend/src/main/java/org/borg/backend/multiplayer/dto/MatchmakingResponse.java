@@ -5,14 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.borg.backend.common.enums.MatchStatus;
 
-/**
- * Response object for matchmaking operations.
- * Field usage by status:
- * - WAITING: No additional fields
- * - MATCHED: pendingSessionId, opponentDisplayName
- * - ACCEPTED: sessionId, opponentDisplayName
- * - DECLINED: No additional fields
- */
 
 @Getter
 @AllArgsConstructor

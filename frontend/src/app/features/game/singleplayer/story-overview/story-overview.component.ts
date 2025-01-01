@@ -68,9 +68,9 @@ export class StoryOverviewComponent implements OnInit {
     openChapterDialog(title: string, id: number, index: number) {
         let message: string
         if (this.playerProgress.completedChapters <= index) {
-            message = "Would you like to start this story?"
+            message = "Would you like to start this chapter?"
         } else {
-            message = "You've already completed this story, do you want to play it again?"
+            message = "You've already completed this chapter, do you want to play it again?"
         }
 
 

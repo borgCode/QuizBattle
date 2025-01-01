@@ -3,20 +3,20 @@ package org.borg.backend.achievement.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.achievement.model.AchievementLevel;
-import org.borg.backend.achievement.model.UserUnlockedAchievement;
+import org.borg.backend.achievement.model.*;
 import org.borg.backend.achievement.repository.AchievementRepository;
 import org.borg.backend.achievement.events.AchievementEvents;
-import org.borg.backend.achievement.model.Achievement;
 import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Transactional
@@ -27,6 +27,11 @@ public class AchievementService {
     private final AchievementRepository achievementRepository;
     private final PlayerRepository playerRepository;
     private final UserUnlockedAchievementRepository userUnlockedAchievementRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
+    public List<UserUnlockedAchievementDTO> getUnlockedAchievements(Long playerId) {
+        return null;
+    }
 
     @EventListener
     @Async
@@ -53,6 +58,8 @@ public class AchievementService {
         log.warn("Saving {} to DB", unlockedAchievement.getAchievement().getName());
 
         userUnlockedAchievementRepository.save(unlockedAchievement);
+        
+        sendAchievementNotification(player, unlockedAchievement);
 
     }
 
@@ -133,7 +140,19 @@ public class AchievementService {
         }
 
         userUnlockedAchievementRepository.save(unlockedAchievement);
+
+        sendAchievementNotification(player, unlockedAchievement);
     }
-    
-    
+
+
+    private void sendAchievementNotification(Player player, UserUnlockedAchievement unlockedAchievement) {
+        AchievementNotification achievementNotification = AchievementNotification.builder()
+                .achievementName(unlockedAchievement.getAchievement().getName())
+                .achievementDescription(unlockedAchievement.getCurrentLevel().getDescription())
+                .earnedAt(unlockedAchievement.getAchievedAt())
+                .build();
+        
+        
+        simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
+    }
 }
