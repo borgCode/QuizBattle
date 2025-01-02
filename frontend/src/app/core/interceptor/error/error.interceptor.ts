@@ -2,11 +2,13 @@ import {Injectable} from '@angular/core';
 import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {AlertMessageService} from '../../services/alert-message/alert-message.service';
+import {Router} from '@angular/router';
 
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  constructor(private alertMessageService: AlertMessageService) {
+  constructor(private alertMessageService: AlertMessageService,
+              private router: Router) {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -30,6 +32,9 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         let errorMessage = 'An unexpected error occurred';
         if (errorBody.businessErrorCode) {
+
+          const sessionId = req.body?.sessionId;
+
           switch (errorBody.businessErrorCode) {
             case 300:
               this.alertMessageService.show('Current password is incorrect', 'error');
@@ -66,6 +71,33 @@ export class ErrorInterceptor implements HttpInterceptor {
               break;
             case 325:
               this.alertMessageService.show('You already have an ongoing match with this player!', 'error');
+              break;
+            case 326:
+              this.alertMessageService.show("It's not your turn to play!", 'error');
+              if (sessionId) {
+                this.router.navigate(['multiplayer', sessionId]);
+              }
+              break;
+            case 327:
+              this.alertMessageService.show("You must wait for your opponent to finish their questions", 'error');
+              if (sessionId) {
+                this.router.navigate(['multiplayer', sessionId]);
+              }
+              break;
+            case 328:
+              this.alertMessageService.show('You must answer the current questions before selecting a new category', 'error');
+              if (sessionId) {
+                this.router.navigate(['multiplayer', sessionId]);
+              }
+              break;
+            case 329:
+              this.alertMessageService.show('The question does not belong to this session', 'error');
+              if (sessionId) {
+                this.router.navigate(['multiplayer', sessionId]);
+              }
+              break;
+            case 330:
+              this.alertMessageService.show("You've already answered this question!", 'error');
               break;
             case 413:
               this.alertMessageService.show('The file size is too big! Max 500kb', 'error');

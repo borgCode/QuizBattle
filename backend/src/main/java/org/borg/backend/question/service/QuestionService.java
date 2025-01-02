@@ -113,7 +113,7 @@ public class QuestionService {
         
         if (questionSessionService.isQuestionAnswered(request.getPlayerId(), request.getQuestionId())) {
             log.warn("Attempt to answer already answered question: {}", request.getQuestionId());
-            throw new IllegalStateException("Question has already been answered");
+            throw new GameException(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED);
         }
         
         Question question = questionRepository.findById(request.getQuestionId())
