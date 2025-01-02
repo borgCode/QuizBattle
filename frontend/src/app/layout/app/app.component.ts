@@ -1,8 +1,10 @@
-import { Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {NavbarComponent} from '../../core/components/navbar/navbar.component';
 import {RouterOutlet} from '@angular/router';
 import {AlertMessageComponent} from '../../core/alert-message/notification/alert-message.component';
+import {LoginStateService} from '../../core/services/login-state-service/login-state.service';
+import {WebSocketService} from '../../core/websocket/web-socket.service';
 
 
 @Component({
@@ -12,7 +14,23 @@ import {AlertMessageComponent} from '../../core/alert-message/notification/alert
   templateUrl: 'app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'Quiz Battle';
+export class AppComponent implements OnInit {
+
+  constructor(
+    private loginStateService: LoginStateService,
+    private webSocketService: WebSocketService
+  ) {
+  }
+
+  ngOnInit() {
+    this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.webSocketService.initWebSocketConnection();
+      } else {
+        this.webSocketService.disconnectWebSocket();
+      }
+    })
+  }
+
 
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Client} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {TokenService} from '../services/token/token.service';
@@ -13,11 +13,10 @@ export class WebSocketService {
   constructor(
     private tokenService: TokenService,
   ) {
-    this.initWebSocketConnection();
   }
 
 
-  private initWebSocketConnection() {
+  public initWebSocketConnection() {
     const token = this.tokenService?.token;
     if (token) {
       const websocket = new SockJS('http://localhost:8080/socket');
@@ -27,7 +26,8 @@ export class WebSocketService {
           Authorization: 'Bearer ' + token
         },
         debug: msg => {
-          console.log(msg); },
+          console.log(msg);
+        },
         onConnect: () => {
           console.log("Connected to websocket");
         },
@@ -44,6 +44,11 @@ export class WebSocketService {
 
 
   }
+
+  disconnectWebSocket() {
+    this.stompClient.deactivate();
+  }
+
   sendMessage(destination: string, message: any) {
     console.log(message);
     console.log(JSON.stringify(message));
