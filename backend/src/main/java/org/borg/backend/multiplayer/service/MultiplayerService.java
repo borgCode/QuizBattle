@@ -166,9 +166,13 @@ public class MultiplayerService {
         players.get(1).setStats(player2Stats);
 
         playerRepository.saveAll(players);
-
-        applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
-
+        
+        log.warn("Winner id: {}", session.getWinnerId());
+        
+        
+        if (!session.getIsTie()) {
+            applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
+        }
     }
 
     private void sendGameOverNotifications(MultiplayerSession session) {
