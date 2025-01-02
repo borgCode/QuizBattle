@@ -19,8 +19,11 @@ public enum BusinessErrorCodes {
     FRIENDSHIP_NOT_FOUND(323, HttpStatus.BAD_REQUEST, "The friendship was not found"),
     REMATCH_REQUEST_ALREADY_SENT(324, HttpStatus.BAD_REQUEST, "Rematch request already sent"),
     GAME_ALREADY_ONGOING(325, HttpStatus.BAD_REQUEST, "Players already have a game against each other ongoing"),
-    PROFILE_PIC_TOO_LARGE(413, HttpStatus.PAYLOAD_TOO_LARGE, "File size exceeds the maximum allowed limit of 500KB")
-    ;
+    NOT_PLAYER_TURN(326, HttpStatus.BAD_REQUEST, "It's not your turn"),
+    MUST_WAIT_FOR_OPPONENT(327, HttpStatus.BAD_REQUEST, "You must wait for your opponent to finish their questions"),
+    MUST_ANSWER_EXISTING_QUESTIONS(328, HttpStatus.BAD_REQUEST, "You must answer the current questions before selecting a new category"),
+    INVALID_QUESTION(329, HttpStatus.BAD_REQUEST, "The question not does belong to this session"),
+    PROFILE_PIC_TOO_LARGE(413, HttpStatus.PAYLOAD_TOO_LARGE, "File size exceeds the maximum allowed limit of 500KB");
 
     private final int code;
     private final HttpStatus httpStatus;

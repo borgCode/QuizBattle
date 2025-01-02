@@ -41,14 +41,13 @@ public class QuestionSessionService {
         PlayerSession existingSession = quizSessions.get(playerId);
 
         if (existingSession != null) {
-            if (!existingSession.currentCategory.equals(category) && existingSession.answers.size() < existingSession.questionIds.size()) {
+            if (existingSession.answers.size() < 3) {
                 log.warn("Attempted to start new category while current category incomplete");
                 return existingSession.getQuestionIds();
             }
-            if (existingSession.currentCategory.equals(category)) {
-                log.warn("Attempted to replay category: {}", category);
-                return Collections.emptyList();
-            }
+            log.info("Round completed, removing session for player: {}", playerId);
+            quizSessions.remove(playerId);
+            return Collections.emptyList();
         }
         
         PlayerSession session = new PlayerSession(questionIds, category);
@@ -120,6 +119,10 @@ public class QuestionSessionService {
     public List<Long> getSessionQuestions(Long playerId) {
         PlayerSession session = quizSessions.get(playerId);
         if (session == null) {
+            return Collections.emptyList();
+        }
+        if (session.getAnswers().size() >= 3) {
+            quizSessions.remove(playerId);
             return Collections.emptyList();
         }
         return session.getQuestionIds();

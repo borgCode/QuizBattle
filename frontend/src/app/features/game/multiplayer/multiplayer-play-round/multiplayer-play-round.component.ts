@@ -7,6 +7,7 @@ import {QuestionsService} from '../../../../api/generated/services/questions.ser
 import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
 import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
 import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
+import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-multiplayer-play-round',
@@ -44,7 +45,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       this.sessionId = value['sessionId'];
     });
 
-    console.log(this.storedPlayerId)
 
     this.questionService.getPlayerSessionQuestions({playerId: this.storedPlayerId}).subscribe({
       next: questions => {
@@ -64,21 +64,31 @@ export class MultiplayerPlayRoundComponent implements OnInit {
               next: questions => {
                 this.questions = questions;
                 this.isRestoredSession = true;
+              },
+              error: err => {
+                console.log('No active questions found, returning to score screen');
+                this.router.navigate(['multiplayer', this.sessionId]);
               }
             })
 
           } else {
-            // this.resetState();
-
-            console.log(this.sessionId)
-
-            this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
-              next: categories =>
-                this.categories = categories
-            })
+            this.loadCategorySelection();
           }
         }
+      },
+      error: err => {
+        console.error('Error getting session questions:', err);
+        this.router.navigate(['multiplayer', this.sessionId]);
       }
+    })
+  }
+
+  private loadCategorySelection() {
+    this.resetState();
+
+    this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
+      next: categories =>
+        this.categories = categories
     })
   }
 
@@ -86,18 +96,14 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     this.isRestoredSession = false;
     this.selectedCategory = null;
     this.questions = [];
+    this.answerIsCorrect = null;
+    this.correctAnswerIndex = null;
   }
 
 
   onCategorySelected(category: string) {
     this.selectedCategory = category;
-    this.fetchQuestions(category);
-  }
 
-  private fetchQuestions(category: string) {
-    console.log(category)
-    console.log(this.sessionId)
-    console.log(this.storedPlayerId)
     this.questionService.getNewQuestionsForCategory({
       body: {
         category: category,
@@ -106,12 +112,22 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       }
     }).subscribe({
       next: data => {
-        this.questions = data;
-        this.isRestoredSession = true;
+        if (data && data.length > 0) {
+          this.questions = data;
+          this.isRestoredSession = true;
+
+        } else {
+          console.log("This category has already been played, please choose another");
+          this.selectedCategory = null;
+          this.loadCategorySelection();
+        }
+      },
+      error: err => {
+        console.log(err)
       }
     });
-
   }
+
 
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
 
@@ -128,9 +144,11 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       next: (response: AnswerValidationResponse) => {
         this.answerIsCorrect = response.correct;
         this.correctAnswerIndex = response.correctAnswerIndex
+      },
+      error: err => {
+        console.log(err)
       }
     })
-
   }
 
   resetQuestionState() {

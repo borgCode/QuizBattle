@@ -20,8 +20,10 @@ import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.question.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.dto.Question;
+import org.borg.backend.question.service.QuestionSessionService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,7 @@ public class MultiplayerService {
     private final PendingSessionRepository pendingSessionRepository;
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final QuestionSessionService questionSessionService;
 
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
@@ -76,21 +79,18 @@ public class MultiplayerService {
     public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-
-        //Increment score if answer was correct
+        
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
             Integer playerScore = scores.getOrDefault(playerId, 0);
             scores.put(playerId, playerScore + 1);
         }
-
-        //Update questions answered
+        
         Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
         questionsAnswered.put(playerId, questionsAnswered.get(playerId) + 1);
-
-        //Update which question out of the 18 is correct
+        
         session.getQuestionResults().add(new PlayerQuestionResult(playerId, questionId, session.getQuestionsAnswered().get(playerId) - 1, isCorrect));
-        //Find opponent in session
+        
         Player opponent = session.getPlayers().stream()
                 .filter(p -> !p.getId().equals(playerId))
                 .findFirst()
@@ -102,15 +102,15 @@ public class MultiplayerService {
             sendGameOverNotifications(session);
 
         } else {
-            //Update question index to manage turns
+            
             session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
-
-            //Determine if it's the opponent's turn
+            
             if (session.getCurrentQuestionIndex() == 0) {
                 if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
                     session.setCurrentPlayerTurn(opponent);
                 } else {
                     session.getQuestionIds().clear();
+                    questionSessionService.finishSession(playerId);
                 }
 
             }
@@ -180,10 +180,8 @@ public class MultiplayerService {
         }
     }
 
-    public void updateSessionQuestionsAndCategory(Long sessionId, List<Question> questions, String selectedCategory) {
-        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
-
+    public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
+        
         session.getQuestionIds().clear();
         for (Question question : questions) {
             session.getQuestionIds().add(question.getId());
@@ -208,6 +206,27 @@ public class MultiplayerService {
             multiplayerSessionDTOS.add(multiplayerSessionDTO);
         }
         return multiplayerSessionDTOS;
+    }
+
+    public void validatePlayerTurn(MultiplayerQuestionsRequest request, MultiplayerSession session) {
+        if (!session.getCurrentPlayerTurn().getId().equals(request.getPlayerId())) {
+            throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN);
+        }
+
+        Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
+        Long opponentId = session.getPlayers().stream()
+                .filter(p -> !p.getId().equals(request.getPlayerId()))
+                .findFirst()
+                .map(Player::getId)
+                .orElseThrow();
+        
+        if (questionsAnswered.get(request.getPlayerId()) > questionsAnswered.get(opponentId)) {
+            throw new GameException(BusinessErrorCodes.MUST_WAIT_FOR_OPPONENT);
+        }
+
+        if (!session.getQuestionIds().isEmpty()) {
+            throw new GameException(BusinessErrorCodes.MUST_ANSWER_EXISTING_QUESTIONS);
+        }
     }
 
     public void acknowledgeGameOver(Long sessionId, Long playerId) {
@@ -362,5 +381,7 @@ public class MultiplayerService {
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
 
     }
+
+   
 }
             

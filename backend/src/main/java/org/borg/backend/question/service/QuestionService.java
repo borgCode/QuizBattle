@@ -4,6 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
+import org.borg.backend.common.enums.BusinessErrorCodes;
+import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.multiplayer.service.MultiplayerService;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
@@ -44,9 +46,15 @@ public class QuestionService {
         return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
     }
     
+    @Transactional
     public List<QuestionDTO> getNewQuestionsForCategory(MultiplayerQuestionsRequest request) {
-        String currentCategory = questionSessionService.getCurrentCategory(request.getPlayerId());
+
+        MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
+                .orElseThrow(() -> new NoSuchElementException("Session not found"));
         
+        multiplayerService.validatePlayerTurn(request, session);
+        
+        String currentCategory = questionSessionService.getCurrentCategory(request.getPlayerId());
         if (currentCategory != null && currentCategory.equalsIgnoreCase(request.getCategory())) {
             log.warn("Attempt to replay category: {}", request.getCategory());
             return Collections.emptyList();
@@ -61,7 +69,7 @@ public class QuestionService {
         
         questionSessionService.initializeSession(request.getPlayerId(), questionIds, request.getCategory());
 
-        multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, request.getCategory());
+        multiplayerService.updateSessionQuestionsAndCategory(session, questions, request.getCategory());
 
         return QuestionMapper.multipleToDTO(questions);
     }
@@ -84,11 +92,25 @@ public class QuestionService {
         return QuestionMapper.multipleToDTO(questions);
     }
 
+    @Transactional
     public AnswerValidationResponse validateMultiplayerAnswer(MultiplayerAnswerValidationRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
+        
 
+        MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
+                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+        
+        if (!session.getCurrentPlayerTurn().getId().equals(request.getPlayerId())) {
+            throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN);
+        }
+        
+        if (!session.getQuestionIds().contains(request.getQuestionId())) {
+            throw new GameException(BusinessErrorCodes.INVALID_QUESTION);
+        }
+        
+        
         if (questionSessionService.isQuestionAnswered(request.getPlayerId(), request.getQuestionId())) {
             log.warn("Attempt to answer already answered question: {}", request.getQuestionId());
             throw new IllegalStateException("Question has already been answered");
