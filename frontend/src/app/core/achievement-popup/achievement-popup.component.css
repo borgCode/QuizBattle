@@ -1,1 +1,5 @@
-
+.achievement-container {
+  width: 230px;
+  border: goldenrod 2px solid;
+  overflow: hidden;
+}

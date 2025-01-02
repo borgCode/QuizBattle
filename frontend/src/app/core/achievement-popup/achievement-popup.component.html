@@ -3,13 +3,9 @@
   <div class="card">
     <img src="https://placehold.co/200" alt="Achievement">
     <div class="card-body">
-      <h5 class="card-title">Achievement Title</h5>
+      <h5 class="card-title">Achievement Earned!</h5>
+      <h6 class="card-title">{{ currentAchievement.achievementName }}</h6>
+      <div class="p card-text">{{currentAchievement.achievementDescription}}</div>
     </div>
   </div>
-</div>
-
-<!-- Test buttons -->
-<div class="controls">
-  <button (click)="showPopup()">Show Achievement</button>
-  <button (click)="hidePopup()">Hide Achievement</button>
 </div>

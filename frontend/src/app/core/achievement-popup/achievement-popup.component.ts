@@ -54,8 +54,10 @@ export class AchievementPopupComponent implements OnInit, OnDestroy {
     this.subscription = this.achievementService.achievements$.subscribe(
       achievement => {
         this.currentAchievement = achievement;
+        this.showPopup();
         setTimeout(() => {
           this.currentAchievement = undefined;
+          this.hidePopup()
         }, 5000);
       }
     );
@@ -65,16 +67,10 @@ export class AchievementPopupComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  togglePopup() {
-    this.isVisible = !this.isVisible;
-  }
-
-  // Method to show popup
   showPopup() {
     this.isVisible = true;
   }
 
-  // Method to hide popup
   hidePopup() {
     this.isVisible = false;
   }
