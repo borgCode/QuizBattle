@@ -243,8 +243,6 @@ public class MultiplayerService {
 
     @Transactional
     public void requestRematch(RematchRequest rematchRequest) {
-
-
         log.warn("Rematch request: {}", rematchRequest);
         MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
@@ -270,8 +268,10 @@ public class MultiplayerService {
         }
 
         if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), opponentPlayer.getId())) {
+            log.warn("Sending player id: {} opponent id: {}", sendingPlayer.getId(), opponentPlayer.getId());
             throw new GameException(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT);
         }
+        log.warn("Creating pending session");
         
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(opponentPlayer.getId(), sendingPlayer.getId());
         log.warn("Pending session is: " + pendingSession);
@@ -286,8 +286,7 @@ public class MultiplayerService {
 
             //Delete original notification
             notificationService.deleteMatchRequestNotification(playerId, pendingSession.getId());
-
-
+            
             pendingSessionRepository.delete(pendingSession);
 
 

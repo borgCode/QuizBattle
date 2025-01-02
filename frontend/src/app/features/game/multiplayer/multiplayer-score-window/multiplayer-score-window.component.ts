@@ -55,10 +55,18 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.initStoredPlayerId();
-    this.initBoxes();
-    this.getGameState();
+    this.activatedRoute.params.subscribe(value => {
+      this.sessionId = value['sessionId'];
+      this.resetGameComponents();
+      this.initStoredPlayerId();
+      this.initBoxes();
+      this.getGameState();
+    })
+  }
 
+  private resetGameComponents() {
+    this.isGameOver = false;
+    this.boxes = [];
   }
 
   private initStoredPlayerId() {
@@ -78,50 +86,48 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   private getGameState() {
-    this.activatedRoute.params.subscribe(value => {
-      this.sessionId = value['sessionId'];
 
-      this.multiplayerService.getGameState({sessionId: this.sessionId}).subscribe({
-        next: gameState => {
-          this.gameState = gameState;
+    this.multiplayerService.getGameState({sessionId: this.sessionId}).subscribe({
+      next: gameState => {
+        this.gameState = gameState;
 
-          this.opponentIndex = this.gameState.playerDTOS.findIndex(player =>
-            player.id !== this.storedPlayerId
-          );
+        this.opponentIndex = this.gameState.playerDTOS.findIndex(player =>
+          player.id !== this.storedPlayerId
+        );
 
-          this.playerTotalScore = gameState.scores[gameState.playerDTOS[(this.opponentIndex + 1) % 2].id];
-          this.opponentTotalScore = gameState.scores[gameState.playerDTOS[this.opponentIndex].id];
+        this.playerTotalScore = gameState.scores[gameState.playerDTOS[(this.opponentIndex + 1) % 2].id];
+        this.opponentTotalScore = gameState.scores[gameState.playerDTOS[this.opponentIndex].id];
 
-          this.opponentDisplayName = gameState.playerDTOS[this.opponentIndex].displayName;
-          this.opponentAvatar = 'data:image/jpeg;base64,' + gameState.playerDTOS[this.opponentIndex].base64Image;
+        this.opponentDisplayName = gameState.playerDTOS[this.opponentIndex].displayName;
+        this.opponentAvatar = 'data:image/jpeg;base64,' + gameState.playerDTOS[this.opponentIndex].base64Image;
 
-          this.results = this.gameState.results
+        this.results = this.gameState.results
 
-          this.results.forEach((result) => {
-              if (result.playerId == this.storedPlayerId) {
-                const position = this.indexToBoxPosition(result.questionIndex);
-                this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct)
-              } else {
-                const position = this.indexToBoxPosition(result.questionIndex);
-                this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct);
-              }
+        this.results.forEach((result) => {
+            if (result.playerId == this.storedPlayerId) {
+              const position = this.indexToBoxPosition(result.questionIndex);
+              this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct)
+            } else {
+              const position = this.indexToBoxPosition(result.questionIndex);
+              this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct);
             }
-          )
-
-
-          this.hasAcknowledgedGameOver = gameState.playerAcknowledgment[this.storedPlayerId];
-
-          if (gameState.status == 'COMPLETED') {
-            this.isGameOver = true;
-
-            if (!this.hasAcknowledgedGameOver) {
-              this.handleGameOver();
-            }
-
           }
-        }
+        )
 
-      })
+
+        this.hasAcknowledgedGameOver = gameState.playerAcknowledgment[this.storedPlayerId];
+
+        if (gameState.status == 'COMPLETED') {
+          this.isGameOver = true;
+
+          if (!this.hasAcknowledgedGameOver) {
+            this.handleGameOver();
+          }
+
+        }
+      }
+
+
     });
   }
 
