@@ -152,7 +152,8 @@ public class AchievementService {
                 .earnedAt(unlockedAchievement.getAchievedAt())
                 .build();
         
-        
+        log.warn("Username is: {} ", player.getUsername());
+        log.warn("Sending achievement notif");
         simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
     }
 }
