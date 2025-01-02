@@ -1,1 +1,15 @@
-<p>achievement-popup works!</p>
+<div class="achievement-container position-fixed top-50 end-50"
+     [@popupState]="isVisible ? 'show' : 'hide'">
+  <div class="card">
+    <img src="https://placehold.co/200" alt="Achievement">
+    <div class="card-body">
+      <h5 class="card-title">Achievement Title</h5>
+    </div>
+  </div>
+</div>
+
+<!-- Test buttons -->
+<div class="controls">
+  <button (click)="showPopup()">Show Achievement</button>
+  <button (click)="hidePopup()">Hide Achievement</button>
+</div>

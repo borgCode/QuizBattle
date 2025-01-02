@@ -56,9 +56,7 @@ export class WebSocketService {
   processSubscriptionQueue() {
     while (this.subscriptionQueue.length > 0) {
       const sub = this.subscriptionQueue.shift();
-      if (sub) {
-        this.initSub(sub.destination, sub.callback);
-      }
+      this.initSub(sub.destination, sub.callback);
     }
   }
 
