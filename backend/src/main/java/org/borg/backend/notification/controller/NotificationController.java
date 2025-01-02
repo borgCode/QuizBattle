@@ -32,7 +32,6 @@ public class NotificationController {
     
     @PostMapping("/read/{notificationId}")
     public ResponseEntity<Void> markAsRead(@PathVariable Long notificationId) {
-        log.warn("Marking as read");
         notificationService.markAsRead(notificationId);
         return ResponseEntity.ok().build();
     }

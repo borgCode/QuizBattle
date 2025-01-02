@@ -76,7 +76,7 @@ public class MultiplayerService {
     public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-        
+
         //Increment score if answer was correct
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
@@ -166,7 +166,7 @@ public class MultiplayerService {
         players.get(1).setStats(player2Stats);
 
         playerRepository.saveAll(players);
-        
+
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
 
     }
@@ -217,58 +217,67 @@ public class MultiplayerService {
         session.getPlayerAcknowledgment().put(playerId, true);
         multiplayerSessionRepository.save(session);
     }
-    
+
     @Transactional
     public void requestRematch(RematchRequest rematchRequest) {
+
+
+        log.warn("Rematch request: {}", rematchRequest);
         MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
-        
+
+        if (session.getStatus().equals(GameStatus.ACTIVE)) {
+            throw new GameException(BusinessErrorCodes.GAME_ALREADY_ONGOING);
+        }
+
         Long playerId = rematchRequest.getPlayerId();
 
         Player sendingPlayer = session.getPlayers().stream()
                 .filter(player -> player.getId().equals(playerId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Player not found in session"));
-        
+
         Player opponentPlayer = session.getPlayers().stream()
                 .filter(player -> !player.equals(sendingPlayer))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Opponent not found in session"));
-        
+
+        if (multiplayerSessionRepository.checkIfOngoingSessionExists(sendingPlayer, opponentPlayer, GameStatus.ACTIVE)) {
+            throw new GameException(BusinessErrorCodes.GAME_ALREADY_ONGOING);
+        }
+
         if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), opponentPlayer.getId())) {
             throw new GameException(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT);
         }
         
-
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(opponentPlayer.getId(), sendingPlayer.getId());
         log.warn("Pending session is: " + pendingSession);
-        
+
         if (pendingSession != null) {
-            
-           
+
+            log.warn("Has pending session");
+
             Long newSessionId = createRematchSession(session);
-            
-            
-            
+            log.warn("new session id: {}", newSessionId);
+
+
             //Delete original notification
             notificationService.deleteMatchRequestNotification(playerId, pendingSession.getId());
 
+
             pendingSessionRepository.delete(pendingSession);
-            
+
+
             notificationService.sendRematchStartedNotification(playerId, opponentPlayer.getDisplayName(), newSessionId);
             notificationService.sendRematchStartedNotification(opponentPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
-            
-            
+
+
         } else {
             log.warn("No existing session, creating new pending");
-            
+
             PendingSession newSession = pendingSessionRepository.save(new PendingSession(playerId, opponentPlayer.getId()));
             notificationService.sendRematchRequestNotification(opponentPlayer.getId(), newSession.getId(), sendingPlayer.getDisplayName(), sendingPlayer.getId());
         }
-        log.warn("Marking as read");
-        
-        notificationService.markAsRead(rematchRequest.getNotificationId());
-
     }
 
     private Long createRematchSession(MultiplayerSession session) {
@@ -287,7 +296,7 @@ public class MultiplayerService {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
         Long newSessionId = createMultiplayerSession(pendingSession);
-        
+
         notificationService.sendRematchAcceptedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
         return newSessionId;
     }
@@ -296,7 +305,7 @@ public class MultiplayerService {
     public void handleRematchReject(RematchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
-        
+
         notificationService.sendRematchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
         pendingSessionRepository.delete(pendingSession);
     }
@@ -336,7 +345,7 @@ public class MultiplayerService {
             players.get(1).getStats().incrementLosses();
             players.get(0).getStats().incrementWins();
         }
-        
+
 
         playerRepository.saveAll(players);
 
@@ -349,7 +358,7 @@ public class MultiplayerService {
 
         notificationService.sendGameWonNotification(session);
         notificationService.sendGameLostNotification(session);
-        
+
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
 
     }

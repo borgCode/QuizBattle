@@ -172,6 +172,5 @@ public class NotificationService {
     public void deleteMatchRequestNotification(Long playerId, Long pendingSessionId) {
         notificationRepository.delete(notificationRepository.findByPlayerIdAndPendingSessionId(playerId, pendingSessionId));
         
-        
     }
 }

@@ -64,6 +64,9 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 324:
               this.alertMessageService.show('You already sent a rematch request!', 'error');
               break;
+            case 325:
+              this.alertMessageService.show('You already have an ongoing match with this player!', 'error');
+              break;
             case 413:
               this.alertMessageService.show('The file size is too big! Max 500kb', 'error');
               break;

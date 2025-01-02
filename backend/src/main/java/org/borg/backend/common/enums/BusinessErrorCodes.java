@@ -18,6 +18,7 @@ public enum BusinessErrorCodes {
     FRIENDSHIP_ALREADY_EXISTS(322, HttpStatus.BAD_REQUEST, "Friendship already exists"),
     FRIENDSHIP_NOT_FOUND(323, HttpStatus.BAD_REQUEST, "The friendship was not found"),
     REMATCH_REQUEST_ALREADY_SENT(324, HttpStatus.BAD_REQUEST, "Rematch request already sent"),
+    GAME_ALREADY_ONGOING(325, HttpStatus.BAD_REQUEST, "Players already have a game against each other ongoing"),
     PROFILE_PIC_TOO_LARGE(413, HttpStatus.PAYLOAD_TOO_LARGE, "File size exceeds the maximum allowed limit of 500KB")
     ;
 
