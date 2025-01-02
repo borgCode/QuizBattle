@@ -50,4 +50,20 @@ public class ImageUtil {
         }
         return null;
     }
+
+    public static String encodeAchievementImageToBase64(String subFilePath) {
+        String basePath = "backend/src/main/java/org/borg/backend/storage/achievement/";
+
+        try {
+            Path path = Paths.get(basePath + subFilePath);
+            byte[] imageBytes = Files.readAllBytes(path);
+            return Base64.getEncoder().encodeToString(imageBytes);
+        } catch (IOException e) {
+
+            //TODO error handling
+            System.err.println("Error encoding image file: " + subFilePath);
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -7,6 +7,7 @@ import org.borg.backend.achievement.model.*;
 import org.borg.backend.achievement.repository.AchievementRepository;
 import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
+import org.borg.backend.common.util.ImageUtil;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.context.event.EventListener;
@@ -15,6 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -149,6 +151,7 @@ public class AchievementService {
         AchievementNotification achievementNotification = AchievementNotification.builder()
                 .achievementName(unlockedAchievement.getAchievement().getName())
                 .achievementDescription(unlockedAchievement.getCurrentLevel().getDescription())
+                .base64Image(ImageUtil.encodeAchievementImageToBase64(unlockedAchievement.getCurrentLevel().getImageUrl()))
                 .earnedAt(unlockedAchievement.getAchievedAt())
                 .build();
         

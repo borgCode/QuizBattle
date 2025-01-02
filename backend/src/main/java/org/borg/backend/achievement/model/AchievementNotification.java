@@ -11,5 +11,6 @@ import java.time.LocalDateTime;
 public class AchievementNotification {
     private final String achievementName;
     private final String achievementDescription;
+    private String base64Image;
     private final LocalDateTime earnedAt;
 }

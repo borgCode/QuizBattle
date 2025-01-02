@@ -3,7 +3,7 @@
      [@popupState]
      (@popupState.done)="clearAchievement()">
   <div class="card">
-    <img src="https://placehold.co/200" alt="Achievement">
+    <img [src]="'data:image/jpeg;base64,' + currentAchievement.base64Image">
     <div class="card-body">
       <h5 class="card-title">Achievement Earned!</h5>
       <h6 class="card-title">{{ currentAchievement.achievementName }}</h6>

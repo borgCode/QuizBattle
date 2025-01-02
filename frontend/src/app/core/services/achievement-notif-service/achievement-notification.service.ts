@@ -6,6 +6,7 @@ import {filter} from 'rxjs/operators';
 export interface AchievementNotification {
   achievementName: string;
   achievementDescription: string;
+  base64Image: string;
   earnedAt: string;
 }
 
