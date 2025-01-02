@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -15,45 +16,79 @@ import java.util.concurrent.ConcurrentHashMap;
 public class QuestionSessionService {
 
     private final ConcurrentHashMap<Long, PlayerSession> quizSessions = new ConcurrentHashMap<>();
-    
+
 
     @Data
-    @AllArgsConstructor
     private static class PlayerSession {
         private List<Long> questionIds;
         private ConcurrentHashMap<Integer, Boolean> answers;
         private LocalDateTime timestamp;
         private int currentIndex;
+        private String currentCategory;
+        private Set<Long> answeredQuestionIds;
+
+        public PlayerSession(List<Long> questionIds, String currentCategory) {
+            this.questionIds = questionIds;
+            this.answers = new ConcurrentHashMap<>();
+            this.timestamp = LocalDateTime.now();
+            this.currentIndex = 0;
+            this.currentCategory = currentCategory;
+            this.answeredQuestionIds = ConcurrentHashMap.newKeySet();
+        }
     }
-    
-    public List<Long> initializeSession(Long playerId, List<Long> questionIds) {
-        if (quizSessions.containsKey(playerId)) {
-            return quizSessions.get(playerId).getQuestionIds();
+
+    public List<Long> initializeSession(Long playerId, List<Long> questionIds, String category) {
+        PlayerSession existingSession = quizSessions.get(playerId);
+
+        if (existingSession != null) {
+            if (!existingSession.currentCategory.equals(category) && existingSession.answers.size() < existingSession.questionIds.size()) {
+                log.warn("Attempted to start new category while current category incomplete");
+                return existingSession.getQuestionIds();
+            }
+            if (existingSession.currentCategory.equals(category)) {
+                log.warn("Attempted to replay category: {}", category);
+                return Collections.emptyList();
+            }
         }
         
-        PlayerSession session = new PlayerSession(questionIds, new ConcurrentHashMap<>(), LocalDateTime.now(), 0);
-        
+        PlayerSession session = new PlayerSession(questionIds, category);
         quizSessions.put(playerId, session);
-        
+
         return questionIds;
     }
-    
-    public boolean saveMultiplayerAnswer(Long playerId, Boolean isCorrect) {
+
+    public boolean saveMultiplayerAnswer(Long playerId, Long questionId, Boolean isCorrect) {
         PlayerSession session = quizSessions.get(playerId);
         if (session == null) {
             throw new IllegalStateException("No active sessions found for player");
         }
 
+        if (session.answeredQuestionIds.contains(questionId)) {
+            log.warn("Attempted to answer same question twice: {}", questionId);
+            throw new IllegalStateException("Question has already been answered");
+        }
+
         ConcurrentHashMap<Integer, Boolean> playerAnswers = session.getAnswers();
-        
+
         if (playerAnswers.size() >= 3) {
             throw new IllegalStateException("Player has already answered the maximum number of questions");
         }
 
         playerAnswers.put(session.getCurrentIndex(), isCorrect);
         session.setCurrentIndex(session.getCurrentIndex() + 1);
+        session.answeredQuestionIds.add(questionId);
 
         return playerAnswers.size() >= 3;
+    }
+
+    public boolean isQuestionAnswered(Long playerId, Long questionId) {
+        PlayerSession session = quizSessions.get(playerId);
+        return session != null && session.getAnsweredQuestionIds().contains(questionId);
+    }
+
+    public String getCurrentCategory(Long playerId) {
+        PlayerSession session = quizSessions.get(playerId);
+        return session != null ? session.getCurrentCategory() : null;
     }
 
     public void saveSingleplayerAnswer(Long playerId, Boolean isCorrect) {
@@ -63,7 +98,7 @@ public class QuestionSessionService {
         if (session == null) {
             throw new IllegalStateException("No active sessions found for player");
         }
-        
+
         ConcurrentHashMap<Integer, Boolean> playerAnswers = session.getAnswers();
 
         if (playerAnswers.size() >= 5) {
@@ -81,7 +116,7 @@ public class QuestionSessionService {
         }
         return session.getAnswers().values().stream().toList();
     }
-    
+
     public List<Long> getSessionQuestions(Long playerId) {
         PlayerSession session = quizSessions.get(playerId);
         if (session == null) {

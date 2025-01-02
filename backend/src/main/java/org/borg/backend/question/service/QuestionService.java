@@ -45,12 +45,21 @@ public class QuestionService {
     }
     
     public List<QuestionDTO> getNewQuestionsForCategory(MultiplayerQuestionsRequest request) {
+        String currentCategory = questionSessionService.getCurrentCategory(request.getPlayerId());
+        
+        if (currentCategory != null && currentCategory.equalsIgnoreCase(request.getCategory())) {
+            log.warn("Attempt to replay category: {}", request.getCategory());
+            return Collections.emptyList();
+        }
+        
+        
         List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(request.getCategory());
 
         List<Long> questionIds = questions.stream()
                 .map(Question::getId)
                 .toList();
-        questionSessionService.initializeSession(request.getPlayerId(), questionIds);
+        
+        questionSessionService.initializeSession(request.getPlayerId(), questionIds, request.getCategory());
 
         multiplayerService.updateSessionQuestionsAndCategory(request.getSessionId(), questions, request.getCategory());
 
@@ -67,10 +76,12 @@ public class QuestionService {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
         List<Long> questionIds = session.getQuestionIds();
-        
-        questionSessionService.initializeSession(playerId, questionIds);
 
-        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
+        List<Question> questions = questionRepository.findAllById(questionIds);
+        
+        questionSessionService.initializeSession(playerId, questionIds, questions.get(0).getCategory());
+
+        return QuestionMapper.multipleToDTO(questions);
     }
 
     public AnswerValidationResponse validateMultiplayerAnswer(MultiplayerAnswerValidationRequest request) {
@@ -78,12 +89,17 @@ public class QuestionService {
             throw new IllegalArgumentException("Request cannot be null");
         }
 
+        if (questionSessionService.isQuestionAnswered(request.getPlayerId(), request.getQuestionId())) {
+            log.warn("Attempt to answer already answered question: {}", request.getQuestionId());
+            throw new IllegalStateException("Question has already been answered");
+        }
+        
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
 
         AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), question, request.getAnswer());
 
-        boolean isLastQuestion = questionSessionService.saveMultiplayerAnswer(request.getPlayerId(), validationResponse.isCorrect());
+        boolean isLastQuestion = questionSessionService.saveMultiplayerAnswer(request.getPlayerId(), request.getQuestionId(), validationResponse.isCorrect());
         if (isLastQuestion) {
             log.warn("Publishing category complete event");
             applicationEventPublisher.publishEvent(new AchievementEvents.CategoryCompletedEvent(request.getPlayerId(), question.getCategory()));
@@ -157,7 +173,7 @@ public class QuestionService {
         List<Long> questionIds = questions.stream()
                 .map(Question::getId)
                 .toList();
-        questionSessionService.initializeSession(request.getPlayerId(), questionIds);
+        questionSessionService.initializeSession(request.getPlayerId(), questionIds, request.getCategory());
 
         return QuestionMapper.multipleToDTO(questions);
     }
