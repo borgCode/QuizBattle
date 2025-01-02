@@ -5,24 +5,19 @@ import {
 } from '../services/achievement-notif-service/achievement-notification.service';
 import {Subscription} from 'rxjs';
 import {animate, keyframes, state, style, transition, trigger} from '@angular/animations';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-achievement-popup',
-  imports: [],
+  imports: [
+    NgIf
+  ],
   templateUrl: './achievement-popup.component.html',
   styleUrl: './achievement-popup.component.css',
   animations: [
     trigger('popupState', [
-      state('show', style({
-        opacity: 1,
-
-      })),
-      state('hide', style({
-        opacity: 0,
-
-      })),
-      transition('hide => show', [
-        animate('0.2s ease-out'),
+      transition(':enter', [
+        style({opacity: 0}), animate('0.2s ease-out', style({opacity: 1})),
         animate(
           "0.7s",
           keyframes([
@@ -36,8 +31,8 @@ import {animate, keyframes, state, style, transition, trigger} from '@angular/an
           ])
         )
       ]),
-      transition('show => hide', [
-        animate('0.5s ease-in')
+      transition(':leave', [
+        animate('0.5s 3s ease-in', style({opacity: 0}))
       ])
     ])
   ]
@@ -45,7 +40,7 @@ import {animate, keyframes, state, style, transition, trigger} from '@angular/an
 export class AchievementPopupComponent implements OnInit, OnDestroy {
   currentAchievement?: AchievementNotification;
   private subscription?: Subscription;
-  isVisible = false;
+  shouldShowPopup = false;
 
   constructor(private achievementService: AchievementNotificationService) {
   }
@@ -54,11 +49,7 @@ export class AchievementPopupComponent implements OnInit, OnDestroy {
     this.subscription = this.achievementService.achievements$.subscribe(
       achievement => {
         this.currentAchievement = achievement;
-        this.showPopup();
-        setTimeout(() => {
-          this.currentAchievement = undefined;
-          this.hidePopup()
-        }, 5000);
+        this.shouldShowPopup = true;
       }
     );
   }
@@ -67,11 +58,8 @@ export class AchievementPopupComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  showPopup() {
-    this.isVisible = true;
-  }
-
-  hidePopup() {
-    this.isVisible = false;
+  clearAchievement() {
+    this.currentAchievement = null;
+    this.shouldShowPopup = false;
   }
 }
