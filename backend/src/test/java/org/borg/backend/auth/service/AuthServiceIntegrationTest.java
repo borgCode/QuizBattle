@@ -1,0 +1,91 @@
+package org.borg.backend.auth.service;
+
+
+import org.borg.backend.auth.dto.AuthRequest;
+import org.borg.backend.auth.dto.AuthResponse;
+import org.borg.backend.auth.dto.RegistrationRequest;
+import org.borg.backend.auth.model.Role;
+import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.common.exceptions.UserNameAlreadyTakenException;
+import org.borg.backend.player.repository.PlayerRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+public class AuthServiceIntegrationTest {
+
+    @Autowired
+    private PlayerRepository playerRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private AuthService authService;
+    
+    private static final String TEST_USERNAME = "testuser";
+    private static final String TEST_PASSWORD = "password123";
+    private static final String TEST_DISPLAY_NAME = "Test User";
+
+    private RegistrationRequest request;
+    
+
+
+    @BeforeEach
+    void setUp() {
+        playerRepository.deleteAll();
+
+        if (roleRepository.findByName("USER").isEmpty()) {
+            Role userRole = new Role();
+            userRole.setName("USER");
+            roleRepository.save(userRole);
+        }
+        request = RegistrationRequest.builder()
+                .username(TEST_USERNAME)
+                .password(TEST_PASSWORD)
+                .displayName(TEST_DISPLAY_NAME)
+                .build();
+    }
+
+    @Test
+    void registerNewUserSuccess() {
+        assertDoesNotThrow(() -> authService.register(request));
+        
+        assertTrue(playerRepository.findByUsername(TEST_USERNAME).isPresent());
+    }
+    
+    @Test
+    void registerDuplicateUserFailed() {
+        
+        authService.register(request);
+        
+        assertThrows(UserNameAlreadyTakenException.class, () -> authService.register(request));
+    }
+    
+    @Test
+    void authenticateValidUserSuccess() {
+        authService.register(request);
+
+        AuthRequest authRequest = AuthRequest.builder()
+                .username(TEST_USERNAME)
+                .password(TEST_PASSWORD)
+                .build();
+
+        AuthResponse authResponse = authService.authenticate(authRequest);
+        
+        assertNotNull(authResponse);
+        assertNotNull(authResponse.getRefreshToken());
+        assertNotNull(authResponse.getAccessToken());
+        assertEquals("Login successful", authResponse.getMessage());
+        assertEquals(TEST_USERNAME, authResponse.getPlayerDTO().getUsername());
+        
+        
+    }
+}
