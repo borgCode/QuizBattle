@@ -14,6 +14,7 @@ import { MultiplayerService } from './services/multiplayer.service';
 import { FriendshipService } from './services/friendship.service';
 import { ChapterService } from './services/chapter.service';
 import { AuthenticationService } from './services/authentication.service';
+import { AchievementService } from './services/achievement.service';
 
 /**
  * Module that provides all services and configuration.
@@ -31,6 +32,7 @@ import { AuthenticationService } from './services/authentication.service';
     FriendshipService,
     ChapterService,
     AuthenticationService,
+    AchievementService,
     ApiConfiguration
   ],
 })

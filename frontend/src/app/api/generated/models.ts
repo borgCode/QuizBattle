@@ -32,3 +32,4 @@ export { StoryDto } from './models/story-dto';
 export { StoryOverviewDto } from './models/story-overview-dto';
 export { StoryOverviewRequest } from './models/story-overview-request';
 export { UpdatePlayerRequest } from './models/update-player-request';
+export { UserUnlockedAchievementDto } from './models/user-unlocked-achievement-dto';

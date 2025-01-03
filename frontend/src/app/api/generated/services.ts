@@ -10,3 +10,4 @@ export { MultiplayerService } from './services/multiplayer.service';
 export { FriendshipService } from './services/friendship.service';
 export { ChapterService } from './services/chapter.service';
 export { AuthenticationService } from './services/authentication.service';
+export { AchievementService } from './services/achievement.service';

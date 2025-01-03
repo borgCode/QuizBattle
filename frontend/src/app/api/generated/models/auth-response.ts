@@ -4,7 +4,8 @@
 
 import { PlayerDto } from '../models/player-dto';
 export interface AuthResponse {
+  accessToken?: string;
   message?: string;
   playerDTO?: PlayerDto;
-  token?: string;
+  refreshToken?: string;
 }

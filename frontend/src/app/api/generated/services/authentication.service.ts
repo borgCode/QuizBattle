@@ -14,6 +14,8 @@ import { StrictHttpResponse } from '../strict-http-response';
 import { authenticate } from '../fn/authentication/authenticate';
 import { Authenticate$Params } from '../fn/authentication/authenticate';
 import { AuthResponse } from '../models/auth-response';
+import { refresh } from '../fn/authentication/refresh';
+import { Refresh$Params } from '../fn/authentication/refresh';
 import { register } from '../fn/authentication/register';
 import { Register$Params } from '../fn/authentication/register';
 
@@ -49,6 +51,31 @@ export class AuthenticationService extends BaseService {
       map((r: StrictHttpResponse<{
 }>): {
 } => r.body)
+    );
+  }
+
+  /** Path part for operation `refresh()` */
+  static readonly RefreshPath = '/auth/refresh';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `refresh()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  refresh$Response(params: Refresh$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+    return refresh(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `refresh$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  refresh(params: Refresh$Params, context?: HttpContext): Observable<string> {
+    return this.refresh$Response(params, context).pipe(
+      map((r: StrictHttpResponse<string>): string => r.body)
     );
   }
 
