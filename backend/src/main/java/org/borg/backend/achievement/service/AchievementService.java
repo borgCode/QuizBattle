@@ -109,7 +109,9 @@ public class AchievementService {
 
         int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
         log.warn("Current level is: {}", currentLevel);
-        if (currentLevel >= achievement.getLevels().size() - 1) {
+        log.warn("Achievement levels size: " + achievement.getLevels().size());
+        if (currentLevel >= achievement.getLevels().size()) {
+            log.warn("Returning null");
             return null;
         }
         
