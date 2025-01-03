@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
     
-
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
         return ResponseEntity

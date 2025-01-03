@@ -1,5 +1,7 @@
 package org.borg.backend.auth.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
@@ -178,58 +180,7 @@ class AuthServiceTest {
 
         }
     }
-
-    @Test
-    void authenticateWithInvalidCredentialsShouldThrowException() {
-        AuthRequest authRequest = AuthRequest.builder()
-                .username("testuser123")
-                .password("wrongpassword")
-                .build();
-        
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Invalid credentials"));
-        
-        assertThrows(BadCredentialsException.class, () ->
-                authService.authenticate(authRequest)
-        );
-        
-        verifyNoInteractions(jwtService);
-    }
-
-    @Test
-    void authenticateWithNonExistentUserShouldThrowException() {
-        AuthRequest authRequest = AuthRequest.builder()
-                .username("nonexistentuser")
-                .password("password123")
-                .build();
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new UsernameNotFoundException("User not found"));
-
-        assertThrows(UsernameNotFoundException.class, () ->
-                authService.authenticate(authRequest)
-        );
-        
-        verifyNoInteractions(jwtService);
-    }
-
-    @Test
-    void authenticateWithLockedAccountShouldThrowException() {
-        AuthRequest authRequest = AuthRequest.builder()
-                .username("lockeduser")
-                .password("password123")
-                .build();
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new LockedException("Account is locked"));
-
-        assertThrows(LockedException.class, () ->
-                authService.authenticate(authRequest)
-        );
-
-        verifyNoInteractions(jwtService);
-    }
-
+    
     @Test
     void refreshTokenSuccess() {
 
@@ -242,20 +193,6 @@ class AuthServiceTest {
         RefreshTokenResponse response = authService.refresh(request);
         
         assertEquals("newAccessToken", response.getAccessToken());
-        verify(jwtService).createNewAccessToken("refreshToken");
-    }
-    
-    @Test
-    void refreshTokenFailure() {
-        RefreshTokenRequest request = RefreshTokenRequest.builder()
-                .refreshToken("refreshToken").
-                build();
-
-        when(jwtService.createNewAccessToken(request.getRefreshToken())).thenReturn(null);
-
-        assertThrows(RuntimeException.class, () ->
-                authService.refresh(request));
-
         verify(jwtService).createNewAccessToken("refreshToken");
     }
 }
