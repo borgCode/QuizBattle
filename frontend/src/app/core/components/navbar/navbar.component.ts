@@ -29,7 +29,7 @@ export class NavbarComponent {
 
 
   logout() {
-    this.tokenService.clearToken();
+    this.tokenService.clearTokens();
     this.loginStateService.clearLoggedInUser();
     this.router.navigate(['/login']);
   }
