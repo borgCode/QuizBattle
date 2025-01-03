@@ -62,9 +62,9 @@ public class AuthService {
         );
 
         Player player = (Player) auth.getPrincipal();
-        String token = jwtService.generateToken(player);
-
-        //Return userDTO if login is successful
+        String accessToken = jwtService.generateToken(player);
+        String refreshToken = jwtService.generateRefreshToken(player);
+        
 
         PlayerDTO playerDTO = PlayerMapper.toDTO(player);
         
@@ -72,12 +72,18 @@ public class AuthService {
         return AuthResponse.builder()
                 .message("Login successful")
                 .playerDTO(playerDTO)
-                .accessToken(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
 
     }
 
     public String refresh(String refreshToken) {
-        return null;
+        String newAccessToken = jwtService.createNewAccessToken(refreshToken);
+        if (newAccessToken == null) {
+            //TODO custom error
+            throw new RuntimeException("No new access token");
+        }
+        return newAccessToken;
     }
 }

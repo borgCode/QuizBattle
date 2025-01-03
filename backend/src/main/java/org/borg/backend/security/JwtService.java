@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,15 +17,23 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
     @Value("${jwt.expiration}")
     private long jwtExpiration;
+    @Value("${jwt.refresh.expiration}")
+    private long refreshExpiration;
     @Value("${jwt.secret}")
     private String secretKey;
 
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
     public String generateToken(Map<String, Object> claims, UserDetails userDetails) {
@@ -48,6 +57,15 @@ public class JwtService {
                 .compact();
 
     }
+    public String createNewAccessToken(String refreshToken) {
+        final String username = extractUsername(refreshToken);
+        if (username != null && !isTokenExpired(refreshToken)) {
+            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
+            return generateToken(userDetails);
+        }
+        return null;
+    }
+    
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
