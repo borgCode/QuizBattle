@@ -72,8 +72,12 @@ public class AuthService {
         return AuthResponse.builder()
                 .message("Login successful")
                 .playerDTO(playerDTO)
-                .token(token)
+                .accessToken(token)
                 .build();
 
+    }
+
+    public String refresh(String refreshToken) {
+        return null;
     }
 }

@@ -11,5 +11,6 @@ import org.borg.backend.player.dto.PlayerDTO;
 public class AuthResponse {
     private String message;
     private PlayerDTO playerDTO;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 }
