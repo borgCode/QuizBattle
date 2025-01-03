@@ -217,4 +217,14 @@ public class QuestionService {
 
         return validationResponse;
     }
+
+    public void finishSession(Long playerId) {
+        log.warn("Getting current category: " + questionSessionService.getCurrentCategory(playerId));
+        
+        applicationEventPublisher.publishEvent(new AchievementEvents.CategoryCompletedEvent(playerId, questionSessionService.getCurrentCategory(playerId)));
+        
+        questionSessionService.finishSession(playerId);
+        
+        
+    }
 }
