@@ -3,9 +3,8 @@ package org.borg.backend.auth.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.auth.dto.AuthRequest;
-import org.borg.backend.auth.dto.AuthResponse;
-import org.borg.backend.auth.dto.RegistrationRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("auth")
 @RequiredArgsConstructor
@@ -33,7 +33,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<String> refresh(@RequestBody String refreshToken) {
-        return ResponseEntity.ok(authService.refresh(refreshToken));
+    public ResponseEntity<RefreshTokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        log.warn("Refresh request received");
+        return ResponseEntity.ok(authService.refresh(request));
     }
 }

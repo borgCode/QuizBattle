@@ -36,7 +36,8 @@ export class LoginComponent {
       body: this.authRequest
     }).subscribe({
       next: (res:AuthResponse) => {
-        this.tokenService.token = res.token as string;
+        this.tokenService.accessToken = res.accessToken as string;
+        this.tokenService.refreshToken = res.refreshToken as string;
         this.loginStateService.loggedInUser = res.playerDTO;
         this.router.navigate(['']);
       },

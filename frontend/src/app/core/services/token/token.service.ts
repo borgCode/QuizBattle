@@ -62,9 +62,9 @@ export class TokenService {
     }
 
     try {
-      const responseToken = await firstValueFrom(this.authService.refresh({body: refreshToken}))
-      if (responseToken) {
-        this.accessToken = responseToken;
+      const response = await firstValueFrom(this.authService.refresh({body: {refreshToken: refreshToken}}))
+      if (response) {
+        this.accessToken = response.accessToken;
         return true;
       }
       return false;

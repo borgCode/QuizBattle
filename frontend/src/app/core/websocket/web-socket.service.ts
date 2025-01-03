@@ -20,7 +20,7 @@ export class WebSocketService {
 
 
   public initWebSocketConnection() {
-    const token = this.tokenService?.token;
+    const token = this.tokenService?.accessToken;
     if (token) {
       const websocket = new SockJS('http://localhost:8080/socket');
       this.stompClient = new Client({

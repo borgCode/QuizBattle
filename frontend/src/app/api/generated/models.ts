@@ -22,6 +22,8 @@ export { PlayerInteractionResponse } from './models/player-interaction-response'
 export { PlayerProgressDto } from './models/player-progress-dto';
 export { PlayerQuestionResult } from './models/player-question-result';
 export { QuestionDto } from './models/question-dto';
+export { RefreshTokenRequest } from './models/refresh-token-request';
+export { RefreshTokenResponse } from './models/refresh-token-response';
 export { RegistrationRequest } from './models/registration-request';
 export { RematchRequest } from './models/rematch-request';
 export { RematchResponse } from './models/rematch-response';

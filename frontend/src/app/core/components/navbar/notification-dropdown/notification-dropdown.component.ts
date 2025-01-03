@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
-import {BehaviorSubject, lastValueFrom} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {Notification} from '../../../../api/generated/models/notification';
 import {NotificationService} from '../../../../api/generated/services/notification.service';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
@@ -65,6 +65,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
 
   private fetchNotifications() {
+    console.log("User id: " + this.loginStateService.loggedInUser.id)
     if (this.loginStateService.loggedInUser.id) {
       this.notificationService.getPlayerNotifications({playerId: this.loginStateService.loggedInUser.id}).subscribe(
         notifications => this.notifications.next(notifications)

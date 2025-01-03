@@ -16,6 +16,7 @@ import { Authenticate$Params } from '../fn/authentication/authenticate';
 import { AuthResponse } from '../models/auth-response';
 import { refresh } from '../fn/authentication/refresh';
 import { Refresh$Params } from '../fn/authentication/refresh';
+import { RefreshTokenResponse } from '../models/refresh-token-response';
 import { register } from '../fn/authentication/register';
 import { Register$Params } from '../fn/authentication/register';
 
@@ -63,7 +64,7 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  refresh$Response(params: Refresh$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+  refresh$Response(params: Refresh$Params, context?: HttpContext): Observable<StrictHttpResponse<RefreshTokenResponse>> {
     return refresh(this.http, this.rootUrl, params, context);
   }
 
@@ -73,9 +74,9 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  refresh(params: Refresh$Params, context?: HttpContext): Observable<string> {
+  refresh(params: Refresh$Params, context?: HttpContext): Observable<RefreshTokenResponse> {
     return this.refresh$Response(params, context).pipe(
-      map((r: StrictHttpResponse<string>): string => r.body)
+      map((r: StrictHttpResponse<RefreshTokenResponse>): RefreshTokenResponse => r.body)
     );
   }
 

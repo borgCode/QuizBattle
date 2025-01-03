@@ -2,9 +2,7 @@ package org.borg.backend.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.auth.dto.AuthRequest;
-import org.borg.backend.auth.dto.AuthResponse;
-import org.borg.backend.auth.dto.RegistrationRequest;
+import org.borg.backend.auth.dto.*;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.exceptions.UserNameAlreadyTakenException;
 import org.borg.backend.auth.model.Role;
@@ -20,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Ref;
 import java.util.List;
 
 @Slf4j
@@ -78,12 +77,15 @@ public class AuthService {
 
     }
 
-    public String refresh(String refreshToken) {
-        String newAccessToken = jwtService.createNewAccessToken(refreshToken);
+    public RefreshTokenResponse refresh(RefreshTokenRequest request) {
+        String newAccessToken = jwtService.createNewAccessToken(request.getRefreshToken());
         if (newAccessToken == null) {
             //TODO custom error
             throw new RuntimeException("No new access token");
         }
-        return newAccessToken;
+        log.warn("New accessToken: {}", newAccessToken);
+        return RefreshTokenResponse.builder()
+                .accessToken(newAccessToken)
+                .build();
     }
 }
