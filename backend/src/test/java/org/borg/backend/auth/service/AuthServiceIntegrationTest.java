@@ -1,9 +1,7 @@
 package org.borg.backend.auth.service;
 
 
-import org.borg.backend.auth.dto.AuthRequest;
-import org.borg.backend.auth.dto.AuthResponse;
-import org.borg.backend.auth.dto.RegistrationRequest;
+import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.common.exceptions.UserNameAlreadyTakenException;
@@ -13,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,27 +51,22 @@ public class AuthServiceIntegrationTest {
                 .password(TEST_PASSWORD)
                 .displayName(TEST_DISPLAY_NAME)
                 .build();
+        
+        authService.register(request);
     }
 
     @Test
     void registerNewUserSuccess() {
-        assertDoesNotThrow(() -> authService.register(request));
-        
         assertTrue(playerRepository.findByUsername(TEST_USERNAME).isPresent());
     }
     
     @Test
     void registerDuplicateUserFailed() {
-        
-        authService.register(request);
-        
         assertThrows(UserNameAlreadyTakenException.class, () -> authService.register(request));
     }
     
     @Test
     void authenticateValidUserSuccess() {
-        authService.register(request);
-
         AuthRequest authRequest = AuthRequest.builder()
                 .username(TEST_USERNAME)
                 .password(TEST_PASSWORD)
@@ -86,6 +80,34 @@ public class AuthServiceIntegrationTest {
         assertEquals("Login successful", authResponse.getMessage());
         assertEquals(TEST_USERNAME, authResponse.getPlayerDTO().getUsername());
         
-        
+    }
+    
+    @Test
+    void authenticateWrongPasswordFail() {
+
+        AuthRequest authRequest = AuthRequest.builder()
+                .username(TEST_USERNAME)
+                .password("wrongpassword")
+                .build();
+
+        assertThrows(BadCredentialsException.class, () -> authService.authenticate(authRequest));
+    }
+    
+    @Test
+    void refreshTokenSuccess() {
+        AuthRequest authRequest = AuthRequest.builder()
+                .username(TEST_USERNAME)
+                .password(TEST_PASSWORD)
+                .build();
+
+        AuthResponse authResponse = authService.authenticate(authRequest);
+
+        RefreshTokenRequest refreshRequest = RefreshTokenRequest.builder()
+                .refreshToken(authResponse.getRefreshToken())
+                .build();
+        RefreshTokenResponse refreshResponse = authService.refresh(refreshRequest);
+
+        assertNotNull(refreshResponse);
+        assertNotNull(refreshResponse.getAccessToken());
     }
 }
