@@ -73,6 +73,10 @@ public class AchievementService {
     public void handleCategoryCompletedEvent(AchievementEvents.CategoryCompletedEvent event) {
 
         Achievement achievement = achievementRepository.findByName(event.category());
+        
+        if (achievement == null) {
+            log.warn("Achievement is NULL");
+        }
 
         Player player = playerRepository.findById(event.playerId())
                 .orElseThrow(() -> new EntityNotFoundException("Player not found"));

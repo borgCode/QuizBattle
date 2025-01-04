@@ -88,7 +88,7 @@ public class AchievementServiceIntegrationTest {
                     "History",
                     "Geography",
                     "Sports",
-                    "Films",
+                    "Film",
                     "Books",
                     "Animals"
             );
