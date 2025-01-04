@@ -3,6 +3,7 @@ package org.borg.backend.achievement.service;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.achievement.model.Achievement;
+import org.borg.backend.achievement.model.AchievementLevel;
 import org.borg.backend.achievement.model.UserUnlockedAchievement;
 import org.borg.backend.achievement.repository.AchievementRepository;
 import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
@@ -56,8 +57,6 @@ public class AchievementServiceIntegrationTest {
         playerRepository.deleteAll();
         userUnlockedAchievementRepository.deleteAll();
 
-        initDataService.initAchievements();
-
         if (roleRepository.findByName("USER").isEmpty()) {
             Role userRole = new Role();
             userRole.setName("USER");
@@ -72,21 +71,126 @@ public class AchievementServiceIntegrationTest {
         achievementRepository.deleteAll();
     }
 
-//    @Nested
-//    class AchievementLevelProgress {
-//        @Test
-//        void testPlayerProgressThroughAllLevels() {
-//
-//        }
-//
-//        @Test
-//        void testMultipleCategoriesProgressSimultaneously() {
-//
-//        }
-//    }
+    @Nested
+    class AchievementLevelProgress {
+        private Player player;
+
+        @BeforeEach
+        void setUp() {
+            Role userRole = roleRepository.findByName("USER")
+                    .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
+
+            player = Player.builder()
+                    .username("testPlayer")
+                    .password("password")
+                    .displayName("Test Player")
+                    .accountLocked(false)
+                    .enabled(true)
+                    .roles(new ArrayList<>(List.of(userRole)))
+                    .build();
+        }
+        
+        @Test
+        void testPlayerProgressThroughAllLevels() {
+            createAchievements();
+            
+            CategoryStats categoryStats = CategoryStats.builder()
+                    .category("Geography")
+                    .correct(0)
+                    .questionsAnswered(0)
+                    .build();
+
+            Stats stats = new Stats();
+            categoryStats.setStats(stats);
+            stats.setCategoryStats(Map.of("Geography", categoryStats));
+            stats.setPlayer(player);
+            player.setStats(stats);
+            player = playerRepository.save(player);
+            
+            increaseStatsToNextLevelAndPublish(5);
+            assertUnlockedAchievement(1);
+            increaseStatsToNextLevelAndPublish(5);
+            assertUnlockedAchievement(2);
+            increaseStatsToNextLevelAndPublish(5);
+            assertUnlockedAchievement(3);
+
+
+        }
+
+        private void createAchievements() {
+            List<AchievementLevel> levels = List.of(
+                    AchievementLevel.builder()
+                            .name("Globe Trotter")
+                            .level(1)
+                            .requirementValue(5)
+                            .description("Answer 5 geography questions correctly")
+                            .imageUrl("geography-bronze.png")
+                            .build(),
+                    AchievementLevel.builder()
+                            .name("World Explorer")
+                            .level(2)
+                            .requirementValue(10)
+                            .description("Answer 10 geography questions correctly")
+                            .imageUrl("geography-silver.png")
+                            .build(),
+                    AchievementLevel.builder()
+                            .name("Geography Sage")
+                            .level(3)
+                            .requirementValue(15)
+                            .description("Answer 15 geography questions correctly")
+                            .imageUrl("geography-gold.png")
+                            .build()
+            );
+
+            Achievement achievement = new Achievement();
+            achievement.setName("Geography");
+
+            levels.forEach(level -> level.setAchievement(achievement));
+            achievement.setLevels(levels);
+
+            achievementRepository.save(achievement);
+        }
+
+        private void increaseStatsToNextLevelAndPublish(int i) {
+            log.warn("Increase to next level");
+            CategoryStats categoryStats = player.getStats().getCategoryStats().get("Geography");
+            int previousCorrect = categoryStats.getCorrect();
+            
+            categoryStats.setCorrect(previousCorrect + i);
+            playerRepository.save(player);
+
+            assertEquals(previousCorrect + i, categoryStats.getCorrect());
+            
+            applicationEventPublisher.publishEvent(new AchievementEvents.CategoryCompletedEvent(player.getId(), "Geography"));
+        }
+
+        private void assertUnlockedAchievement(int achievementLevel) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            List<UserUnlockedAchievement> unlockedAchievements = userUnlockedAchievementRepository.findAllByPlayerId(player.getId());
+
+            UserUnlockedAchievement unlockedAchievement = unlockedAchievements.get(0);
+
+            assertAll("Check unlocked achievement details",
+                    () -> assertEquals(1, unlockedAchievements.size()),
+                    () -> assertEquals("Geography", unlockedAchievement.getAchievement().getName()),
+                    () -> assertEquals(achievementLevel, unlockedAchievement.getCurrentLevel().getLevel())
+            );
+        }
+        
+    }
 
     @Nested
     class MultiplePlayerConcurrentOperations {
+
+        @BeforeEach
+        void setUp() {
+            initDataService.initAchievements();
+        }
 
 
         @Test
@@ -100,7 +204,7 @@ public class AchievementServiceIntegrationTest {
                     "Books",
                     "Animals"
             );
-            
+
             Map<Long, Set<String>> playerAwardedAchievements = new ConcurrentHashMap<>();
 
 
@@ -110,7 +214,7 @@ public class AchievementServiceIntegrationTest {
                 List<Player> createdPlayers = createTestPlayers();
                 return playerRepository.saveAll(createdPlayers);
             });
-            
+
             CountDownLatch startLatch = new CountDownLatch(1);
             CountDownLatch finishLatch = new CountDownLatch(players.size());
 
@@ -124,12 +228,12 @@ public class AchievementServiceIntegrationTest {
                     .map(player -> new Thread(() -> {
                         try {
                             startLatch.await();
-                            
+
                             int numCategories = random.nextInt(3) + 2;
                             List<String> selectedCategories = new ArrayList<>(categories);
                             Collections.shuffle(selectedCategories);
                             selectedCategories = selectedCategories.subList(0, numCategories);
-                            
+
                             playerAwardedAchievements.put(player.getId(), ConcurrentHashMap.newKeySet());
 
 
@@ -172,18 +276,18 @@ public class AchievementServiceIntegrationTest {
                     for (String playedCategory : playedCategories) {
                         Achievement achievement = achievementRepository.findByName(playedCategory);
                         UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
-                        
+
                         assertNotNull(unlockedAchievement, String.format("Achievement: %s not found for player: %s", playedCategory, player.getId()));
                     }
-                    
+
                     List<UserUnlockedAchievement> userUnlockedAchievements = userUnlockedAchievementRepository.findAllByPlayerId(player.getId());
                     assertEquals(playedCategories.size(), userUnlockedAchievements.size(), String.format("Number of achievements mismatched for player: %s", player.getId()));
                 }
- 
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            
+
         }
 
         private List<Player> createTestPlayers() {
@@ -200,11 +304,12 @@ public class AchievementServiceIntegrationTest {
                         .enabled(true)
                         .roles(new ArrayList<>(List.of(userRole)))
                         .build();
-                
+
                 players.add(player);
             }
             return players;
         }
+
         private void updateStats(List<Player> players, List<String> categories) {
             for (Player player : players) {
                 Stats stats = player.getStats();
