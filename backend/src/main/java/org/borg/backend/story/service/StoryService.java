@@ -1,6 +1,7 @@
 package org.borg.backend.story.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.chapter.mapper.ChapterMapper;
 import org.borg.backend.chapter.model.Chapter;
 import org.borg.backend.chapter.repository.ChapterRepository;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class StoryService {
     private final StoryRepository storyRepository;
@@ -68,6 +70,7 @@ public class StoryService {
     }
 
     public PlayerProgress getOrCreatePlayerProgress(Long playerId, Story story) {
+        log.warn("Creating player progress");
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(playerId, story.getId());
         
         if (playerProgress == null) {
