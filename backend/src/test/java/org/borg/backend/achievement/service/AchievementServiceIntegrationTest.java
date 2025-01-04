@@ -2,6 +2,8 @@ package org.borg.backend.achievement.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
+import org.borg.backend.achievement.model.Achievement;
+import org.borg.backend.achievement.model.UserUnlockedAchievement;
 import org.borg.backend.achievement.repository.AchievementRepository;
 import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
 import org.borg.backend.auth.model.Role;
@@ -19,16 +21,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Fail.fail;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -92,6 +92,8 @@ public class AchievementServiceIntegrationTest {
                     "Books",
                     "Animals"
             );
+            
+            Map<Long, Set<String>> playerAwardedAchievements = new ConcurrentHashMap<>();
 
 
             TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -109,16 +111,18 @@ public class AchievementServiceIntegrationTest {
                 return null;
             });
 
+            Random random = new Random();
             List<Thread> playerThreads = players.stream()
                     .map(player -> new Thread(() -> {
                         try {
                             startLatch.await();
-                            Random random = new Random();
                             
                             int numCategories = random.nextInt(3) + 2;
                             List<String> selectedCategories = new ArrayList<>(categories);
                             Collections.shuffle(selectedCategories);
                             selectedCategories = selectedCategories.subList(0, numCategories);
+                            
+                            playerAwardedAchievements.put(player.getId(), ConcurrentHashMap.newKeySet());
 
 
                             for (String category : selectedCategories) {
@@ -135,6 +139,7 @@ public class AchievementServiceIntegrationTest {
                                                 category
                                         )
                                 );
+                                playerAwardedAchievements.get(player.getId()).add(category);
                             }
 
                             finishLatch.countDown();
@@ -150,22 +155,32 @@ public class AchievementServiceIntegrationTest {
             try {
                 boolean completed = finishLatch.await(10, TimeUnit.SECONDS);
                 assertTrue(completed, "Not all achievement operations completed in time");
-      
-                Thread.sleep(1000);
+
+
+                for (Player player : players) {
+                    Set<String> playedCategories = playerAwardedAchievements.get(player.getId());
+                    assertNotNull(playedCategories, "No achievements recorded for this player");
+
+                    for (String playedCategory : playedCategories) {
+                        Achievement achievement = achievementRepository.findByName(playedCategory);
+                        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
+                        
+                        assertNotNull(unlockedAchievement, String.format("Achievement: %s not found for player: %s", playedCategory, player.getId()));
+                    }
+                    
+                    List<UserUnlockedAchievement> userUnlockedAchievements = userUnlockedAchievementRepository.findAllByPlayerId(player.getId());
+                    assertEquals(playedCategories.size(), userUnlockedAchievements.size(), String.format("Number of achievements mismatched for player: %s", player.getId()));
+                }
  
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                fail("Test interrupted");
             }
-
-
+            
         }
 
         private List<Player> createTestPlayers() {
             Role userRole = roleRepository.findByName("USER")
                     .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
-
-
             List<Player> players = new ArrayList<>();
 
             for (int i = 1; i <= 10; i++) {
@@ -177,16 +192,12 @@ public class AchievementServiceIntegrationTest {
                         .enabled(true)
                         .roles(new ArrayList<>(List.of(userRole)))
                         .build();
-
-
+                
                 players.add(player);
             }
-
             return players;
         }
-
         private void updateStats(List<Player> players, List<String> categories) {
-
             for (Player player : players) {
                 Stats stats = player.getStats();
                 for (String category : categories) {
