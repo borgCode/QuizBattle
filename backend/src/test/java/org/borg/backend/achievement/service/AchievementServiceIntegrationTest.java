@@ -190,7 +190,7 @@ public class AchievementServiceIntegrationTest {
         }
 
 
-        @Test
+        @RepeatedTest(5)
         void multiplePlayersUnlockAchievementsSimultaneously() {
             List<String> categories = Arrays.asList(
                     "Science & Nature",
@@ -264,6 +264,8 @@ public class AchievementServiceIntegrationTest {
             try {
                 boolean completed = finishLatch.await(10, TimeUnit.SECONDS);
                 assertTrue(completed, "Not all achievement operations completed in time");
+                
+                Thread.sleep(100);
 
 
                 for (Player player : players) {

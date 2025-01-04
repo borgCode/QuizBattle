@@ -16,9 +16,7 @@ import org.borg.backend.seed.InitDataService;
 import org.borg.backend.story.model.Story;
 import org.borg.backend.story.repository.StoryRepository;
 import org.borg.backend.story.service.StoryService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChapterServiceIntegrationTest {
 
     @Autowired
@@ -58,15 +57,16 @@ class ChapterServiceIntegrationTest {
     private StoryService storyService;
     @Autowired
     private ChapterService chapterService;
-
-    @BeforeEach
-    void setUp() {
+    
+    @BeforeAll
+    void setUpOnce() {
         chapterProgressRepository.deleteAll();
         chapterRepository.deleteAll();
         playerProgressRepository.deleteAll();
         playerRepository.deleteAll();
         storyRepository.deleteAll();
-        
+
+
 
         if (roleRepository.findByName("USER").isEmpty()) {
             Role userRole = new Role();
@@ -75,9 +75,9 @@ class ChapterServiceIntegrationTest {
         }
         initDataService.initStoryData();
     }
-
-    @AfterEach
-    void tearDown() {
+    
+    @AfterAll
+    void cleanUpAll() {
         chapterProgressRepository.deleteAll();
         chapterRepository.deleteAll();
         playerProgressRepository.deleteAll();
@@ -85,7 +85,21 @@ class ChapterServiceIntegrationTest {
         storyRepository.deleteAll();
     }
 
-    @Test
+    @BeforeEach
+    void setUp() {
+        chapterProgressRepository.deleteAll();
+        playerProgressRepository.deleteAll();
+        playerRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        chapterProgressRepository.deleteAll();
+        playerProgressRepository.deleteAll();
+        playerRepository.deleteAll();
+    }
+
+    @RepeatedTest(5)
     void multiplePlayersInitiateChaptersSimultaneously() {
 
         Map<Long, Long> playerStoryIds = new ConcurrentHashMap<>();
@@ -109,6 +123,7 @@ class ChapterServiceIntegrationTest {
                                 startLatch.await();
                                 
                                 Long storyId = random.nextLong(3) + 1;
+                                log.warn("StoryId: " + storyId);
                                 
                                 playerStoryIds.put(player.getId(), storyId);
 
