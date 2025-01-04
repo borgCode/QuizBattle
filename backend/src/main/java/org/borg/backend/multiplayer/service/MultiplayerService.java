@@ -332,6 +332,8 @@ public class MultiplayerService {
 
         notificationService.sendRematchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
         pendingSessionRepository.delete(pendingSession);
+        
+        log.warn("Rematch rejected");
     }
 
     private Long createMultiplayerSession(PendingSession pendingSession) {

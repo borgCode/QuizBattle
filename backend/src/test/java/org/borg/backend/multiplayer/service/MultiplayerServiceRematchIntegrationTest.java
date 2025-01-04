@@ -17,9 +17,7 @@ import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -89,8 +87,45 @@ public class MultiplayerServiceRematchIntegrationTest {
     }
 
     @Test
-    void rematchRequestWhenNoRequestsHaveBeenSent() {
+    void rematchRequestWhenNoRequestsHaveBeenSentAndAccept() {
+        RematchResponse rematchResponse = setupRematchScenario();
+        
+        multiplayerService.handleRematchAccept(rematchResponse);
 
+        assertAll("Post-accept state checks",
+                () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
+                        sendingPlayer.getId(), opponentPlayer.getId())),
+                () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(opponentPlayer.getId()).isEmpty()),
+                () -> assertTrue(multiplayerSessionRepository.checkIfOngoingSessionExists(
+                        sendingPlayer, opponentPlayer, GameStatus.ACTIVE))
+        );
+
+        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(sendingPlayer.getId());
+        Notification sendingPlayerNotification = sendingPlayerNotifications.get(0);
+        assertEquals(NotificationType.REMATCH_ACCEPTED, sendingPlayerNotification.getType());
+
+    }
+
+    @Test
+    void rematchRequestWhenNoRequestsHaveBeenSentAndReject() {
+        RematchResponse rematchResponse = setupRematchScenario();
+        
+        multiplayerService.handleRematchReject(rematchResponse);
+
+        assertAll("Post-reject state checks",
+                () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
+                        sendingPlayer.getId(), opponentPlayer.getId())),
+                () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(opponentPlayer.getId()).isEmpty()),
+                () -> assertFalse(multiplayerSessionRepository.checkIfOngoingSessionExists(
+                        sendingPlayer, opponentPlayer, GameStatus.ACTIVE))
+        );
+
+        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(sendingPlayer.getId());
+        Notification sendingPlayerNotification = sendingPlayerNotifications.get(0);
+        assertEquals(NotificationType.REMATCH_DECLINED, sendingPlayerNotification.getType());
+    }
+    
+    private RematchResponse setupRematchScenario() {
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
         multiplayerService.requestRematch(rematchRequest);
 
@@ -106,26 +141,12 @@ public class MultiplayerServiceRematchIntegrationTest {
                 () -> assertEquals(NotificationType.REMATCH_REQUEST, opponentNotification.getType())
         );
 
-        RematchResponse rematchResponse = new RematchResponse(
+        return new RematchResponse(
                 opponentNotification.getSenderId(),
                 opponentPlayer.getDisplayName(),
                 opponentNotification.getPendingSessionId(),
                 opponentNotification.getId()
         );
-        multiplayerService.handleRematchAccept(rematchResponse);
-
-        assertAll("Post-accept state checks",
-                () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
-                        sendingPlayer.getId(), opponentPlayer.getId())),
-                () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(opponentPlayer.getId()).isEmpty()),
-                () -> assertTrue(multiplayerSessionRepository.checkIfOngoingSessionExists(
-                        sendingPlayer, opponentPlayer, GameStatus.ACTIVE))
-        );
-
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(sendingPlayer.getId());
-        Notification sendingPlayerNotification = sendingPlayerNotifications.get(0);
-        assertEquals(NotificationType.REMATCH_ACCEPTED, sendingPlayerNotification.getType());
-
     }
 
     @Test
