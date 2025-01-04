@@ -68,7 +68,7 @@ public class MultiplayerServiceRematchIntegrationTest {
         completedMultiplayerSession.setStatus(GameStatus.COMPLETED);
         multiplayerSessionRepository.save(completedMultiplayerSession);
     }
-
+    
 
     private Player createAndSavePlayer(String name) {
         Role userRole = roleRepository.findByName("USER")

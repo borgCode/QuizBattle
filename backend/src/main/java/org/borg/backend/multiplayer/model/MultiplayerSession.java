@@ -47,17 +47,17 @@ public class MultiplayerSession {
     private Map<Long, Integer> questionsAnswered;
     
     @ElementCollection
-    private List<Long> questionIds;
+    private List<Long> questionIds = new ArrayList<>();
     
     @ElementCollection
     @CollectionTable(name = "player_question_results")
-    private Set<PlayerQuestionResult> questionResults;
+    private Set<PlayerQuestionResult> questionResults = new HashSet<>();
     
     @ElementCollection
-    private Set<String> playedCategories;
+    private Set<String> playedCategories = new HashSet<>();
     
     @ElementCollection
-    private List<String> roundCategories;
+    private List<String> roundCategories = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "player_acknowledgment")

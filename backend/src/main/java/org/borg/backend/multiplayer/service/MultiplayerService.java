@@ -55,8 +55,9 @@ public class MultiplayerService {
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElse(null);
-
-
+        
+        
+        log.warn("Getting game state, list is " + multiplayerSession.getQuestionIds());
         return GameStateResponse.builder()
                 .playerTurn(multiplayerSession.getCurrentPlayerTurn().getId())
                 .playerDTOS(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
@@ -185,7 +186,7 @@ public class MultiplayerService {
     }
 
     public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
-        
+        log.warn("Session ids: " + session.getQuestionIds());
         session.getQuestionIds().clear();
         for (Question question : questions) {
             session.getQuestionIds().add(question.getId());

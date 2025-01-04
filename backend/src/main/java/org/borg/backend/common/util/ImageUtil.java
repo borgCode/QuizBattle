@@ -1,5 +1,6 @@
 package org.borg.backend.common.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 
+@Slf4j
 public class ImageUtil {
 
 
@@ -17,9 +19,8 @@ public class ImageUtil {
 
         if (subFilePath == null || subFilePath.isEmpty()) {
             try {
-                Path path = Paths.get("backend/src/main/java/org/borg/backend/storage/profile-pics/placeholder/placeholder.jpg");
-                byte[] imageBytes = Files.readAllBytes(path);
-                return Base64.getEncoder().encodeToString(imageBytes);
+                log.warn("Path is null");
+                return loadAndEncodeResource("placeholder_profile_pic/placeholder.jpg");
             } catch (IOException e) {
                 //TODO error handling
             }
@@ -64,6 +65,7 @@ public class ImageUtil {
 
     private static String loadAndEncodeResource(String resourcePath) throws IOException {
         ClassPathResource resource = new ClassPathResource(resourcePath);
+        log.warn(resourcePath);
         try (InputStream inputStream = resource.getInputStream()) {
             byte[] imageBytes = inputStream.readAllBytes();
             return Base64.getEncoder().encodeToString(imageBytes);
