@@ -4,9 +4,11 @@ import org.borg.backend.achievement.service.AchievementService;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.common.enums.GameStatus;
+import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.multiplayer.dto.GameStateResponse;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.model.Player;
@@ -18,6 +20,7 @@ import org.borg.backend.question.repository.QuestionRepository;
 import org.borg.backend.question.service.QuestionService;
 import org.borg.backend.question.service.QuestionSessionService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,9 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,8 +57,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
     private AchievementService achievementService;
     private Player player1;
     private Player player2;
-    private MultiplayerSession multiplayerSession;
-    
+
 
     @BeforeEach
     void setUp() {
@@ -74,9 +74,6 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         player1 = createAndSavePlayer("player1");
         player2 = createAndSavePlayer("player2");
 
-        multiplayerSession = new MultiplayerSession(player1, player2, player1);
-        multiplayerSession.setStatus(GameStatus.ACTIVE);
-        multiplayerSessionRepository.save(multiplayerSession);
     }
 
     private Player createAndSavePlayer(String name) {
@@ -97,6 +94,11 @@ public class MultiplayerServiceGameFlowIntegrationTest {
 
     @Test
     void testAnswerValidationAndGameStateUpdate() {
+
+        MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1);
+        multiplayerSession.setStatus(GameStatus.ACTIVE);
+        multiplayerSessionRepository.save(multiplayerSession);
+
         List<Question> questions = loadQuestionsToDB();
 
         List<Long> expectedQuestionIds = questions.stream()
@@ -106,7 +108,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         questionSessionService.initializeSession(player1.getId(), expectedQuestionIds, "Sports");
         multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
 
-        questions.forEach(question -> validateCorrectAnswer(question));
+        questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
         GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
 
@@ -135,6 +137,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         );
 
     }
+
     private List<Question> loadQuestionsToDB() {
         Question questionObj1 = new Question();
         questionObj1.setCategory("Sports");
@@ -158,10 +161,10 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         return questionRepository.saveAll(List.of(questionObj1, questionObj2, questionObj3));
     }
 
-    private void validateCorrectAnswer(Question question) {
+    private void validateCorrectAnswer(Question question, Long sessionId) {
         MultiplayerAnswerValidationRequest request = new MultiplayerAnswerValidationRequest(
                 question.getId(),
-                multiplayerSession.getId(),
+                sessionId,
                 question.getCorrectAnswer(),
                 player1.getId()
         );
@@ -185,10 +188,117 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         // Test category selection and question progression
     }
 
-    @Test
-    void testGameCompletion() {
-        // Test different game completion scenarios (win/loss/tie)
+    @Nested
+    class gameCompletionTests {
+        private List<Question> questions;
+
+        @BeforeEach
+        void setUp() {
+            questions = loadQuestionsToDB();
+
+            questionSessionService.initializeSession(player1.getId(), questions.stream().map(Question::getId).toList(), "Sports");
+
+        }
+
+        @Test
+        void testGameCompletionWin() {
+
+            MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 5));
+
+            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+
+            questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
+
+            GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
+
+            assertAll("Post-win checks",
+                    () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
+                            "Game status should be COMPLETED after a player wins."),
+                    () -> assertEquals(player1.getId(), gameStateResponse.getWinnerId(),
+                            "Player 1 should be marked as the winner."),
+                    () -> assertEquals(player2.getId(), gameStateResponse.getLoserId(),
+                            "Player 2 should be marked as the loser.")
+            );
+
+            verifyNotifications(NotificationType.GAME_WON, NotificationType.GAME_LOST);
+        }
+        
+        @Test
+        void testGameCompleteLoss() {
+            MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(5, 18));
+
+            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+
+            questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
+
+            GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
+
+            assertAll("Post-win checks",
+                    () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
+                            "Game status should be COMPLETED after a player wins."),
+                    () -> assertEquals(player1.getId(), gameStateResponse.getLoserId(),
+                            "Player 1 should be marked as the loser."),
+                    () -> assertEquals(player2.getId(), gameStateResponse.getWinnerId(),
+                            "Player 2 should be marked as the winner.")
+            );
+            
+            verifyNotifications(NotificationType.GAME_LOST, NotificationType.GAME_WON);
+            
+        }
+        
+        @Test
+        void testGameCompleteTie() {
+            MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 18));
+
+            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+
+            questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
+
+            GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
+
+            assertAll("Post-tie checks",
+                    () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
+                            "Game status should be COMPLETED after a player wins."),
+                    () -> assertNull(gameStateResponse.getLoserId(),
+                            "Loser id should be null"),
+                    () -> assertNull( gameStateResponse.getWinnerId(),
+                            "Winner id should be null"),
+                    () -> assertTrue(gameStateResponse.getIsTie(), "Game should be tied")
+            );
+            
+            verifyNotifications(NotificationType.GAME_TIED, NotificationType.GAME_TIED);
+        }
+
+        private MultiplayerSession createAlmostCompleteGame(int player1Score, int player2Score) {
+
+            MultiplayerSession session = new MultiplayerSession(player1, player2, player1);
+            Map<Long, Integer> questionAnswered = new HashMap<>(Map.of(player1.getId(), 15, player2.getId(), 18));
+            Map<Long, Integer> scores = new HashMap<>(Map.of(player1.getId(), player1Score, player2.getId(), player2Score));
+            session.setCurrentPlayerTurn(player1);
+            session.setQuestionsAnswered(questionAnswered);
+            session.setScore(scores);
+            session.setStatus(GameStatus.ACTIVE);
+
+            return session;
+        }
+
+        private void verifyNotifications(NotificationType player1ExpectedType, NotificationType player2ExpectedType) {
+            
+            List<Notification> player1Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player1.getId());
+            List<Notification> player2Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player2.getId());
+
+            assertAll("Post-game notification checks",
+                    () -> assertTrue(player1Notifications.size() == 1
+                                    && player1Notifications.get(0).getType().equals(player1ExpectedType),
+                            String.format("Player 1 should have one unread %s notification.", player1ExpectedType)),
+                    () -> assertTrue(player2Notifications.size() == 1
+                                    && player2Notifications.get(0).getType().equals(player2ExpectedType),
+                            String.format("Player 2 should have one unread %s notification.", player2ExpectedType))
+            );
+        }
+
     }
+
 
     @Test
     void testPlayerAcknowledgment() {
