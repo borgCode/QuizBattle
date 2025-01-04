@@ -28,23 +28,23 @@ public class Player implements UserDetails {
 
     private String password;
     private String displayName;
-    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Stats stats;
     private boolean accountLocked;
     private boolean enabled;
 
     private String avatarPath;
 
-    @ManyToMany(mappedBy = "players")
+    @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY)
     private List<MultiplayerSession> session;
 
-    @OneToMany(mappedBy = "player1", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "player1", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Friendship> friendshipsInitiated = new HashSet<>();
 
-    @OneToMany(mappedBy = "player2", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "player2", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Friendship> friendshipsReceived = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Role> roles;
     
 

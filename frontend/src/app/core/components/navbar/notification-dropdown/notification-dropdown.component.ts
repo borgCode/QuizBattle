@@ -173,8 +173,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     this.multiplayerService.requestRematch({
       body: {
         sessionId: startedSessionId,
-        playerId: this.loginStateService.loggedInUser.id,
-        notificationId: notificationId}}).subscribe({
+        playerId: this.loginStateService.loggedInUser.id}}).subscribe({
       next: () => {
 
         this.alertMessageService.show('Send rematch request!', 'success')

@@ -11,5 +11,4 @@ public class RematchRequest {
     
     private Long sessionId;
     private Long playerId;
-    private Long notificationId;
 }
