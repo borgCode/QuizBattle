@@ -320,6 +320,8 @@ public class MultiplayerService {
         Long newSessionId = createMultiplayerSession(pendingSession);
 
         notificationService.sendRematchAcceptedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
+        
+        pendingSessionRepository.delete(pendingSession);
         return newSessionId;
     }
 
