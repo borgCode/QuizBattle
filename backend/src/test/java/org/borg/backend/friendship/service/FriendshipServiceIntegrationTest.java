@@ -2,8 +2,10 @@ package org.borg.backend.friendship.service;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.FriendshipStatus;
 import org.borg.backend.common.enums.NotificationType;
+import org.borg.backend.common.exceptions.FriendshipException;
 import org.borg.backend.friendship.dto.PlayerInteraction;
 import org.borg.backend.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.friendship.model.Friendship;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,11 +44,11 @@ class FriendshipServiceIntegrationTest {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private FriendshipService friendshipService;
 
     private Player sender;
     private Player receiver;
-    @Autowired
-    private FriendshipService friendshipService;
 
     @BeforeEach
     void setUp() {
@@ -85,9 +88,9 @@ class FriendshipServiceIntegrationTest {
         @Test
         void sendFriendRequestWithNoPendingRequestAndBeAccepted() {
             PlayerInteractionResponse response = setupFriendRequestScenario();
-            
+
             friendshipService.handleFriendshipResponse(response, true);
-            
+
             assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(receiver.getId()).isEmpty());
 
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(sender, receiver);
@@ -104,6 +107,19 @@ class FriendshipServiceIntegrationTest {
             assertEquals(NotificationType.FRIEND_ACCEPTED, friendRequestAcceptedNotification.getType());
         }
 
+        @Test
+        void sendFriendRequestWithNoPendingRequestAndBeRejected() {
+            PlayerInteractionResponse response = setupFriendRequestScenario();
+
+            friendshipService.handleFriendshipResponse(response, false);
+
+            assertAll("Verify friend request rejection",
+                    () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(receiver.getId()).isEmpty()),
+                    () -> assertTrue(friendshipRepository.findByPlayer1AndPlayer2(sender, receiver).isEmpty(), "Friendship was not deleted"),
+                    () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(sender.getId()).isEmpty())
+            );
+        }
+        
         private PlayerInteractionResponse setupFriendRequestScenario() {
             PlayerInteraction playerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
             friendshipService.sendFriendRequest(playerInteraction);
@@ -111,7 +127,7 @@ class FriendshipServiceIntegrationTest {
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(sender, receiver);
             List<Notification> notifications = notificationRepository.findByPlayerIdAndIsReadFalse(receiver.getId());
             Notification friendRequestNotification = notifications.get(0);
-            
+
             assertAll("Post-request friendship",
                     () -> assertTrue(friendship.isPresent(), "Friendship was not saved to repository"),
                     () -> assertEquals(sender, friendship.get().getPlayer1(), "Expected sender was not the actual sender"),
@@ -119,11 +135,36 @@ class FriendshipServiceIntegrationTest {
                     () -> assertEquals(FriendshipStatus.PENDING, friendship.get().getStatus(), "Friendship should be PENDING"),
                     () -> assertEquals(NotificationType.FRIEND_REQUEST, friendRequestNotification.getType(), "Notification type was not FRIEND_REQUEST")
             );
-            
+
             return new PlayerInteractionResponse(receiver.getId(), sender.getId(), friendRequestNotification.getId());
         }
+        
+        @Test
+        void throwErrorWhenRespondingToNoExistingFriendRequest() {
+            
+            Notification friendRequest = Notification.builder()
+                    .playerId(receiver.getId())
+                    .senderId(sender.getId())
+                    .type(NotificationType.FRIEND_REQUEST)
+                    .message(sender.getDisplayName() + " sent you a friend request!")
+                    .isRead(false)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            
+            Notification savedNotification = notificationRepository.save(friendRequest);
+            
+            PlayerInteractionResponse response = new PlayerInteractionResponse(receiver.getId(), sender.getId(), savedNotification.getId());
+
+            FriendshipException exception = assertThrows(FriendshipException.class,
+                    () -> friendshipService.handleFriendshipResponse(response, true));
+            
+            assertEquals(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND, exception.getErrorCode());
+            
+            assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(receiver.getId()).isEmpty());
+            
+        }
+        
     }
 
-    
-    
+
 }

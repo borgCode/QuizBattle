@@ -70,7 +70,7 @@ public class FriendshipService {
                         friendshipRepository.save(friendship);
                         notificationService.sendFriendAcceptedNotification(friendship.getPlayer1().getId(), sendingPlayer);
                         notificationService.sendFriendAcceptedNotification(friendship.getPlayer2().getId(), receivingPlayer);
-                        
+
                         //Clean up the friend request notif in the case of both sending a request
                         notificationService.deleteFriendRequestByPlayerIds(sendingPlayer.getId(), receivingPlayer.getId());
                     }
@@ -93,6 +93,7 @@ public class FriendshipService {
                         sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
 
         if (existingFriendships.isEmpty()) {
+            notificationService.markAsRead(response.getNotificationId());
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
         }
 
@@ -110,12 +111,11 @@ public class FriendshipService {
             friendshipRepository.delete(friendship);
         }
         
-        if (response.getNotificationId() != null) {
-            notificationService.markAsRead(response.getNotificationId());
-        }
+        notificationService.markAsRead(response.getNotificationId());
+
     }
 
-    
+
     public void blockPlayer(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
