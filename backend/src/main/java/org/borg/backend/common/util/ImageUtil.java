@@ -1,6 +1,9 @@
 package org.borg.backend.common.util;
 
+import org.springframework.core.io.ClassPathResource;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,12 +39,8 @@ public class ImageUtil {
     }
     
     public static String encodeStoryImageToBase64(String subFilePath) {
-        String basePath = "backend/src/main/java/org/borg/backend/storage/story/";
-
         try {
-            Path path = Paths.get(basePath + subFilePath);
-            byte[] imageBytes = Files.readAllBytes(path);
-            return Base64.getEncoder().encodeToString(imageBytes);
+            return loadAndEncodeResource("story/" + subFilePath);
         } catch (IOException e) {
 
             //TODO error handling
@@ -52,12 +51,8 @@ public class ImageUtil {
     }
 
     public static String encodeAchievementImageToBase64(String subFilePath) {
-        String basePath = "backend/src/main/java/org/borg/backend/storage/achievement/";
-
         try {
-            Path path = Paths.get(basePath + subFilePath);
-            byte[] imageBytes = Files.readAllBytes(path);
-            return Base64.getEncoder().encodeToString(imageBytes);
+            return loadAndEncodeResource("achievement/" + subFilePath);
         } catch (IOException e) {
 
             //TODO error handling
@@ -65,5 +60,13 @@ public class ImageUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static String loadAndEncodeResource(String resourcePath) throws IOException {
+        ClassPathResource resource = new ClassPathResource(resourcePath);
+        try (InputStream inputStream = resource.getInputStream()) {
+            byte[] imageBytes = inputStream.readAllBytes();
+            return Base64.getEncoder().encodeToString(imageBytes);
+        }
     }
 }
