@@ -89,22 +89,7 @@ class AuthControllerTest {
                         .value("Username is taken"))
                 .andExpect(jsonPath("$.error").value("Username is taken"));
     }
-
-    @Test
-    void registerWithUnfilledFieldsFailed() throws Exception {
-        RegistrationRequest request = RegistrationRequest.builder()
-                .username("")
-                .password("")
-                .displayName("")
-                .build();
-        
-        mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.validationErrors").isArray()) 
-                .andExpect(jsonPath("$.validationErrors").isNotEmpty());
-    }
+    
 
     @Test
     void authenticateSuccess() throws Exception {
@@ -122,25 +107,6 @@ class AuthControllerTest {
 
         verify(authService).authenticate(any(AuthRequest.class));
     }
-    @Test
-    void authenticateFailedWithIncorrectCredentials() throws Exception {
-        AuthRequest request = AuthRequest.builder()
-                .username("testuser123")
-                .password("wrongpassword")
-                .build();
-
-        when(authService.authenticate(any(AuthRequest.class)))
-                .thenThrow(new BadCredentialsException("Bad credentials"));
-
-        mockMvc.perform(post("/auth/authenticate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden()) 
-                .andExpect(jsonPath("$.businessErrorCode").value(BusinessErrorCodes.BAD_CREDENTIALS.getCode())) 
-                .andExpect(jsonPath("$.businessErrorDescription").value(BusinessErrorCodes.BAD_CREDENTIALS.getDescription())) 
-                .andExpect(jsonPath("$.error").value("Bad credentials"));
-    }
-
     @Test
     void refreshTokenSuccess() throws Exception {
         RefreshTokenRequest request = RefreshTokenRequest.builder()

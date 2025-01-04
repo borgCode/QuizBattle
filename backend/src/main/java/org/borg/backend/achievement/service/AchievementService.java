@@ -14,7 +14,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -83,8 +86,9 @@ public class AchievementService {
         
     }
 
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleGameWonEvent(AchievementEvents.GameWonEvent event) {
         Achievement achievement = achievementRepository.findByName("Victories");
 
@@ -109,7 +113,9 @@ public class AchievementService {
 
         int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
         log.warn("Current level is: {}", currentLevel);
-        if (currentLevel >= achievement.getLevels().size() - 1) {
+        log.warn("Achievement levels size: " + achievement.getLevels().size());
+        if (currentLevel >= achievement.getLevels().size()) {
+            log.warn("Returning null");
             return null;
         }
         

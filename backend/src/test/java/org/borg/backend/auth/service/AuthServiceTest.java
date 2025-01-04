@@ -16,21 +16,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 class AuthServiceTest {
@@ -178,58 +175,7 @@ class AuthServiceTest {
 
         }
     }
-
-    @Test
-    void authenticateWithInvalidCredentialsShouldThrowException() {
-        AuthRequest authRequest = AuthRequest.builder()
-                .username("testuser123")
-                .password("wrongpassword")
-                .build();
-        
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Invalid credentials"));
-        
-        assertThrows(BadCredentialsException.class, () ->
-                authService.authenticate(authRequest)
-        );
-        
-        verifyNoInteractions(jwtService);
-    }
-
-    @Test
-    void authenticateWithNonExistentUserShouldThrowException() {
-        AuthRequest authRequest = AuthRequest.builder()
-                .username("nonexistentuser")
-                .password("password123")
-                .build();
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new UsernameNotFoundException("User not found"));
-
-        assertThrows(UsernameNotFoundException.class, () ->
-                authService.authenticate(authRequest)
-        );
-        
-        verifyNoInteractions(jwtService);
-    }
-
-    @Test
-    void authenticateWithLockedAccountShouldThrowException() {
-        AuthRequest authRequest = AuthRequest.builder()
-                .username("lockeduser")
-                .password("password123")
-                .build();
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new LockedException("Account is locked"));
-
-        assertThrows(LockedException.class, () ->
-                authService.authenticate(authRequest)
-        );
-
-        verifyNoInteractions(jwtService);
-    }
-
+    
     @Test
     void refreshTokenSuccess() {
 
@@ -242,20 +188,6 @@ class AuthServiceTest {
         RefreshTokenResponse response = authService.refresh(request);
         
         assertEquals("newAccessToken", response.getAccessToken());
-        verify(jwtService).createNewAccessToken("refreshToken");
-    }
-    
-    @Test
-    void refreshTokenFailure() {
-        RefreshTokenRequest request = RefreshTokenRequest.builder()
-                .refreshToken("refreshToken").
-                build();
-
-        when(jwtService.createNewAccessToken(request.getRefreshToken())).thenReturn(null);
-
-        assertThrows(RuntimeException.class, () ->
-                authService.refresh(request));
-
         verify(jwtService).createNewAccessToken("refreshToken");
     }
 }

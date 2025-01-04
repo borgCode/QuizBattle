@@ -69,7 +69,7 @@ public class QuestionController {
     
     @PostMapping("chapter/clear-answers/{playerId}")
     public ResponseEntity<Void> clearRoundResults(@PathVariable Long playerId) {
-        questionSessionService.finishSession(playerId);
+        questionService.finishSession(playerId);
         return ResponseEntity.ok().build();
     }
 }
