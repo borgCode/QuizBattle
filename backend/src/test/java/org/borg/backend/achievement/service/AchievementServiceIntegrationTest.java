@@ -13,6 +13,7 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.seed.InitDataService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -64,18 +65,25 @@ public class AchievementServiceIntegrationTest {
         }
     }
 
-    @Nested
-    class AchievementLevelProgress {
-        @Test
-        void testPlayerProgressThroughAllLevels() {
-
-        }
-
-        @Test
-        void testMultipleCategoriesProgressSimultaneously() {
-
-        }
+    @AfterEach
+    void tearDown() {
+        userUnlockedAchievementRepository.deleteAll();
+        playerRepository.deleteAll();
+        achievementRepository.deleteAll();
     }
+
+//    @Nested
+//    class AchievementLevelProgress {
+//        @Test
+//        void testPlayerProgressThroughAllLevels() {
+//
+//        }
+//
+//        @Test
+//        void testMultipleCategoriesProgressSimultaneously() {
+//
+//        }
+//    }
 
     @Nested
     class MultiplePlayerConcurrentOperations {
@@ -218,10 +226,10 @@ public class AchievementServiceIntegrationTest {
 
         }
 
-        @Test
-        void multiplePlayersGetCorrectNotifications() {
-
-        }
+//        @Test
+//        void multiplePlayersGetCorrectNotifications() {
+//
+//        }
 
 
     }

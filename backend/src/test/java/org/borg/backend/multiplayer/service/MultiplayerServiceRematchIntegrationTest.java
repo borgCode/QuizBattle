@@ -17,6 +17,7 @@ import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -196,6 +197,8 @@ public class MultiplayerServiceRematchIntegrationTest {
 
         assertEquals(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT, exception.getErrorCode());
     }
+
+   
 }
 
 
