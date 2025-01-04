@@ -62,9 +62,9 @@ public class NotificationIntegrationTest {
         completedMultiplayerSession.setStatus(GameStatus.COMPLETED);
         multiplayerSessionRepository.save(completedMultiplayerSession);
         
-        RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId(), )
-
-        notificationService.sendRematchRequestNotification(opponentPlayer.getId(), sendingPlayer.getDisplayName(), );
+//        RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId(), )
+//
+//        notificationService.sendRematchRequestNotification(opponentPlayer.getId(), sendingPlayer.getDisplayName(), );
     }
 
     private Player createAndSavePlayer(String name) {
