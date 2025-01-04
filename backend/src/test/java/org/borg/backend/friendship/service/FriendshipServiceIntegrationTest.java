@@ -6,6 +6,7 @@ import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.FriendshipStatus;
 import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.FriendshipException;
+import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.friendship.dto.PlayerInteraction;
 import org.borg.backend.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.friendship.model.Friendship;
@@ -119,6 +120,21 @@ class FriendshipServiceIntegrationTest {
                     () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(sender.getId()).isEmpty())
             );
         }
+        @Test
+        void throwErrorWhenSendingRequestToExistingFriendship() {
+            PlayerInteractionResponse response = setupFriendRequestScenario();
+            
+            friendshipService.handleFriendshipResponse(response, true);
+            
+            PlayerInteraction newFriendRequest = new PlayerInteraction(sender.getId(), receiver.getId());
+            
+            FriendshipException exception = assertThrows(FriendshipException.class,
+                    () -> friendshipService.sendFriendRequest(newFriendRequest));
+            
+            assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS, exception.getErrorCode());
+            
+        }
+        
         
         private PlayerInteractionResponse setupFriendRequestScenario() {
             PlayerInteraction playerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
@@ -137,6 +153,40 @@ class FriendshipServiceIntegrationTest {
             );
 
             return new PlayerInteractionResponse(receiver.getId(), sender.getId(), friendRequestNotification.getId());
+        }
+        @Test
+        void automaticallyAcceptFriendshipWhenBothPlayersSendRequest() {
+            PlayerInteraction firstPlayerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            friendshipService.sendFriendRequest(firstPlayerInteraction);
+
+            PlayerInteraction secondPlayerInteraction = new PlayerInteraction(receiver.getId(), sender.getId());
+            friendshipService.sendFriendRequest(secondPlayerInteraction);
+            
+            List<Notification> notificationsPlayer1 = notificationRepository.findByPlayerIdAndIsReadFalse(sender.getId());
+            List<Notification> notificationsPlayer2 = notificationRepository.findByPlayerIdAndIsReadFalse(receiver.getId());
+            
+            assertAll("Both players should only have friend request accepted notifications",
+                    () -> assertTrue(notificationsPlayer1.size() == 1
+                    && notificationsPlayer1.get(0).getType().equals(NotificationType.FRIEND_ACCEPTED)),
+            () -> assertTrue(notificationsPlayer2.size() == 1
+                    && notificationsPlayer2.get(0).getType().equals(NotificationType.FRIEND_ACCEPTED))
+            );
+
+            assertFalse(friendshipRepository.findByPlayer1AndPlayer2OrPlayer1AndPlayer2(sender, receiver, receiver, sender).isEmpty());
+            
+        }
+        @Test
+        void throwErrorWhenSendingSendingMultipleRequests() {
+            PlayerInteraction firstPlayerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            friendshipService.sendFriendRequest(firstPlayerInteraction);
+            
+            PlayerInteraction secondPlayerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            
+            FriendshipException exception = assertThrows(FriendshipException.class,
+                    () -> friendshipService.sendFriendRequest(secondPlayerInteraction)
+            );
+            
+            assertEquals(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING, exception.getErrorCode());
         }
         
         @Test
@@ -163,8 +213,58 @@ class FriendshipServiceIntegrationTest {
             assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(receiver.getId()).isEmpty());
             
         }
+        @Test
+        void throwErrorWhenSendingToBlockedFriendship() {
+            PlayerInteraction playerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            
+            friendshipService.blockPlayer(playerInteraction);
+            
+            PlayerInteraction otherPlayerInteraction = new PlayerInteraction(receiver.getId(), sender.getId());
+            
+            FriendshipException exception = assertThrows(FriendshipException.class,
+                    () -> friendshipService.sendFriendRequest(otherPlayerInteraction));
+            
+            assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED, exception.getErrorCode());
+            
+            
+        }
+        
+    }
+    @Nested
+    class BlockPlayerTests {
+        
+        @Test
+        void successfullyBlockPlayer() {
+            PlayerInteraction playerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+
+            friendshipService.blockPlayer(playerInteraction);
+
+            Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(sender, receiver);
+            assertAll("Post-block friendship",
+                    () -> assertTrue(friendship.isPresent(), "Friendship was not saved to repository"),
+                    () -> assertEquals(sender, friendship.get().getPlayer1(), "The player who blocked was not the expected player"),
+                    () -> assertEquals(receiver, friendship.get().getPlayer2(), "The blocked player was not the expected player"),
+                    () -> assertEquals(FriendshipStatus.BLOCKED, friendship.get().getStatus(), "Friendship should be BLOCKED")
+            );
+        }
+        
+        @Test
+        void throwErrorWhenAlreadyBlocked() {
+            PlayerInteraction firstPlayerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+
+            friendshipService.blockPlayer(firstPlayerInteraction);
+
+            PlayerInteraction secondPlayerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            
+            FriendshipException exception = assertThrows(FriendshipException.class,
+                    () -> friendshipService.blockPlayer(secondPlayerInteraction));
+            
+            assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED, exception.getErrorCode());
+
+        }
         
     }
 
-
+    
+    
 }
