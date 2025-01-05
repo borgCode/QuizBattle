@@ -361,6 +361,14 @@ public class MultiplayerService {
 
         session.getPlayerHasGivenUp().put(playerId, true);
         session.setStatus(GameStatus.COMPLETED);
+
+        session.setLoserId(playerId);
+        session.setWinnerId(session.getPlayers().stream()
+                .filter(player -> !player.getId().equals(playerId))
+                .findFirst()
+                .map(Player::getId)
+                .orElseThrow(() -> new IllegalStateException("Player not found in session")));
+        
         multiplayerSessionRepository.save(session);
 
         List<Player> players = session.getPlayers();
@@ -375,14 +383,7 @@ public class MultiplayerService {
 
 
         playerRepository.saveAll(players);
-
-        session.setLoserId(playerId);
-        session.setWinnerId(session.getPlayers().stream()
-                .filter(player -> !player.getId().equals(playerId))
-                .findFirst()
-                .map(Player::getId)
-                .orElseThrow(() -> new IllegalStateException("Player not found in session")));
-
+        
         notificationService.sendGameWonNotification(session);
         notificationService.sendGameLostNotification(session);
 

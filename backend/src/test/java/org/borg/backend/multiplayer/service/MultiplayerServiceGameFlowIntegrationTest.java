@@ -151,11 +151,6 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         questionService.validateMultiplayerAnswer(request);
 
     }
-
-    @Test
-    void testScoring() {
-        // Test score updates and winner determination
-    }
     
     @Nested
     class turnValidationTests {
@@ -253,7 +248,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
                     new MultiplayerQuestionsRequest("Sports", sessionId, player1.getId()));
             
             MultiplayerAnswerValidationRequest request = 
-                    new MultiplayerAnswerValidationRequest(questions.get(0).getId(), sessionId, questions.get(0).getCorrectAnswer(), player2.getId());
+                    new MultiplayerAnswerValidationRequest(questions.get(0).getId(), sessionId, questions.get(0).getCorrectAnswer(), player1.getId());
             
             questionService.validateMultiplayerAnswer(request);
             
@@ -261,15 +256,9 @@ public class MultiplayerServiceGameFlowIntegrationTest {
                     () ->  questionService.validateMultiplayerAnswer(request),
                     "Player should not be able to answer the same question more than once"
             );
-            
             assertEquals(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED, exception.getErrorCode());
         }
         
-    }
-    
-    @Test
-    void testRoundManagement() {
-        // Test category selection and question progression
     }
 
     @Nested
@@ -352,6 +341,35 @@ public class MultiplayerServiceGameFlowIntegrationTest {
             
             verifyNotifications(NotificationType.GAME_TIED, NotificationType.GAME_TIED);
         }
+        
+        @Test
+        void testGameOverAcknowledgement() {
+            MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 5));
+
+            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+
+            questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
+            
+            multiplayerService.acknowledgeGameOver(multiplayerSession.getId(), player1.getId());
+
+            
+            
+            Map<Long, Boolean> firstAcknowledgements = multiplayerService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
+            assertAll("First acknowledgement checks",
+                    () -> assertTrue(firstAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
+                    () -> assertFalse(firstAcknowledgements.get(player2.getId()), "Player2 acknowledgement should be false")
+                    );
+            
+            multiplayerService.acknowledgeGameOver(multiplayerSession.getId(), player2.getId());
+
+            Map<Long, Boolean> secondAcknowledgements = multiplayerService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
+
+            assertAll("Second acknowledgement checks",
+                    () -> assertTrue(secondAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
+                    () -> assertTrue(secondAcknowledgements.get(player2.getId()), "Player2 acknowledgement should be true")
+            );
+            
+        }
 
         private MultiplayerSession createAlmostCompleteGame(int player1Score, int player2Score) {
 
@@ -366,28 +384,47 @@ public class MultiplayerServiceGameFlowIntegrationTest {
             return session;
         }
 
-        private void verifyNotifications(NotificationType player1ExpectedType, NotificationType player2ExpectedType) {
-            
-            List<Notification> player1Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player1.getId());
-            List<Notification> player2Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player2.getId());
-
-            assertAll("Post-game notification checks",
-                    () -> assertTrue(player1Notifications.size() == 1
-                                    && player1Notifications.get(0).getType().equals(player1ExpectedType),
-                            String.format("Player 1 should have one unread %s notification.", player1ExpectedType)),
-                    () -> assertTrue(player2Notifications.size() == 1
-                                    && player2Notifications.get(0).getType().equals(player2ExpectedType),
-                            String.format("Player 2 should have one unread %s notification.", player2ExpectedType))
-            );
-        }
-
     }
-
-
+    
     @Test
-    void testPlayerAcknowledgment() {
-        // Test game acknowledgment flow
+    void testGiveUpHandling() {
+        MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1);
+        multiplayerSession.setStatus(GameStatus.ACTIVE);
+        multiplayerSessionRepository.save(multiplayerSession);
+        
+        multiplayerService.handleGiveUp(multiplayerSession.getId(), player1.getId());
+        
+        MultiplayerSession updatedSession = multiplayerSessionRepository.findById(multiplayerSession.getId())
+                .orElseThrow();
+
+        Long playerWhoGaveUp = updatedSession.getPlayerHasGivenUp().entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+        
+        assertAll("Post give up session checks",
+                () -> assertEquals(player1.getId(), playerWhoGaveUp, "Player1 should be the one who gave up"),
+                () -> assertEquals(GameStatus.COMPLETED, updatedSession.getStatus(), "Game status should be COMPLETED"),
+                () -> assertEquals(player1.getId(), updatedSession.getLoserId(), "Player1 should be the loser"),
+                () -> assertEquals(player2.getId(), updatedSession.getWinnerId(), "Player2 should be the winner")
+                );
+        
+        Player updatedPlayer1 = playerRepository.findById(player1.getId())
+                .orElseThrow();
+        Player updatedPlayer2 = playerRepository.findById(player2.getId())
+                .orElseThrow();
+        
+        assertAll("Post give up stats checks",
+                () -> assertEquals(1, updatedPlayer1.getStats().getNumOfLosses(), "Player1 should have 1 loss"),
+                () -> assertEquals(0, updatedPlayer1.getStats().getNumOfWins(), "Player2 should have 0 wins"),
+                () -> assertEquals(0, updatedPlayer2.getStats().getNumOfLosses(), "Player2 should have 0 losses"),
+                () -> assertEquals(1, updatedPlayer2.getStats().getNumOfWins(), "Player2 should have 1 win")
+                );
+        
+        verifyNotifications(NotificationType.GAME_LOST, NotificationType.GAME_WON);
     }
+    
 
     private List<Question> loadQuestionsToDB() {
         Question questionObj1 = new Question();
@@ -410,5 +447,20 @@ public class MultiplayerServiceGameFlowIntegrationTest {
 
 
         return questionRepository.saveAll(List.of(questionObj1, questionObj2, questionObj3));
+    }
+
+    private void verifyNotifications(NotificationType player1ExpectedType, NotificationType player2ExpectedType) {
+
+        List<Notification> player1Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player1.getId());
+        List<Notification> player2Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player2.getId());
+
+        assertAll("Post-game notification checks",
+                () -> assertTrue(player1Notifications.size() == 1
+                                && player1Notifications.get(0).getType().equals(player1ExpectedType),
+                        String.format("Player 1 should have one unread %s notification.", player1ExpectedType)),
+                () -> assertTrue(player2Notifications.size() == 1
+                                && player2Notifications.get(0).getType().equals(player2ExpectedType),
+                        String.format("Player 2 should have one unread %s notification.", player2ExpectedType))
+        );
     }
 }
