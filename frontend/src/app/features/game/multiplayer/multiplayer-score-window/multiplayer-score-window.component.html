@@ -23,6 +23,10 @@
           <div  (click)="removeFriend()" class="btn btn-warning mt-2">Remove friend</div>
           <div  (click)="blockPlayer()" class="btn btn-danger mt-2">Block player</div>
         </div>
+        <div *ngSwitchCase="'INCOMING_REQUEST'" class="div">
+          <div  (click)="acceptFriend()" class="btn btn-success mt-2">Accept friend request</div>
+          <div  (click)="blockPlayer()" class="btn btn-danger mt-2">Block player</div>
+        </div>
       </div>
       <p>{{ playerTotalScore }}
         - {{ opponentTotalScore }}</p>

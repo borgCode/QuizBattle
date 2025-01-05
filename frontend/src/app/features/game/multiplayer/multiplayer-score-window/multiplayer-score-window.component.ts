@@ -273,6 +273,15 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     });
   }
 
+  acceptFriend() {
+    this.friendshipService.acceptFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
+      next: () => {
+        this.alertMessageService.show('Accepted friend request', 'success')
+        this.getFriendshipStatus();
+      },
+    });
+  }
+
   backToMultiplayerPage() {
     this.router.navigate(['multiplayer']);
   }

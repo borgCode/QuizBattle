@@ -222,7 +222,7 @@ export class FriendshipService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getRelationshipStatus$Response(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE'>> {
+  getRelationshipStatus$Response(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'>> {
     return getRelationshipStatus(this.http, this.rootUrl, params, context);
   }
 
@@ -232,9 +232,9 @@ export class FriendshipService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getRelationshipStatus(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE'> {
+  getRelationshipStatus(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'> {
     return this.getRelationshipStatus$Response(params, context).pipe(
-      map((r: StrictHttpResponse<'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE'>): 'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE' => r.body)
+      map((r: StrictHttpResponse<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'>): 'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE' => r.body)
     );
   }
 

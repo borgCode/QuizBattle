@@ -310,7 +310,8 @@ class FriendshipServiceIntegrationTest {
         @Test
         void getFriendshipStatusTest() {
             RelationshipStatusRequest request = new RelationshipStatusRequest(player1.getId(), player2.getId());
-            
+            RelationshipStatusRequest receiverRequest = new RelationshipStatusRequest(player2.getId(), player1.getId());
+
             FriendshipStatus noneStatus = friendshipService.getRelationshipStatus(request);
             assertEquals(FriendshipStatus.NONE, noneStatus, "Status should be NONE");
 
@@ -318,7 +319,10 @@ class FriendshipServiceIntegrationTest {
             friendshipService.sendFriendRequest(friendRequestFromPlayer1);
 
             FriendshipStatus pendingStatus = friendshipService.getRelationshipStatus(request);
-            assertEquals(FriendshipStatus.PENDING, pendingStatus, "Status should be PENDING");
+            assertEquals(FriendshipStatus.PENDING, pendingStatus, "Sender should see PENDING status");
+
+            FriendshipStatus incomingStatus = friendshipService.getRelationshipStatus(receiverRequest);
+            assertEquals(FriendshipStatus.INCOMING_REQUEST, incomingStatus, "Receiver should see INCOMING_REQUEST status");
 
             PlayerInteraction friendRequestFromPlayer2 = new PlayerInteraction(player2.getId(), player1.getId());
             friendshipService.sendFriendRequest(friendRequestFromPlayer2);
@@ -330,7 +334,10 @@ class FriendshipServiceIntegrationTest {
             friendshipService.blockPlayer(blockRequestFromPlayer1);
 
             FriendshipStatus blockedStatus = friendshipService.getRelationshipStatus(request);
-            assertEquals(FriendshipStatus.BLOCKED, blockedStatus, "Status should be BLOCKED");
+            assertEquals(FriendshipStatus.BLOCKED, blockedStatus, "Blocker should see BLOCKED status");
+
+            FriendshipStatus blockedPlayerStatus = friendshipService.getRelationshipStatus(receiverRequest);
+            assertEquals(FriendshipStatus.NONE, blockedPlayerStatus, "Blocked player should see NONE status");
             
         }
 

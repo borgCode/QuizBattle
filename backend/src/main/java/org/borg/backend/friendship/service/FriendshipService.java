@@ -117,8 +117,11 @@ public class FriendshipService {
             friendshipRepository.delete(friendship);
         }
 
-        notificationService.markAsRead(response.getNotificationId());
-
+        if (response.getNotificationId() != null) {
+            notificationService.markAsRead(response.getNotificationId());
+        } else {
+            notificationService.deleteFriendRequestByPlayerIds(response.getSenderId(), response.getReceiverId());
+        }
     }
 
 
@@ -186,9 +189,12 @@ public class FriendshipService {
         Player receivingPlayer = playerRepository.findById(removeFriendRequest.getReceiverId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
-        if (existingFriendship.isPresent()) {
-            Friendship friendship = existingFriendship.get();
+        List<Friendship> existingFriendships = friendshipRepository
+                .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
+                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
+        
+        if (!existingFriendships.isEmpty()) {
+            Friendship friendship = existingFriendships.get(0);
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
                 throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
             }
@@ -223,7 +229,22 @@ public class FriendshipService {
                         request.getTargetPlayerId(),
                         request.getTargetPlayerId(),
                         request.getPlayerId());
+
+        if (friendships.isEmpty()) {
+            return FriendshipStatus.NONE;
+        }
+
+        Friendship friendship = friendships.get(0);
         
-        return friendships.isEmpty() ? FriendshipStatus.NONE : friendships.get(0).getStatus();
+        if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
+            return friendship.getPlayer1().getId().equals(request.getPlayerId()) ?
+                    FriendshipStatus.BLOCKED : FriendshipStatus.NONE;
+        }
+
+        if (friendship.getStatus() == FriendshipStatus.PENDING) {
+            return friendship.getPlayer1().getId().equals(request.getPlayerId()) ?
+                    FriendshipStatus.PENDING : FriendshipStatus.INCOMING_REQUEST;
+        }
+        return friendship.getStatus();
     }
 }
