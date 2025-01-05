@@ -230,6 +230,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   sendFriendRequest() {
     this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
       next: () => {
+        console.log("Stored id: " + this.storedPlayerId)
+        console.log("Opponent id: " + this.opponentId)
         this.alertMessageService.show('Friend request sent successfully', 'success')
         this.getFriendshipStatus();
       },
@@ -239,6 +241,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   cancelFriendRequest() {
     this.friendshipService.removeAsFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
       next: () => {
+        console.log("Stored id: " + this.storedPlayerId)
+        console.log("Opponent id: " + this.opponentId)
         this.alertMessageService.show('Friend request canceled', 'success')
         this.getFriendshipStatus();
       },

@@ -32,6 +32,8 @@ public class FriendshipService {
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
+        log.warn("Friend request sender: " + request.getSenderId());
+        log.warn("Friend request receiver: " + request.getReceiverId());
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -121,6 +123,7 @@ public class FriendshipService {
 
 
     public void blockPlayer(PlayerInteraction blockRequest) {
+        
         Player sendingPlayer = playerRepository.findById(blockRequest.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -173,7 +176,10 @@ public class FriendshipService {
 
     }
 
+    @Transactional
     public void removeAsFriend(PlayerInteraction removeFriendRequest) {
+        log.warn("Remove request sender: " + removeFriendRequest.getSenderId());
+        log.warn("Remove request receiver: " + removeFriendRequest.getReceiverId());
         Player sendingPlayer = playerRepository.findById(removeFriendRequest.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 

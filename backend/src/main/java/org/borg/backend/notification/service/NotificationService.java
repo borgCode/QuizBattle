@@ -27,7 +27,6 @@ public class NotificationService {
     }
 
     public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer) {
-        log.warn("Sending notification from {} to {}", receiverId, sendingPlayer.getDisplayName());
         notificationRepository.save(Notification.builder()
                 .playerId(receiverId)
                 .senderId(sendingPlayer.getId())
