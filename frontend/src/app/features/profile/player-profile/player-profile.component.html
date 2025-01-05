@@ -1,7 +1,6 @@
-
 <div class="container p-5" style="height: 100%">
   <div class="container">
-    <div class="row text-center g-4">
+    <div class="row text-center h-25 g-4 overflow-hidden overflow-y-auto">
       <div class="col-md-4">
         <div class="card">
           <img [src]="image" class="card-img-top" style="max-height: 340px" alt="...">
@@ -27,14 +26,32 @@
         </div>
       </div>
       <div class="col-md-4">
-        <app-friends-panel [friendsList]="friendsList"></app-friends-panel>
+        <ul class="nav nav-tabs nav-justified">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#friends">Friends</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#blocked">Blocked</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade show active p-2" id="friends">
+            <app-friends-panel [friendsList]="friendsList"></app-friends-panel>
+          </div>
+          <div class="tab-pane fade" id="blocked">
+          </div>
+        </div>
       </div>
     </div>
+
     <div class="row">
       <div class="col-md-5 offset-md-4"></div>
     </div>
   </div>
   <app-category-pie-chart [categoryStats]=player.stats.categoryStats></app-category-pie-chart>
 </div>
+
+
+
 
 

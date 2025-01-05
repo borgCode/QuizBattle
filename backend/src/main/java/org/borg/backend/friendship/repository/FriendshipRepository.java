@@ -21,5 +21,5 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
             "JOIN Friendship f ON ((f.player1.id = :playerId AND p = f.player2) " +
             "OR (f.player2.id = :playerId AND p = f.player1))" +
             "AND f.status = :status")
-    List<Player> getAllByPlayerId(Long playerId, FriendshipStatus status);
+    List<Player> getAllByPlayerIdAndStatus(Long playerId, FriendshipStatus status);
 }
