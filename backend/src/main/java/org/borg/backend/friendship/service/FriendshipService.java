@@ -58,14 +58,14 @@ public class FriendshipService {
             log.warn("Friendship status: " + friendship.getStatus());
             if (friendship.getPlayer1().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
-                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
+                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
                     case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
                     case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
                 }
             } else if (friendship.getPlayer2().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
                     case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
-                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
+                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
                     case PENDING -> {
                         friendship.setStatus(FriendshipStatus.ACTIVE);
                         friendshipRepository.save(friendship);
@@ -128,7 +128,7 @@ public class FriendshipService {
         if (existingFriendship.isPresent()) {
             Friendship friendship = existingFriendship.get();
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
-                throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED);
+                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
             }
             if (friendship.getStatus() == FriendshipStatus.PENDING || friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 friendship.setStatus(FriendshipStatus.BLOCKED);

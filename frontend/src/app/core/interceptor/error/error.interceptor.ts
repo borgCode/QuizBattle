@@ -69,6 +69,9 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 204:
               this.alertMessageService.show("You can't unblock someone who isn't blocked", 'error');
               break;
+            case 205:
+              this.alertMessageService.show("You already blocked this player!", 'error');
+              break;
             case 300:
               this.alertMessageService.show('You already sent a rematch request!', 'error');
               break;

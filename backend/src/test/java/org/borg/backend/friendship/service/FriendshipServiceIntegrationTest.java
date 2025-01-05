@@ -222,7 +222,7 @@ class FriendshipServiceIntegrationTest {
             FriendshipException exception = assertThrows(FriendshipException.class,
                     () -> friendshipService.sendFriendRequest(otherPlayerInteraction));
             
-            assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED, exception.getErrorCode());
+            assertEquals(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER, exception.getErrorCode());
             
             
         }
@@ -257,7 +257,7 @@ class FriendshipServiceIntegrationTest {
             FriendshipException exception = assertThrows(FriendshipException.class,
                     () -> friendshipService.blockPlayer(secondPlayerInteraction));
             
-            assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED, exception.getErrorCode());
+            assertEquals(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP, exception.getErrorCode());
 
         }
 

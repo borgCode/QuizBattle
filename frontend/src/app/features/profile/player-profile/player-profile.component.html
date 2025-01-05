@@ -41,7 +41,9 @@
             ></app-relationship-panel>
           </div>
           <div class="tab-pane fade" id="blocked">
-            <app-relationship-panel [relationships]="blockedList"></app-relationship-panel>
+            <app-relationship-panel [relationships]="blockedList"
+                                    (relationshipActionSelected)="handleAction($event)"
+            ></app-relationship-panel>
           </div>
         </div>
       </div>

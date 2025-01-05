@@ -7,6 +7,7 @@ import {FriendshipService} from '../../../api/generated/services/friendship.serv
 import {Router} from '@angular/router';
 import {PlayerService} from '../../../api/generated/services/player.service';
 import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
+import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-user-profile',
@@ -72,13 +73,17 @@ export class PlayerProfileComponent implements OnInit {
         //TODO remove logic
         break;
       case "BLOCK":
+        console.log("Calling block")
         this.friendshipService.blockPlayer({
           body: {
             senderId: this.player.id,
             receiverId: $event.playerId
           }
         }).subscribe({
-          next: () => this.alertMessageService.show("Blocked player", "success")
+          next: () => this.alertMessageService.show("Blocked player", "success"),
+          error: err => {
+            console.log(err)
+          }
         })
         break;
       default:
