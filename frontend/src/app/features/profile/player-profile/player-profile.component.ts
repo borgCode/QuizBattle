@@ -75,7 +75,10 @@ export class PlayerProfileComponent implements OnInit {
             receiverId: $event.playerId
           }
         }).subscribe({
-          next: () => this.alertMessageService.show("Removed player from friends", "success"),
+          next: () => {
+            this.alertMessageService.show("Removed player from friends", "success")
+            this.getFriends();
+          },
           error: err => {
             console.log(err)
           }
@@ -88,7 +91,10 @@ export class PlayerProfileComponent implements OnInit {
             receiverId: $event.playerId
           }
         }).subscribe({
-          next: () => this.alertMessageService.show("Blocked player", "success"),
+          next: () => {
+            this.alertMessageService.show("Blocked player", "success")
+            this.getFriends()
+          },
           error: err => {
             console.log(err)
           }
@@ -101,7 +107,10 @@ export class PlayerProfileComponent implements OnInit {
             receiverId: $event.playerId
           }
         }).subscribe({
-          next: () => this.alertMessageService.show("Unblocked player", "success"),
+          next: () => {
+            this.alertMessageService.show("Unblocked player", "success")
+            this.getFriends()
+          },
           error: err => {
             console.log(err)
           }
