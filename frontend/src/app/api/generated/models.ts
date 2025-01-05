@@ -26,6 +26,7 @@ export { RefreshTokenRequest } from './models/refresh-token-request';
 export { RefreshTokenResponse } from './models/refresh-token-response';
 export { RegistrationRequest } from './models/registration-request';
 export { RelationshipsDto } from './models/relationships-dto';
+export { RelationshipStatusRequest } from './models/relationship-status-request';
 export { RematchRequest } from './models/rematch-request';
 export { RematchResponse } from './models/rematch-response';
 export { SinglePlayerAnswerValidationRequest } from './models/single-player-answer-validation-request';

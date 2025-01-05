@@ -4,11 +4,12 @@
       <app-player-card
         [playerAvatar]="'data:image/jpeg;base64,' + gameState.playerDTOS[(opponentIndex + 1) % 2].base64Image"
         [playerDisplayName]="gameState.playerDTOS[(opponentIndex + 1) % 2].displayName"
-      maxHeight="150px"></app-player-card>
+        maxHeight="150px"></app-player-card>
     </div>
     <div class="score-panel col-4 col-sm-4 align-content-center text-center">
-      <div (click)="sendFriendRequest(gameState.playerDTOS[opponentIndex].id)" class="btn btn-primary mt-2">Send
-        friend request
+      <div [ngSwitch]="friendshipStatus">
+        <div *ngSwitchCase="'NONE'" (click)="sendFriendRequest()" class="btn btn-primary mt-2">Send friend request</div>
+        <div *ngSwitchCase="'PENDING'" (click)="cancelFriendRequest()" class="btn btn-warning mt-2">Cancel request pending</div>
       </div>
       <p>{{ playerTotalScore }}
         - {{ opponentTotalScore }}</p>

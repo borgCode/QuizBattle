@@ -21,6 +21,8 @@ import { getFriends } from '../fn/friendship/get-friends';
 import { GetFriends$Params } from '../fn/friendship/get-friends';
 import { getRelationships } from '../fn/friendship/get-relationships';
 import { GetRelationships$Params } from '../fn/friendship/get-relationships';
+import { getRelationshipStatus } from '../fn/friendship/get-relationship-status';
+import { GetRelationshipStatus$Params } from '../fn/friendship/get-relationship-status';
 import { PlayerDto } from '../models/player-dto';
 import { rejectFriendship } from '../fn/friendship/reject-friendship';
 import { RejectFriendship$Params } from '../fn/friendship/reject-friendship';
@@ -208,6 +210,31 @@ export class FriendshipService extends BaseService {
   getRelationships(params: GetRelationships$Params, context?: HttpContext): Observable<RelationshipsDto> {
     return this.getRelationships$Response(params, context).pipe(
       map((r: StrictHttpResponse<RelationshipsDto>): RelationshipsDto => r.body)
+    );
+  }
+
+  /** Path part for operation `getRelationshipStatus()` */
+  static readonly GetRelationshipStatusPath = '/friendship/relationship/status';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getRelationshipStatus()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getRelationshipStatus$Response(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE'>> {
+    return getRelationshipStatus(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getRelationshipStatus$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getRelationshipStatus(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE'> {
+    return this.getRelationshipStatus$Response(params, context).pipe(
+      map((r: StrictHttpResponse<'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE'>): 'PENDING' | 'ACTIVE' | 'BLOCKED' | 'NONE' => r.body)
     );
   }
 

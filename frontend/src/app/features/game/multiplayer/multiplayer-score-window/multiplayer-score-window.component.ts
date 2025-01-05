@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../api/generated/models/game-state-response';
 import {PlayerQuestionResult} from '../../../../api/generated/models/player-question-result';
 import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
@@ -25,7 +25,9 @@ interface BoxRow {
   imports: [
     NgForOf,
     NgIf,
-    PlayerCardComponent
+    PlayerCardComponent,
+    NgSwitch,
+    NgSwitchCase
   ],
   templateUrl: './multiplayer-score-window.component.html',
   styleUrl: './multiplayer-score-window.component.css'
@@ -40,9 +42,12 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   isGameOver: boolean = false;
   playerTotalScore: number;
   opponentTotalScore: number;
+  opponentId: number;
   opponentDisplayName: string;
   opponentAvatar: string = '';
   hasAcknowledgedGameOver: boolean;
+
+  friendshipStatus: string;
 
   constructor(
     private multiplayerService: MultiplayerService,
@@ -91,9 +96,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       next: gameState => {
         this.gameState = gameState;
 
-        this.opponentIndex = this.gameState.playerDTOS.findIndex(player =>
-          player.id !== this.storedPlayerId
-        );
+        this.opponentIndex = this.gameState.playerDTOS.findIndex(player => player.id !== this.storedPlayerId);
+        this.opponentId = this.gameState.playerDTOS[this.opponentIndex].id;
 
         this.playerTotalScore = gameState.scores[gameState.playerDTOS[(this.opponentIndex + 1) % 2].id];
         this.opponentTotalScore = gameState.scores[gameState.playerDTOS[this.opponentIndex].id];
@@ -113,8 +117,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             }
           }
         )
-
-
         this.hasAcknowledgedGameOver = gameState.playerAcknowledgment[this.storedPlayerId];
 
         if (gameState.status == 'COMPLETED') {
@@ -123,11 +125,9 @@ export class MultiplayerScoreWindowComponent implements OnInit {
           if (!this.hasAcknowledgedGameOver) {
             this.handleGameOver();
           }
-
         }
+        this.getFriendshipStatus()
       }
-
-
     });
   }
 
@@ -148,9 +148,26 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   }
 
+  private getFriendshipStatus() {
+    this.friendshipService.getRelationshipStatus({
+      relationshipStatusRequest: {
+        playerId: this.storedPlayerId,
+        targetPlayerId: this.opponentId
+      }
+    }).subscribe({
+      next: value => {
+        if (value) {
+          this.friendshipStatus = value;
+        }
+
+      },
+      error: err => {
+        console.log(err)
+      }
+    })
+  }
+
   private handleGameOver() {
-
-
     const gameResult: GameResult = (() => {
       if (this.gameState.playerWhoGaveUp) {
         console.log("A player gave up: " + this.gameState.playerWhoGaveUp)
@@ -210,9 +227,21 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
 
-  sendFriendRequest(opponentId: number) {
-    this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverId: opponentId}}).subscribe({
-      next: () => this.alertMessageService.show('Friend request sent successfully', 'success'),
+  sendFriendRequest() {
+    this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
+      next: () => {
+        this.alertMessageService.show('Friend request sent successfully', 'success')
+        this.getFriendshipStatus();
+      },
+    });
+  }
+
+  cancelFriendRequest() {
+    this.friendshipService.removeAsFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
+      next: () => {
+        this.alertMessageService.show('Friend request canceled', 'success')
+        this.getFriendshipStatus();
+      },
     });
   }
 
@@ -230,6 +259,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       next: () => this.alertMessageService.show('Send rematch request!', 'success'),
     })
   }
+
 
   giveUpClick() {
     this.multiplayerService.giveUp({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
