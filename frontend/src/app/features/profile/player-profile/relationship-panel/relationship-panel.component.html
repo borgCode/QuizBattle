@@ -1,0 +1,21 @@
+<ng-container *ngFor="let player of relationships">
+  <div class="row align-items-center bg-light">
+    <div class="player-avatar col-4 p-2">
+      <img [src]="'data:image/jpeg;base64,' + player.base64Image" style="max-height: 40px; max-width: 40px"
+           alt="player avatar" class="rounded-circle"/>
+    </div>
+    <div class="player-name col-4 fw-bold">
+      {{ player.displayName }}
+    </div>
+    <div class="btn-group col-4">
+      <button class="btn btn-info btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        Actions
+      </button>
+      <ul class="dropdown-menu">
+        <li><button class="dropdown-item" (click)="emitRemoveFriend(player.id)">Remove friend</button></li>
+        <li><button class="dropdown-item" (click)="emitBlockPlayer(player.id);">Block player</button></li>
+<!--        <li><button class="dropdown-item" href="#">Invite friend to play a game</button></li>-->
+      </ul>
+    </div>
+  </div>
+</ng-container>

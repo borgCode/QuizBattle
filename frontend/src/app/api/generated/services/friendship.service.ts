@@ -19,9 +19,12 @@ import { blockPlayer } from '../fn/friendship/block-player';
 import { BlockPlayer$Params } from '../fn/friendship/block-player';
 import { getFriends } from '../fn/friendship/get-friends';
 import { GetFriends$Params } from '../fn/friendship/get-friends';
+import { getRelationships } from '../fn/friendship/get-relationships';
+import { GetRelationships$Params } from '../fn/friendship/get-relationships';
 import { PlayerDto } from '../models/player-dto';
 import { rejectFriendship } from '../fn/friendship/reject-friendship';
 import { RejectFriendship$Params } from '../fn/friendship/reject-friendship';
+import { RelationshipsDto } from '../models/relationships-dto';
 import { unblockPlayer } from '../fn/friendship/unblock-player';
 import { UnblockPlayer$Params } from '../fn/friendship/unblock-player';
 
@@ -153,6 +156,31 @@ export class FriendshipService extends BaseService {
   acceptFriend(params: AcceptFriend$Params, context?: HttpContext): Observable<void> {
     return this.acceptFriend$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `getRelationships()` */
+  static readonly GetRelationshipsPath = '/friendship/relationships/{playerId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getRelationships()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getRelationships$Response(params: GetRelationships$Params, context?: HttpContext): Observable<StrictHttpResponse<RelationshipsDto>> {
+    return getRelationships(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getRelationships$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getRelationships(params: GetRelationships$Params, context?: HttpContext): Observable<RelationshipsDto> {
+    return this.getRelationships$Response(params, context).pipe(
+      map((r: StrictHttpResponse<RelationshipsDto>): RelationshipsDto => r.body)
     );
   }
 
