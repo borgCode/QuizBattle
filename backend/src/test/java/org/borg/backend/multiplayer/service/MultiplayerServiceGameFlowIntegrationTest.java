@@ -3,8 +3,10 @@ package org.borg.backend.multiplayer.service;
 import org.borg.backend.achievement.service.AchievementService;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.common.enums.NotificationType;
+import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.multiplayer.dto.GameStateResponse;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
@@ -13,9 +15,7 @@ import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.question.dto.MultiplayerAnswerValidationRequest;
-import org.borg.backend.question.dto.PlayerQuestionResult;
-import org.borg.backend.question.dto.Question;
+import org.borg.backend.question.dto.*;
 import org.borg.backend.question.repository.QuestionRepository;
 import org.borg.backend.question.service.QuestionService;
 import org.borg.backend.question.service.QuestionSessionService;
@@ -138,28 +138,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
 
     }
 
-    private List<Question> loadQuestionsToDB() {
-        Question questionObj1 = new Question();
-        questionObj1.setCategory("Sports");
-        questionObj1.setQuestion("In Baseball, how many times does the ball have to be pitched outside of the strike zone before the batter is walked?");
-        questionObj1.setOptions(Arrays.asList("4", "1", "2", "3"));
-        questionObj1.setCorrectAnswer("4");
-
-        Question questionObj2 = new Question();
-        questionObj2.setCategory("Sports");
-        questionObj2.setQuestion("What cricketing term denotes a batsman being dismissed with a score of zero?");
-        questionObj2.setOptions(Arrays.asList("Duck", "Bye", "Beamer", "Carry"));
-        questionObj2.setCorrectAnswer("Duck");
-
-        Question questionObj3 = new Question();
-        questionObj3.setCategory("Sports");
-        questionObj3.setQuestion("In what sport does Fanny Chmelar compete for Germany?");
-        questionObj3.setOptions(Arrays.asList("Skiing", "Swimming", "Showjumping", "Gymnastics"));
-        questionObj3.setCorrectAnswer("Skiing");
-
-
-        return questionRepository.saveAll(List.of(questionObj1, questionObj2, questionObj3));
-    }
+    
 
     private void validateCorrectAnswer(Question question, Long sessionId) {
         MultiplayerAnswerValidationRequest request = new MultiplayerAnswerValidationRequest(
@@ -177,12 +156,117 @@ public class MultiplayerServiceGameFlowIntegrationTest {
     void testScoring() {
         // Test score updates and winner determination
     }
+    
+    @Nested
+    class turnValidationTests {
+        Long sessionId;
+        List<Question> questions;
+        @BeforeEach
+        void setUp() {
+            MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1);
+            sessionId = multiplayerSessionRepository.save(multiplayerSession).getId();
+            
+            questions = loadQuestionsToDB();
+        }
+        
+        @Test
+        void shouldThrowErrorWhenRequestingQuestions_whenOtherPlayersTurn() {
+            GameException exception = assertThrows(GameException.class,
+                    () -> questionService.getNewQuestionsForCategory(
+                            new MultiplayerQuestionsRequest("Geography", sessionId, player2.getId())
+                    ), "Player should not be able to request questions when it's the other player's turn"
+            );
 
-    @Test
-    void testTurnValidation() {
-        // Test turn order and validation rules
+            assertEquals(BusinessErrorCodes.NOT_PLAYER_TURN, exception.getErrorCode());
+        }
+
+        @Test
+        void shouldThrowErrorWhenRequestingQuestions_whenPlayerHasAnsweredMoreThanOpponent() {
+            MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
+                    .orElseThrow();
+            
+            
+            Map<Long, Integer> questionsAnswered = new HashMap<>(Map.of(
+                    player1.getId(), 3,  
+                    player2.getId(), 1  
+            ));
+            session.setQuestionsAnswered(questionsAnswered);
+            
+            session.getQuestionIds().clear();
+
+            multiplayerSessionRepository.save(session);
+            
+            MultiplayerQuestionsRequest request = new MultiplayerQuestionsRequest(
+                    "Geography", session.getId(), player1.getId());
+
+            GameException exception = assertThrows(GameException.class,
+                    () -> multiplayerService.validatePlayerTurn(request, session),
+                    "Should throw exception when player tries to request questions after answering more than opponent"
+            );
+
+            assertEquals(BusinessErrorCodes.MUST_WAIT_FOR_OPPONENT, exception.getErrorCode());
+        }
+        
+        
+        @Test
+        void shouldThrowErrorWhenRequestingQuestions_whenExistingQuestionsUnanswered() {
+            questionService.getNewQuestionsForCategory(
+                    new MultiplayerQuestionsRequest("Sports", sessionId, player1.getId()));
+
+            GameException exception = assertThrows(GameException.class,
+                    () -> questionService.getNewQuestionsForCategory(
+                            new MultiplayerQuestionsRequest("Geography", sessionId, player1.getId())
+                    ), "Should throw exception when player tries to select another category when they have finished the current"
+            );
+            assertEquals(BusinessErrorCodes.MUST_ANSWER_EXISTING_QUESTIONS, exception.getErrorCode());
+        }
+        
+        @Test
+        void shouldThrowErrorWhenRequestingAnswerValidation_whenOtherPlayersTurn() {
+            GameException exception = assertThrows(GameException.class,
+                    () -> questionService.validateMultiplayerAnswer(
+                            new MultiplayerAnswerValidationRequest(questions.get(0).getId(), sessionId, questions.get(0).getCorrectAnswer(), player2.getId())
+                    ), "Player should not be able to validate answer when it's the other player's turn"
+            );
+
+            assertEquals(BusinessErrorCodes.NOT_PLAYER_TURN, exception.getErrorCode());
+        }
+        
+        @Test
+        void shouldThrowErrorWhenRequestingAnswerValidation_whenInvalidQuestionId() {
+            questionService.getNewQuestionsForCategory(
+                    new MultiplayerQuestionsRequest("Sports", sessionId, player1.getId()));
+
+            Long invalidQuestionId = 1231313213L;
+            GameException exception = assertThrows(GameException.class,
+                    () -> questionService.validateMultiplayerAnswer(
+                            new MultiplayerAnswerValidationRequest(invalidQuestionId, sessionId, "correctAnswer", player1.getId())
+                    ), "Player should not be able to answer a question outside of the three round questions"
+            );
+            
+            assertEquals(BusinessErrorCodes.INVALID_QUESTION, exception.getErrorCode());
+        }
+        
+        @Test
+        void shouldThrowErrorWhenRequestingAnswerValidation_whenAlreadyAnsweredQuestion() {
+            questionService.getNewQuestionsForCategory(
+                    new MultiplayerQuestionsRequest("Sports", sessionId, player1.getId()));
+            
+            MultiplayerAnswerValidationRequest request = 
+                    new MultiplayerAnswerValidationRequest(questions.get(0).getId(), sessionId, questions.get(0).getCorrectAnswer(), player2.getId());
+            
+            questionService.validateMultiplayerAnswer(request);
+            
+            GameException exception = assertThrows(GameException.class,
+                    () ->  questionService.validateMultiplayerAnswer(request),
+                    "Player should not be able to answer the same question more than once"
+            );
+            
+            assertEquals(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED, exception.getErrorCode());
+        }
+        
     }
-
+    
     @Test
     void testRoundManagement() {
         // Test category selection and question progression
@@ -303,5 +387,28 @@ public class MultiplayerServiceGameFlowIntegrationTest {
     @Test
     void testPlayerAcknowledgment() {
         // Test game acknowledgment flow
+    }
+
+    private List<Question> loadQuestionsToDB() {
+        Question questionObj1 = new Question();
+        questionObj1.setCategory("Sports");
+        questionObj1.setQuestion("In Baseball, how many times does the ball have to be pitched outside of the strike zone before the batter is walked?");
+        questionObj1.setOptions(Arrays.asList("4", "1", "2", "3"));
+        questionObj1.setCorrectAnswer("4");
+
+        Question questionObj2 = new Question();
+        questionObj2.setCategory("Sports");
+        questionObj2.setQuestion("What cricketing term denotes a batsman being dismissed with a score of zero?");
+        questionObj2.setOptions(Arrays.asList("Duck", "Bye", "Beamer", "Carry"));
+        questionObj2.setCorrectAnswer("Duck");
+
+        Question questionObj3 = new Question();
+        questionObj3.setCategory("Sports");
+        questionObj3.setQuestion("In what sport does Fanny Chmelar compete for Germany?");
+        questionObj3.setOptions(Arrays.asList("Skiing", "Swimming", "Showjumping", "Gymnastics"));
+        questionObj3.setCorrectAnswer("Skiing");
+
+
+        return questionRepository.saveAll(List.of(questionObj1, questionObj2, questionObj3));
     }
 }

@@ -56,7 +56,6 @@ public class QuestionService {
         
         String currentCategory = questionSessionService.getCurrentCategory(request.getPlayerId());
         if (currentCategory != null && currentCategory.equalsIgnoreCase(request.getCategory())) {
-            log.warn("Attempt to replay category: {}", request.getCategory());
             return Collections.emptyList();
         }
         
