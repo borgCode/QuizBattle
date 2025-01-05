@@ -131,20 +131,20 @@ class ChapterServiceIntegrationTest {
         void shouldUpdateChapterProgressAndCompleteStory() {
             int expectedCompleteChapters = 1;
             for (int i = 0; i < chapters.size() - 1; i++) {
-                initChapterProgressAndAssertStatus(chapters.get(1).getId(), expectedCompleteChapters);
+                initChapterProgressAndAssertStatus(chapters.get(i).getId(), expectedCompleteChapters);
                 expectedCompleteChapters++;
             }
 
             InitiateProgressResponse response = chapterService.initiateProgress(
-                    new InitiateProgressRequest(player.getId()
-                            , playerProgress.getId(),
+                    new InitiateProgressRequest(player.getId(),
+                            playerProgress.getId(),
                             story.getId(),
                             chapters.get(chapters.size() - 1).getId())
             );
 
             chapterService.updateChapterProgress(response.getChapterProgressId());
 
-            PlayerProgress newPlayerProgress = playerProgressRepository.findByPlayerIdAndStoryId(player.getId(), player.getId());
+            PlayerProgress newPlayerProgress = playerProgressRepository.findByPlayerIdAndStoryId(player.getId(), story.getId());
 
             assertAll("Post story-complete progress checks",
                     () -> assertEquals(ProgressStatus.COMPLETED, chapterProgressRepository.findById(response.getChapterProgressId()).get().getProgressStatus(),
