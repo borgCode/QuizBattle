@@ -84,13 +84,7 @@ class ChapterServiceIntegrationTest {
         playerRepository.deleteAll();
         storyRepository.deleteAll();
     }
-
-    @BeforeEach
-    void setUp() {
-        chapterProgressRepository.deleteAll();
-        playerProgressRepository.deleteAll();
-        playerRepository.deleteAll();
-    }
+    
 
     @AfterEach
     void tearDown() {
