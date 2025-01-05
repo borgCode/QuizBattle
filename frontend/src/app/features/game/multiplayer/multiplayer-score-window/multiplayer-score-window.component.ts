@@ -230,8 +230,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   sendFriendRequest() {
     this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
       next: () => {
-        console.log("Stored id: " + this.storedPlayerId)
-        console.log("Opponent id: " + this.opponentId)
         this.alertMessageService.show('Friend request sent successfully', 'success')
         this.getFriendshipStatus();
       },
@@ -241,9 +239,35 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   cancelFriendRequest() {
     this.friendshipService.removeAsFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
       next: () => {
-        console.log("Stored id: " + this.storedPlayerId)
-        console.log("Opponent id: " + this.opponentId)
         this.alertMessageService.show('Friend request canceled', 'success')
+        this.getFriendshipStatus();
+      },
+    });
+  }
+
+  blockPlayer() {
+    this.friendshipService.blockPlayer({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
+      next: () => {
+        this.alertMessageService.show('Blocked player', 'success')
+        this.getFriendshipStatus();
+      },
+    });
+  }
+
+  unBlockPlayer() {
+    this.friendshipService.unblockPlayer({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
+      next: () => {
+        this.alertMessageService.show('Unblocked player', 'success')
+        this.getFriendshipStatus();
+      },
+    });
+  }
+
+
+  removeFriend() {
+    this.friendshipService.removeAsFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
+      next: () => {
+        this.alertMessageService.show('Removed friend', 'success')
         this.getFriendshipStatus();
       },
     });
@@ -263,7 +287,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       next: () => this.alertMessageService.show('Send rematch request!', 'success'),
     })
   }
-
 
   giveUpClick() {
     this.multiplayerService.giveUp({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({

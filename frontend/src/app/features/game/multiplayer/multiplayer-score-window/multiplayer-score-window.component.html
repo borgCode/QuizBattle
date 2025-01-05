@@ -8,8 +8,21 @@
     </div>
     <div class="score-panel col-4 col-sm-4 align-content-center text-center">
       <div [ngSwitch]="friendshipStatus">
-        <div *ngSwitchCase="'NONE'" (click)="sendFriendRequest()" class="btn btn-primary mt-2">Send friend request</div>
-        <div *ngSwitchCase="'PENDING'" (click)="cancelFriendRequest()" class="btn btn-warning mt-2">Cancel request pending</div>
+        <div *ngSwitchCase="'NONE'" class="div">
+          <div  (click)="sendFriendRequest()" class="btn btn-primary mt-2">Send friend request</div>
+          <div  (click)="blockPlayer()" class="btn btn-danger mt-2">Block player</div>
+        </div>
+        <div *ngSwitchCase="'PENDING'" class="div">
+          <div  (click)="cancelFriendRequest()" class="btn btn-success mt-2">Cancel pending request</div>
+          <div  (click)="blockPlayer()" class="btn btn-danger mt-2">Block player</div>
+        </div>
+        <div *ngSwitchCase="'BLOCKED'" class="div">
+          <div  (click)="unBlockPlayer()" class="btn btn-info mt-2">Unblock player</div>
+        </div>
+        <div *ngSwitchCase="'ACTIVE'" class="div">
+          <div  (click)="removeFriend()" class="btn btn-warning mt-2">Remove friend</div>
+          <div  (click)="blockPlayer()" class="btn btn-danger mt-2">Block player</div>
+        </div>
       </div>
       <p>{{ playerTotalScore }}
         - {{ opponentTotalScore }}</p>
