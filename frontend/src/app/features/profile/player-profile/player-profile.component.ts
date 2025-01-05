@@ -82,7 +82,6 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "BLOCK":
-        console.log("Calling block")
         this.friendshipService.blockPlayer({
           body: {
             senderId: this.player.id,
@@ -90,6 +89,19 @@ export class PlayerProfileComponent implements OnInit {
           }
         }).subscribe({
           next: () => this.alertMessageService.show("Blocked player", "success"),
+          error: err => {
+            console.log(err)
+          }
+        })
+        break;
+      case "UNBLOCK":
+        this.friendshipService.unblockPlayer({
+          body: {
+            senderId: this.player.id,
+            receiverId: $event.playerId
+          }
+        }).subscribe({
+          next: () => this.alertMessageService.show("Unblocked player", "success"),
           error: err => {
             console.log(err)
           }

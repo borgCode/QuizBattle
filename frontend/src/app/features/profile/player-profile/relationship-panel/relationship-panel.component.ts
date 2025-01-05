@@ -1,17 +1,19 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {PlayerDto} from '../../../../api/generated/models/player-dto';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-relationship-panel',
   imports: [
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './relationship-panel.component.html',
   styleUrl: './relationship-panel.component.css'
 })
 export class RelationshipPanelComponent {
   @Input() relationships: PlayerDto[];
+  @Input() type: string;
   @Output() relationshipActionSelected = new EventEmitter<{playerId: number, action: string}>
 
 
@@ -25,4 +27,7 @@ export class RelationshipPanelComponent {
     //TODO IMPLEMENT
   }
 
+  emitUnblockPlayer(id: number) {
+    this.relationshipActionSelected.emit({playerId: id, action: "UNBLOCK"})
+  }
 }

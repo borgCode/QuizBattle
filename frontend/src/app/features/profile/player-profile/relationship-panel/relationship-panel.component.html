@@ -12,72 +12,29 @@
         Actions
       </button>
       <ul class="dropdown-menu">
-        <li><button class="dropdown-item" (click)="emitRemoveFriend(player.id)">Remove friend</button></li>
-        <li><button class="dropdown-item" (click)="emitBlockPlayer(player.id);">Block player</button></li>
-<!--        <li><button class="dropdown-item" href="#">Invite friend to play a game</button></li>-->
+        <ng-container *ngIf="type == 'friends'; else elseBlock">
+          <li>
+            <button class="dropdown-item" (click)="emitRemoveFriend(player.id)">
+              Remove friend
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item" (click)="emitBlockPlayer(player.id)">
+              Block player
+            </button>
+          </li>
+          <!-- Uncomment the following line to add another action -->
+          <!-- <li><button class="dropdown-item">Invite friend to play a game</button></li> -->
+        </ng-container>
+        <ng-template #elseBlock>
+          <li>
+            <button class="dropdown-item" (click)="emitUnblockPlayer(player.id)">
+              Unblock player
+            </button>
+          </li>
+        </ng-template>
       </ul>
     </div>
   </div>
 </ng-container>
-
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 1</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 2</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 3</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 4</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 5</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 6</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 7</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 8</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 9</div>
-</div>
-<div class="row align-items-center bg-light">
-  <div class="player-avatar col-6 p-2 me-3">
-    <img src="https://via.placeholder.com/40" alt="player avatar" class="rounded-circle" />
-  </div>
-  <div class="player-name col-6 fw-bold">Player 10</div>
-</div>
 

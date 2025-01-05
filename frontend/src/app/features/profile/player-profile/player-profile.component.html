@@ -36,11 +36,13 @@
       <div class="tab-content relationship-panel">
         <div class="tab-pane fade show active p-2" id="friends">
           <app-relationship-panel [relationships]="friendsList"
+                                  [type]="'friends'"
                                   (relationshipActionSelected)="handleAction($event)"
           ></app-relationship-panel>
         </div>
         <div class="tab-pane fade" id="blocked">
           <app-relationship-panel [relationships]="blockedList"
+                                  [type]="'blocked'"
                                   (relationshipActionSelected)="handleAction($event)"
           ></app-relationship-panel>
         </div>
