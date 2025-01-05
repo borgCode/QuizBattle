@@ -36,70 +36,73 @@ export class ErrorInterceptor implements HttpInterceptor {
           const sessionId = req.body?.sessionId;
 
           switch (errorBody.businessErrorCode) {
-            case 300:
+            case 100:
               this.alertMessageService.show('Current password is incorrect', 'error');
               break;
-            case 301:
+            case 101:
               this.alertMessageService.show('New password does not match', 'error');
               break;
-            case 302:
+            case 102:
               this.alertMessageService.show('Your account has been locked', 'error');
               break;
-            case 303:
+            case 103:
               this.alertMessageService.show('Your account has been disabled', 'error');
               break;
-            case 304:
+            case 104:
               this.alertMessageService.show('Username and/or password is incorrect', 'error');
               break;
-            case 305:
+            case 105:
               this.alertMessageService.show("Username is already taken", 'error');
               break;
-            case 320:
+            case 200:
               this.alertMessageService.show('Cannot send friend request to a blocked user', 'error');
               break;
-            case 321:
+            case 201:
               this.alertMessageService.show('Friend request is already pending', 'error');
               break;
-            case 322:
+            case 202:
               this.alertMessageService.show('You are already friends with this user', 'error');
               break;
-            case 323:
+            case 203:
               this.alertMessageService.show('This friend request is no longer available', 'error');
               break;
-            case 324:
+            case 204:
+              this.alertMessageService.show("You can't unblock someone who isn't blocked", 'error');
+              break;
+            case 300:
               this.alertMessageService.show('You already sent a rematch request!', 'error');
               break;
-            case 325:
+            case 301:
               this.alertMessageService.show('You already have an ongoing match with this player!', 'error');
               break;
-            case 326:
+            case 302:
               this.alertMessageService.show("It's not your turn to play!", 'error');
               if (sessionId) {
                 this.router.navigate(['multiplayer', sessionId]);
               }
               break;
-            case 327:
+            case 303:
               this.alertMessageService.show("You must wait for your opponent to finish their questions", 'error');
               if (sessionId) {
                 this.router.navigate(['multiplayer', sessionId]);
               }
               break;
-            case 328:
+            case 304:
               this.alertMessageService.show('You must answer the current questions before selecting a new category', 'error');
               if (sessionId) {
                 this.router.navigate(['multiplayer', sessionId]);
               }
               break;
-            case 329:
+            case 305:
               this.alertMessageService.show('The question does not belong to this session', 'error');
               if (sessionId) {
                 this.router.navigate(['multiplayer', sessionId]);
               }
               break;
-            case 330:
+            case 306:
               this.alertMessageService.show("You've already answered this question!", 'error');
               break;
-            case 413:
+            case 400:
               this.alertMessageService.show('The file size is too big! Max 500kb', 'error');
               break;
           }
