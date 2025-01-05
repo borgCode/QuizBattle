@@ -22,11 +22,38 @@ import { GetFriends$Params } from '../fn/friendship/get-friends';
 import { PlayerDto } from '../models/player-dto';
 import { rejectFriendship } from '../fn/friendship/reject-friendship';
 import { RejectFriendship$Params } from '../fn/friendship/reject-friendship';
+import { unblockPlayer } from '../fn/friendship/unblock-player';
+import { UnblockPlayer$Params } from '../fn/friendship/unblock-player';
 
 @Injectable({ providedIn: 'root' })
 export class FriendshipService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
+  }
+
+  /** Path part for operation `unblockPlayer()` */
+  static readonly UnblockPlayerPath = '/friendship/unblock';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `unblockPlayer()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  unblockPlayer$Response(params: UnblockPlayer$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return unblockPlayer(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `unblockPlayer$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  unblockPlayer(params: UnblockPlayer$Params, context?: HttpContext): Observable<void> {
+    return this.unblockPlayer$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `rejectFriendship()` */

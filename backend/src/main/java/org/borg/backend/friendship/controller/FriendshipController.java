@@ -44,7 +44,11 @@ public class FriendshipController {
         friendshipService.blockPlayer(request);
         return ResponseEntity.ok().build();
     }
-    
+    @PostMapping("/unblock")
+    public ResponseEntity<Void> unblockPlayer(@RequestBody PlayerInteraction request) {
+        friendshipService.unblockPlayer(request);
+        return ResponseEntity.ok().build();
+    }
     @GetMapping("/friends/{playerId}")
     public ResponseEntity<List<PlayerDTO>> getFriends(@PathVariable Long playerId) {
         return ResponseEntity.ok(friendshipService.getFriends(playerId));
