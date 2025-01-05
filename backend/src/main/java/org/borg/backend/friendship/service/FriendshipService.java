@@ -116,11 +116,11 @@ public class FriendshipService {
     }
 
 
-    public void blockPlayer(PlayerInteraction request) {
-        Player sendingPlayer = playerRepository.findById(request.getSenderId())
+    public void blockPlayer(PlayerInteraction blockRequest) {
+        Player sendingPlayer = playerRepository.findById(blockRequest.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        Player receivingPlayer = playerRepository.findById(request.getReceiverId())
+        Player receivingPlayer = playerRepository.findById(blockRequest.getReceiverId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
@@ -141,6 +141,31 @@ public class FriendshipService {
                     FriendshipStatus.BLOCKED
             ));
         }
+    }
+    
+    public void unblockPlayer(PlayerInteraction unblockRequest) {
+        Player sendingPlayer = playerRepository.findById(unblockRequest.getSenderId())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        Player receivingPlayer = playerRepository.findById(unblockRequest.getReceiverId())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
+        if (existingFriendship.isPresent()) {
+            Friendship friendship = existingFriendship.get();
+            if (friendship.getStatus() == FriendshipStatus.PENDING || friendship.getStatus() == FriendshipStatus.ACTIVE) {
+                throw new FriendshipException(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP);
+            }
+            
+            if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
+                friendshipRepository.delete(friendship);
+            }
+            
+        } else {
+            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
+        }
+        
+        
     }
 
     public List<PlayerDTO> getFriends(Long playerId) {

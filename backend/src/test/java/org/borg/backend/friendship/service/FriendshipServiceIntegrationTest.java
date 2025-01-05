@@ -6,7 +6,6 @@ import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.FriendshipStatus;
 import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.FriendshipException;
-import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.friendship.dto.PlayerInteraction;
 import org.borg.backend.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.friendship.model.Friendship;
@@ -15,7 +14,6 @@ import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -262,9 +260,34 @@ class FriendshipServiceIntegrationTest {
             assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_BLOCKED, exception.getErrorCode());
 
         }
+
+        @Test
+        void successfullyUnblockPlayer() {
+            PlayerInteraction blockInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            friendshipService.blockPlayer(blockInteraction);
+
+            PlayerInteraction unblockInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            friendshipService.unblockPlayer(unblockInteraction);
+
+            Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(sender, receiver);
+            assertFalse(friendship.isPresent(), "Relationship was not deleted from repo after unblock");
+
+        }
+        
+        @Test
+        void throwErrorWhenUnblockingNonBlockedPlayer() {
+            PlayerInteraction friendRequest = new PlayerInteraction(sender.getId(), receiver.getId());
+            friendshipService.sendFriendRequest(friendRequest);
+
+            PlayerInteraction unblockInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            
+            FriendshipException exception = assertThrows(FriendshipException.class,
+                    () -> friendshipService.unblockPlayer(unblockInteraction));
+            
+            assertEquals(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP, exception.getErrorCode());
+            
+        }
         
     }
-
-    
     
 }

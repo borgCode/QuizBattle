@@ -84,7 +84,7 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.businessErrorCode").value(305))
+                .andExpect(jsonPath("$.businessErrorCode").value(105))
                 .andExpect(jsonPath("$.businessErrorDescription")
                         .value("Username is taken"))
                 .andExpect(jsonPath("$.error").value("Username is taken"));

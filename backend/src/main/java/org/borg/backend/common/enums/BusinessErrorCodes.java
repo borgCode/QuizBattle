@@ -17,7 +17,7 @@ public enum BusinessErrorCodes {
     FRIENDSHIP_REQUEST_PENDING(201, HttpStatus.BAD_REQUEST, "Friend request is already pending"),
     FRIENDSHIP_ALREADY_EXISTS(202, HttpStatus.BAD_REQUEST, "Friendship already exists"),
     FRIENDSHIP_NOT_FOUND(203, HttpStatus.BAD_REQUEST, "The friendship was not found"),
-    FRIENDSHIP_NOT_BLOCKED(204, HttpStatus.BAD_REQUEST, "The friendship is not blocked"),
+    CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP(204, HttpStatus.BAD_REQUEST, "Can't unblock friendship that isn't blocked"),
     
     REMATCH_REQUEST_ALREADY_SENT(300, HttpStatus.BAD_REQUEST, "Rematch request already sent"),
     GAME_ALREADY_ONGOING(301, HttpStatus.BAD_REQUEST, "Players already have a game against each other ongoing"),
