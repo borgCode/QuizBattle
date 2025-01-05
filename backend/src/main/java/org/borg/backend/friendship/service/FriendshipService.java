@@ -195,12 +195,12 @@ public class FriendshipService {
     }
 
     public List<PlayerDTO> getFriends(Long playerId) {
-        return PlayerMapper.multipleToDTO(friendshipRepository.getAllByPlayerIdAndStatus(playerId, FriendshipStatus.ACTIVE));
+        return PlayerMapper.multipleToDTO(friendshipRepository.getActiveFriends(playerId));
     }
 
     public RelationshipsDTO getRelationships(Long playerId) {
-        List<Player> friends = friendshipRepository.getAllByPlayerIdAndStatus(playerId, FriendshipStatus.ACTIVE);
-        List<Player> blocked = friendshipRepository.getAllByPlayerIdAndStatus(playerId, FriendshipStatus.BLOCKED);
+        List<Player> friends = friendshipRepository.getActiveFriends(playerId);
+        List<Player> blocked = friendshipRepository.getBlockedPlayers(playerId);
 
         return RelationshipsDTO.builder()
                 .friends(PlayerMapper.multipleToDTO(friends))

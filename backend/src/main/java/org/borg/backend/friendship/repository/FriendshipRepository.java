@@ -16,10 +16,15 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     List<Friendship> findByPlayer1AndPlayer2OrPlayer1AndPlayer2(Player player1A, Player player2A, Player player2B, Player player1B);
     
     Optional<Friendship> findByPlayer1AndPlayer2(Player player1, Player player2);
+    
+    @Query("SELECT DISTINCT p FROM Player p " +
+            "JOIN Friendship f ON (f.player1.id = :playerId AND p = f.player2 OR " +
+            "f.player2.id = :playerId AND p = f.player1) " +
+            "WHERE f.status = 'ACTIVE'")
+    List<Player> getActiveFriends(Long playerId);
 
     @Query("SELECT DISTINCT p FROM Player p " +
-            "JOIN Friendship f ON ((f.player1.id = :playerId AND p = f.player2) " +
-            "OR (f.player2.id = :playerId AND p = f.player1))" +
-            "AND f.status = :status")
-    List<Player> getAllByPlayerIdAndStatus(Long playerId, FriendshipStatus status);
+            "JOIN Friendship f ON (f.player1.id = :playerId AND p = f.player2) " +
+            "WHERE f.status = 'BLOCKED'")
+    List<Player> getBlockedPlayers(Long playerId);
 }
