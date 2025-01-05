@@ -126,24 +126,25 @@ public class FriendshipService {
         Player receivingPlayer = playerRepository.findById(blockRequest.getReceiverId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
-        if (existingFriendship.isPresent()) {
-            Friendship friendship = existingFriendship.get();
-            if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
+        List<Friendship> existingFriendships = friendshipRepository
+                .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
+                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
+
+        if (!existingFriendships.isEmpty()) {
+            Friendship existingFriendship = existingFriendships.get(0);
+            if (existingFriendship.getStatus() == FriendshipStatus.BLOCKED &&
+                    existingFriendship.getPlayer1().equals(sendingPlayer)) {
                 throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
             }
-            if (friendship.getStatus() == FriendshipStatus.PENDING || friendship.getStatus() == FriendshipStatus.ACTIVE) {
-                friendship.setStatus(FriendshipStatus.BLOCKED);
-                friendshipRepository.save(friendship);
-            }
-        } else {
-            friendshipRepository.save(new Friendship(
-                    sendingPlayer,
-                    receivingPlayer,
-                    LocalDate.now(),
-                    FriendshipStatus.BLOCKED
-            ));
+
+            friendshipRepository.delete(existingFriendship);
         }
+        friendshipRepository.save(new Friendship(
+                sendingPlayer,
+                receivingPlayer,
+                LocalDate.now(),
+                FriendshipStatus.BLOCKED
+        ));
     }
 
     public void unblockPlayer(PlayerInteraction unblockRequest) {
@@ -184,7 +185,7 @@ public class FriendshipService {
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
                 throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
             }
-            if  (friendship.getStatus() == FriendshipStatus.ACTIVE) {
+            if (friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 friendshipRepository.delete(friendship);
             }
             if (friendship.getStatus() == FriendshipStatus.PENDING) {
