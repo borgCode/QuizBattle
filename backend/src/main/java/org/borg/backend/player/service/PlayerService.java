@@ -52,7 +52,7 @@ public class PlayerService {
                 .orElseThrow(() -> new NoSuchElementException("User not found!"));
         log.warn("Saving profile pic");
         String profilePicturePath = fileStorageService.saveProfilePicture(file, playerId);
-        log.warn("SAved + {}", profilePicturePath);
+        log.warn("Saved + {}", profilePicturePath);
         player.setAvatarPath(profilePicturePath);
         playerRepository.save(player);
     }
