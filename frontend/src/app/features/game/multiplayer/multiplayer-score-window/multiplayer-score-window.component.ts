@@ -5,11 +5,11 @@ import {GameStateResponse} from '../../../../api/generated/models/game-state-res
 import {PlayerQuestionResult} from '../../../../api/generated/models/player-question-result';
 import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
 import {PlayerCardComponent} from '../../../../shared/components/player-card/player-card-component';
-import {FriendshipService} from '../../../../api/generated/services/friendship.service';
 import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverDialogComponent} from './dialog/game-over-dialog/game-over-dialog.component';
 import {GameResult} from '../../../../shared/enums/game-result';
+import {FriendshipService} from '../../../../api/generated/services/friendship.service';
 
 interface Box {
   color: string;

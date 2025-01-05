@@ -3,11 +3,10 @@ import {LoginStateService} from '../../../core/services/login-state-service/logi
 import {PlayerDto} from '../../../api/generated/models/player-dto';
 import {CategoryPieChartComponent} from './category-pie-chart/category-pie-chart.component';
 import {RelationshipPanelComponent} from './relationship-panel/relationship-panel.component';
-import {FriendshipService} from '../../../api/generated/services/friendship.service';
 import {Router} from '@angular/router';
 import {PlayerService} from '../../../api/generated/services/player.service';
 import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
-import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
+import {FriendshipService} from '../../../api/generated/services/friendship.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -70,7 +69,17 @@ export class PlayerProfileComponent implements OnInit {
   handleAction($event: { playerId: number; action: string }) {
     switch ($event.action) {
       case "REMOVE":
-        //TODO remove logic
+        this.friendshipService.removeAsFriend({
+          body: {
+            senderId: this.player.id,
+            receiverId: $event.playerId
+          }
+        }).subscribe({
+          next: () => this.alertMessageService.show("Removed player from friends", "success"),
+          error: err => {
+            console.log(err)
+          }
+        })
         break;
       case "BLOCK":
         console.log("Calling block")

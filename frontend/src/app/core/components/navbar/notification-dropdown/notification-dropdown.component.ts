@@ -6,9 +6,9 @@ import {NotificationService} from '../../../../api/generated/services/notificati
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
-import {FriendshipService} from '../../../../api/generated/services/friendship.service';
 import {AlertMessageService} from '../../../services/alert-message/alert-message.service';
 import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
+import {FriendshipService} from '../../../../api/generated/services/friendship.service';
 
 declare var bootstrap: any;
 

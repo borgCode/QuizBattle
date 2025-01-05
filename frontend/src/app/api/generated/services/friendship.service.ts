@@ -25,6 +25,8 @@ import { PlayerDto } from '../models/player-dto';
 import { rejectFriendship } from '../fn/friendship/reject-friendship';
 import { RejectFriendship$Params } from '../fn/friendship/reject-friendship';
 import { RelationshipsDto } from '../models/relationships-dto';
+import { removeAsFriend } from '../fn/friendship/remove-as-friend';
+import { RemoveAsFriend$Params } from '../fn/friendship/remove-as-friend';
 import { unblockPlayer } from '../fn/friendship/unblock-player';
 import { UnblockPlayer$Params } from '../fn/friendship/unblock-player';
 
@@ -55,6 +57,31 @@ export class FriendshipService extends BaseService {
    */
   unblockPlayer(params: UnblockPlayer$Params, context?: HttpContext): Observable<void> {
     return this.unblockPlayer$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `removeAsFriend()` */
+  static readonly RemoveAsFriendPath = '/friendship/remove';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `removeAsFriend()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  removeAsFriend$Response(params: RemoveAsFriend$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return removeAsFriend(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `removeAsFriend$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  removeAsFriend(params: RemoveAsFriend$Params, context?: HttpContext): Observable<void> {
+    return this.removeAsFriend$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }

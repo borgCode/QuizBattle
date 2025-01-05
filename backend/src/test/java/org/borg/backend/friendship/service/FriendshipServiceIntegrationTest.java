@@ -132,8 +132,7 @@ class FriendshipServiceIntegrationTest {
             assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS, exception.getErrorCode());
             
         }
-        
-        
+
         private PlayerInteractionResponse setupFriendRequestScenario() {
             PlayerInteraction playerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
             friendshipService.sendFriendRequest(playerInteraction);
@@ -152,6 +151,34 @@ class FriendshipServiceIntegrationTest {
 
             return new PlayerInteractionResponse(receiver.getId(), sender.getId(), friendRequestNotification.getId());
         }
+
+        @Test
+        void removeActiveFriendTest() {
+            PlayerInteractionResponse response = setupFriendRequestScenario();
+            
+            friendshipService.handleFriendshipResponse(response, true);
+            
+            friendshipService.removeAsFriend(new PlayerInteraction(sender.getId(), receiver.getId()));
+
+            Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(sender, receiver);
+            assertFalse(friendship.isPresent(), "Relationship was not deleted from repo after removing friend");
+        }
+        @Test
+        void removePendingFriendTest() {
+            PlayerInteraction playerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
+            friendshipService.sendFriendRequest(playerInteraction);
+
+            friendshipService.removeAsFriend(new PlayerInteraction(sender.getId(), receiver.getId()));
+
+            Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(sender, receiver);
+            assertFalse(friendship.isPresent(), "Relationship was not deleted from repo after removing friend");
+            
+            
+            assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(receiver.getId()).isEmpty());
+        }
+        
+        
+       
         @Test
         void automaticallyAcceptFriendshipWhenBothPlayersSendRequest() {
             PlayerInteraction firstPlayerInteraction = new PlayerInteraction(sender.getId(), receiver.getId());
@@ -289,5 +316,6 @@ class FriendshipServiceIntegrationTest {
         }
         
     }
+    
     
 }

@@ -58,14 +58,16 @@ public class FriendshipService {
             log.warn("Friendship status: " + friendship.getStatus());
             if (friendship.getPlayer1().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
-                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
+                    case BLOCKED ->
+                            throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
                     case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
                     case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
                 }
             } else if (friendship.getPlayer2().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
                     case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
-                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
+                    case BLOCKED ->
+                            throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
                     case PENDING -> {
                         friendship.setStatus(FriendshipStatus.ACTIVE);
                         friendshipRepository.save(friendship);
@@ -111,7 +113,7 @@ public class FriendshipService {
         } else {
             friendshipRepository.delete(friendship);
         }
-        
+
         notificationService.markAsRead(response.getNotificationId());
 
     }
@@ -143,7 +145,7 @@ public class FriendshipService {
             ));
         }
     }
-    
+
     public void unblockPlayer(PlayerInteraction unblockRequest) {
         Player sendingPlayer = playerRepository.findById(unblockRequest.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
@@ -157,30 +159,53 @@ public class FriendshipService {
             if (friendship.getStatus() == FriendshipStatus.PENDING || friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 throw new FriendshipException(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP);
             }
-            
+
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
                 friendshipRepository.delete(friendship);
             }
-            
+
         } else {
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
         }
-        
-        
+
+
+    }
+
+    public void removeAsFriend(PlayerInteraction removeFriendRequest) {
+        Player sendingPlayer = playerRepository.findById(removeFriendRequest.getSenderId())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        Player receivingPlayer = playerRepository.findById(removeFriendRequest.getReceiverId())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
+        if (existingFriendship.isPresent()) {
+            Friendship friendship = existingFriendship.get();
+            if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
+                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
+            }
+            if  (friendship.getStatus() == FriendshipStatus.ACTIVE) {
+                friendshipRepository.delete(friendship);
+            }
+            if (friendship.getStatus() == FriendshipStatus.PENDING) {
+                friendshipRepository.delete(friendship);
+                notificationService.deleteFriendRequestByPlayerIds(receivingPlayer.getId(), sendingPlayer.getId());
+            }
+        }
     }
 
     public List<PlayerDTO> getFriends(Long playerId) {
         return PlayerMapper.multipleToDTO(friendshipRepository.getAllByPlayerIdAndStatus(playerId, FriendshipStatus.ACTIVE));
     }
-    
+
     public RelationshipsDTO getRelationships(Long playerId) {
         List<Player> friends = friendshipRepository.getAllByPlayerIdAndStatus(playerId, FriendshipStatus.ACTIVE);
         List<Player> blocked = friendshipRepository.getAllByPlayerIdAndStatus(playerId, FriendshipStatus.BLOCKED);
-        
+
         return RelationshipsDTO.builder()
                 .friends(PlayerMapper.multipleToDTO(friends))
                 .blocked(PlayerMapper.multipleToDTO(blocked))
                 .build();
     }
-    
+
 }
