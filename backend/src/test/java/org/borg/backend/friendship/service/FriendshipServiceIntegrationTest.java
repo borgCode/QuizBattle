@@ -8,6 +8,7 @@ import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.FriendshipException;
 import org.borg.backend.friendship.dto.PlayerInteraction;
 import org.borg.backend.friendship.dto.PlayerInteractionResponse;
+import org.borg.backend.friendship.dto.RelationshipStatusRequest;
 import org.borg.backend.friendship.dto.RelationshipsDTO;
 import org.borg.backend.friendship.model.Friendship;
 import org.borg.backend.friendship.repository.FriendshipRepository;
@@ -306,6 +307,32 @@ class FriendshipServiceIntegrationTest {
 
     @Nested
     class RelationshipQueryTests {
+        @Test
+        void getFriendshipStatusTest() {
+            RelationshipStatusRequest request = new RelationshipStatusRequest(player1.getId(), player2.getId());
+            
+            FriendshipStatus noneStatus = friendshipService.getRelationshipStatus(request);
+            assertEquals(FriendshipStatus.NONE, noneStatus, "Status should be NONE");
+
+            PlayerInteraction friendRequestFromPlayer1 = new PlayerInteraction(player1.getId(), player2.getId());
+            friendshipService.sendFriendRequest(friendRequestFromPlayer1);
+
+            FriendshipStatus pendingStatus = friendshipService.getRelationshipStatus(request);
+            assertEquals(FriendshipStatus.PENDING, pendingStatus, "Status should be PENDING");
+
+            PlayerInteraction friendRequestFromPlayer2 = new PlayerInteraction(player2.getId(), player1.getId());
+            friendshipService.sendFriendRequest(friendRequestFromPlayer2);
+
+            FriendshipStatus activeStatus = friendshipService.getRelationshipStatus(request);
+            assertEquals(FriendshipStatus.ACTIVE, activeStatus, "Status should be ACTIVE");
+
+            PlayerInteraction blockRequestFromPlayer1 = new PlayerInteraction(player1.getId(), player2.getId());
+            friendshipService.blockPlayer(blockRequestFromPlayer1);
+
+            FriendshipStatus blockedStatus = friendshipService.getRelationshipStatus(request);
+            assertEquals(FriendshipStatus.BLOCKED, blockedStatus, "Status should be BLOCKED");
+            
+        }
 
         @Test
         void getBlockedPlayersOnlyReturnsPlayersBlockedByRequestingPlayer() {

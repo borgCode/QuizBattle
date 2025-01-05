@@ -2,6 +2,7 @@ package org.borg.backend.friendship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.friendship.dto.RelationshipStatusRequest;
 import org.borg.backend.friendship.dto.RelationshipsDTO;
 import org.borg.backend.friendship.model.Friendship;
 import org.borg.backend.common.enums.FriendshipStatus;
@@ -209,4 +210,14 @@ public class FriendshipService {
                 .build();
     }
 
+    public FriendshipStatus getRelationshipStatus(RelationshipStatusRequest request) {
+        List<Friendship> friendships = friendshipRepository
+                .findByPlayer1IdAndPlayer2IdOrPlayer1IdAndPlayer2Id(
+                        request.getPlayerId(),
+                        request.getTargetPlayerId(),
+                        request.getTargetPlayerId(),
+                        request.getPlayerId());
+        
+        return friendships.isEmpty() ? FriendshipStatus.NONE : friendships.get(0).getStatus();
+    }
 }

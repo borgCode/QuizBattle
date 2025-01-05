@@ -4,11 +4,13 @@ package org.borg.backend.friendship.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.common.enums.FriendshipStatus;
 import org.borg.backend.friendship.dto.RelationshipsDTO;
 import org.borg.backend.friendship.service.FriendshipService;
 import org.borg.backend.friendship.dto.PlayerInteraction;
 import org.borg.backend.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.player.dto.PlayerDTO;
+import org.borg.backend.friendship.dto.RelationshipStatusRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,5 +65,9 @@ public class FriendshipController {
     @GetMapping("/relationships/{playerId}")
     public ResponseEntity<RelationshipsDTO> getRelationships(@PathVariable Long playerId) {
         return ResponseEntity.ok(friendshipService.getRelationships(playerId));
+    }
+    @GetMapping("/relationship/status")
+    public ResponseEntity<FriendshipStatus> getRelationshipStatus(RelationshipStatusRequest relationshipStatusRequest) {
+        return ResponseEntity.ok(friendshipService.getRelationshipStatus(relationshipStatusRequest));
     }
 }

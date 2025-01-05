@@ -27,4 +27,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
             "JOIN Friendship f ON (f.player1.id = :playerId AND p = f.player2) " +
             "WHERE f.status = 'BLOCKED'")
     List<Player> getBlockedPlayers(Long playerId);
+
+    List<Friendship> findByPlayer1IdAndPlayer2IdOrPlayer1IdAndPlayer2Id(Long player1Id, Long player1Id1, Long player1Id2, Long player1Id3);
 }
