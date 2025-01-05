@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlayerProgressRepository extends JpaRepository<PlayerProgress, Long> {
-    PlayerProgress findByPlayerIdAndStoryId(Long playerId, Long playerId1);
+    PlayerProgress findByPlayerIdAndStoryId(Long playerId, Long storyId);
 }

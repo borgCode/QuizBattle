@@ -82,6 +82,10 @@ public class ChapterService {
         log.warn("Update chapter progress");
         ChapterProgress chapterProgress = chapterProgressRepository.findById(chapterProgressId)
                 .orElseThrow(() -> new EntityNotFoundException("ChapterProgress not found"));
+        
+        if (chapterProgress.getProgressStatus().equals(ProgressStatus.COMPLETED)) {
+            return;
+        }
 
         chapterProgress.setCompletedAt(LocalDate.now());
         chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
