@@ -56,7 +56,6 @@ export class MultiplayerComponent implements OnInit {
   ngOnInit() {
 
     this.player = this.loginStateService.loggedInUser;
-    //TODO show user error
     if (!this.player) {
       console.warn('No logged-in user found!');
     }
@@ -93,7 +92,7 @@ export class MultiplayerComponent implements OnInit {
             this.openMatchFoundDialog(matchUpdate.pendingSessionId, matchUpdate.opponentDisplayName)
             break;
           case 'ACCEPTED':
-            this.showMatchConfirmation(matchUpdate.sessionId,matchUpdate.opponentDisplayName);
+            this.showMatchConfirmation(matchUpdate.sessionId, matchUpdate.opponentDisplayName);
             break;
           case 'DECLINED':
             break;
@@ -114,8 +113,10 @@ export class MultiplayerComponent implements OnInit {
         pendingSessionId: pendingSessionId,
         playerId: this.player.id
       }
-
-      if (result === true) {
+      if (result.timedOut) {
+        this.webSocketService.sendMessage('/app/matchmaking/decline', decision);
+        console.log("Match declined due to timeout")
+      } else if (result === true) {
         this.webSocketService.sendMessage('/app/matchmaking/accept', decision);
         console.log("Match accepted")
       } else {
@@ -153,14 +154,14 @@ export class MultiplayerComponent implements OnInit {
       width: '300px',
       disableClose: true,
     })
-    dialogRef.afterClosed().subscribe(()  => {
+    dialogRef.afterClosed().subscribe(() => {
       console.log("Closed friendsdialog");
     })
   }
 
   private getFriends() {
     console.log(this.friends);
-    this.friendService.getFriends({playerId: this.player.id}).subscribe( {
+    this.friendService.getFriends({playerId: this.player.id}).subscribe({
       next: data => {
         this.friends = data;
       }

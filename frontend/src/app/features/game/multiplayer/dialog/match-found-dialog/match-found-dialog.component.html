@@ -4,6 +4,14 @@
     You've been matched with
     <span class="opponent-name">{{data.opponentName}}</span>
   </div>
+  <div class="progress" style="height: 20px; max-width: 500px">
+    <div class="progress-bar"
+         role="progressbar"
+         [style.width.%]="progressPercentage"
+         [class.bg-warning]="progressPercentage < 50"
+         [class.bg-danger]="progressPercentage < 20">
+    </div>
+  </div>
   <div class="actions">
     <button class="accept-btn" (click)="onAccept()">Accept</button>
     <button class="decline-btn" (click)="onDecline()">Decline</button>
