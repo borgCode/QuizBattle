@@ -18,7 +18,7 @@ import {AlertMessageService} from '../../../core/services/alert-message/alert-me
 
 
 interface MatchDecision {
-  pendingSessionId: number;
+  matchmakingSessionId: number;
   playerId: number;
 }
 
@@ -104,7 +104,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
           case 'MATCHED':
             console.log("Match was found")
             this.isSearching = false;
-            this.openMatchFoundDialog(matchUpdate.pendingSessionId, matchUpdate.opponentDisplayName)
+            this.openMatchFoundDialog(matchUpdate.matchmakingSessionId, matchUpdate.opponentDisplayName)
             break;
           case 'ACCEPTED':
             this.showMatchConfirmation(matchUpdate.sessionId, matchUpdate.opponentDisplayName);
@@ -130,7 +130,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
     })
   }
 
-  private openMatchFoundDialog(pendingSessionId: number, opponentDisplayName: string) {
+  private openMatchFoundDialog(matchmakingSessionId: number, opponentDisplayName: string) {
     const dialogRef = this.matchFoundDialog.open(MatchFoundDialogComponent, {
       data: {opponentName: opponentDisplayName},
       width: '300px',
@@ -139,7 +139,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       const decision: MatchDecision = {
-        pendingSessionId: pendingSessionId,
+        matchmakingSessionId: matchmakingSessionId,
         playerId: this.player.id
       }
       if (result.timedOut) {

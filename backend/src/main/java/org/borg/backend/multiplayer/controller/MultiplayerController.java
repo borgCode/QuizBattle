@@ -34,12 +34,12 @@ public class MultiplayerController {
 
     @MessageMapping("/matchmaking/accept")
     public void acceptMatch(@Payload MatchDecision matchDecision) {
-        matchMakingService.handleMatchResponse(matchDecision.getPendingSessionId(), matchDecision.getPlayerId(), true);
+        matchMakingService.handleMatchResponse(matchDecision.getMatchmakingSessionId(), matchDecision.getPlayerId(), true);
     }
 
     @MessageMapping("/matchmaking/decline")
     public void declineMatch(@Payload MatchDecision matchDecision) {
-        matchMakingService.handleMatchResponse(matchDecision.getPendingSessionId(), matchDecision.getPlayerId(), false);
+        matchMakingService.handleMatchResponse(matchDecision.getMatchmakingSessionId(), matchDecision.getPlayerId(), false);
     }
 
 

@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class MatchDecision {
-    private Long pendingSessionId;
+    private Long matchmakingSessionId;
     private Long playerId;
 }
