@@ -65,6 +65,7 @@ class MatchMakingServiceIntegrationTest {
 
     @AfterEach
     void tearDown() {
+        matchMakingService.clearQueue();
         multiplayerSessionRepository.deleteAll();
         playerRepository.deleteAll();
         pendingSessionRepository.deleteAll();
@@ -229,6 +230,8 @@ class MatchMakingServiceIntegrationTest {
                         "Mismatch in players in the queue")
         );
         
+        
+        
     }
 
     private Player createAndSavePlayer(String name) {
@@ -246,7 +249,4 @@ class MatchMakingServiceIntegrationTest {
 
         return playerRepository.save(player);
     }
-    
-    
-
 }

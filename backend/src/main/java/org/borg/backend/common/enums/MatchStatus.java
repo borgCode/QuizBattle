@@ -5,7 +5,5 @@ public enum MatchStatus {
     MATCHED,
     ACCEPTED,
     DECLINED,
-    CANCELLED,
-    ERROR,
-    TIMEOUT
+    WAITING_FOR_OTHER_PLAYER,
 }

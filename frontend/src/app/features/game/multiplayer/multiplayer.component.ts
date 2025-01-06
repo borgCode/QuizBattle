@@ -14,6 +14,7 @@ import {
   FriendsListDialogComponent
 } from '../../../shared/components/dialog/friends-list-dialog/friends-list-dialog.component';
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
+import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
 
 
 interface MatchDecision {
@@ -49,7 +50,8 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
     private router: Router,
     private matchFoundDialog: MatDialog,
     private matchConfirmedDialog: MatDialog,
-    private friendListDialog: MatDialog
+    private friendListDialog: MatDialog,
+    private alertMessageService: AlertMessageService
   ) {
   }
 
@@ -107,6 +109,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
             this.showMatchConfirmation(matchUpdate.sessionId, matchUpdate.opponentDisplayName);
             break;
           case 'DECLINED':
+            this.alertMessageService.show("The match was declined", "error")
             break;
         }
       });

@@ -18,6 +18,9 @@ public class MatchmakingResponse {
     public static MatchmakingResponse waiting() {
         return new MatchmakingResponse(MatchStatus.WAITING, null, null, null);
     }
+    public static MatchmakingResponse waitingForOtherPlayer() {
+        return new MatchmakingResponse(MatchStatus.WAITING_FOR_OTHER_PLAYER, null, null, null);
+    }
 
     public static MatchmakingResponse matched(Long pendingSessionId, String opponentDisplayName) {
         return new MatchmakingResponse(MatchStatus.MATCHED, pendingSessionId, null, opponentDisplayName);

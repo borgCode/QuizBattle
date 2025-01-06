@@ -30,9 +30,6 @@ public class MatchMakingService {
     public void findMatch(Long playerId) {
         synchronized (matchmakingQueue) {
             Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
-            
-            log.warn("Queue size: " + this.matchmakingQueue.size());
-            
             if (opponentId.isPresent()) {
                 if (opponentId.get().equals(playerId)) {
                     return;
@@ -124,6 +121,11 @@ public class MatchMakingService {
 
     public void cancelMatchmaking(Long playerId) {
         matchmakingQueue.remove(playerId);
+    }
+    
+    //Test methods
+    public void clearQueue() {
+        this.matchmakingQueue.clear();
     }
     
     public int getQueueSize() {
