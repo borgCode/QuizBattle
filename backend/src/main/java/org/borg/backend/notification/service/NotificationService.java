@@ -1,6 +1,7 @@
 package org.borg.backend.notification.service;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
@@ -104,11 +105,12 @@ public class NotificationService {
                 .createdAt(LocalDateTime.now())
                 .build());
     }
-    //TODO refactor to not delete
-
+    
     public void markAsRead(Long notificationId) {
-        log.warn("Marking as read");
-        notificationRepository.deleteById(notificationId);
+        Notification notification = notificationRepository.findById(notificationId)
+                        .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+        notification.setRead(true);
+        notificationRepository.save(notification);
     }
 
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {

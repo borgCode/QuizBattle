@@ -11,6 +11,7 @@ import org.borg.backend.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.exceptions.FriendshipException;
 import org.borg.backend.friendship.repository.FriendshipRepository;
+import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.dto.PlayerDTO;
@@ -29,6 +30,7 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final PlayerRepository playerRepository;
     private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
@@ -99,7 +101,7 @@ public class FriendshipService {
                         sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
 
         if (existingFriendships.isEmpty()) {
-            notificationService.markAsRead(response.getNotificationId());
+            notificationRepository.deleteById(response.getNotificationId());
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
         }
 
@@ -118,7 +120,7 @@ public class FriendshipService {
         }
 
         if (response.getNotificationId() != null) {
-            notificationService.markAsRead(response.getNotificationId());
+            notificationRepository.deleteById(response.getNotificationId());
         } else {
             notificationService.deleteFriendRequestByPlayerIds(response.getSenderId(), response.getReceiverId());
         }
