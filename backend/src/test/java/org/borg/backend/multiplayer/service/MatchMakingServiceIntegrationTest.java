@@ -125,6 +125,11 @@ class MatchMakingServiceIntegrationTest {
             assertNull(postDeclinedPendingSession, "Pending session should be cleaned up after both players after someone declined");
             
         }
+        
+        @Test
+        void TwoPlayersMatched_oneTimedOutAndCleanUp() {
+            
+        }
 
         private PendingSession setupPendingSession() {
             matchMakingService.findMatch(player1.getId());
