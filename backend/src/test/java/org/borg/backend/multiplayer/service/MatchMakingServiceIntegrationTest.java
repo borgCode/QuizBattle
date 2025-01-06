@@ -20,6 +20,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -47,6 +48,8 @@ class MatchMakingServiceIntegrationTest {
 
     @MockitoBean
     private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private SessionCleanUpService sessionCleanUpService;
 
     @BeforeEach
     void setUp() {
@@ -128,6 +131,13 @@ class MatchMakingServiceIntegrationTest {
         
         @Test
         void TwoPlayersMatched_oneTimedOutAndCleanUp() {
+            PendingSession savedPendingSession = setupPendingSession();
+            matchMakingService.handleMatchResponse(savedPendingSession.getId(), player1.getId(), true);
+            
+            Instant futureTime = savedPendingSession.getCreatedAt().plusSeconds(16);
+            sessionCleanUpService.cleanUpPendingSessions(futureTime);
+            
+            assertFalse(pendingSessionRepository.existsById(savedPendingSession.getId()));
             
         }
 

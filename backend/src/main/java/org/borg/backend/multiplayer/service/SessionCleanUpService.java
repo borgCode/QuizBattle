@@ -17,4 +17,8 @@ public class SessionCleanUpService {
     public void cleanUpPendingSessions() {
         pendingSessionRepository.deleteOlderThan(Instant.now().minusMillis(15000));
     }
+
+    public void cleanUpPendingSessions(Instant now) {
+        pendingSessionRepository.deleteOlderThan(now.minusMillis(15000));
+    }
 }
