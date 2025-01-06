@@ -67,7 +67,7 @@ public class MatchMakingService {
         
         if (!hasAccepted) {
             try {
-                cancelMatch(pendingSession);
+                cancelMatch(pendingSession, playerId);
             } catch (ObjectOptimisticLockingFailureException e) {
                 log.info("Session {} was already cancelled by another player", pendingSessionId);
             }
@@ -83,16 +83,16 @@ public class MatchMakingService {
         
         if (pendingSession.isOpponentAccepted() && pendingSession.isRequestingPlayerAccepted()) {
             createMultiplayerSession(pendingSession);
+        } else {
+            messagingTemplate.convertAndSend("/topic/match" + playerId,
+                    MatchmakingResponse.waitingForOtherPlayer());
         }
-        
-        
     }
     
-    private void cancelMatch(PendingSession pendingSession) {
+    private void cancelMatch(PendingSession pendingSession, long playerId) {
+        Long opponentId = pendingSession.getOpponentId().equals(playerId) ? pendingSession.getRequestingPlayerId() : pendingSession.getOpponentId();
         
-        messagingTemplate.convertAndSend("/topic/match" + pendingSession.getRequestingPlayerId(),
-                MatchmakingResponse.declined());
-        messagingTemplate.convertAndSend("/topic/match" + pendingSession.getOpponentId(),
+        messagingTemplate.convertAndSend("/topic/match" + opponentId,
                 MatchmakingResponse.declined());
         pendingSessionRepository.delete(pendingSession);
     }

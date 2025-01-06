@@ -92,6 +92,8 @@ class MatchMakingServiceIntegrationTest {
             matchMakingService.handleMatchResponse(savedPendingSession.getId(), player1.getId(), true);
             assertTrue(multiplayerSessionRepository.findByPlayerId(player1.getId()).isEmpty(), "Multiplayer session should not be created until both players accept");
 
+            verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.waitingForOtherPlayer());
+
             matchMakingService.handleMatchResponse(savedPendingSession.getId(), player2.getId(), true);
             
             List<MultiplayerSession> player1Sessions = multiplayerSessionRepository.findByPlayerId(player1.getId());
@@ -120,7 +122,6 @@ class MatchMakingServiceIntegrationTest {
 
             matchMakingService.handleMatchResponse(savedPendingSession.getId(), player1.getId(), false);
             
-            verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.declined());
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.declined());
 
             PendingSession postDeclinedPendingSession = pendingSessionRepository
@@ -141,6 +142,7 @@ class MatchMakingServiceIntegrationTest {
             sessionCleanUpService.cleanUpPendingSessions(futureTime);
             
             assertFalse(pendingSessionRepository.existsById(savedPendingSession.getId()));
+            
             
         }
 

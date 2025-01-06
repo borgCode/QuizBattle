@@ -39,6 +39,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
   player!: PlayerDto;
   gameSessions: Array<MultiplayerSessionDto> = [];
   isSearching: boolean = false;
+  waitingForOpponent: boolean = false;
   friends: PlayerDto[] = [];
   image: string = '';
 
@@ -110,6 +111,10 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
             break;
           case 'DECLINED':
             this.alertMessageService.show("The match was declined", "error")
+            this.waitingForOpponent = false;
+            break;
+          case 'WAITING_FOR_OTHER_PLAYER':
+            this.waitingForOpponent = true;
             break;
         }
       });
@@ -191,5 +196,15 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
       }
     })
 
+  }
+
+  getButtonText() {
+    if (this.waitingForOpponent) {
+      return 'Waiting for Opponent to accept';
+    }
+    if (this.isSearching) {
+      return 'Finding Game';
+    }
+    return 'Find Game';
   }
 }

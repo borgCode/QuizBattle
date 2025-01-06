@@ -9,12 +9,12 @@
         ></app-player-card>
       </div>
       <div class="col-md-3 align-content-center">
-        <div (click)="!isSearching && findGame()"
+        <div (click)="!isSearching && !waitingForOpponent && findGame()"
              class="btn btn-success btn-lg"
-             [class.disabled]="isSearching"
-             [ngStyle]="{'cursor': isSearching ? 'not-allowed' : 'pointer'}">
-          {{ isSearching ? 'Finding Game' : 'Find Game' }}
-          <span *ngIf="isSearching" class="loading-dots"></span>
+             [class.disabled]="isSearching || waitingForOpponent"
+             [ngStyle]="{'cursor': (isSearching || waitingForOpponent) ? 'not-allowed' : 'pointer'}">
+          {{ getButtonText() }}
+          <span *ngIf="isSearching || waitingForOpponent" class="loading-dots"></span>
         </div>
       </div>
       <div class="col-md-3 align-content-center" *ngIf="isSearching">
