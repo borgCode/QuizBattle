@@ -244,7 +244,6 @@ public class MultiplayerService {
 
     @Transactional
     public void requestRematch(RematchRequest rematchRequest) {
-        log.warn("Rematch request: {}", rematchRequest);
         MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
 
@@ -299,7 +298,7 @@ public class MultiplayerService {
             log.warn("No existing session, creating new pending");
 
             PendingSession newSession = pendingSessionRepository.save(new PendingSession(playerId, opponentPlayer.getId()));
-            notificationService.sendRematchRequestNotification(opponentPlayer.getId(), newSession.getId(), sendingPlayer.getDisplayName(), sendingPlayer.getId());
+            notificationService.sendRematchRequestNotification(opponentPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
         }
     }
 

@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.multiplayer.dto.MatchmakingResponse;
+import org.borg.backend.multiplayer.model.MatchmakingSession;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
-import org.borg.backend.multiplayer.model.PendingSession;
+import org.borg.backend.multiplayer.repository.MatchmakingSessionRepository;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -42,7 +42,7 @@ class MatchMakingServiceIntegrationTest {
     @Autowired
     private PlayerRepository playerRepository;
     @Autowired
-    private PendingSessionRepository pendingSessionRepository;
+    private MatchmakingSessionRepository matchmakingSessionRepository;
     @Autowired
     private RoleRepository roleRepository;
 
@@ -68,7 +68,7 @@ class MatchMakingServiceIntegrationTest {
         matchMakingService.clearQueue();
         multiplayerSessionRepository.deleteAll();
         playerRepository.deleteAll();
-        pendingSessionRepository.deleteAll();
+        matchmakingSessionRepository.deleteAll();
     }
     
     
@@ -87,14 +87,14 @@ class MatchMakingServiceIntegrationTest {
 
         @Test
         void fullFlowMatchTwoPlayers_bothAcceptAndCreateMultiplayerSession() {
-            PendingSession savedPendingSession = setupPendingSession();
+            MatchmakingSession matchmakingSession = setupMatchmakingSession();
 
-            matchMakingService.handleMatchResponse(savedPendingSession.getId(), player1.getId(), true);
+            matchMakingService.handleMatchResponse(matchmakingSession.getId(), player1.getId(), true);
             assertTrue(multiplayerSessionRepository.findByPlayerId(player1.getId()).isEmpty(), "Multiplayer session should not be created until both players accept");
 
             verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.waitingForOtherPlayer());
 
-            matchMakingService.handleMatchResponse(savedPendingSession.getId(), player2.getId(), true);
+            matchMakingService.handleMatchResponse(matchmakingSession.getId(), player2.getId(), true);
             
             List<MultiplayerSession> player1Sessions = multiplayerSessionRepository.findByPlayerId(player1.getId());
             List<MultiplayerSession> player2Sessions = multiplayerSessionRepository.findByPlayerId(player2.getId());
@@ -107,44 +107,44 @@ class MatchMakingServiceIntegrationTest {
             verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.accepted(player1Sessions.get(0).getId(), player2.getDisplayName()));
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.accepted(player1Sessions.get(0).getId(), player1.getDisplayName()));
             
-            PendingSession postAcceptPendingSession = pendingSessionRepository
+            MatchmakingSession postAcceptSession = matchmakingSessionRepository
                     .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
                             player1.getId(), player2.getId(),
                             player2.getId(), player1.getId()
                     );
-            assertNull(postAcceptPendingSession, "Pending session should be cleaned up after both players accepted");
+            assertNull(postAcceptSession, "Matchmaking session should be cleaned up after both players accepted");
             
         }
         
         @Test
         void twoPlayersMatched_oneDeclineAndCleanUp() {
-            PendingSession savedPendingSession = setupPendingSession();
+            MatchmakingSession savedMatchmakingSession = setupMatchmakingSession();
 
-            matchMakingService.handleMatchResponse(savedPendingSession.getId(), player1.getId(), false);
+            matchMakingService.handleMatchResponse(savedMatchmakingSession.getId(), player1.getId(), false);
             
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.declined());
 
-            PendingSession postDeclinedPendingSession = pendingSessionRepository
+            MatchmakingSession postDeclinedSession = matchmakingSessionRepository
                     .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
                             player1.getId(), player2.getId(),
                             player2.getId(), player1.getId()
                     );
-            assertNull(postDeclinedPendingSession, "Pending session should be cleaned up after both players after someone declined");
+            assertNull(postDeclinedSession, "Matchmaking session should be cleaned up after both players after someone declined");
             
         }
         
         @Test
         void TwoPlayersMatched_oneTimedOutAndCleanUp() {
-            PendingSession savedPendingSession = setupPendingSession();
-            matchMakingService.handleMatchResponse(savedPendingSession.getId(), player1.getId(), true);
+            MatchmakingSession savedMatchmakingSession = setupMatchmakingSession();
+            matchMakingService.handleMatchResponse(savedMatchmakingSession.getId(), player1.getId(), true);
             
-            Instant futureTime = savedPendingSession.getCreatedAt().plusSeconds(16);
-            sessionCleanUpService.cleanUpPendingSessions(futureTime);
+            Instant futureTime = savedMatchmakingSession.getCreatedAt().plusSeconds(16);
+            sessionCleanUpService.cleanUpMatchmakingSessions(futureTime);
             
-            assertFalse(pendingSessionRepository.existsById(savedPendingSession.getId()));
+            assertFalse(matchmakingSessionRepository.existsById(savedMatchmakingSession.getId()));
             
         }
-        private PendingSession setupPendingSession() {
+        private MatchmakingSession setupMatchmakingSession() {
             matchMakingService.findMatch(player1.getId());
             assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
 
@@ -153,16 +153,16 @@ class MatchMakingServiceIntegrationTest {
             matchMakingService.findMatch(player2.getId());
             assertEquals(0, matchMakingService.getQueueSize(), "There should be 0 players in the queue");
 
-            PendingSession savedPendingSession = pendingSessionRepository
+            MatchmakingSession savedMatchmakingSession = matchmakingSessionRepository
                     .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
                             player1.getId(), player2.getId(),
                             player2.getId(), player1.getId()
                     );
 
-            verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.matched(savedPendingSession.getId(), player2.getDisplayName()));
-            verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.matched(savedPendingSession.getId(), player1.getDisplayName()));
+            verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.matched(savedMatchmakingSession.getId(), player2.getDisplayName()));
+            verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.matched(savedMatchmakingSession.getId(), player1.getDisplayName()));
             
-            return savedPendingSession;
+            return savedMatchmakingSession;
         }
 
 
@@ -218,11 +218,11 @@ class MatchMakingServiceIntegrationTest {
         
         executorService.shutdown();
 
-        List<PendingSession> pendingSessions = pendingSessionRepository.findAll();
+        List<MatchmakingSession> matchmakingSessions = matchmakingSessionRepository.findAll();
 
         assertAll(
-                () -> assertEquals(pendingSessions.size() * 2, players.size(),
-                        "Mismatch in players in pending sessions"),
+                () -> assertEquals(matchmakingSessions.size() * 2, players.size(),
+                        "Mismatch in players in Matchmaking sessions"),
                 () -> assertEquals(0, matchMakingService.getQueueSize(),
                         "Mismatch in players in the queue")
         );

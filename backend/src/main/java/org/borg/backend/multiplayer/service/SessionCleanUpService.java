@@ -1,7 +1,7 @@
 package org.borg.backend.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.multiplayer.repository.PendingSessionRepository;
+import org.borg.backend.multiplayer.repository.MatchmakingSessionRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -11,14 +11,14 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class SessionCleanUpService {
 
-    private final PendingSessionRepository pendingSessionRepository;
+    private final MatchmakingSessionRepository matchmakingSessionRepository;
 
     @Scheduled(fixedRate = 5000)
-    public void cleanUpPendingSessions() {
-        pendingSessionRepository.deleteOlderThan(Instant.now().minusMillis(15000));
+    public void cleanUpMatchmakingSessions() {
+        matchmakingSessionRepository.deleteOlderThan(Instant.now().minusMillis(15000));
     }
 
-    public void cleanUpPendingSessions(Instant now) {
-        pendingSessionRepository.deleteOlderThan(now.minusMillis(15000));
+    public void cleanUpMatchmakingSessions(Instant now) {
+        matchmakingSessionRepository.deleteOlderThan(now.minusMillis(15000));
     }
 }

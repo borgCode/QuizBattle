@@ -13,14 +13,7 @@ import java.time.Instant;
 @Repository
 public interface PendingSessionRepository extends JpaRepository<PendingSession, Long> {
     boolean existsByRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long opponentId);
-
-
+    
     PendingSession findByRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long opponentId);
-
-    PendingSession findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long requestingPlayerId1, Long requestingPlayerId2, Long requestingPlayerId3);
-
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM PendingSession  ps WHERE ps.createdAt < :instant")
-     void deleteOlderThan(@Param("instant") Instant instant);
+    
 }

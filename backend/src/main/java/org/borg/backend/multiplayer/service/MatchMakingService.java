@@ -3,10 +3,10 @@ package org.borg.backend.multiplayer.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.dto.MatchmakingResponse;
+import org.borg.backend.multiplayer.model.MatchmakingSession;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
-import org.borg.backend.multiplayer.model.PendingSession;
+import org.borg.backend.multiplayer.repository.MatchmakingSessionRepository;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,7 +22,7 @@ public class MatchMakingService {
 
     private final List<Long> matchmakingQueue = Collections.synchronizedList(new ArrayList<>());
     private final MultiplayerSessionRepository multiplayerSessionRepository;
-    private final PendingSessionRepository pendingSessionRepository;
+    private final MatchmakingSessionRepository matchmakingSessionRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final PlayerRepository playerRepository;
 
@@ -52,55 +52,55 @@ public class MatchMakingService {
                 .orElseThrow(() -> new NoSuchElementException("Opponent not found"));
 
 
-        PendingSession pendingSession = new PendingSession(playerId, opponentId.get());
-        pendingSessionRepository.save(pendingSession);
+        MatchmakingSession matchmakingSession = new MatchmakingSession(playerId, opponentId.get());
+        matchmakingSessionRepository.save(matchmakingSession);
 
         messagingTemplate.convertAndSend("/topic/match" + requestingPlayer.getId(),
-                MatchmakingResponse.matched(pendingSession.getId(), opponent.getDisplayName()));
+                MatchmakingResponse.matched(matchmakingSession.getId(), opponent.getDisplayName()));
         messagingTemplate.convertAndSend("/topic/match" + opponent.getId(),
-                MatchmakingResponse.matched(pendingSession.getId(), requestingPlayer.getDisplayName()));
+                MatchmakingResponse.matched(matchmakingSession.getId(), requestingPlayer.getDisplayName()));
     }
 
-    public void handleMatchResponse(long pendingSessionId, long playerId, boolean hasAccepted) {
-        PendingSession pendingSession = pendingSessionRepository.findById(pendingSessionId)
-                .orElseThrow(() -> new NoSuchElementException("Pending session not found"));
+    public void handleMatchResponse(long matchmakingSessionId, long playerId, boolean hasAccepted) {
+        MatchmakingSession matchmakingSession = matchmakingSessionRepository.findById(matchmakingSessionId)
+                .orElseThrow(() -> new NoSuchElementException("Matchmaking session not found"));
         
         if (!hasAccepted) {
             try {
-                cancelMatch(pendingSession, playerId);
+                cancelMatch(matchmakingSession, playerId);
             } catch (ObjectOptimisticLockingFailureException e) {
-                log.info("Session {} was already cancelled by another player", pendingSessionId);
+                log.info("Session {} was already cancelled by another player", matchmakingSession);
             }
             return;
         }
         
-        if (playerId == pendingSession.getRequestingPlayerId()) {
-            pendingSession.setRequestingPlayerAccepted(true);
-        } else if (playerId == pendingSession.getOpponentId()) {
-            pendingSession.setOpponentAccepted(true);
+        if (playerId == matchmakingSession.getRequestingPlayerId()) {
+            matchmakingSession.setRequestingPlayerAccepted(true);
+        } else if (playerId == matchmakingSession.getOpponentId()) {
+            matchmakingSession.setOpponentAccepted(true);
         }
-        pendingSessionRepository.save(pendingSession);
+        matchmakingSessionRepository.save(matchmakingSession);
         
-        if (pendingSession.isOpponentAccepted() && pendingSession.isRequestingPlayerAccepted()) {
-            createMultiplayerSession(pendingSession);
+        if (matchmakingSession.isOpponentAccepted() && matchmakingSession.isRequestingPlayerAccepted()) {
+            createMultiplayerSession(matchmakingSession);
         } else {
             messagingTemplate.convertAndSend("/topic/match" + playerId,
                     MatchmakingResponse.waitingForOtherPlayer());
         }
     }
     
-    private void cancelMatch(PendingSession pendingSession, long playerId) {
-        Long opponentId = pendingSession.getOpponentId().equals(playerId) ? pendingSession.getRequestingPlayerId() : pendingSession.getOpponentId();
+    private void cancelMatch(MatchmakingSession matchmakingSession, long playerId) {
+        Long opponentId = matchmakingSession.getOpponentId().equals(playerId) ? matchmakingSession.getRequestingPlayerId() : matchmakingSession.getOpponentId();
         
         messagingTemplate.convertAndSend("/topic/match" + opponentId,
                 MatchmakingResponse.declined());
-        pendingSessionRepository.delete(pendingSession);
+        matchmakingSessionRepository.delete(matchmakingSession);
     }
 
-    private void createMultiplayerSession(PendingSession pendingSession) {
-        Player player1 = playerRepository.findById(pendingSession.getRequestingPlayerId())
+    private void createMultiplayerSession(MatchmakingSession matchmakingSession) {
+        Player player1 = playerRepository.findById(matchmakingSession.getRequestingPlayerId())
                 .orElseThrow(() -> new NoSuchElementException("Requesting player not found"));
-        Player player2 = playerRepository.findById(pendingSession.getOpponentId())
+        Player player2 = playerRepository.findById(matchmakingSession.getOpponentId())
                 .orElseThrow(() -> new NoSuchElementException("Opponent not found"));
 
         //Randomly choose who starts
@@ -115,7 +115,7 @@ public class MatchMakingService {
         messagingTemplate.convertAndSend("/topic/match" + player2.getId(),
                 MatchmakingResponse.accepted(session.getId(), player1.getDisplayName()));
         
-        pendingSessionRepository.delete(pendingSession);
+        matchmakingSessionRepository.delete(matchmakingSession);
         
     }
 
