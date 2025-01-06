@@ -22,6 +22,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -164,14 +168,40 @@ class MatchMakingServiceIntegrationTest {
     }
     
     @Test
-    void concurrentMatchmakingTest() {
+    void concurrentMatchmakingTest() throws InterruptedException {
         int numOfPlayers = 100;
         List<Player> players = new ArrayList<>();
 
         for (int i = 0; i < numOfPlayers; i++) {
             players.add(createAndSavePlayer("Player " + i));
         }
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(numOfPlayers);
+
+        for (Player player : players) {
+            executorService.submit(() -> {
+                try {
+                    matchMakingService.findMatch(player.getId());
+                } finally {
+                    latch.countDown();
+                }
+            });
+            
+        }
         
+        boolean completed = latch.await(5, TimeUnit.SECONDS);
+        assertTrue(completed, "Not all matchmaking operations finished on time");
+        
+        executorService.shutdown();
+
+        List<PendingSession> pendingSessions = pendingSessionRepository.findAll();
+
+        assertAll(
+                () -> assertEquals(pendingSessions.size() * 2, players.size(),
+                        "Mismatch in players in pending sessions"),
+                () -> assertEquals(0, matchMakingService.getQueueSize(),
+                        "Mismatch in players in the queue")
+        );
         
     }
 
