@@ -2,6 +2,7 @@ package org.borg.backend.achievement.model;
 
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -12,5 +13,5 @@ public class AchievementNotification {
     private final String achievementName;
     private final String achievementDescription;
     private String base64Image;
-    private final LocalDateTime earnedAt;
+    private final Instant earnedAt;
 }

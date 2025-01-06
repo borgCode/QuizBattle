@@ -20,6 +20,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.awt.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class AchievementService {
                 .player(player)
                 .achievement(achievement)
                 .currentLevel(achievement.getLevels().get(0))
-                .achievedAt(LocalDateTime.now())
+                .achievedAt(Instant.now())
                 .build();
 
         log.warn("Saving {} to DB", unlockedAchievement.getAchievement().getName());
@@ -138,12 +139,12 @@ public class AchievementService {
                     .player(player)
                     .achievement(achievement)
                     .currentLevel(newLevel)
-                    .achievedAt(LocalDateTime.now())
+                    .achievedAt(Instant.now())
                     .build();
         } else {
             log.warn("Already unlocked, updating to new level is applicable, {}", newLevel);
             unlockedAchievement.setCurrentLevel(newLevel);
-            unlockedAchievement.setAchievedAt(LocalDateTime.now());
+            unlockedAchievement.setAchievedAt(Instant.now());
         }
 
         userUnlockedAchievementRepository.save(unlockedAchievement);

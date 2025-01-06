@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +23,7 @@ public class QuestionSessionService {
     private static class PlayerSession {
         private List<Long> questionIds;
         private ConcurrentHashMap<Integer, Boolean> answers;
-        private LocalDateTime timestamp;
+        private Instant timestamp;
         private int currentIndex;
         private String currentCategory;
         private Set<Long> answeredQuestionIds;
@@ -30,7 +31,7 @@ public class QuestionSessionService {
         public PlayerSession(List<Long> questionIds, String currentCategory) {
             this.questionIds = questionIds;
             this.answers = new ConcurrentHashMap<>();
-            this.timestamp = LocalDateTime.now();
+            this.timestamp = Instant.now();
             this.currentIndex = 0;
             this.currentCategory = currentCategory;
             this.answeredQuestionIds = ConcurrentHashMap.newKeySet();

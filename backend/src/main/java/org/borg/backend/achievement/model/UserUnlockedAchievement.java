@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.borg.backend.player.model.Player;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -31,5 +32,5 @@ public class UserUnlockedAchievement {
     private AchievementLevel currentLevel;
     
     
-    private LocalDateTime achievedAt;
+    private Instant achievedAt; 
 }

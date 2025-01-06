@@ -3,7 +3,9 @@
           aria-expanded="false">
     <i class="fa-regular fa-bell"></i>
     <ng-container *ngIf="unreadNotifications$ | async as unreadNotifications">
-      <span class="notification-badge position-absolute badge rounded-pill bg-danger">{{ unreadNotifications.length }}</span>
+      <span *ngIf="unreadNotifications.length > 0" class="notification-badge position-absolute badge rounded-pill bg-danger">
+        {{ unreadNotifications.length }}
+      </span>
     </ng-container>
   </button>
 
@@ -357,12 +359,12 @@
                               title="Go to score window"
                               (click)="goToGame(notification.id, notification.startedSessionId)">
                         <i class="fa-regular fa-question-circle"></i>
-                </button>
-                <button class="btn btn-sm btn"
-                        data-bs-toggle="tooltip"
-                        title="Request rematch"
-                        (click)="requestRematch(notification.id, notification.startedSessionId)"
-                        style="color: #6f42c1; border: solid 1px #6f42c1;">
+                      </button>
+                      <button class="btn btn-sm btn"
+                              data-bs-toggle="tooltip"
+                              title="Request rematch"
+                              (click)="requestRematch(notification.id, notification.startedSessionId)"
+                              style="color: #6f42c1; border: solid 1px #6f42c1;">
                         <i class="fa-solid fa-sync-alt"></i>
                       </button>
                     </div>
@@ -437,7 +439,8 @@
         <button type="button" class="btn-close"></button>
       </div>
       <div class="modal-body">
-        <p>Do you want to go to the accepted game? You can find it in the list of active games or directly go there now</p>
+        <p>Do you want to go to the accepted game? You can find it in the list of active games or directly go there
+          now</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="stay-button">Stay</button>

@@ -84,36 +84,33 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
   acceptFriendRequest(originalSender: number, notificationId: number) {
     //Remove value from notif bell
-    this.unreadNotifications.next(
-      this.unreadNotifications.value.filter(n => n.id !== notificationId)
-    )
+
     this.friendshipService.acceptFriend({
       body: {
         senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
       }
     }).subscribe({
-      next: () => this.alertMessageService.show("Accepted friend request!", 'success'),
+      next: () => {
+        this.alertMessageService.show("Accepted friend request!", 'success')
+        this.fetchNotifications();
+      },
     })
   }
 
   declineFriendRequest(originalSender: number, notificationId: number) {
-    this.unreadNotifications.next(
-      this.unreadNotifications.value.filter(n => n.id !== notificationId))
-
     this.friendshipService.rejectFriendship({
       body: {
         senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
       }
     }).subscribe({
-      next: () => this.alertMessageService.show("Friend request rejected!", 'success'),
+      next: () => {
+        this.alertMessageService.show("Friend request rejected!", 'success')
+        this.fetchNotifications();
+      },
     })
   }
 
-
   acceptRematch(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.unreadNotifications.next(
-      this.unreadNotifications.value.filter(n => n.id !== notificationId))
-
     this.multiplayerService.acceptRematch({
       body: {
         originalSenderId: senderId,
@@ -140,14 +137,12 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
           modal.style.display = 'none';
           modal.classList.remove('show');
         })
+        this.fetchNotifications();
       }
     })
   }
 
   declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.unreadNotifications.next(
-      this.unreadNotifications.value.filter(n => n.id !== notificationId))
-
     this.multiplayerService.rejectRematch({
       body: {
         originalSenderId: senderId,
@@ -156,39 +151,36 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
         playerDisplayName: this.loginStateService.loggedInUser.displayName
       }
     }).subscribe({
-      next: () => this.alertMessageService.show("You declined the rematch!", 'success'),
+      next: () => {
+        this.alertMessageService.show("You declined the rematch!", 'success')
+        this.fetchNotifications()
+      },
     })
   }
 
   async goToGame(notificationId: number, startedSessionId: number) {
-
     this.markAsRead(notificationId);
-
     this.router.navigate(['multiplayer', startedSessionId]);
   }
 
   requestRematch(notificationId: number, startedSessionId: number) {
-    this.unreadNotifications.next(
-      this.unreadNotifications.value.filter(n => n.id !== notificationId))
-
     this.multiplayerService.requestRematch({
       body: {
         sessionId: startedSessionId,
         playerId: this.loginStateService.loggedInUser.id}}).subscribe({
       next: () => {
-
         this.alertMessageService.show('Send rematch request!', 'success')
+        this.markAsRead(notificationId);
       }
     })
   }
 
   markAsRead(notificationId: number) {
-    console.log(notificationId)
-
-    this.unreadNotifications.next(
-      this.unreadNotifications.value.filter(n => n.id !== notificationId))
-
-    this.notificationService.markAsRead({notificationId: notificationId}).subscribe();
+    this.notificationService.markAsRead({notificationId: notificationId}).subscribe({
+      next: () => {
+        this.fetchNotifications();
+      }
+    });
   }
 
 }

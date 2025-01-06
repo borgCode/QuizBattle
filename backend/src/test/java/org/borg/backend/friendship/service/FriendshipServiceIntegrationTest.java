@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,7 +182,7 @@ class FriendshipServiceIntegrationTest {
                     .type(NotificationType.FRIEND_REQUEST)
                     .message(player1.getDisplayName() + " sent you a friend request!")
                     .isRead(false)
-                    .createdAt(LocalDateTime.now())
+                    .createdAt(Instant.now())
                     .build();
 
             Notification savedNotification = notificationRepository.save(friendRequest);

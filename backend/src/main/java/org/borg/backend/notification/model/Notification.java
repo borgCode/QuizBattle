@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.borg.backend.common.enums.NotificationType;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Getter
@@ -23,11 +24,10 @@ public class Notification {
     private NotificationType type;
     private Long pendingSessionId;
     private Long startedSessionId;
-    private Long opponentId;
     private String message;
     private boolean isRead;
     private boolean isArchived;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     
 }
 

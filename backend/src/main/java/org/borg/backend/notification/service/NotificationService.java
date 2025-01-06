@@ -11,6 +11,7 @@ import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -106,7 +107,7 @@ public class NotificationService {
                 .pendingSessionId(pendingSessionId)
                 .isRead(false)
                 .isArchived(false)
-                .createdAt(LocalDateTime.now())
+                .createdAt(Instant.now())
                 .build());
     }
     
