@@ -144,13 +144,12 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
       }
       if (result.timedOut) {
         this.webSocketService.sendMessage('/app/matchmaking/decline', decision);
-        console.log("Match declined due to timeout")
+        this.alertMessageService.show("You didn't accept the match in time", "error")
       } else if (result === true) {
         this.webSocketService.sendMessage('/app/matchmaking/accept', decision);
-        console.log("Match accepted")
       } else {
         this.webSocketService.sendMessage('/app/matchmaking/decline', decision);
-        console.log("Match declined")
+        this.alertMessageService.show("You declined the match", "success");
       }
     })
   }
