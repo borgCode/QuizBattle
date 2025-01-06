@@ -26,6 +26,7 @@ public class Notification {
     private Long opponentId;
     private String message;
     private boolean isRead;
+    private boolean isArchived;
     private LocalDateTime createdAt;
     
 }

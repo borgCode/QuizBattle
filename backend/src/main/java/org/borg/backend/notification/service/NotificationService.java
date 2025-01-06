@@ -45,12 +45,14 @@ public class NotificationService {
         String message = senderDisplayName + " requested a rematch against you!";
         buildAndSaveNotification(receivingId, senderId, NotificationType.REMATCH_REQUEST, message, null, pendingSessionId);
     }
+
     public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
         notificationRepository.deleteById(notificationId);
 
         String message = playerDisplayName + " accepted your request for a rematch!";
         buildAndSaveNotification(playerToNotify, null, NotificationType.REMATCH_ACCEPTED, message, newSessionId, null);
     }
+
     public void sendRematchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
         notificationRepository.deleteById(notificationId);
 
@@ -63,7 +65,7 @@ public class NotificationService {
                 .filter(p -> p.getId().equals(session.getLoserId()))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Player not found"));
-        
+
         String message = "You won your match against " + opponent.getDisplayName() + "!";
         buildAndSaveNotification(session.getWinnerId(), null, NotificationType.GAME_WON, message, session.getId(), null);
     }
@@ -81,10 +83,10 @@ public class NotificationService {
     public void sendTieNotifications(MultiplayerSession session) {
         Player player1 = session.getPlayers().get(0);
         Player player2 = session.getPlayers().get(1);
-        
+
         String messagePlayer1 = "Your match against " + player2.getDisplayName() + " was tied!";
         buildAndSaveNotification(player1.getId(), null, NotificationType.GAME_TIED, messagePlayer1, session.getId(), null);
-        
+
         String messagePlayer2 = "Your match against " + player1.getDisplayName() + " was tied!";
         buildAndSaveNotification(player2.getId(), null, NotificationType.GAME_TIED, messagePlayer2, session.getId(), null);
 
@@ -99,6 +101,7 @@ public class NotificationService {
                 .startedSessionId(startedSessionId)
                 .pendingSessionId(pendingSessionId)
                 .isRead(false)
+                .isArchived(false)
                 .createdAt(LocalDateTime.now())
                 .build());
     }
@@ -112,7 +115,7 @@ public class NotificationService {
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {
         notificationRepository.deleteByPlayerIdAndSenderIdAndType(id, id1, NotificationType.FRIEND_REQUEST);
     }
-    
+
     public void deleteMatchRequestNotification(Long playerId, Long pendingSessionId) {
         Notification notification = notificationRepository.findByPlayerIdAndPendingSessionId(playerId, pendingSessionId);
         if (notification != null) {
