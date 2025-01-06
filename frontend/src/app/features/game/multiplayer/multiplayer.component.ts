@@ -101,6 +101,15 @@ export class MultiplayerComponent implements OnInit {
 
   }
 
+  leaveMatchmakingQueue() {
+    this.isSearching = false;
+    this.multiplayerService.cancelMatchmaking({playerId: this.player.id}).subscribe({
+      next: () => {
+        console.log("Left queue")
+      }
+    })
+  }
+
   private openMatchFoundDialog(pendingSessionId: number, opponentDisplayName: string) {
     const dialogRef = this.matchFoundDialog.open(MatchFoundDialogComponent, {
       data: {opponentName: opponentDisplayName},

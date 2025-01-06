@@ -19,7 +19,6 @@ public class ImageUtil {
 
         if (subFilePath == null || subFilePath.isEmpty()) {
             try {
-                log.warn("Path is null");
                 return loadAndEncodeResource("placeholder_profile_pic/placeholder.jpg");
             } catch (IOException e) {
                 //TODO error handling
@@ -65,7 +64,6 @@ public class ImageUtil {
 
     private static String loadAndEncodeResource(String resourcePath) throws IOException {
         ClassPathResource resource = new ClassPathResource(resourcePath);
-        log.warn(resourcePath);
         try (InputStream inputStream = resource.getInputStream()) {
             byte[] imageBytes = inputStream.readAllBytes();
             return Base64.getEncoder().encodeToString(imageBytes);

@@ -10,6 +10,7 @@ import org.borg.backend.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -63,7 +64,11 @@ public class MatchMakingService {
                 .orElseThrow(() -> new NoSuchElementException("Pending session not found"));
         
         if (!hasAccepted) {
-            cancelMatch(pendingSession);
+            try {
+                cancelMatch(pendingSession);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                log.info("Session {} was already cancelled by another player", pendingSessionId);
+            }
             return;
         }
         

@@ -3,7 +3,7 @@
     <div class="row mb-4 g-3">
       <div class="col-md-3">
         <app-player-card
-maxHeight="250px"
+          maxHeight="250px"
           [playerDisplayName]="player.displayName"
           [playerAvatar]="image"
         ></app-player-card>
@@ -15,6 +15,12 @@ maxHeight="250px"
              [ngStyle]="{'cursor': isSearching ? 'not-allowed' : 'pointer'}">
           {{ isSearching ? 'Finding Game' : 'Find Game' }}
           <span *ngIf="isSearching" class="loading-dots"></span>
+        </div>
+      </div>
+      <div class="col-md-3 align-content-center" *ngIf="isSearching">
+        <div class="btn btn-danger btn-lg"
+             (click)="leaveMatchmakingQueue()">
+          Stop searching
         </div>
       </div>
       <div class="col-md-3 align-content-center">
@@ -37,7 +43,8 @@ maxHeight="250px"
                   <!-- Player 1 Section -->
                   <div class="col-md-4 d-flex align-items-center">
                     <div class="player-avatar bg-light rounded-circle p-2 me-3">
-                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTOList[0].base64Image" style="max-height: 40px; max-width: 40px" alt="Player 1" class="rounded-circle"/>
+                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTOList[0].base64Image"
+                           style="max-height: 40px; max-width: 40px" alt="Player 1" class="rounded-circle"/>
                     </div>
                     <div class="player-info">
                       <div class="fw-bold">{{ gameSession.playerDTOList[0].displayName }}</div>
@@ -66,7 +73,8 @@ maxHeight="250px"
                       <div class="text-primary fs-4">{{ gameSession.score[gameSession.playerDTOList[1].id] }}</div>
                     </div>
                     <div class="player-avatar bg-light rounded-circle p-2 ms-3">
-                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTOList[1].base64Image" style="max-height: 40px; max-width: 40px" alt="Player 2" class="rounded-circle"/>
+                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTOList[1].base64Image"
+                           style="max-height: 40px; max-width: 40px" alt="Player 2" class="rounded-circle"/>
                     </div>
                   </div>
                 </div>
