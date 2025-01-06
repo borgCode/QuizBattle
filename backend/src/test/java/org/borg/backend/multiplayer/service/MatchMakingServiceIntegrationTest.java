@@ -69,6 +69,8 @@ class MatchMakingServiceIntegrationTest {
         playerRepository.deleteAll();
         pendingSessionRepository.deleteAll();
     }
+    
+    
 
     @Nested
     class MatchingMakingFullFLowTests {
@@ -179,6 +181,15 @@ class MatchMakingServiceIntegrationTest {
             matchMakingService.cancelMatchmaking(player1.getId());
             assertEquals(0, matchMakingService.getQueueSize(), "There should be no players in the queue");
             
+        }
+        
+        @Test
+        void playersShouldNotMatchWithThemselves () {
+            matchMakingService.findMatch(player1.getId());
+            assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
+
+            matchMakingService.findMatch(player1.getId());
+            assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
         }
     }
     

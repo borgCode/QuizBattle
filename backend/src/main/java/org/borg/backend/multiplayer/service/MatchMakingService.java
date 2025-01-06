@@ -30,8 +30,11 @@ public class MatchMakingService {
     public void findMatch(Long playerId) {
         synchronized (matchmakingQueue) {
             Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
-
+            
             if (opponentId.isPresent()) {
+                if (opponentId.get().equals(playerId)) {
+                    return;
+                }
                 matchmakingQueue.remove(opponentId.get());
                 handleMatchMakingRequest(playerId, opponentId);
             } else {
