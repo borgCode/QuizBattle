@@ -25,8 +25,10 @@ declare var bootstrap: any;
   styleUrl: './notification-dropdown.component.css'
 })
 export class NotificationDropdownComponent implements OnInit, AfterViewInit {
-  private notifications = new BehaviorSubject<Notification[]>([]);
-  notifications$ = this.notifications.asObservable();
+  private unreadNotifications = new BehaviorSubject<Notification[]>([]);
+  unreadNotifications$ = this.unreadNotifications.asObservable();
+  private readNotifications = new BehaviorSubject<Notification[]>([]);
+  readNotifications$ = this.readNotifications.asObservable();
 
 
   constructor(
@@ -44,7 +46,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
       if (isLoggedIn) {
         this.fetchNotifications();
       } else {
-        this.notifications.next([]);
+        this.unreadNotifications.next([]);
+        this.readNotifications.next([]);
       }
     });
 
@@ -67,16 +70,22 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   private fetchNotifications() {
     console.log("User id: " + this.loginStateService.loggedInUser.id)
     if (this.loginStateService.loggedInUser.id) {
-      this.notificationService.getPlayerNotifications({playerId: this.loginStateService.loggedInUser.id}).subscribe(
-        notifications => this.notifications.next(notifications)
+      this.notificationService.getActivePlayerNotifications({playerId: this.loginStateService.loggedInUser.id}).subscribe(
+        notifications => {
+          const readNotifications = notifications.filter(notification => notification.read);
+          const unreadNotifications = notifications.filter(notification => !notification.read);
+
+          this.readNotifications.next(readNotifications);
+          this.unreadNotifications.next(unreadNotifications);
+        }
       )
     }
   }
 
   acceptFriendRequest(originalSender: number, notificationId: number) {
     //Remove value from notif bell
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId)
+    this.unreadNotifications.next(
+      this.unreadNotifications.value.filter(n => n.id !== notificationId)
     )
     this.friendshipService.acceptFriend({
       body: {
@@ -88,8 +97,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   declineFriendRequest(originalSender: number, notificationId: number) {
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId))
+    this.unreadNotifications.next(
+      this.unreadNotifications.value.filter(n => n.id !== notificationId))
 
     this.friendshipService.rejectFriendship({
       body: {
@@ -100,18 +109,10 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     })
   }
 
-  markAsRead(notificationId: number) {
-    console.log(notificationId)
-
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId))
-
-    this.notificationService.markAsRead({notificationId: notificationId}).subscribe();
-  }
 
   acceptRematch(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId))
+    this.unreadNotifications.next(
+      this.unreadNotifications.value.filter(n => n.id !== notificationId))
 
     this.multiplayerService.acceptRematch({
       body: {
@@ -144,8 +145,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId))
+    this.unreadNotifications.next(
+      this.unreadNotifications.value.filter(n => n.id !== notificationId))
 
     this.multiplayerService.rejectRematch({
       body: {
@@ -167,8 +168,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   requestRematch(notificationId: number, startedSessionId: number) {
-    this.notifications.next(
-      this.notifications.value.filter(n => n.id !== notificationId))
+    this.unreadNotifications.next(
+      this.unreadNotifications.value.filter(n => n.id !== notificationId))
 
     this.multiplayerService.requestRematch({
       body: {
@@ -179,6 +180,15 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
         this.alertMessageService.show('Send rematch request!', 'success')
       }
     })
+  }
+
+  markAsRead(notificationId: number) {
+    console.log(notificationId)
+
+    this.unreadNotifications.next(
+      this.unreadNotifications.value.filter(n => n.id !== notificationId))
+
+    this.notificationService.markAsRead({notificationId: notificationId}).subscribe();
   }
 
 }

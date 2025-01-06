@@ -45,7 +45,7 @@ public class NotificationService {
         buildAndSaveNotification(receivingId, null, NotificationType.REMATCH_ACCEPTED, message, newSessionId, null);
     }
 
-    public void sendRematchRequestNotification(Long receivingId, Long pendingSessionId, String senderDisplayName, Long senderId) {
+    public void sendRematchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId ) {
         String message = senderDisplayName + " requested a rematch against you!";
         buildAndSaveNotification(receivingId, senderId, NotificationType.REMATCH_REQUEST, message, null, pendingSessionId);
     }

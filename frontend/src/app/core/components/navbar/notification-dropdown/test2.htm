@@ -1,0 +1,84 @@
+<div class="dropdown">
+  <button class="btn btn-light position-relative"
+          type="button"
+          id="notificationsDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false">
+    <i class="bi bi-bell"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          *ngIf="unreadCount > 0">
+          {{ unreadCount }}
+        </span>
+  </button>
+
+  <div class="dropdown-menu dropdown-menu-end notification-panel p-0"
+       aria-labelledby="notificationsDropdown">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+      <h6 class="mb-0">Notifications</h6>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary"
+                *ngIf="unreadCount > 0"
+                (click)="markAllAsRead()">
+          Mark all as read
+        </button>
+        <button class="btn btn-sm btn-outline-secondary"
+                (click)="openSettings()">
+          <i class="bi bi-gear"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">All ({{ notifications.length }})</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Mentions (0)</a>
+      </li>
+    </ul>
+
+    <!-- Notifications List -->
+    <div class="notification-list">
+      <div *ngFor="let notification of notifications"
+           class="notification-item p-3 border-bottom"
+           [class.unread]="!notification.isRead">
+        <div class="d-flex">
+          <!-- Image -->
+          <div class="flex-shrink-0">
+            <img [src]="notification.imageUrl"
+                 class="rounded-circle"
+                 width="48"
+                 height="48"
+                 [alt]="notification.title">
+          </div>
+
+          <!-- Content -->
+          <div class="flex-grow-1 ms-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="mb-1" [innerHTML]="notification.message"></p>
+                <small class="text-muted">
+                  {{ notification.timestamp | date:'mediumDate' }} ·
+                  {{ notification.category }}
+                </small>
+              </div>
+              <button class="btn btn-sm btn-link text-muted"
+                      (click)="deleteNotification(notification.id)">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="notifications.length === 0"
+           class="p-4 text-center text-muted">
+        <i class="bi bi-bell-slash fs-4"></i>
+        <p class="mt-2">No notifications</p>
+      </div>
+    </div>
+  </div>
+</div>

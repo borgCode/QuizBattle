@@ -2,8 +2,8 @@
   <button class="btn btn-dark position-relative" id="notificationsDropdown" data-bs-toggle="dropdown"
           aria-expanded="false">
     <i class="fa-regular fa-bell"></i>
-    <ng-container *ngIf="notifications$ | async as notifications">
-      <span class="notification-badge position-absolute badge rounded-pill bg-danger">{{ notifications.length }}</span>
+    <ng-container *ngIf="unreadNotifications$ | async as unreadNotifications">
+      <span class="notification-badge position-absolute badge rounded-pill bg-danger">{{ unreadNotifications.length }}</span>
     </ng-container>
   </button>
 
@@ -17,21 +17,206 @@
         <i class="fa-solid fa-arrow-right"></i>
       </div>
     </div>
-    <ng-container *ngIf="notifications$ | async as notifications">
+    <ng-container *ngIf="unreadNotifications$ | async as unreadNotifications">
       <div class="notification-list">
-        <div *ngFor="let notification of notifications">
-          <div *ngIf="!notification.read">
-            <div class="notification-item p-3 border-bottom unread">
-              <ng-container [ngSwitch]="notification.type">
-                <div *ngSwitchCase="'FRIEND_REQUEST'" class="friend-request d-flex">
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <i class="fa-solid fa-user-group icon"></i>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
+        <div *ngFor="let notification of unreadNotifications">
+          <div class="notification-item p-3 border-bottom unread" (click)="markAsRead(notification.id)">
+            <ng-container [ngSwitch]="notification.type">
+              <div *ngSwitchCase="'FRIEND_REQUEST'" class="friend-request d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-user-group icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <button class="btn btn-sm btn-success"
+                            data-bs-toggle="tooltip"
+                            title="Accept friends request"
+                            (click)="acceptFriendRequest(notification.senderId, notification.id)">
+                      <i class="fa-regular fa-circle-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger"
+                            data-bs-toggle="tooltip"
+                            title="Decline friend request"
+                            (click)="declineFriendRequest(notification.senderId, notification.id)">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'FRIEND_ACCEPTED'" class="friend-accepted d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-user-group icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'REMATCH_REQUEST'" class="rematch-request d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-gamepad icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <button class="btn btn-sm btn-success"
+                            data-bs-toggle="tooltip"
+                            title="Accept rematch"
+                            (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)">
+                      <i class="fa-regular fa-circle-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger"
+                            data-bs-toggle="tooltip"
+                            title="Decline rematch"
+                            (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'REMATCH_ACCEPTED'" class="rematch-accepted d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-gamepad icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <button class="btn btn-sm btn-primary"
+                            data-bs-toggle="tooltip"
+                            title="Go to game"
+                            (click)="goToGame(notification.id, notification.startedSessionId)">
+                      <i class="fa-solid fa-arrow-circle-right"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'REMATCH_DECLINED'" class="rematch-declined d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-ban icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'GAME_WON'" class="rematch-request d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-trophy icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <button class="btn btn-sm btn-primary"
+                            data-bs-toggle="tooltip"
+                            title="Go to score window"
+                            (click)="goToGame(notification.id, notification.startedSessionId)">
+                      <i class="fa-regular fa-question-circle"></i>
+                    </button>
+                    <button class="btn btn-sm btn"
+                            data-bs-toggle="tooltip"
+                            title="Request rematch"
+                            (click)="requestRematch(notification.id, notification.startedSessionId)"
+                            style="color: #6f42c1; border: solid 1px #6f42c1;">
+                      <i class="fa-solid fa-sync-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'GAME_LOST'" class="rematch-request d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-thumbs-down icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <button class="btn btn-sm btn-primary"
+                            data-bs-toggle="tooltip"
+                            title="Go to score window"
+                            (click)="goToGame(notification.id, notification.startedSessionId)">
+                      <i class="fa-regular fa-question-circle"></i>
+                    </button>
+                    <button class="btn btn-sm"
+                            data-bs-toggle="tooltip"
+                            title="Request rematch"
+                            (click)="requestRematch(notification.id, notification.startedSessionId)"
+                            style="color: #6f42c1; border: solid 1px #6f42c1;">
+                      <i class="fa-solid fa-sync-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'GAME_TIED'" class="rematch-request d-flex">
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <i class="fa-solid fa-handshake icon"></i>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <button class="btn btn-sm btn-primary"
+                            data-bs-toggle="tooltip"
+                            title="Go to score window"
+                            (click)="goToGame(notification.id, notification.startedSessionId)">
+                      <i class="fa-regular fa-question-circle"></i>
+                    </button>
+                    <button class="btn btn-sm"
+                            data-bs-toggle="tooltip"
+                            title="Request rematch"
+                            (click)="requestRematch(notification.id, notification.startedSessionId)"
+                            style="color: #6f42c1; border: solid 1px #6f42c1;">
+                      <i class="fa-solid fa-sync-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="readNotifications$ | async as readNotifications">
+      <div class="notification-list">
+        <div *ngFor="let notification of readNotifications">
+          <div class="notification-item p-3 border-bottom">
+            <ng-container [ngSwitch]="notification.type">
+              <div *ngSwitchCase="'FRIEND_REQUEST'" class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="fa-solid fa-user-group icon"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <p class="mb-1">Friend Request</p>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <div>
                       <button class="btn btn-sm btn-success"
                               data-bs-toggle="tooltip"
                               title="Accept friends request"
@@ -44,30 +229,48 @@
                               (click)="declineFriendRequest(notification.senderId, notification.id)">
                         <i class="fa-solid fa-xmark"></i>
                       </button>
+                      <button class="btn btn-sm btn-link text-muted">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
-                <div *ngSwitchCase="'FRIEND_ACCEPTED'" class="friend-accepted d-flex">
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <i class="fa-solid fa-user-group icon"></i>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
+              </div>
+
+              <div *ngSwitchCase="'FRIEND_ACCEPTED'" class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="fa-solid fa-user-group icon"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <p class="mb-1">Friend Request Accepted</p>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <div>
+                      <button class="btn btn-sm btn-link text-muted">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
-                <div *ngSwitchCase="'REMATCH_REQUEST'" class="rematch-request d-flex">
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <i class="fa-solid fa-gamepad icon"></i>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
+              </div>
+
+              <div *ngSwitchCase="'REMATCH_REQUEST'" class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="fa-solid fa-gamepad icon"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <p class="mb-1">Rematch Request</p>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <div>
                       <button class="btn btn-sm btn-success"
                               data-bs-toggle="tooltip"
                               title="Accept rematch"
@@ -80,64 +283,92 @@
                               (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)">
                         <i class="fa-solid fa-xmark"></i>
                       </button>
+                      <button class="btn btn-sm btn-link text-muted">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
-                <div *ngSwitchCase="'REMATCH_ACCEPTED'" class="rematch-accepted d-flex">
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <i class="fa-solid fa-gamepad icon"></i>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
+              </div>
+
+              <div *ngSwitchCase="'REMATCH_ACCEPTED'" class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="fa-solid fa-gamepad icon"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <p class="mb-1">Rematch Accepted</p>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <div>
                       <button class="btn btn-sm btn-primary"
                               data-bs-toggle="tooltip"
                               title="Go to game"
                               (click)="goToGame(notification.id, notification.startedSessionId)">
                         <i class="fa-solid fa-arrow-circle-right"></i>
                       </button>
+                      <button class="btn btn-sm btn-link text-muted">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
-                <div *ngSwitchCase="'REMATCH_DECLINED'" class="rematch-declined d-flex">
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <i class="fa-solid fa-ban icon"></i>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
+              </div>
+
+              <div *ngSwitchCase="'REMATCH_DECLINED'" class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="fa-solid fa-ban icon"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <p class="mb-1">Rematch Declined</p>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <div>
+                      <button class="btn btn-sm btn-link text-muted">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
-                <div *ngSwitchCase="'GAME_WON'" class="rematch-request d-flex">
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <i class="fa-solid fa-trophy icon"></i>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
+              </div>
+
+              <div *ngSwitchCase="'GAME_WON'" class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="fa-solid fa-trophy icon"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <p class="mb-1">Game Won</p>
+                      <small class="text-muted">
+                        {{ notification.message }}
+                      </small>
+                    </div>
+                    <div>
                       <button class="btn btn-sm btn-primary"
                               data-bs-toggle="tooltip"
                               title="Go to score window"
                               (click)="goToGame(notification.id, notification.startedSessionId)">
                         <i class="fa-regular fa-question-circle"></i>
-                      </button>
-                      <button class="btn btn-sm btn"
-                              data-bs-toggle="tooltip"
-                              title="Request rematch"
-                              (click)="requestRematch(notification.id, notification.startedSessionId)"
-                              style="color: #6f42c1; border: solid 1px #6f42c1;">
+                </button>
+                <button class="btn btn-sm btn"
+                        data-bs-toggle="tooltip"
+                        title="Request rematch"
+                        (click)="requestRematch(notification.id, notification.startedSessionId)"
+                        style="color: #6f42c1; border: solid 1px #6f42c1;">
                         <i class="fa-solid fa-sync-alt"></i>
                       </button>
                     </div>
                   </div>
                 </div>
+
                 <div *ngSwitchCase="'GAME_LOST'" class="rematch-request d-flex">
                   <div class="flex-grow-1 ms-3">
                     <div class="d-flex justify-content-between">
@@ -154,7 +385,6 @@
                         <i class="fa-regular fa-question-circle"></i>
                       </button>
                       <button class="btn btn-sm"
-
                               data-bs-toggle="tooltip"
                               title="Request rematch"
                               (click)="requestRematch(notification.id, notification.startedSessionId)"
@@ -164,6 +394,7 @@
                     </div>
                   </div>
                 </div>
+
                 <div *ngSwitchCase="'GAME_TIED'" class="rematch-request d-flex">
                   <div class="flex-grow-1 ms-3">
                     <div class="d-flex justify-content-between">
@@ -189,258 +420,8 @@
                     </div>
                   </div>
                 </div>
-              </ng-container>
-            </div>
-          </div>
-
-          <div *ngIf="notification.read">
-            <div class="notification-item p-3 border-bottom">
-              <ng-container [ngSwitch]="notification.type">
-
-                <div *ngSwitchCase="'FRIEND_REQUEST'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-user-group icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Friend Request</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-success"
-                                data-bs-toggle="tooltip"
-                                title="Accept friends request"
-                                (click)="acceptFriendRequest(notification.senderId, notification.id)">
-                          <i class="fa-regular fa-circle-check"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger"
-                                data-bs-toggle="tooltip"
-                                title="Decline friend request"
-                                (click)="declineFriendRequest(notification.senderId, notification.id)">
-                          <i class="fa-solid fa-xmark"></i>
-                        </button>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-
-                <div *ngSwitchCase="'FRIEND_ACCEPTED'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-user-group icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Friend Request Accepted</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-
-                <div *ngSwitchCase="'REMATCH_REQUEST'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-gamepad icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Rematch Request</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-success"
-                                data-bs-toggle="tooltip"
-                                title="Accept rematch"
-                                (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)">
-                          <i class="fa-regular fa-circle-check"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger"
-                                data-bs-toggle="tooltip"
-                                title="Decline rematch"
-                                (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)">
-                          <i class="fa-solid fa-xmark"></i>
-                        </button>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-
-                <div *ngSwitchCase="'REMATCH_ACCEPTED'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-gamepad icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Rematch Accepted</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-primary"
-                                data-bs-toggle="tooltip"
-                                title="Go to game"
-                                (click)="goToGame(notification.id, notification.startedSessionId)">
-                          <i class="fa-solid fa-arrow-circle-right"></i>
-                        </button>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-
-                <div *ngSwitchCase="'REMATCH_DECLINED'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-ban icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Rematch Declined</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div *ngSwitchCase="'GAME_WON'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-trophy icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Game Won</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-primary"
-                                data-bs-toggle="tooltip"
-                                title="Go to score window"
-                                (click)="goToGame(notification.id, notification.startedSessionId)">
-                          <i class="fa-regular fa-question-circle"></i>
-                        </button>
-                        <button class="btn btn-sm"
-                                data-bs-toggle="tooltip"
-                                title="Request rematch"
-                                (click)="requestRematch(notification.id, notification.startedSessionId)"
-                                style="color: #6f42c1; border: solid 1px #6f42c1;">
-                          <i class="fa-solid fa-sync-alt"></i>
-                        </button>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Game Lost -->
-                <div *ngSwitchCase="'GAME_LOST'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-thumbs-down icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Game Lost</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-primary"
-                                data-bs-toggle="tooltip"
-                                title="Go to score window"
-                                (click)="goToGame(notification.id, notification.startedSessionId)">
-                          <i class="fa-regular fa-question-circle"></i>
-                        </button>
-                        <button class="btn btn-sm"
-                                data-bs-toggle="tooltip"
-                                title="Request rematch"
-                                (click)="requestRematch(notification.id, notification.startedSessionId)"
-                                style="color: #6f42c1; border: solid 1px #6f42c1;">
-                          <i class="fa-solid fa-sync-alt"></i>
-                        </button>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Game Tied -->
-                <div *ngSwitchCase="'GAME_TIED'" class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="fa-solid fa-handshake icon"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <p class="mb-1">Game Tied</p>
-                        <small class="text-muted">
-                          {{ notification.message }}
-                        </small>
-                      </div>
-                      <div>
-                        <button class="btn btn-sm btn-primary"
-                                data-bs-toggle="tooltip"
-                                title="Go to score window"
-                                (click)="goToGame(notification.id, notification.startedSessionId)">
-                          <i class="fa-regular fa-question-circle"></i>
-                        </button>
-                        <button class="btn btn-sm"
-                                data-bs-toggle="tooltip"
-                                title="Request rematch"
-                                (click)="requestRematch(notification.id, notification.startedSessionId)"
-                                style="color: #6f42c1; border: solid 1px #6f42c1;">
-                          <i class="fa-solid fa-sync-alt"></i>
-                        </button>
-                        <button class="btn btn-sm btn-link text-muted">
-                          <i class="bi bi-x-lg"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ng-container>
-            </div>
+              </div>
+            </ng-container>
           </div>
         </div>
       </div>
