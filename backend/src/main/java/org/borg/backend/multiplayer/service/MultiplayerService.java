@@ -178,11 +178,20 @@ public class MultiplayerService {
 
     private void sendGameOverNotifications(MultiplayerSession session) {
         if (session.getIsTie()) {
-            notificationService.sendTieNotifications(session);
+            notificationService.sendTieNotifications(session.getPlayers(), session.getId());
         } else {
-            notificationService.sendGameWonNotification(session);
-            notificationService.sendGameLostNotification(session);
+            Player loserPlayer = findPlayerInSession(session, session.getLoserId());
+            Player winnerPlayer = findPlayerInSession(session, session.getWinnerId());
+            notificationService.sendGameWonNotification(session.getWinnerId(), loserPlayer.getDisplayName(), session.getId());
+            notificationService.sendGameLostNotification(session.getLoserId(), winnerPlayer.getDisplayName(), session.getId());
         }
+    }
+
+    private Player findPlayerInSession(MultiplayerSession session, Long playerId) {
+        return session.getPlayers().stream()
+                .filter(p -> p.getId().equals(playerId))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Player not found"));
     }
 
     public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
@@ -370,22 +379,17 @@ public class MultiplayerService {
         
         multiplayerSessionRepository.save(session);
 
-        List<Player> players = session.getPlayers();
+        Player loserPlayer = findPlayerInSession(session, session.getLoserId());
+        Player winnerPlayer = findPlayerInSession(session, session.getWinnerId());
 
-        if (players.get(0).getId().equals(playerId)) {
-            players.get(0).getStats().incrementLosses();
-            players.get(1).getStats().incrementWins();
-        } else {
-            players.get(1).getStats().incrementLosses();
-            players.get(0).getStats().incrementWins();
-        }
-
-
-        playerRepository.saveAll(players);
+        loserPlayer.getStats().incrementLosses();
+        winnerPlayer.getStats().incrementWins();
         
-        notificationService.sendGameWonNotification(session);
-        notificationService.sendGameLostNotification(session);
-
+        playerRepository.saveAll(List.of(loserPlayer, winnerPlayer));
+        
+        notificationService.sendGameWonNotification(winnerPlayer.getId(), loserPlayer.getDisplayName(), sessionId);
+        notificationService.sendGameLostNotification(loserPlayer.getId(), winnerPlayer.getDisplayName(), sessionId);
+        
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
 
     }

@@ -1,5 +1,6 @@
 package org.borg.backend.notification.service;
 
+import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,13 +26,17 @@ public class NotificationIntegrationTest {
     @Autowired
     private NotificationService notificationService;
     Player sendingPlayer;
-    
+    Long playerWithNotificationsId = 1L;
+    @Autowired
+    private NotificationArchiveService notificationArchiveService;
+
     @BeforeEach
     void setUp() {
         sendingPlayer = Player.builder()
                 .id(999L)
                 .displayName("Sender")
                 .build();
+        
     }
     
     @AfterEach
@@ -39,8 +46,6 @@ public class NotificationIntegrationTest {
     
     @Test
     void testMarkingAsRead() {
-        Long playerWithNotificationsId = 1L;
-        
         notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
         
         List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
@@ -55,8 +60,6 @@ public class NotificationIntegrationTest {
     }
     @Test
     void testMarkingAsArchived() {
-        Long playerWithNotificationsId = 1L;
-
         notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 
         List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
@@ -67,5 +70,34 @@ public class NotificationIntegrationTest {
         
         updatedNotificationsList = notificationService.getAllPlayerNotifications(playerWithNotificationsId);
         assertEquals(1, updatedNotificationsList.size(), "Notification should be marked as archived");
+    }
+    
+    @Test
+    void testScheduledArchiving() {
+        notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
+        
+        notificationService.sendGameWonNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
+
+        Instant futureTime = Instant.now().plus(Duration.ofHours(25));
+        notificationArchiveService.archiveNotifications(futureTime);
+
+        List<Notification> activeNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        assertAll("Active notifications at 25 hours",
+                () -> assertEquals(1, activeNotifications.size(),
+                        "There should only be one active notification"),
+                () -> assertEquals(NotificationType.GAME_WON, activeNotifications.get(0).getType(),
+                        "Active notification should be GAME_WON")
+        );
+        
+        List<Notification> allNotifications = notificationService.getAllPlayerNotifications(playerWithNotificationsId);
+        assertEquals(2, allNotifications.size(), "There should be two notifications");
+        
+        Instant laterTime = Instant.now().plus(Duration.ofHours(49));
+        notificationArchiveService.archiveNotifications(laterTime);
+        
+        List<Notification> laterActiveNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        assertEquals(0, laterActiveNotifications.size(),
+                "There should be no active notifications after 49 hours");
+        
     }
 }

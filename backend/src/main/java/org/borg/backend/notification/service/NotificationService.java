@@ -4,7 +4,6 @@ package org.borg.backend.notification.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.notification.repository.NotificationRepository;
@@ -12,9 +11,7 @@ import org.borg.backend.player.model.Player;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -65,35 +62,25 @@ public class NotificationService {
         buildAndSaveNotification(playerToNotify, null, NotificationType.REMATCH_DECLINED, message, null, null);
     }
 
-    public void sendGameWonNotification(MultiplayerSession session) {
-        Player opponent = session.getPlayers().stream()
-                .filter(p -> p.getId().equals(session.getLoserId()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
-
-        String message = "You won your match against " + opponent.getDisplayName() + "!";
-        buildAndSaveNotification(session.getWinnerId(), null, NotificationType.GAME_WON, message, session.getId(), null);
+    public void sendGameWonNotification(Long winnerId, String opponentDisplayName, Long sessionId) {
+        String message = "You won your match against " + opponentDisplayName + "!";
+        buildAndSaveNotification(winnerId, null, NotificationType.GAME_WON, message, sessionId, null);
     }
 
-    public void sendGameLostNotification(MultiplayerSession session) {
-        Player opponent = session.getPlayers().stream()
-                .filter(p -> p.getId().equals(session.getWinnerId()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
-
-        String message = "You lost your match against " + opponent.getDisplayName() + "!";
-        buildAndSaveNotification(session.getLoserId(), null, NotificationType.GAME_LOST, message, session.getId(), null);
+    public void sendGameLostNotification(Long loserId, String opponentDisplayName, Long sessionId) {
+        String message = "You lost your match against " + opponentDisplayName + "!";
+        buildAndSaveNotification(loserId, null, NotificationType.GAME_LOST, message, sessionId, null);
     }
 
-    public void sendTieNotifications(MultiplayerSession session) {
-        Player player1 = session.getPlayers().get(0);
-        Player player2 = session.getPlayers().get(1);
+    public void sendTieNotifications(List<Player> players, Long sessionId) {
+        Player player1 = players.get(0);
+        Player player2 = players.get(1);
+        
+        String messagePlayer1 = "Your match against " + player1.getDisplayName() + " was tied!";
+        buildAndSaveNotification(player1.getId(), null, NotificationType.GAME_TIED, messagePlayer1, sessionId, null);
 
-        String messagePlayer1 = "Your match against " + player2.getDisplayName() + " was tied!";
-        buildAndSaveNotification(player1.getId(), null, NotificationType.GAME_TIED, messagePlayer1, session.getId(), null);
-
-        String messagePlayer2 = "Your match against " + player1.getDisplayName() + " was tied!";
-        buildAndSaveNotification(player2.getId(), null, NotificationType.GAME_TIED, messagePlayer2, session.getId(), null);
+        String messagePlayer2 = "Your match against " + player2.getDisplayName() + " was tied!";
+        buildAndSaveNotification(player2.getId(), null, NotificationType.GAME_TIED, messagePlayer2, sessionId, null);
 
     }
 
