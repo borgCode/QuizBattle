@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {NgForOf, NgIf, NgStyle, NgSwitch, NgSwitchCase} from '@angular/common';
 import {Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
@@ -34,7 +34,7 @@ interface MatchDecision {
   templateUrl: './multiplayer.component.html',
   styleUrl: './multiplayer.component.css'
 })
-export class MultiplayerComponent implements OnInit {
+export class MultiplayerComponent implements OnInit, OnDestroy {
   player!: PlayerDto;
   gameSessions: Array<MultiplayerSessionDto> = [];
   isSearching: boolean = false;
@@ -70,6 +70,18 @@ export class MultiplayerComponent implements OnInit {
         this.gameSessions = value;
       }
     })
+  }
+  ngOnDestroy() {
+    if (this.isSearching) {
+      this.leaveMatchmakingQueue();
+    }
+  }
+
+  @HostListener('window:beforeunload')
+  onBeforeUnload() {
+    if (this.isSearching) {
+      this.leaveMatchmakingQueue();
+    }
   }
 
   openGame(sessionId: number) {

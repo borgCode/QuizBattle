@@ -31,6 +31,8 @@ public class MatchMakingService {
         synchronized (matchmakingQueue) {
             Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
             
+            log.warn("Queue size: " + this.matchmakingQueue.size());
+            
             if (opponentId.isPresent()) {
                 if (opponentId.get().equals(playerId)) {
                     return;
