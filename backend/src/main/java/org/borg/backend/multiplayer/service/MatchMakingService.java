@@ -115,4 +115,10 @@ public class MatchMakingService {
     public void cancelMatchmaking(Long playerId) {
         matchmakingQueue.remove(playerId);
     }
+    
+    public int getQueueSize() {
+        synchronized (matchmakingQueue) {
+            return matchmakingQueue.size();
+        }
+    }
 }

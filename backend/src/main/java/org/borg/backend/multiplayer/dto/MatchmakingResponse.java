@@ -2,11 +2,12 @@ package org.borg.backend.multiplayer.dto;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import org.borg.backend.common.enums.MatchStatus;
 
 
-@Getter
+@Data
 @AllArgsConstructor
 public class MatchmakingResponse {
     private MatchStatus matchStatus;

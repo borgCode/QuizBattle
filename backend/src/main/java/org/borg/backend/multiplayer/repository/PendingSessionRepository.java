@@ -10,4 +10,6 @@ public interface PendingSessionRepository extends JpaRepository<PendingSession, 
 
 
     PendingSession findByRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long opponentId);
+
+    PendingSession findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long requestingPlayerId1, Long requestingPlayerId2, Long requestingPlayerId3);
 }
