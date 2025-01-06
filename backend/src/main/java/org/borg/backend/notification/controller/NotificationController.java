@@ -20,19 +20,28 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("{playerId}")
-    public ResponseEntity<List<Notification>> getPlayerNotifications (@PathVariable Long playerId) {
-        return ResponseEntity.ok(notificationService.getPlayerNotifications(playerId));
+    public ResponseEntity<List<Notification>> getActivePlayerNotifications(@PathVariable Long playerId) {
+        return ResponseEntity.ok(notificationService.getActivePlayerNotifications(playerId));
+    }
+
+    @GetMapping("/archived/{playerId}")
+    public ResponseEntity<List<Notification>> getAllPlayerNotifications(@PathVariable Long playerId) {
+        return ResponseEntity.ok(notificationService.getAllPlayerNotifications(playerId));
     }
     
     @PostMapping("/send/{playerId}")
     public ResponseEntity<Void> sendNotification(@PathVariable Long playerId) {
-        
         return ResponseEntity.ok().build();
     }
     
     @PostMapping("/read/{notificationId}")
     public ResponseEntity<Void> markAsRead(@PathVariable Long notificationId) {
         notificationService.markAsRead(notificationId);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/archive/{notificationId}")
+    public ResponseEntity<Void> archiveNotification(@PathVariable Long notificationId) {
+        notificationService.archiveNotification(notificationId);
         return ResponseEntity.ok().build();
     }
 }

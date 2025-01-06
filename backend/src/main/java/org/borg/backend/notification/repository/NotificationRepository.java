@@ -16,4 +16,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Notification findByPlayerIdAndPendingSessionId(Long playerId, Long pendingSessionId);
 
     List<Notification> findByPlayerIdAndIsArchivedFalse(Long playerId);
+
+    List<Notification> findByPlayerId(Long playerId);
 }

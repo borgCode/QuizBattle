@@ -11,8 +11,12 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { getPlayerNotifications } from '../fn/notification/get-player-notifications';
-import { GetPlayerNotifications$Params } from '../fn/notification/get-player-notifications';
+import { archiveNotification } from '../fn/notification/archive-notification';
+import { ArchiveNotification$Params } from '../fn/notification/archive-notification';
+import { getActivePlayerNotifications } from '../fn/notification/get-active-player-notifications';
+import { GetActivePlayerNotifications$Params } from '../fn/notification/get-active-player-notifications';
+import { getAllPlayerNotifications } from '../fn/notification/get-all-player-notifications';
+import { GetAllPlayerNotifications$Params } from '../fn/notification/get-all-player-notifications';
 import { markAsRead } from '../fn/notification/mark-as-read';
 import { MarkAsRead$Params } from '../fn/notification/mark-as-read';
 import { Notification } from '../models/notification';
@@ -75,27 +79,77 @@ export class NotificationService extends BaseService {
     );
   }
 
-  /** Path part for operation `getPlayerNotifications()` */
-  static readonly GetPlayerNotificationsPath = '/notification/{playerId}';
+  /** Path part for operation `archiveNotification()` */
+  static readonly ArchiveNotificationPath = '/notification/archive/{notificationId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getPlayerNotifications()` instead.
+   * To access only the response body, use `archiveNotification()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getPlayerNotifications$Response(params: GetPlayerNotifications$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Notification>>> {
-    return getPlayerNotifications(this.http, this.rootUrl, params, context);
+  archiveNotification$Response(params: ArchiveNotification$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return archiveNotification(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getPlayerNotifications$Response()` instead.
+   * To access the full response (for headers, for example), `archiveNotification$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getPlayerNotifications(params: GetPlayerNotifications$Params, context?: HttpContext): Observable<Array<Notification>> {
-    return this.getPlayerNotifications$Response(params, context).pipe(
+  archiveNotification(params: ArchiveNotification$Params, context?: HttpContext): Observable<void> {
+    return this.archiveNotification$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `getActivePlayerNotifications()` */
+  static readonly GetActivePlayerNotificationsPath = '/notification/{playerId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getActivePlayerNotifications()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getActivePlayerNotifications$Response(params: GetActivePlayerNotifications$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Notification>>> {
+    return getActivePlayerNotifications(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getActivePlayerNotifications$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getActivePlayerNotifications(params: GetActivePlayerNotifications$Params, context?: HttpContext): Observable<Array<Notification>> {
+    return this.getActivePlayerNotifications$Response(params, context).pipe(
+      map((r: StrictHttpResponse<Array<Notification>>): Array<Notification> => r.body)
+    );
+  }
+
+  /** Path part for operation `getAllPlayerNotifications()` */
+  static readonly GetAllPlayerNotificationsPath = '/notification/archived/{playerId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getAllPlayerNotifications()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAllPlayerNotifications$Response(params: GetAllPlayerNotifications$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Notification>>> {
+    return getAllPlayerNotifications(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getAllPlayerNotifications$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAllPlayerNotifications(params: GetAllPlayerNotifications$Params, context?: HttpContext): Observable<Array<Notification>> {
+    return this.getAllPlayerNotifications$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<Notification>>): Array<Notification> => r.body)
     );
   }

@@ -22,8 +22,12 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     
-    public List<Notification> getPlayerNotifications(Long playerId) {
+    public List<Notification> getActivePlayerNotifications(Long playerId) {
         return notificationRepository.findByPlayerIdAndIsArchivedFalse(playerId);
+    }
+    
+    public List<Notification> getAllPlayerNotifications(Long playerId) {
+        return notificationRepository.findByPlayerId(playerId);
     }
     
     public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer) {
@@ -110,6 +114,12 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(notificationId)
                         .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
         notification.setRead(true);
+        notificationRepository.save(notification);
+    }
+    public void archiveNotification(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+        notification.setArchived(true);
         notificationRepository.save(notification);
     }
 
