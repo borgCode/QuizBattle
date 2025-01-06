@@ -9,6 +9,4 @@ public enum NotificationType {
     GAME_WON,
     GAME_LOST,
     GAME_TIED,
-    
-    
 }

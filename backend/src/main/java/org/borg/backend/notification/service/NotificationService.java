@@ -27,49 +27,82 @@ public class NotificationService {
     }
 
     public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer) {
-        notificationRepository.save(Notification.builder()
-                .playerId(receiverId)
-                .senderId(sendingPlayer.getId())
-                .type(NotificationType.FRIEND_REQUEST)
-                .message(sendingPlayer.getDisplayName() + " sent you a friend request!")
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
+        String message = sendingPlayer.getDisplayName() + " sent you a friend request!";
+        buildAndSaveNotification(receiverId, sendingPlayer.getId(), NotificationType.FRIEND_REQUEST, message, null, null);
     }
 
     public void sendFriendAcceptedNotification(Long receiverId, Player sendingPlayer) {
-        notificationRepository.save(Notification.builder()
-                .playerId(receiverId)
-                .type(NotificationType.FRIEND_ACCEPTED)
-                .message(sendingPlayer.getDisplayName() + " accepted your friend request!")
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
+        String message = sendingPlayer.getDisplayName() + " accepted your friend request!";
+        buildAndSaveNotification(receiverId, sendingPlayer.getId(), NotificationType.FRIEND_ACCEPTED, message, null, null);
     }
 
     public void sendRematchStartedNotification(Long receivingId, String senderDisplayName, Long newSessionId) {
-        notificationRepository.save(Notification.builder()
-                .playerId(receivingId)
-                .type(NotificationType.REMATCH_ACCEPTED)
-                .startedSessionId(newSessionId)
-                .message("Your rematch request against " + senderDisplayName + " was accepted!")
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
+        String message = "Your rematch request against " + senderDisplayName + " was accepted!";
+        buildAndSaveNotification(receivingId, null, NotificationType.REMATCH_ACCEPTED, message, newSessionId, null);
     }
 
-    public void sendRematchRequestNotification(
-            Long receivingId, Long pendingSessionId, String senderDisplayName, Long senderId) {
+    public void sendRematchRequestNotification(Long receivingId, Long pendingSessionId, String senderDisplayName, Long senderId) {
+        String message = senderDisplayName + " requested a rematch against you!";
+        buildAndSaveNotification(receivingId, senderId, NotificationType.REMATCH_REQUEST, message, null, pendingSessionId);
+    }
+    public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
+        notificationRepository.deleteById(notificationId);
+
+        String message = playerDisplayName + " accepted your request for a rematch!";
+        buildAndSaveNotification(playerToNotify, null, NotificationType.REMATCH_ACCEPTED, message, newSessionId, null);
+    }
+    public void sendRematchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
+        notificationRepository.deleteById(notificationId);
+
+        String message = "Your rematch request against " + playerDisplayName + " was declined!";
+        buildAndSaveNotification(playerToNotify, null, NotificationType.REMATCH_DECLINED, message, null, null);
+    }
+
+    public void sendGameWonNotification(MultiplayerSession session) {
+        Player opponent = session.getPlayers().stream()
+                .filter(p -> p.getId().equals(session.getLoserId()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Player not found"));
+        
+        String message = "You won your match against " + opponent.getDisplayName() + "!";
+        buildAndSaveNotification(session.getWinnerId(), null, NotificationType.GAME_WON, message, session.getId(), null);
+    }
+
+    public void sendGameLostNotification(MultiplayerSession session) {
+        Player opponent = session.getPlayers().stream()
+                .filter(p -> p.getId().equals(session.getWinnerId()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Player not found"));
+
+        String message = "You lost your match against " + opponent.getDisplayName() + "!";
+        buildAndSaveNotification(session.getLoserId(), null, NotificationType.GAME_LOST, message, session.getId(), null);
+    }
+
+    public void sendTieNotifications(MultiplayerSession session) {
+        Player player1 = session.getPlayers().get(0);
+        Player player2 = session.getPlayers().get(1);
+        
+        String messagePlayer1 = "Your match against " + player2.getDisplayName() + " was tied!";
+        buildAndSaveNotification(player1.getId(), null, NotificationType.GAME_TIED, messagePlayer1, session.getId(), null);
+        
+        String messagePlayer2 = "Your match against " + player1.getDisplayName() + " was tied!";
+        buildAndSaveNotification(player2.getId(), null, NotificationType.GAME_TIED, messagePlayer2, session.getId(), null);
+
+    }
+
+    private void buildAndSaveNotification(Long receiverId, Long senderId, NotificationType notificationType, String message, Long startedSessionId, Long pendingSessionId) {
         notificationRepository.save(Notification.builder()
-                .playerId(receivingId)
+                .playerId(receiverId)
                 .senderId(senderId)
-                .type(NotificationType.REMATCH_REQUEST)
-                .message(senderDisplayName + " requested a rematch against you!")
+                .type(notificationType)
+                .message(message)
+                .startedSessionId(startedSessionId)
                 .pendingSessionId(pendingSessionId)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build());
     }
+    //TODO refactor to not delete
 
     public void markAsRead(Long notificationId) {
         log.warn("Marking as read");
@@ -79,95 +112,7 @@ public class NotificationService {
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {
         notificationRepository.deleteByPlayerIdAndSenderIdAndType(id, id1, NotificationType.FRIEND_REQUEST);
     }
-
-    public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
-        notificationRepository.deleteById(notificationId);
-
-        notificationRepository.save(Notification.builder()
-                .playerId(playerToNotify)
-                .type(NotificationType.REMATCH_ACCEPTED)
-                .startedSessionId(newSessionId)
-                .message(playerDisplayName + " accepted your request for a rematch!")
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
-    }
-
-    public void sendRematchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
-        notificationRepository.deleteById(notificationId);
-
-        notificationRepository.save(Notification.builder()
-                .playerId(playerToNotify)
-                .type(NotificationType.REMATCH_DECLINED)
-                .message("Your rematch request against " + playerDisplayName + " was declined!")
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
-    }
-
-    public void sendTieNotifications(MultiplayerSession session) {
-        Player player1 = session.getPlayers().get(0);
-        Player player2 = session.getPlayers().get(1);
-
-        List<Notification> notifications = new ArrayList<>();
-
-        notifications.add(Notification.builder()
-                .playerId(player1.getId())
-                .type(NotificationType.GAME_TIED)
-                .message("Your match against " + player2.getDisplayName() + " was tied!")
-                .startedSessionId(session.getId())
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
-
-        notifications.add(Notification.builder()
-                .playerId(player2.getId())
-                .type(NotificationType.GAME_TIED)
-                .message("Your match against " + player1.getDisplayName() + " was tied!")
-                .startedSessionId(session.getId())
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
-
-        notificationRepository.saveAll(notifications);
-    }
-
-    public void sendGameWonNotification(MultiplayerSession session) {
-        Player opponent = session.getPlayers().stream()
-                .filter(p -> p.getId().equals(session.getLoserId()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
-
-
-        notificationRepository.save(Notification.builder()
-                .playerId(session.getWinnerId())
-                .type(NotificationType.GAME_WON)
-                .message("You won your match against " + opponent.getDisplayName() + "!")
-                .startedSessionId(session.getId())
-                .opponentId(opponent.getId())
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
-    }
-
-    public void sendGameLostNotification(MultiplayerSession session) {
-        Player opponent = session.getPlayers().stream()
-                .filter(p -> p.getId().equals(session.getWinnerId()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
-
-
-        notificationRepository.save(Notification.builder()
-                .playerId(session.getLoserId())
-                .type(NotificationType.GAME_LOST)
-                .message("You lost your match against " + opponent.getDisplayName() + "!")
-                .startedSessionId(session.getId())
-                .opponentId(opponent.getId())
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build());
-    }
-
+    
     public void deleteMatchRequestNotification(Long playerId, Long pendingSessionId) {
         Notification notification = notificationRepository.findByPlayerIdAndPendingSessionId(playerId, pendingSessionId);
         if (notification != null) {

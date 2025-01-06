@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 @ToString
 @Entity
 public class Notification {
-    
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

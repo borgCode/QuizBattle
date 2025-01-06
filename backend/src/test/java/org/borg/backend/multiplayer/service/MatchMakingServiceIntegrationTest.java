@@ -143,9 +143,7 @@ class MatchMakingServiceIntegrationTest {
             
             assertFalse(pendingSessionRepository.existsById(savedPendingSession.getId()));
             
-            
         }
-
         private PendingSession setupPendingSession() {
             matchMakingService.findMatch(player1.getId());
             assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
@@ -185,7 +183,6 @@ class MatchMakingServiceIntegrationTest {
             assertEquals(0, matchMakingService.getQueueSize(), "There should be no players in the queue");
             
         }
-        
         @Test
         void playersShouldNotMatchWithThemselves () {
             matchMakingService.findMatch(player1.getId());
@@ -215,9 +212,7 @@ class MatchMakingServiceIntegrationTest {
                     latch.countDown();
                 }
             });
-            
         }
-        
         boolean completed = latch.await(5, TimeUnit.SECONDS);
         assertTrue(completed, "Not all matchmaking operations finished on time");
         
@@ -231,11 +226,7 @@ class MatchMakingServiceIntegrationTest {
                 () -> assertEquals(0, matchMakingService.getQueueSize(),
                         "Mismatch in players in the queue")
         );
-        
-        
-        
     }
-
     private Player createAndSavePlayer(String name) {
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
