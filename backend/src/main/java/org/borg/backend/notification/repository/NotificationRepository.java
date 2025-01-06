@@ -9,10 +9,11 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findByPlayerIdAndIsReadFalse(Long playerId);
 
     
     void deleteByPlayerIdAndSenderIdAndType(Long id, Long id1, NotificationType notificationType);
 
     Notification findByPlayerIdAndPendingSessionId(Long playerId, Long pendingSessionId);
+
+    List<Notification> findByPlayerIdAndIsArchivedFalse(Long playerId);
 }

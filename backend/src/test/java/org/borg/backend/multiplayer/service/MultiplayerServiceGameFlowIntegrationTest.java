@@ -451,8 +451,8 @@ public class MultiplayerServiceGameFlowIntegrationTest {
 
     private void verifyNotifications(NotificationType player1ExpectedType, NotificationType player2ExpectedType) {
 
-        List<Notification> player1Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player1.getId());
-        List<Notification> player2Notifications = notificationRepository.findByPlayerIdAndIsReadFalse(player2.getId());
+        List<Notification> player1Notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId());
+        List<Notification> player2Notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId());
 
         assertAll("Post-game notification checks",
                 () -> assertTrue(player1Notifications.size() == 1

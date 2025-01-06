@@ -11,7 +11,6 @@ import org.borg.backend.player.model.Player;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -21,11 +20,11 @@ import java.util.NoSuchElementException;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-
+    
     public List<Notification> getPlayerNotifications(Long playerId) {
-        return notificationRepository.findByPlayerIdAndIsReadFalse(playerId);
+        return notificationRepository.findByPlayerIdAndIsArchivedFalse(playerId);
     }
-
+    
     public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer) {
         String message = sendingPlayer.getDisplayName() + " sent you a friend request!";
         buildAndSaveNotification(receiverId, sendingPlayer.getId(), NotificationType.FRIEND_REQUEST, message, null, null);

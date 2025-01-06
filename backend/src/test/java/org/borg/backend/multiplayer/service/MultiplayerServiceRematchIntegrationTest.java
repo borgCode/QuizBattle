@@ -95,12 +95,12 @@ public class MultiplayerServiceRematchIntegrationTest {
         assertAll("Post-accept state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
                         sendingPlayer.getId(), opponentPlayer.getId())),
-                () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(opponentPlayer.getId()).isEmpty()),
+                () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId()).isEmpty()),
                 () -> assertTrue(multiplayerSessionRepository.checkIfOngoingSessionExists(
                         sendingPlayer, opponentPlayer, GameStatus.ACTIVE))
         );
 
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(sendingPlayer.getId());
+        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
         Notification sendingPlayerNotification = sendingPlayerNotifications.get(0);
         assertEquals(NotificationType.REMATCH_ACCEPTED, sendingPlayerNotification.getType());
 
@@ -115,12 +115,12 @@ public class MultiplayerServiceRematchIntegrationTest {
         assertAll("Post-reject state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
                         sendingPlayer.getId(), opponentPlayer.getId())),
-                () -> assertTrue(notificationRepository.findByPlayerIdAndIsReadFalse(opponentPlayer.getId()).isEmpty()),
+                () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId()).isEmpty()),
                 () -> assertFalse(multiplayerSessionRepository.checkIfOngoingSessionExists(
                         sendingPlayer, opponentPlayer, GameStatus.ACTIVE))
         );
 
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(sendingPlayer.getId());
+        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
         Notification sendingPlayerNotification = sendingPlayerNotifications.get(0);
         assertEquals(NotificationType.REMATCH_DECLINED, sendingPlayerNotification.getType());
     }
@@ -132,7 +132,7 @@ public class MultiplayerServiceRematchIntegrationTest {
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), opponentPlayer.getId());
         assertNotNull(pendingSession);
 
-        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(opponentPlayer.getId());
+        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId());
         Notification opponentNotification = opponentNotifications.get(0);
         assertAll("Opponent notification checks",
                 () -> assertEquals(pendingSession.getId(), opponentNotification.getPendingSessionId()),
@@ -158,8 +158,8 @@ public class MultiplayerServiceRematchIntegrationTest {
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
         multiplayerService.requestRematch(rematchRequest);
 
-        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(opponentPlayer.getId());
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsReadFalse(sendingPlayer.getId());
+        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId());
+        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
 
         assertAll("Both players should only have rematch accepted notifications",
                 () -> assertTrue(opponentNotifications.size() == 1
