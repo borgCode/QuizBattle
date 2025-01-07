@@ -29,7 +29,7 @@ public class Player implements UserDetails {
     private String password;
     private String displayName;
     
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "stats_id")
     private Stats stats;
     private boolean accountLocked;

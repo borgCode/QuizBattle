@@ -125,10 +125,9 @@ public class FriendshipService {
             notificationService.deleteFriendRequestByPlayerIds(response.getSenderId(), response.getReceiverId());
         }
     }
-
-
+    
+    @Transactional
     public void blockPlayer(PlayerInteraction blockRequest) {
-        
         Player sendingPlayer = playerRepository.findById(blockRequest.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -145,9 +144,7 @@ public class FriendshipService {
                     existingFriendship.getPlayer1().equals(sendingPlayer)) {
                 throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
             }
-
             friendshipRepository.delete(existingFriendship);
-            
         }
         friendshipRepository.save(new Friendship(
                 sendingPlayer,
@@ -155,7 +152,6 @@ public class FriendshipService {
                 LocalDate.now(),
                 FriendshipStatus.BLOCKED
         ));
-        
         notificationService.deleteFriendRequestByPlayerIds(sendingPlayer.getId(), receivingPlayer.getId());
     }
 
