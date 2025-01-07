@@ -18,16 +18,15 @@
   text-align: right;
 }
 
-.notification-item {
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-}
-
 .archive-btn {
   visibility: hidden;
 }
-
 .archive-btn:hover {
   box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
+}
+
+.notification-item {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .notification-item:hover {
@@ -39,7 +38,8 @@
 }
 
 .notification-item.unread {
-  background-color: rgba(13,110,253,0.04);
+  background-color: rgba(75, 136, 232, 0.1);
+  border-left: 6px solid rgba(13, 110, 253, 1);
   cursor: pointer;
 }
 
