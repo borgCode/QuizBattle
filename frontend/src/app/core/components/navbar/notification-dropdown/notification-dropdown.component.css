@@ -8,13 +8,34 @@
   overflow-y: auto;
 }
 
+.notification-icon {
+  width: 40px;
+}
+
+.notification-actions {
+  width: 120px;
+  padding-right: 10px;
+  text-align: right;
+}
+
 .notification-item {
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.archive-btn {
+  visibility: hidden;
+}
+
+.archive-btn:hover {
+  box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
 }
 
 .notification-item:hover {
   background-color: rgba(0, 0, 0, 0.05);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  .archive-btn {
+    visibility: visible;
+  }
 }
 
 .notification-item.unread {
