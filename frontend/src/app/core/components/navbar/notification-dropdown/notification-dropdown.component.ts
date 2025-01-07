@@ -126,6 +126,12 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
         const stayButton = document.getElementById('stay-button')
         const goToGameButton = document.getElementById('go-to-game-button')
+        const closeButton = document.querySelector('.btn-close');
+
+        closeButton.addEventListener('click', () => {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        });
 
         stayButton.addEventListener('click', () => {
           modal.style.display = 'none';
