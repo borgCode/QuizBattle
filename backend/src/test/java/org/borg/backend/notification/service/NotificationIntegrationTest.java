@@ -59,6 +59,31 @@ public class NotificationIntegrationTest {
         assertTrue(updatedNotificationsList.get(0).isRead(), "Notification should be marked as read");
     }
     @Test
+    void markingAllAsRead() {
+        notificationService.sendGameWonNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
+        notificationService.sendGameWonNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
+        notificationService.sendGameLostNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
+        notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
+
+        List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        List<Notification> readNotifications = notificationList.stream()
+                        .filter(Notification::isRead)
+                                .toList();
+        assertEquals(0, readNotifications.size(), "Player should have 0 read notifications");
+        
+        List<Long> notificationIds = notificationList.stream()
+                .map(Notification::getId)
+                .toList();
+        notificationService.markAllAsRead(notificationIds);
+
+        List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        List<Notification> updatedReadNotifications = updatedNotificationsList.stream()
+                .filter(Notification::isRead)
+                .toList();
+        assertEquals(4, updatedReadNotifications.size(), "Player should have 4 read notifications");
+        
+    }
+    @Test
     void testMarkingAsArchived() {
         notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 

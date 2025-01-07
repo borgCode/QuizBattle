@@ -31,5 +31,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "AND n.createdAt < :threshold " +
             "AND n.isArchived = false")
     void archiveByTypeAndOlderThan(@Param("types") List<NotificationType> notificationTypes, @Param("threshold") Instant threshold);
-    
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Notification n SET n.isRead = true " +
+            "WHERE n.id IN :notificationIds")
+    void markNotificationsAsRead(@Param("notificationIds") List<Long> notificationIds);
 }

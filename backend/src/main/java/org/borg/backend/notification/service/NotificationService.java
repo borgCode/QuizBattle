@@ -104,6 +104,10 @@ public class NotificationService {
         notification.setRead(true);
         notificationRepository.save(notification);
     }
+    public void markAllAsRead(List<Long> notificationIds) {
+        notificationRepository.markNotificationsAsRead(notificationIds);
+    }
+    
     public void archiveNotification(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
