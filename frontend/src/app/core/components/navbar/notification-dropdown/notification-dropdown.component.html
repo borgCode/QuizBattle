@@ -62,45 +62,32 @@
                 </div>
               </div>
 
-              <div *ngSwitchCase="'REMATCH_REQUEST'" class="rematch-request d-flex">
-                <div class="flex-grow-1 ms-3">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                      <i class="fa-solid fa-gamepad icon"></i>
-                      <small class="text-muted">
-                        {{ notification.message }}
-                      </small>
-                    </div>
-                    <button class="btn btn-sm btn-success"
+              <div *ngSwitchCase="'REMATCH_REQUEST'" class="d-flex align-items-start p-2">
+                <div style="width: 40px">
+                  <i class="fa-solid fa-gamepad icon"></i>
+                </div>
+
+                <div class="d-flex flex-grow-1 justify-content-between align-items-start">
+
+                  <div class="me-3">
+                    <small class="text-muted">{{ notification.message }}</small>
+                  </div>
+
+                  <div style="width: 120px; text-align: right">
+                    <button class="btn btn-sm btn-success me-1"
                             data-bs-toggle="tooltip"
                             title="Accept rematch"
                             (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)">
                       <i class="fa-regular fa-circle-check"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger"
+                    <button class="btn btn-sm btn-danger me-1"
                             data-bs-toggle="tooltip"
                             title="Decline rematch"
                             (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)">
                       <i class="fa-solid fa-xmark"></i>
                     </button>
-                  </div>
-                </div>
-              </div>
-
-              <div *ngSwitchCase="'REMATCH_ACCEPTED'" class="rematch-accepted d-flex">
-                <div class="flex-grow-1 ms-3">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                      <i class="fa-solid fa-gamepad icon"></i>
-                      <small class="text-muted">
-                        {{ notification.message }}
-                      </small>
-                    </div>
-                    <button class="btn btn-sm btn-primary"
-                            data-bs-toggle="tooltip"
-                            title="Go to game"
-                            (click)="goToGame(notification.id, notification.startedSessionId)">
-                      <i class="fa-solid fa-arrow-circle-right"></i>
+                    <button class="btn btn-sm btn-link text-muted position-absolute top-0 end-0">
+                      <i class="bi bi-x-lg"></i>
                     </button>
                   </div>
                 </div>
