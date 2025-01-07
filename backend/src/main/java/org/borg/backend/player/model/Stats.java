@@ -20,8 +20,7 @@ public class Stats {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "player_id")
+    @OneToOne(mappedBy = "stats")
     @JsonIgnore
     private Player player;
     private int numOfGames;

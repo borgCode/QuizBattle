@@ -28,7 +28,9 @@ public class Player implements UserDetails {
 
     private String password;
     private String displayName;
-    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
+    
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "stats_id")
     private Stats stats;
     private boolean accountLocked;
     private boolean enabled;
