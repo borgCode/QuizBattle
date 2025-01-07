@@ -12,11 +12,15 @@
 
   <div class="dropdown-menu dropdown-menu-end notification-panel p-0">
     <div class="d-flex justify-content-between p-3 border-bottom">
-      <div class="btn btn-light d-flex">
+      <div class="btn btn-light d-flex"
+           data-bs-toggle="tooltip"
+           title="Mark all as read">
         <i class="fa-regular fa-envelope-open"></i>
       </div>
       <h6 class="mb-0 ms-3">Notifications</h6>
-      <div class="btn btn-light d-flex">
+      <div class="btn btn-light d-flex"
+           data-bs-toggle="tooltip"
+           title="Archived messages">
         <i class="fa-solid fa-arrow-right"></i>
       </div>
     </div>
@@ -383,7 +387,6 @@
                     <button class="archive-btn btn btn-sm btn-link position-absolute top-0 end-0"
                             data-bs-toggle="tooltip"
                             title="Archive"
-                            (click)="archiveNotification(notification.id)"
                             (click)="archiveNotification(notification.id)">
                       <i class="bi bi-x-lg"></i>
                     </button>
