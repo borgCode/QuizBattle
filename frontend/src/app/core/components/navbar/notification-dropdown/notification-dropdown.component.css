@@ -20,6 +20,10 @@
 
 .archive-btn {
   visibility: hidden;
+  background-color: rgba(13, 110, 253, 0.1);
+  border: 1px solid rgba(13, 110, 253, 0.3);
+  border-radius: 4px;
+  transform: scale(0.85, 0.85);
 }
 .archive-btn:hover {
   box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
