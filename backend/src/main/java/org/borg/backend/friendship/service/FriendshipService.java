@@ -147,6 +147,7 @@ public class FriendshipService {
             }
 
             friendshipRepository.delete(existingFriendship);
+            
         }
         friendshipRepository.save(new Friendship(
                 sendingPlayer,
@@ -154,6 +155,8 @@ public class FriendshipService {
                 LocalDate.now(),
                 FriendshipStatus.BLOCKED
         ));
+        
+        notificationService.deleteFriendRequestByPlayerIds(sendingPlayer.getId(), receivingPlayer.getId());
     }
 
     public void unblockPlayer(PlayerInteraction unblockRequest) {

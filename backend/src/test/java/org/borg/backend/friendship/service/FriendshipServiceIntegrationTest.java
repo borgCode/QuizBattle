@@ -262,6 +262,19 @@ class FriendshipServiceIntegrationTest {
                     () -> assertEquals(FriendshipStatus.BLOCKED, friendship.get().getStatus(), "Friendship should be BLOCKED")
             );
         }
+        @Test
+        void blockingShouldRemoveFriendRequest() {
+            PlayerInteraction friendRequest = new PlayerInteraction(player1.getId(), player2.getId());
+            friendshipService.sendFriendRequest(friendRequest);
+
+            PlayerInteraction blockInteraction = new PlayerInteraction(player2.getId(), player1.getId());
+            friendshipService.blockPlayer(blockInteraction);
+            
+            assertEquals(0, notificationRepository.findByPlayerId(player2.getId()).size(),
+                    "Player 1 should have no notifications after blocking player2");
+            
+            
+        }
 
         @Test
         void throwErrorWhenAlreadyBlocked() {
