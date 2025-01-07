@@ -7,7 +7,6 @@ export interface Notification {
   createdAt?: string;
   id?: number;
   message?: string;
-  opponentId?: number;
   pendingSessionId?: number;
   playerId?: number;
   read?: boolean;

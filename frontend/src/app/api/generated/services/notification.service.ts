@@ -17,41 +17,16 @@ import { getActivePlayerNotifications } from '../fn/notification/get-active-play
 import { GetActivePlayerNotifications$Params } from '../fn/notification/get-active-player-notifications';
 import { getAllPlayerNotifications } from '../fn/notification/get-all-player-notifications';
 import { GetAllPlayerNotifications$Params } from '../fn/notification/get-all-player-notifications';
+import { markAllAsRead } from '../fn/notification/mark-all-as-read';
+import { MarkAllAsRead$Params } from '../fn/notification/mark-all-as-read';
 import { markAsRead } from '../fn/notification/mark-as-read';
 import { MarkAsRead$Params } from '../fn/notification/mark-as-read';
 import { Notification } from '../models/notification';
-import { sendNotification } from '../fn/notification/send-notification';
-import { SendNotification$Params } from '../fn/notification/send-notification';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
-  }
-
-  /** Path part for operation `sendNotification()` */
-  static readonly SendNotificationPath = '/notification/send/{playerId}';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `sendNotification()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  sendNotification$Response(params: SendNotification$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return sendNotification(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `sendNotification$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  sendNotification(params: SendNotification$Params, context?: HttpContext): Observable<void> {
-    return this.sendNotification$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
   }
 
   /** Path part for operation `markAsRead()` */
@@ -75,6 +50,31 @@ export class NotificationService extends BaseService {
    */
   markAsRead(params: MarkAsRead$Params, context?: HttpContext): Observable<void> {
     return this.markAsRead$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `markAllAsRead()` */
+  static readonly MarkAllAsReadPath = '/notification/read/all';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `markAllAsRead()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  markAllAsRead$Response(params: MarkAllAsRead$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return markAllAsRead(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `markAllAsRead$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  markAllAsRead(params: MarkAllAsRead$Params, context?: HttpContext): Observable<void> {
+    return this.markAllAsRead$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }

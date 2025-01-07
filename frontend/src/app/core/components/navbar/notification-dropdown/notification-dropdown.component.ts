@@ -190,4 +190,13 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
       }
     })
   }
+
+  markAllAsRead() {
+    const notificationIds: number[] = this.unreadNotifications.value.map(notification => notification.id)
+    this.notificationService.markAllAsRead({notificationIds: notificationIds}).subscribe({
+      next: () => {
+        this.fetchNotifications();
+      }
+    })
+  }
 }

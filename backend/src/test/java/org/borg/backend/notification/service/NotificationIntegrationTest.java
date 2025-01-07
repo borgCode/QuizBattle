@@ -28,7 +28,7 @@ public class NotificationIntegrationTest {
     Player sendingPlayer;
     Long playerWithNotificationsId = 1L;
     @Autowired
-    private NotificationArchiveService notificationArchiveService;
+    private NotificationCleanUpService notificationCleanUpService;
 
     @BeforeEach
     void setUp() {
@@ -104,7 +104,7 @@ public class NotificationIntegrationTest {
         notificationService.sendGameWonNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
 
         Instant futureTime = Instant.now().plus(Duration.ofHours(25));
-        notificationArchiveService.archiveNotifications(futureTime);
+        notificationCleanUpService.archiveNotifications(futureTime);
 
         List<Notification> activeNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
         assertAll("Active notifications at 25 hours",
@@ -118,7 +118,7 @@ public class NotificationIntegrationTest {
         assertEquals(2, allNotifications.size(), "There should be two notifications");
         
         Instant laterTime = Instant.now().plus(Duration.ofHours(49));
-        notificationArchiveService.archiveNotifications(laterTime);
+        notificationCleanUpService.archiveNotifications(laterTime);
         
         List<Notification> laterActiveNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
         assertEquals(0, laterActiveNotifications.size(),

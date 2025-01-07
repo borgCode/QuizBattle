@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationArchiveService {
+public class NotificationCleanUpService {
     
     private final NotificationRepository notificationRepository;
     
@@ -29,6 +29,7 @@ public class NotificationArchiveService {
                 List.of(NotificationType.GAME_WON, NotificationType.GAME_LOST, NotificationType.GAME_TIED),
                 Instant.now().minus(Duration.ofHours(48))
         );
+        
     }
 
     public void archiveNotifications(Instant instant) {
