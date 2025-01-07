@@ -183,4 +183,11 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     });
   }
 
+  archiveNotification(notificationId: number) {
+    this.notificationService.archiveNotification({notificationId: notificationId}).subscribe({
+      next: () => {
+        this.fetchNotifications();
+      }
+    })
+  }
 }
