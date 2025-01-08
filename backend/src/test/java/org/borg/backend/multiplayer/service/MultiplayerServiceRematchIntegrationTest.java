@@ -41,7 +41,7 @@ public class MultiplayerServiceRematchIntegrationTest {
     @Autowired
     private PendingSessionRepository pendingSessionRepository;
     @Autowired
-    private MultiplayerService multiplayerService;
+    private PlayerMatchService playerMatchService;
     @Autowired
     private PlayerRepository playerRepository;
 
@@ -90,7 +90,7 @@ public class MultiplayerServiceRematchIntegrationTest {
     void rematchRequestWhenNoRequestsHaveBeenSentAndAccept() {
         RematchResponse rematchResponse = setupRematchScenario();
         
-        multiplayerService.handleRematchAccept(rematchResponse);
+        playerMatchService.handleRematchAccept(rematchResponse);
 
         assertAll("Post-accept state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
@@ -110,7 +110,7 @@ public class MultiplayerServiceRematchIntegrationTest {
     void rematchRequestWhenNoRequestsHaveBeenSentAndReject() {
         RematchResponse rematchResponse = setupRematchScenario();
         
-        multiplayerService.handleRematchReject(rematchResponse);
+        playerMatchService.handleRematchReject(rematchResponse);
 
         assertAll("Post-reject state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
@@ -127,7 +127,7 @@ public class MultiplayerServiceRematchIntegrationTest {
     
     private RematchResponse setupRematchScenario() {
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
-        multiplayerService.requestRematch(rematchRequest);
+        playerMatchService.requestRematch(rematchRequest);
 
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), opponentPlayer.getId());
         assertNotNull(pendingSession);
@@ -153,10 +153,10 @@ public class MultiplayerServiceRematchIntegrationTest {
     void rematchRequestWhenOpponentAlreadyRequested() {
 
         RematchRequest opponentRematchRequest = new RematchRequest(completedMultiplayerSession.getId(), opponentPlayer.getId());
-        multiplayerService.requestRematch(opponentRematchRequest);
+        playerMatchService.requestRematch(opponentRematchRequest);
 
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
-        multiplayerService.requestRematch(rematchRequest);
+        playerMatchService.requestRematch(rematchRequest);
 
         List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId());
         List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
@@ -188,7 +188,7 @@ public class MultiplayerServiceRematchIntegrationTest {
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
 
         GameException exception = assertThrows(GameException.class,
-                () -> multiplayerService.requestRematch(rematchRequest));
+                () -> playerMatchService.requestRematch(rematchRequest));
         assertEquals(BusinessErrorCodes.GAME_ALREADY_ONGOING, exception.getErrorCode());
     }
 
@@ -201,7 +201,7 @@ public class MultiplayerServiceRematchIntegrationTest {
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
 
         GameException exception = assertThrows(GameException.class,
-                () -> multiplayerService.requestRematch(rematchRequest));
+                () -> playerMatchService.requestRematch(rematchRequest));
         assertEquals(BusinessErrorCodes.GAME_ALREADY_ONGOING, exception.getErrorCode());
 
     }
@@ -209,12 +209,12 @@ public class MultiplayerServiceRematchIntegrationTest {
     @Test
     void shouldThrowExceptionWhenSendingMultipleRequests() {
         RematchRequest firstRematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
-        multiplayerService.requestRematch(firstRematchRequest);
+        playerMatchService.requestRematch(firstRematchRequest);
 
         RematchRequest secondRematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
 
         GameException exception = assertThrows(GameException.class,
-                () -> multiplayerService.requestRematch(secondRematchRequest));
+                () -> playerMatchService.requestRematch(secondRematchRequest));
 
         assertEquals(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT, exception.getErrorCode());
     }
