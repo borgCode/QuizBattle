@@ -8,6 +8,7 @@ import org.borg.backend.chat.model.Message;
 import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -18,6 +19,7 @@ public class MessagingService {
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
 
+    @Transactional
     public void sendMessage(SendMessageRequest request) {
         Conversation conversation;
         if (request.getConversationId() == null) {
