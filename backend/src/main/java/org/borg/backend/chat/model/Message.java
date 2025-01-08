@@ -22,9 +22,8 @@ public class Message {
     @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
     
-    @ManyToOne
-    @JoinColumn(name = "sender_id", nullable = false)
-    private Player sender;
+    @Column(name = "sender_id", nullable = false)
+    private Long senderId;
     
     private Instant sentAt;
     private boolean isRead;

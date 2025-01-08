@@ -19,13 +19,11 @@ public class Conversation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne
-    @JoinColumn(name = "player1_id", nullable = false)
-    private Player player1;
-
-    @ManyToOne
-    @JoinColumn(name = "player2_id", nullable = false)
-    private Player player2;
+    @Column(name = "player1_id", nullable = false)
+    private Long player1Id;
+    
+    @Column(name = "player2_id", nullable = false)
+    private Long player2Id;
     
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL)
     @OrderBy("sentAt DESC")
