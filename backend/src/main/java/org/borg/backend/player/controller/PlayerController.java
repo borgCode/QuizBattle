@@ -34,14 +34,6 @@ public class PlayerController {
         playerService.uploadProfilePicture(playerId, file);
         return ResponseEntity.accepted().build();
     }
-    
-    
-    
-    
-    
-    //TODO add friend mapping
-    
-    //TODO send message mapping
 }
    
 

@@ -4,6 +4,8 @@ import {LoginStateService} from '../../services/login-state-service/login-state.
 import {AsyncPipe, NgIf} from '@angular/common';
 import {TokenService} from '../../services/token/token.service';
 import {NotificationDropdownComponent} from './notification-dropdown/notification-dropdown.component';
+import {WhispersDropdownComponent} from './chat-dropdown/whispers-dropdown.component';
+import {PlayerDropdownComponent} from './player-dropdown/player-dropdown.component';
 
 @Component({
   selector: 'app-navbar',
@@ -12,7 +14,9 @@ import {NotificationDropdownComponent} from './notification-dropdown/notificatio
     RouterLink,
     NgIf,
     AsyncPipe,
-    NotificationDropdownComponent
+    NotificationDropdownComponent,
+    WhispersDropdownComponent,
+    PlayerDropdownComponent
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'

@@ -17,11 +17,11 @@
            (click)="markAllAsRead()">
         <i class="fa-regular fa-envelope-open"></i>
       </div>
-      <h6 class="mb-0 ms-3">Notifications</h6>
+      <h6>Notifications</h6>
       <div class="btn btn-light d-flex"
            data-bs-toggle="tooltip"
-           title="Archived messages">
-        <i class="fa-solid fa-arrow-right"></i>
+           title="Archived notifications">
+        <i class="fa-solid fa-box-archive"></i>
       </div>
     </div>
     <ng-container *ngIf="unreadNotifications$ | async as unreadNotifications">

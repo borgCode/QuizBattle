@@ -24,7 +24,9 @@
         </ng-container>
       </ul>
       <ng-container *ngIf="loginStateService.isLoggedIn$ | async">
+        <app-whispers-dropdown></app-whispers-dropdown>
         <app-notification-dropdown></app-notification-dropdown>
+        <app-player-dropdown></app-player-dropdown>
       </ng-container>
     </div>
   </div>
