@@ -7,8 +7,8 @@ import {LoginStateService} from '../../../services/login-state-service/login-sta
 import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
 import {AlertMessageService} from '../../../services/alert-message/alert-message.service';
-import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
 import {FriendshipService} from '../../../../api/generated/services/friendship.service';
+import {MultiplayerMatchService} from '../../../../api/generated/services/multiplayer-match.service';
 
 declare var bootstrap: any;
 
@@ -36,7 +36,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     private loginStateService: LoginStateService,
     private friendshipService: FriendshipService,
     private alertMessageService: AlertMessageService,
-    private multiplayerService: MultiplayerService,
+    private multiplayerMatchService: MultiplayerMatchService,
     private router: Router
   ) {
   }
@@ -111,7 +111,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   acceptRematch(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.multiplayerService.acceptRematch({
+    this.multiplayerMatchService.acceptRematch({
       body: {
         originalSenderId: senderId,
         notificationId: notificationId,
@@ -149,7 +149,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.multiplayerService.rejectRematch({
+    this.multiplayerMatchService.rejectRematch({
       body: {
         originalSenderId: senderId,
         notificationId: notificationId,
@@ -170,7 +170,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   requestRematch(notificationId: number, startedSessionId: number) {
-    this.multiplayerService.requestRematch({
+    this.multiplayerMatchService.requestRematch({
       body: {
         sessionId: startedSessionId,
         playerId: this.loginStateService.loggedInUser.id}}).subscribe({

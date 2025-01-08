@@ -7,7 +7,6 @@ import {MatchConfirmedDialogComponent} from './dialog/match-confirmed-dialog/mat
 import {PlayerDto} from '../../../api/generated/models/player-dto';
 import {MultiplayerSessionDto} from '../../../api/generated/models/multiplayer-session-dto';
 import {LoginStateService} from '../../../core/services/login-state-service/login-state.service';
-import {MultiplayerService} from '../../../api/generated/services/multiplayer.service';
 import {WebSocketService} from '../../../core/websocket/web-socket.service';
 import {PlayerCardComponent} from '../../../shared/components/player-card/player-card-component';
 import {
@@ -15,6 +14,8 @@ import {
 } from '../../../shared/components/dialog/friends-list-dialog/friends-list-dialog.component';
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
 import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
+import {MultiplayerGameService} from '../../../api/generated/services/multiplayer-game.service';
+import {MultiplayerMatchmakingService} from '../../../api/generated/services/multiplayer-matchmaking.service';
 
 
 interface MatchDecision {
@@ -45,7 +46,8 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
 
   constructor(
     private loginStateService: LoginStateService,
-    private multiplayerService: MultiplayerService,
+    private multiplayerGameService: MultiplayerGameService,
+    private matchmakingService: MultiplayerMatchmakingService,
     private webSocketService: WebSocketService,
     private friendService: FriendshipService,
     private router: Router,
@@ -68,7 +70,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
     this.getFriends();
 
 
-    this.multiplayerService.getPlayerSessions({playerId: this.player.id}).subscribe({
+    this.multiplayerGameService.getPlayerSessions({playerId: this.player.id}).subscribe({
       next: value => {
         this.gameSessions = value;
       }
@@ -123,7 +125,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
 
   leaveMatchmakingQueue() {
     this.isSearching = false;
-    this.multiplayerService.cancelMatchmaking({playerId: this.player.id}).subscribe({
+    this.matchmakingService.cancelMatchmaking({playerId: this.player.id}).subscribe({
       next: () => {
         console.log("Left queue")
       }

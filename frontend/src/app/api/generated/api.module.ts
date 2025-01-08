@@ -10,11 +10,13 @@ import { PlayerService } from './services/player.service';
 import { StoryService } from './services/story.service';
 import { QuestionsService } from './services/questions.service';
 import { NotificationService } from './services/notification.service';
-import { MultiplayerService } from './services/multiplayer.service';
+import { MultiplayerMatchService } from './services/multiplayer-match.service';
+import { MultiplayerGameService } from './services/multiplayer-game.service';
 import { FriendshipService } from './services/friendship.service';
 import { ChapterService } from './services/chapter.service';
 import { AuthenticationService } from './services/authentication.service';
 import { AchievementService } from './services/achievement.service';
+import { MultiplayerMatchmakingService } from './services/multiplayer-matchmaking.service';
 
 /**
  * Module that provides all services and configuration.
@@ -28,11 +30,13 @@ import { AchievementService } from './services/achievement.service';
     StoryService,
     QuestionsService,
     NotificationService,
-    MultiplayerService,
+    MultiplayerMatchService,
+    MultiplayerGameService,
     FriendshipService,
     ChapterService,
     AuthenticationService,
     AchievementService,
+    MultiplayerMatchmakingService,
     ApiConfiguration
   ],
 })

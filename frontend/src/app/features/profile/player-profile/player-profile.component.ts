@@ -7,7 +7,6 @@ import {Router} from '@angular/router';
 import {PlayerService} from '../../../api/generated/services/player.service';
 import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
-import {MultiplayerService} from '../../../api/generated/services/multiplayer.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -30,7 +29,6 @@ export class PlayerProfileComponent implements OnInit {
     private friendshipService: FriendshipService,
     private router: Router,
     private alertMessageService: AlertMessageService,
-    private multiplayerService: MultiplayerService
   ) {
   }
 

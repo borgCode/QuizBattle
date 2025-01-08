@@ -3,13 +3,14 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../api/generated/models/game-state-response';
 import {PlayerQuestionResult} from '../../../../api/generated/models/player-question-result';
-import {MultiplayerService} from '../../../../api/generated/services/multiplayer.service';
 import {PlayerCardComponent} from '../../../../shared/components/player-card/player-card-component';
 import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverDialogComponent} from './dialog/game-over-dialog/game-over-dialog.component';
 import {GameResult} from '../../../../shared/enums/game-result';
 import {FriendshipService} from '../../../../api/generated/services/friendship.service';
+import {MultiplayerGameService} from '../../../../api/generated/services/multiplayer-game.service';
+import {MultiplayerMatchService} from '../../../../api/generated/services/multiplayer-match.service';
 
 interface Box {
   color: string;
@@ -50,7 +51,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   friendshipStatus: string;
 
   constructor(
-    private multiplayerService: MultiplayerService,
+    private multiplayerGameService: MultiplayerGameService,
+    private multiplayerMatchService: MultiplayerMatchService,
     private friendshipService: FriendshipService,
     private alertMessageService: AlertMessageService,
     private activatedRoute: ActivatedRoute,
@@ -92,7 +94,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   private getGameState() {
 
-    this.multiplayerService.getGameState({sessionId: this.sessionId}).subscribe({
+    this.multiplayerGameService.getGameState({sessionId: this.sessionId}).subscribe({
       next: gameState => {
         this.gameState = gameState;
 
@@ -191,7 +193,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     this.showGameOverDialog(gameResult);
 
     console.log("Sending complete game")
-    this.multiplayerService.acknowledgeGameOver({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
+    this.multiplayerGameService.acknowledgeGameOver({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
       next: () => console.log('Request successful!'),
       error: (err) => console.error('Error occurred:', err),
     });
@@ -287,7 +289,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   sendRematchRequest() {
-    this.multiplayerService.requestRematch({
+    this.multiplayerMatchService.requestRematch({
       body: {
         sessionId: this.sessionId,
         playerId: this.storedPlayerId
@@ -298,7 +300,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   giveUpClick() {
-    this.multiplayerService.giveUp({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
+    this.multiplayerGameService.giveUp({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
       next: () => {
         const currentUrl = this.router.url;
         this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
