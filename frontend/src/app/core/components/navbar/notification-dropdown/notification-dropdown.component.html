@@ -74,6 +74,72 @@
                   </div>
                 </div>
               </div>
+              <div *ngSwitchCase="'MATCH_REQUEST'" class="d-flex align-items-start p-2">
+                <div class="notification-icon">
+                  <i class="fa-solid fa-gamepad icon"></i>
+                </div>
+                <div class="d-flex flex-grow-1 justify-content-between align-items-start">
+                  <small class="text-muted">{{ notification.message }}</small>
+                  <div class="notification-actions">
+                    <button class="btn btn-sm btn-success me-1"
+                            data-bs-toggle="tooltip"
+                            title="Accept rematch"
+                            (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)">
+                      <i class="fa-regular fa-circle-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger me-1"
+                            data-bs-toggle="tooltip"
+                            title="Decline rematch"
+                            (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <button class="archive-btn btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                            data-bs-toggle="tooltip"
+                            title="Archive"
+                            (click)="archiveNotification(notification.id)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'MATCH_ACCEPTED'" class="d-flex align-items-start p-2">
+                <div class="notification-icon">
+                  <i class="fa-solid fa-gamepad icon"></i>
+                </div>
+                <div class="d-flex flex-grow-1 justify-content-between align-items-start">
+                  <small class="text-muted">{{ notification.message }}</small>
+                  <div class="notification-actions">
+                    <button class="btn btn-sm btn-primary me-1"
+                            data-bs-toggle="tooltip"
+                            title="Go to game"
+                            (click)="goToGame(notification.id, notification.startedSessionId)">
+                      <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button class="archive-btn btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                            data-bs-toggle="tooltip"
+                            title="Archive"
+                            (click)="archiveNotification(notification.id)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'MATCH_DECLINED'" class="d-flex align-items-start p-2">
+                <div class="notification-icon">
+                  <i class="fa-solid fa-ban icon"></i>
+                </div>
+                <div class="d-flex flex-grow-1 justify-content-between align-items-start">
+                  <small class="text-muted">{{ notification.message }}</small>
+                  <div class="notification-actions">
+                    <button class="archive-btn btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                            data-bs-toggle="tooltip"
+                            title="Archive"
+                            (click)="archiveNotification(notification.id)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
               <div *ngSwitchCase="'REMATCH_REQUEST'" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
@@ -270,6 +336,72 @@
               <div *ngSwitchCase="'FRIEND_ACCEPTED'" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-user-group icon"></i>
+                </div>
+                <div class="d-flex flex-grow-1 justify-content-between align-items-start">
+                  <small class="text-muted">{{ notification.message }}</small>
+                  <div class="notification-actions">
+                    <button class="archive-btn btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                            data-bs-toggle="tooltip"
+                            title="Archive"
+                            (click)="archiveNotification(notification.id)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'MATCH_REQUEST'" class="d-flex align-items-start p-2">
+                <div class="notification-icon">
+                  <i class="fa-solid fa-gamepad icon"></i>
+                </div>
+                <div class="d-flex flex-grow-1 justify-content-between align-items-start">
+                  <small class="text-muted">{{ notification.message }}</small>
+                  <div class="notification-actions">
+                    <button class="btn btn-sm btn-success me-1"
+                            data-bs-toggle="tooltip"
+                            title="Accept rematch"
+                            (click)="acceptRematch(notification.senderId, notification.pendingSessionId, notification.id)">
+                      <i class="fa-regular fa-circle-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger me-1"
+                            data-bs-toggle="tooltip"
+                            title="Decline rematch"
+                            (click)="declineRematchRequest(notification.senderId, notification.pendingSessionId, notification.id)">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <button class="archive-btn btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                            data-bs-toggle="tooltip"
+                            title="Archive"
+                            (click)="archiveNotification(notification.id)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'MATCH_ACCEPTED'" class="d-flex align-items-start p-2">
+                <div class="notification-icon">
+                  <i class="fa-solid fa-gamepad icon"></i>
+                </div>
+                <div class="d-flex flex-grow-1 justify-content-between align-items-start">
+                  <small class="text-muted">{{ notification.message }}</small>
+                  <div class="notification-actions">
+                    <button class="btn btn-sm btn-primary me-1"
+                            data-bs-toggle="tooltip"
+                            title="Go to game"
+                            (click)="goToGame(notification.id, notification.startedSessionId)">
+                      <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button class="archive-btn btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                            data-bs-toggle="tooltip"
+                            title="Archive"
+                            (click)="archiveNotification(notification.id)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'MATCH_DECLINED'" class="d-flex align-items-start p-2">
+                <div class="notification-icon">
+                  <i class="fa-solid fa-ban icon"></i>
                 </div>
                 <div class="d-flex flex-grow-1 justify-content-between align-items-start">
                   <small class="text-muted">{{ notification.message }}</small>

@@ -32,6 +32,6 @@ export class RelationshipPanelComponent {
   }
 
   emitSendGameInvite(id: number) {
-    this.relationshipActionSelected.emit({playerId: id, action: "GAME_REQUEST"})
+    this.relationshipActionSelected.emit({playerId: id, action: "MATCH_REQUEST"})
   }
 }

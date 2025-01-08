@@ -11,10 +11,12 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { acceptRematch } from '../fn/multiplayer-match/accept-rematch';
-import { AcceptRematch$Params } from '../fn/multiplayer-match/accept-rematch';
-import { rejectRematch } from '../fn/multiplayer-match/reject-rematch';
-import { RejectRematch$Params } from '../fn/multiplayer-match/reject-rematch';
+import { acceptMatch } from '../fn/multiplayer-match/accept-match';
+import { AcceptMatch$Params } from '../fn/multiplayer-match/accept-match';
+import { rejectMatch } from '../fn/multiplayer-match/reject-match';
+import { RejectMatch$Params } from '../fn/multiplayer-match/reject-match';
+import { requestMatch } from '../fn/multiplayer-match/request-match';
+import { RequestMatch$Params } from '../fn/multiplayer-match/request-match';
 import { requestRematch } from '../fn/multiplayer-match/request-rematch';
 import { RequestRematch$Params } from '../fn/multiplayer-match/request-rematch';
 
@@ -24,8 +26,33 @@ export class MultiplayerMatchService extends BaseService {
     super(config, http);
   }
 
+  /** Path part for operation `requestMatch()` */
+  static readonly RequestMatchPath = '/multiplayer/match';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `requestMatch()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  requestMatch$Response(params: RequestMatch$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return requestMatch(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `requestMatch$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  requestMatch(params: RequestMatch$Params, context?: HttpContext): Observable<void> {
+    return this.requestMatch$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
   /** Path part for operation `requestRematch()` */
-  static readonly RequestRematchPath = '/multiplayer/match/sessions/rematch';
+  static readonly RequestRematchPath = '/multiplayer/match/rematch';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -49,52 +76,52 @@ export class MultiplayerMatchService extends BaseService {
     );
   }
 
-  /** Path part for operation `rejectRematch()` */
-  static readonly RejectRematchPath = '/multiplayer/match/sessions/reject';
+  /** Path part for operation `rejectMatch()` */
+  static readonly RejectMatchPath = '/multiplayer/match/reject';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `rejectRematch()` instead.
+   * To access only the response body, use `rejectMatch()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  rejectRematch$Response(params: RejectRematch$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return rejectRematch(this.http, this.rootUrl, params, context);
+  rejectMatch$Response(params: RejectMatch$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return rejectMatch(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `rejectRematch$Response()` instead.
+   * To access the full response (for headers, for example), `rejectMatch$Response()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  rejectRematch(params: RejectRematch$Params, context?: HttpContext): Observable<void> {
-    return this.rejectRematch$Response(params, context).pipe(
+  rejectMatch(params: RejectMatch$Params, context?: HttpContext): Observable<void> {
+    return this.rejectMatch$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 
-  /** Path part for operation `acceptRematch()` */
-  static readonly AcceptRematchPath = '/multiplayer/match/sessions/accept';
+  /** Path part for operation `acceptMatch()` */
+  static readonly AcceptMatchPath = '/multiplayer/match/accept';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `acceptRematch()` instead.
+   * To access only the response body, use `acceptMatch()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  acceptRematch$Response(params: AcceptRematch$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
-    return acceptRematch(this.http, this.rootUrl, params, context);
+  acceptMatch$Response(params: AcceptMatch$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
+    return acceptMatch(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `acceptRematch$Response()` instead.
+   * To access the full response (for headers, for example), `acceptMatch$Response()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  acceptRematch(params: AcceptRematch$Params, context?: HttpContext): Observable<number> {
-    return this.acceptRematch$Response(params, context).pipe(
+  acceptMatch(params: AcceptMatch$Params, context?: HttpContext): Observable<number> {
+    return this.acceptMatch$Response(params, context).pipe(
       map((r: StrictHttpResponse<number>): number => r.body)
     );
   }

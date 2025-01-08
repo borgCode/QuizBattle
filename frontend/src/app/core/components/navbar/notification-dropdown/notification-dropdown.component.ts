@@ -111,12 +111,13 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   acceptRematch(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.multiplayerMatchService.acceptRematch({
+    this.multiplayerMatchService.acceptMatch({
       body: {
         originalSenderId: senderId,
         notificationId: notificationId,
         pendingSessionId: pendingSessionId,
-        playerDisplayName: this.loginStateService.loggedInUser.displayName
+        playerDisplayName: this.loginStateService.loggedInUser.displayName,
+        rematch: true
       }
     }).subscribe({
       next: sessionId => {
@@ -149,12 +150,13 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
-    this.multiplayerMatchService.rejectRematch({
+    this.multiplayerMatchService.rejectMatch({
       body: {
         originalSenderId: senderId,
         notificationId: notificationId,
         pendingSessionId: pendingSessionId,
-        playerDisplayName: this.loginStateService.loggedInUser.displayName
+        playerDisplayName: this.loginStateService.loggedInUser.displayName,
+        rematch: true
       }
     }).subscribe({
       next: () => {

@@ -30,4 +30,4 @@ export function requestRematch(http: HttpClient, rootUrl: string, params: Reques
   );
 }
 
-requestRematch.PATH = '/multiplayer/match/sessions/rematch';
+requestRematch.PATH = '/multiplayer/match/rematch';
