@@ -46,7 +46,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     });
 
 
-    this.questionService.getPlayerSessionQuestions({playerId: this.storedPlayerId}).subscribe({
+    this.questionService.restoreSessionQuestions({playerId: this.storedPlayerId}).subscribe({
       next: questions => {
         console.log(questions)
         if (questions && questions.length > 0) {

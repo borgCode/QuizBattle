@@ -7,9 +7,11 @@ import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.GameException;
-import org.borg.backend.multiplayer.dto.GameStateResponse;
-import org.borg.backend.multiplayer.model.MultiplayerSession;
-import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.game.multiplayer.dto.GameStateResponse;
+import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.game.multiplayer.service.GameService;
+import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.dto.PlayerDTO;
@@ -50,13 +52,13 @@ public class GameServiceGameFlowIntegrationTest {
     @Autowired
     private QuestionRepository questionRepository;
     @Autowired
-    private QuestionService questionService;
-    @Autowired
     private QuestionSessionService questionSessionService;
     @MockitoBean
     private AchievementService achievementService;
     private Player player1;
     private Player player2;
+    @Autowired
+    private MultiplayerQuestionService multiplayerQuestionService;
 
 
     @BeforeEach
@@ -148,7 +150,7 @@ public class GameServiceGameFlowIntegrationTest {
                 player1.getId()
         );
 
-        questionService.validateMultiplayerAnswer(request);
+        multiplayerQuestionService.validateMultiplayerAnswer(request);
 
     }
     
@@ -167,7 +169,7 @@ public class GameServiceGameFlowIntegrationTest {
         @Test
         void shouldThrowErrorWhenRequestingQuestions_whenOtherPlayersTurn() {
             GameException exception = assertThrows(GameException.class,
-                    () -> questionService.getNewQuestionsForCategory(
+                    () -> multiplayerQuestionService.getNewQuestionsForCategory(
                             new MultiplayerQuestionsRequest("Geography", sessionId, player2.getId())
                     ), "Player should not be able to request questions when it's the other player's turn"
             );
@@ -205,11 +207,11 @@ public class GameServiceGameFlowIntegrationTest {
         
         @Test
         void shouldThrowErrorWhenRequestingQuestions_whenExistingQuestionsUnanswered() {
-            questionService.getNewQuestionsForCategory(
+            multiplayerQuestionService.getNewQuestionsForCategory(
                     new MultiplayerQuestionsRequest("Sports", sessionId, player1.getId()));
 
             GameException exception = assertThrows(GameException.class,
-                    () -> questionService.getNewQuestionsForCategory(
+                    () -> multiplayerQuestionService.getNewQuestionsForCategory(
                             new MultiplayerQuestionsRequest("Geography", sessionId, player1.getId())
                     ), "Should throw exception when player tries to select another category when they have finished the current"
             );
@@ -219,7 +221,7 @@ public class GameServiceGameFlowIntegrationTest {
         @Test
         void shouldThrowErrorWhenRequestingAnswerValidation_whenOtherPlayersTurn() {
             GameException exception = assertThrows(GameException.class,
-                    () -> questionService.validateMultiplayerAnswer(
+                    () -> multiplayerQuestionService.validateMultiplayerAnswer(
                             new MultiplayerAnswerValidationRequest(questions.get(0).getId(), sessionId, questions.get(0).getCorrectAnswer(), player2.getId())
                     ), "Player should not be able to validate answer when it's the other player's turn"
             );
@@ -229,12 +231,12 @@ public class GameServiceGameFlowIntegrationTest {
         
         @Test
         void shouldThrowErrorWhenRequestingAnswerValidation_whenInvalidQuestionId() {
-            questionService.getNewQuestionsForCategory(
+            multiplayerQuestionService.getNewQuestionsForCategory(
                     new MultiplayerQuestionsRequest("Sports", sessionId, player1.getId()));
 
             Long invalidQuestionId = 1231313213L;
             GameException exception = assertThrows(GameException.class,
-                    () -> questionService.validateMultiplayerAnswer(
+                    () -> multiplayerQuestionService.validateMultiplayerAnswer(
                             new MultiplayerAnswerValidationRequest(invalidQuestionId, sessionId, "correctAnswer", player1.getId())
                     ), "Player should not be able to answer a question outside of the three round questions"
             );
@@ -244,16 +246,16 @@ public class GameServiceGameFlowIntegrationTest {
         
         @Test
         void shouldThrowErrorWhenRequestingAnswerValidation_whenAlreadyAnsweredQuestion() {
-            questionService.getNewQuestionsForCategory(
+            multiplayerQuestionService.getNewQuestionsForCategory(
                     new MultiplayerQuestionsRequest("Sports", sessionId, player1.getId()));
             
             MultiplayerAnswerValidationRequest request = 
                     new MultiplayerAnswerValidationRequest(questions.get(0).getId(), sessionId, questions.get(0).getCorrectAnswer(), player1.getId());
             
-            questionService.validateMultiplayerAnswer(request);
+            multiplayerQuestionService.validateMultiplayerAnswer(request);
             
             GameException exception = assertThrows(GameException.class,
-                    () ->  questionService.validateMultiplayerAnswer(request),
+                    () ->  multiplayerQuestionService.validateMultiplayerAnswer(request),
                     "Player should not be able to answer the same question more than once"
             );
             assertEquals(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED, exception.getErrorCode());

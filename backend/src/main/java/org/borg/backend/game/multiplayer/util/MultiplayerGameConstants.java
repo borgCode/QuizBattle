@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.util;
+package org.borg.backend.game.multiplayer.util;
 
 public class MultiplayerGameConstants {
     public static final int TOTAL_QUESTIONS_PER_PLAYER = 18;

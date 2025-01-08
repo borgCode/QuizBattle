@@ -29,4 +29,4 @@ export function clearPlayerSession(http: HttpClient, rootUrl: string, params: Cl
   );
 }
 
-clearPlayerSession.PATH = '/questions/{playerId}/clear';
+clearPlayerSession.PATH = '/questions/multiplayer/{playerId}/clear';

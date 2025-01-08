@@ -31,4 +31,4 @@ export function validateMultiplayerAnswer(http: HttpClient, rootUrl: string, par
   );
 }
 
-validateMultiplayerAnswer.PATH = '/questions/session/validate-answer';
+validateMultiplayerAnswer.PATH = '/questions/multiplayer/answer';

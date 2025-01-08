@@ -32,4 +32,4 @@ export function getActiveSessionQuestions(http: HttpClient, rootUrl: string, par
   );
 }
 
-getActiveSessionQuestions.PATH = '/questions/session/{sessionId}/{playerId}';
+getActiveSessionQuestions.PATH = '/questions/multiplayer/{sessionId}/{playerId}';

@@ -31,4 +31,4 @@ export function getNewQuestionsForCategory(http: HttpClient, rootUrl: string, pa
   );
 }
 
-getNewQuestionsForCategory.PATH = '/questions/session/random-questions';
+getNewQuestionsForCategory.PATH = '/questions/multiplayer/questions';

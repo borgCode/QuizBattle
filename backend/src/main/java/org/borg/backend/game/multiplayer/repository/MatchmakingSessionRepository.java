@@ -1,6 +1,6 @@
-package org.borg.backend.multiplayer.repository;
+package org.borg.backend.game.multiplayer.repository;
 
-import org.borg.backend.multiplayer.model.MatchmakingSession;
+import org.borg.backend.game.multiplayer.model.MatchmakingSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

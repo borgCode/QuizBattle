@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.dto;
+package org.borg.backend.game.multiplayer.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RematchRequest {
-    private Long sessionId;
+public class MatchDecision {
+    private Long matchmakingSessionId;
     private Long playerId;
 }

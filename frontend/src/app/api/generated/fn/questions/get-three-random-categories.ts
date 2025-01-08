@@ -29,4 +29,4 @@ export function getThreeRandomCategories(http: HttpClient, rootUrl: string, para
   );
 }
 
-getThreeRandomCategories.PATH = '/questions/{sessionId}/category-selection';
+getThreeRandomCategories.PATH = '/questions/multiplayer/{sessionId}/categories';

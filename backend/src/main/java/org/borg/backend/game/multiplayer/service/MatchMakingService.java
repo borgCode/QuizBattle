@@ -1,12 +1,12 @@
-package org.borg.backend.multiplayer.service;
+package org.borg.backend.game.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.multiplayer.dto.MatchmakingResponse;
-import org.borg.backend.multiplayer.model.MatchmakingSession;
-import org.borg.backend.multiplayer.model.MultiplayerSession;
-import org.borg.backend.multiplayer.repository.MatchmakingSessionRepository;
-import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.game.multiplayer.dto.MatchmakingResponse;
+import org.borg.backend.game.multiplayer.model.MatchmakingSession;
+import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.game.multiplayer.repository.MatchmakingSessionRepository;
+import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

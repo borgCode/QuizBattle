@@ -3,6 +3,7 @@ package org.borg.backend.question.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
 import org.borg.backend.game.singleplayer.SinglePlayerQuestionService;
 import org.borg.backend.question.dto.*;
 import org.borg.backend.question.service.QuestionService;
@@ -18,40 +19,40 @@ import java.util.List;
 @RequestMapping("/questions")
 @Tag(name = "Questions")
 public class QuestionController {
-
-    private final QuestionService questionService;
+    
     private final QuestionSessionService questionSessionService;
     private final SinglePlayerQuestionService singlePlayerQuestionService;
+    private final MultiplayerQuestionService multiplayerQuestionService;
 
-    @GetMapping("/{sessionId}/category-selection")
+    @GetMapping("/multiplayer/{sessionId}/categories")
     public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
-        return ResponseEntity.ok(questionService.getThreeRandomCategories(sessionId));
+        return ResponseEntity.ok(multiplayerQuestionService.getThreeRandomCategories(sessionId));
     }
     
-    @GetMapping("/{playerId}/questions")
-    public ResponseEntity<List<QuestionDTO>> getPlayerSessionQuestions(@PathVariable Long playerId) {
-        return ResponseEntity.ok(questionService.getPlayerSessionQuestions(playerId));
+    @GetMapping("/multiplayer/{playerId}/restore")
+    public ResponseEntity<List<QuestionDTO>> restoreSessionQuestions(@PathVariable Long playerId) {
+        return ResponseEntity.ok(multiplayerQuestionService.restoreSessionQuestions(playerId));
     }
     
-    @PostMapping("/{playerId}/clear")
+    @PostMapping("/multiplayer/{playerId}/clear")
     public ResponseEntity<Void> clearPlayerSession(@PathVariable Long playerId) {
         questionSessionService.finishSession(playerId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/session/random-questions")
+    @PostMapping("/multiplayer/questions")
     public ResponseEntity<List<QuestionDTO>> getNewQuestionsForCategory(@RequestBody MultiplayerQuestionsRequest request) {
-        return ResponseEntity.ok(questionService.getNewQuestionsForCategory(request));
+        return ResponseEntity.ok(multiplayerQuestionService.getNewQuestionsForCategory(request));
     }
 
-    @PostMapping("/session/validate-answer")
+    @PostMapping("/multiplayer/answer")
     public ResponseEntity<AnswerValidationResponse> validateMultiplayerAnswer(@RequestBody MultiplayerAnswerValidationRequest request) {
-        return ResponseEntity.ok(questionService.validateMultiplayerAnswer(request));
+        return ResponseEntity.ok(multiplayerQuestionService.validateMultiplayerAnswer(request));
     }
 
-    @GetMapping("/session/{sessionId}/{playerId}")
+    @GetMapping("/multiplayer/{sessionId}/{playerId}")
     public ResponseEntity<List<QuestionDTO>> getActiveSessionQuestions(@PathVariable Long sessionId, @PathVariable Long playerId) {
-        return ResponseEntity.ok(questionService.getActiveSessionQuestions(sessionId, playerId));
+        return ResponseEntity.ok(multiplayerQuestionService.getActiveSessionQuestions(sessionId, playerId));
     }
     
     @PostMapping("/chapter/random-questions")

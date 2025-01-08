@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.service;
+package org.borg.backend.game.multiplayer.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -6,13 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.common.exceptions.GameException;
-import org.borg.backend.multiplayer.dto.MatchRequest;
-import org.borg.backend.multiplayer.dto.MatchResponse;
-import org.borg.backend.multiplayer.dto.RematchRequest;
-import org.borg.backend.multiplayer.model.MultiplayerSession;
-import org.borg.backend.multiplayer.model.PendingSession;
-import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.multiplayer.repository.PendingSessionRepository;
+import org.borg.backend.game.multiplayer.dto.MatchRequest;
+import org.borg.backend.game.multiplayer.dto.MatchResponse;
+import org.borg.backend.game.multiplayer.dto.RematchRequest;
+import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.game.multiplayer.model.PendingSession;
+import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.game.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;

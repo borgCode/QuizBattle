@@ -1,7 +1,7 @@
-package org.borg.backend.multiplayer.service;
+package org.borg.backend.game.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.multiplayer.repository.MatchmakingSessionRepository;
+import org.borg.backend.game.multiplayer.repository.MatchmakingSessionRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

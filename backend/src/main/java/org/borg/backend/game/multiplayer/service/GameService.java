@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.service;
+package org.borg.backend.game.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,11 +6,11 @@ import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.common.exceptions.GameException;
-import org.borg.backend.multiplayer.dto.GameStateResponse;
-import org.borg.backend.multiplayer.dto.MultiplayerSessionDTO;
-import org.borg.backend.multiplayer.model.MultiplayerSession;
-import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.multiplayer.util.MultiplayerGameConstants;
+import org.borg.backend.game.multiplayer.dto.GameStateResponse;
+import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
+import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
+import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;

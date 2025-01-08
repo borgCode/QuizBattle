@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.dto;
+package org.borg.backend.game.multiplayer.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

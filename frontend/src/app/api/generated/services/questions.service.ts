@@ -20,8 +20,6 @@ import { getActiveSessionQuestions } from '../fn/questions/get-active-session-qu
 import { GetActiveSessionQuestions$Params } from '../fn/questions/get-active-session-questions';
 import { getNewQuestionsForCategory } from '../fn/questions/get-new-questions-for-category';
 import { GetNewQuestionsForCategory$Params } from '../fn/questions/get-new-questions-for-category';
-import { getPlayerSessionQuestions } from '../fn/questions/get-player-session-questions';
-import { GetPlayerSessionQuestions$Params } from '../fn/questions/get-player-session-questions';
 import { getRoundResults } from '../fn/questions/get-round-results';
 import { GetRoundResults$Params } from '../fn/questions/get-round-results';
 import { getSinglePlayerRoundQuestions } from '../fn/questions/get-single-player-round-questions';
@@ -29,6 +27,8 @@ import { GetSinglePlayerRoundQuestions$Params } from '../fn/questions/get-single
 import { getThreeRandomCategories } from '../fn/questions/get-three-random-categories';
 import { GetThreeRandomCategories$Params } from '../fn/questions/get-three-random-categories';
 import { QuestionDto } from '../models/question-dto';
+import { restoreSessionQuestions } from '../fn/questions/restore-session-questions';
+import { RestoreSessionQuestions$Params } from '../fn/questions/restore-session-questions';
 import { validateMultiplayerAnswer } from '../fn/questions/validate-multiplayer-answer';
 import { ValidateMultiplayerAnswer$Params } from '../fn/questions/validate-multiplayer-answer';
 import { validateSingleplayerAnswer } from '../fn/questions/validate-singleplayer-answer';
@@ -41,7 +41,7 @@ export class QuestionsService extends BaseService {
   }
 
   /** Path part for operation `clearPlayerSession()` */
-  static readonly ClearPlayerSessionPath = '/questions/{playerId}/clear';
+  static readonly ClearPlayerSessionPath = '/questions/multiplayer/{playerId}/clear';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -65,33 +65,8 @@ export class QuestionsService extends BaseService {
     );
   }
 
-  /** Path part for operation `validateMultiplayerAnswer()` */
-  static readonly ValidateMultiplayerAnswerPath = '/questions/session/validate-answer';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `validateMultiplayerAnswer()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  validateMultiplayerAnswer$Response(params: ValidateMultiplayerAnswer$Params, context?: HttpContext): Observable<StrictHttpResponse<AnswerValidationResponse>> {
-    return validateMultiplayerAnswer(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `validateMultiplayerAnswer$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  validateMultiplayerAnswer(params: ValidateMultiplayerAnswer$Params, context?: HttpContext): Observable<AnswerValidationResponse> {
-    return this.validateMultiplayerAnswer$Response(params, context).pipe(
-      map((r: StrictHttpResponse<AnswerValidationResponse>): AnswerValidationResponse => r.body)
-    );
-  }
-
   /** Path part for operation `getNewQuestionsForCategory()` */
-  static readonly GetNewQuestionsForCategoryPath = '/questions/session/random-questions';
+  static readonly GetNewQuestionsForCategoryPath = '/questions/multiplayer/questions';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -112,6 +87,31 @@ export class QuestionsService extends BaseService {
   getNewQuestionsForCategory(params: GetNewQuestionsForCategory$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
     return this.getNewQuestionsForCategory$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
+    );
+  }
+
+  /** Path part for operation `validateMultiplayerAnswer()` */
+  static readonly ValidateMultiplayerAnswerPath = '/questions/multiplayer/answer';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `validateMultiplayerAnswer()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  validateMultiplayerAnswer$Response(params: ValidateMultiplayerAnswer$Params, context?: HttpContext): Observable<StrictHttpResponse<AnswerValidationResponse>> {
+    return validateMultiplayerAnswer(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `validateMultiplayerAnswer$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  validateMultiplayerAnswer(params: ValidateMultiplayerAnswer$Params, context?: HttpContext): Observable<AnswerValidationResponse> {
+    return this.validateMultiplayerAnswer$Response(params, context).pipe(
+      map((r: StrictHttpResponse<AnswerValidationResponse>): AnswerValidationResponse => r.body)
     );
   }
 
@@ -190,8 +190,33 @@ export class QuestionsService extends BaseService {
     );
   }
 
+  /** Path part for operation `getActiveSessionQuestions()` */
+  static readonly GetActiveSessionQuestionsPath = '/questions/multiplayer/{sessionId}/{playerId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getActiveSessionQuestions()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getActiveSessionQuestions$Response(params: GetActiveSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
+    return getActiveSessionQuestions(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getActiveSessionQuestions$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getActiveSessionQuestions(params: GetActiveSessionQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
+    return this.getActiveSessionQuestions$Response(params, context).pipe(
+      map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
+    );
+  }
+
   /** Path part for operation `getThreeRandomCategories()` */
-  static readonly GetThreeRandomCategoriesPath = '/questions/{sessionId}/category-selection';
+  static readonly GetThreeRandomCategoriesPath = '/questions/multiplayer/{sessionId}/categories';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -215,52 +240,27 @@ export class QuestionsService extends BaseService {
     );
   }
 
-  /** Path part for operation `getPlayerSessionQuestions()` */
-  static readonly GetPlayerSessionQuestionsPath = '/questions/{playerId}/questions';
+  /** Path part for operation `restoreSessionQuestions()` */
+  static readonly RestoreSessionQuestionsPath = '/questions/multiplayer/{playerId}/restore';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getPlayerSessionQuestions()` instead.
+   * To access only the response body, use `restoreSessionQuestions()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getPlayerSessionQuestions$Response(params: GetPlayerSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
-    return getPlayerSessionQuestions(this.http, this.rootUrl, params, context);
+  restoreSessionQuestions$Response(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
+    return restoreSessionQuestions(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getPlayerSessionQuestions$Response()` instead.
+   * To access the full response (for headers, for example), `restoreSessionQuestions$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getPlayerSessionQuestions(params: GetPlayerSessionQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
-    return this.getPlayerSessionQuestions$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
-    );
-  }
-
-  /** Path part for operation `getActiveSessionQuestions()` */
-  static readonly GetActiveSessionQuestionsPath = '/questions/session/{sessionId}/{playerId}';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getActiveSessionQuestions()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getActiveSessionQuestions$Response(params: GetActiveSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
-    return getActiveSessionQuestions(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getActiveSessionQuestions$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getActiveSessionQuestions(params: GetActiveSessionQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
-    return this.getActiveSessionQuestions$Response(params, context).pipe(
+  restoreSessionQuestions(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
+    return this.restoreSessionQuestions$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
     );
   }

@@ -1,12 +1,12 @@
-package org.borg.backend.multiplayer.controller;
+package org.borg.backend.game.multiplayer.controller;
 
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.multiplayer.dto.MatchRequest;
-import org.borg.backend.multiplayer.dto.RematchRequest;
-import org.borg.backend.multiplayer.dto.MatchResponse;
-import org.borg.backend.multiplayer.service.PlayerMatchService;
+import org.borg.backend.game.multiplayer.dto.MatchRequest;
+import org.borg.backend.game.multiplayer.dto.RematchRequest;
+import org.borg.backend.game.multiplayer.dto.MatchResponse;
+import org.borg.backend.game.multiplayer.service.PlayerMatchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

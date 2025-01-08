@@ -1,11 +1,11 @@
-package org.borg.backend.multiplayer.controller;
+package org.borg.backend.game.multiplayer.controller;
 
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.multiplayer.dto.GameStateResponse;
-import org.borg.backend.multiplayer.dto.MultiplayerSessionDTO;
-import org.borg.backend.multiplayer.service.GameService;
+import org.borg.backend.game.multiplayer.dto.GameStateResponse;
+import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
+import org.borg.backend.game.multiplayer.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
