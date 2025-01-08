@@ -2,6 +2,7 @@ package org.borg.backend.chat.service;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.chat.dto.ConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
@@ -14,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,8 +34,6 @@ public class MessageServiceIntegrationTest {
     @Autowired
     private PlayerRepository playerRepository;
     
-    private Player player1;
-    private Player player2;
     @Autowired
     private RoleRepository roleRepository;
 
@@ -42,8 +44,7 @@ public class MessageServiceIntegrationTest {
             userRole.setName("USER");
             roleRepository.save(userRole);
         }
-        player1 = createAndSavePlayer("Player1");
-        player2 = createAndSavePlayer("Player2");
+        
     }
 
     private Player createAndSavePlayer(String name) {
@@ -67,10 +68,18 @@ public class MessageServiceIntegrationTest {
         conversationRepository.deleteAll();
         messageRepository.deleteAll();
         playerRepository.deleteAll();
+        
     }
 
     @Nested
     class sendMessageTests {
+        private Player player1;
+        private Player player2;
+        @BeforeEach
+        void setUp() {
+            player1 = createAndSavePlayer("Player1");
+            player2 = createAndSavePlayer("Player2");
+        }
 
         @Test
         void sendMessageWhenConversationDoesNotExist_andCreateConversation() {
@@ -170,5 +179,48 @@ public class MessageServiceIntegrationTest {
             );
         }
         
+    }
+    
+    @Nested
+    class GettingConversationsTests {
+        Player receiverPlayer;
+        List<Player> players = new ArrayList<>();
+        private final int NUM_OF_PLAYERS = 10;
+        @BeforeEach
+        void setUp() {
+            receiverPlayer = createAndSavePlayer("Receiver");
+            for (int i = 0; i < NUM_OF_PLAYERS; i++) {
+                players.add(createAndSavePlayer("Player " + i));
+            }
+        }
+        
+        @Test
+        void shouldReturnAllConversationsForReceiverPlayer() {
+
+            Map<Long, String> expectedMessages = new HashMap<>();
+            for (int i = 0; i < NUM_OF_PLAYERS; i++) {
+                Player sendingPlayer = players.get(i);
+                String message = "Hello from " + sendingPlayer.getDisplayName();
+                
+                messagingService.sendMessage(SendMessageRequest.builder()
+                        .senderId(sendingPlayer.getId())
+                        .receiverId(receiverPlayer.getId())
+                        .message(message)
+                        .build());
+                
+                expectedMessages.put(sendingPlayer.getId(), message);
+            }
+            
+            List<ConversationDTO> conversationDTOS = messagingService.getPlayerConversations(receiverPlayer.getId());
+            
+            assertAll("Post get conversations check",
+                    () -> assertEquals(NUM_OF_PLAYERS, conversationDTOS.size(), String.format("There should be %s conversations", NUM_OF_PLAYERS)),
+                    () -> assertTrue(conversationDTOS.stream()
+                                    .allMatch(dto -> expectedMessages.containsKey(dto.getOtherPlayer().getId()) &&
+                                            expectedMessages.get(dto.getOtherPlayer().getId())
+                                                    .equals(dto.getLatestMessage())),
+                            "Each conversation should have matching sender ID and message content")
+            );
+        }
     }
 }

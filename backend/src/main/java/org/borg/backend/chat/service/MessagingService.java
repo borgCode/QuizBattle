@@ -2,7 +2,9 @@ package org.borg.backend.chat.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.chat.dto.ConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
+import org.borg.backend.chat.mapper.ConversationMapper;
 import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
 import org.borg.backend.chat.repository.ConversationRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +55,7 @@ public class MessagingService {
         conversationRepository.save(conversation);
     }
     
-    
+    public List<ConversationDTO> getPlayerConversations(Long playerId) {
+        return ConversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
+    }
 }
