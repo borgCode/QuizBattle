@@ -36,6 +36,8 @@ public class QuestionService {
     private final GameService gameService;
 
 
+    
+    //RESTORED SESSION
     public List<QuestionDTO> getPlayerSessionQuestions(Long playerId) {
         List<Long> questionIds = questionSessionService.getSessionQuestions(playerId);
         log.warn("Getting session questions");

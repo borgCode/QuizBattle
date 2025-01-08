@@ -3,6 +3,7 @@ package org.borg.backend.question.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.game.singleplayer.SinglePlayerQuestionService;
 import org.borg.backend.question.dto.*;
 import org.borg.backend.question.service.QuestionService;
 import org.borg.backend.question.service.QuestionSessionService;
@@ -20,6 +21,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final QuestionSessionService questionSessionService;
+    private final SinglePlayerQuestionService singlePlayerQuestionService;
 
     @GetMapping("/{sessionId}/category-selection")
     public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
@@ -54,12 +56,12 @@ public class QuestionController {
     
     @PostMapping("/chapter/random-questions")
     public ResponseEntity<List<QuestionDTO>> getSinglePlayerRoundQuestions(@RequestBody SingleplayerQuestionsRequest request) {
-        return ResponseEntity.ok(questionService.getSinglePlayerRoundQuestions(request));
+        return ResponseEntity.ok(singlePlayerQuestionService.getSinglePlayerRoundQuestions(request));
     }
 
     @PostMapping("/chapter/validate-answer")
     public ResponseEntity<AnswerValidationResponse> validateSingleplayerAnswer(@RequestBody SinglePlayerAnswerValidationRequest request) {
-        return ResponseEntity.ok(questionService.validateSingleplayerAnswer(request));
+        return ResponseEntity.ok(singlePlayerQuestionService.validateSingleplayerAnswer(request));
     }
     
     @GetMapping("/chapter/results/{playerId}")
@@ -69,7 +71,7 @@ public class QuestionController {
     
     @PostMapping("chapter/clear-answers/{playerId}")
     public ResponseEntity<Void> clearRoundResults(@PathVariable Long playerId) {
-        questionService.finishSession(playerId);
+        singlePlayerQuestionService.finishSession(playerId);
         return ResponseEntity.ok().build();
     }
 }
