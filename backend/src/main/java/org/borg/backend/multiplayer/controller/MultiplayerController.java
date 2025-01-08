@@ -4,8 +4,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.multiplayer.dto.*;
+import org.borg.backend.multiplayer.service.GameService;
 import org.borg.backend.multiplayer.service.MatchMakingService;
-import org.borg.backend.multiplayer.service.MultiplayerService;
+import org.borg.backend.multiplayer.service.PlayerMatchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -19,12 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Multiplayer")
 public class MultiplayerController {
-    private final MultiplayerService multiplayerService;
     private final MatchMakingService matchMakingService;
+    private final GameService gameService;
+    private final PlayerMatchService playerMatchService;
 
     @GetMapping("{playerId}")
     public List<MultiplayerSessionDTO> getPlayerSessions(@PathVariable Long playerId) {
-        return multiplayerService.getMultiplayerSessionsById(playerId);
+        return gameService.getMultiplayerSessionsById(playerId);
     }
 
     @MessageMapping("/matchmaking/find")
@@ -52,37 +54,37 @@ public class MultiplayerController {
 
     @GetMapping("/session/{sessionId}")
     public ResponseEntity<GameStateResponse> getGameState(@PathVariable Long sessionId) {
-        return ResponseEntity.ok(multiplayerService.getGameState(sessionId));
+        return ResponseEntity.ok(gameService.getGameState(sessionId));
     }
 
     @PostMapping("/session/rematch-request")
     public ResponseEntity<Void> requestRematch(@RequestBody RematchRequest rematchRequest) {
-        multiplayerService.requestRematch(rematchRequest);
+        playerMatchService.requestRematch(rematchRequest);
         return ResponseEntity.ok().build();
     }
     
     @PostMapping("/session/accept")
     public ResponseEntity<Long> acceptRematch(@RequestBody RematchResponse response) {
-        return ResponseEntity.ok(multiplayerService.handleRematchAccept(response));
+        return ResponseEntity.ok(playerMatchService.handleRematchAccept(response));
     }
 
     @PostMapping("/session/reject")
     public ResponseEntity<Void> rejectRematch(@RequestBody RematchResponse response) {
-        multiplayerService.handleRematchReject(response);
+        playerMatchService.handleRematchReject(response);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/session/{sessionId}/complete/{playerId}")
     public ResponseEntity<Void> acknowledgeGameOver(@PathVariable Long sessionId, @PathVariable Long playerId) {
         log.warn("Called complete game");
-        multiplayerService.acknowledgeGameOver(sessionId, playerId);
+        gameService.acknowledgeGameOver(sessionId, playerId);
         return ResponseEntity.ok().build();
     }
     
     @PostMapping("/{sessionId}/complete/{playerId}")
     public ResponseEntity<Void> giveUp(@PathVariable Long sessionId, @PathVariable Long playerId) {
         log.warn("Giving up game");
-        multiplayerService.handleGiveUp(sessionId, playerId);
+        gameService.handleGiveUp(sessionId, playerId);
         return ResponseEntity.ok().build();
     }
     

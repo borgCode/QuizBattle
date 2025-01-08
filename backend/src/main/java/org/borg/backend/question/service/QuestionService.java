@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.exceptions.GameException;
-import org.borg.backend.multiplayer.service.MultiplayerService;
+import org.borg.backend.multiplayer.service.GameService;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.player.model.Player;
@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final MultiplayerService multiplayerService;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final QuestionSessionService questionSessionService;
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final GameService gameService;
 
 
     public List<QuestionDTO> getPlayerSessionQuestions(Long playerId) {
@@ -52,7 +52,7 @@ public class QuestionService {
         MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
         
-        multiplayerService.validatePlayerTurn(request, session);
+        gameService.validatePlayerTurn(request, session);
         
         String currentCategory = questionSessionService.getCurrentCategory(request.getPlayerId());
         if (currentCategory != null && currentCategory.equalsIgnoreCase(request.getCategory())) {
@@ -68,7 +68,7 @@ public class QuestionService {
         
         questionSessionService.initializeSession(request.getPlayerId(), questionIds, request.getCategory());
 
-        multiplayerService.updateSessionQuestionsAndCategory(session, questions, request.getCategory());
+        gameService.updateSessionQuestionsAndCategory(session, questions, request.getCategory());
 
         return QuestionMapper.multipleToDTO(questions);
     }
@@ -128,7 +128,7 @@ public class QuestionService {
             questionSessionService.finishSession(request.getPlayerId());
         }
 
-        multiplayerService.updateGameState(
+        gameService.updateGameState(
                 request.getSessionId(),
                 request.getPlayerId(),
                 request.getQuestionId(),
