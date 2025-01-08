@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class MultiplayerServiceGameFlowIntegrationTest {
+public class GameServiceGameFlowIntegrationTest {
 
     @Autowired
     private NotificationRepository notificationRepository;
@@ -44,7 +44,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
     @Autowired
     private MultiplayerSessionRepository multiplayerSessionRepository;
     @Autowired
-    private MultiplayerService multiplayerService;
+    private GameService gameService;
     @Autowired
     private PlayerRepository playerRepository;
     @Autowired
@@ -106,11 +106,11 @@ public class MultiplayerServiceGameFlowIntegrationTest {
                 .toList();
 
         questionSessionService.initializeSession(player1.getId(), expectedQuestionIds, "Sports");
-        multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+        gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
 
         questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-        GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
+        GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
 
 
         List<Long> expectedPlayerIds = List.of(player1.getId(), player2.getId());
@@ -195,7 +195,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
                     "Geography", session.getId(), player1.getId());
 
             GameException exception = assertThrows(GameException.class,
-                    () -> multiplayerService.validatePlayerTurn(request, session),
+                    () -> gameService.validatePlayerTurn(request, session),
                     "Should throw exception when player tries to request questions after answering more than opponent"
             );
 
@@ -278,11 +278,11 @@ public class MultiplayerServiceGameFlowIntegrationTest {
 
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 5));
 
-            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-            GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
+            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
 
             assertAll("Post-win checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
@@ -300,11 +300,11 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         void testGameCompleteLoss() {
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(5, 18));
 
-            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-            GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
+            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
 
             assertAll("Post-win checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
@@ -323,11 +323,11 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         void testGameCompleteTie() {
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 18));
 
-            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-            GameStateResponse gameStateResponse = multiplayerService.getGameState(multiplayerSession.getId());
+            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
 
             assertAll("Post-tie checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
@@ -346,23 +346,23 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         void testGameOverAcknowledgement() {
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 5));
 
-            multiplayerService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
             
-            multiplayerService.acknowledgeGameOver(multiplayerSession.getId(), player1.getId());
+            gameService.acknowledgeGameOver(multiplayerSession.getId(), player1.getId());
 
             
             
-            Map<Long, Boolean> firstAcknowledgements = multiplayerService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
+            Map<Long, Boolean> firstAcknowledgements = gameService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
             assertAll("First acknowledgement checks",
                     () -> assertTrue(firstAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
                     () -> assertFalse(firstAcknowledgements.get(player2.getId()), "Player2 acknowledgement should be false")
                     );
             
-            multiplayerService.acknowledgeGameOver(multiplayerSession.getId(), player2.getId());
+            gameService.acknowledgeGameOver(multiplayerSession.getId(), player2.getId());
 
-            Map<Long, Boolean> secondAcknowledgements = multiplayerService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
+            Map<Long, Boolean> secondAcknowledgements = gameService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
 
             assertAll("Second acknowledgement checks",
                     () -> assertTrue(secondAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
@@ -392,7 +392,7 @@ public class MultiplayerServiceGameFlowIntegrationTest {
         multiplayerSession.setStatus(GameStatus.ACTIVE);
         multiplayerSessionRepository.save(multiplayerSession);
         
-        multiplayerService.handleGiveUp(multiplayerSession.getId(), player1.getId());
+        gameService.handleGiveUp(multiplayerSession.getId(), player1.getId());
         
         MultiplayerSession updatedSession = multiplayerSessionRepository.findById(multiplayerSession.getId())
                 .orElseThrow();
