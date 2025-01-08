@@ -51,9 +51,7 @@ export class PlayerProfileComponent implements OnInit {
 
       }
     })
-
   }
-
   private getFriends() {
     this.friendshipService.getRelationships({playerId: this.player.id}).subscribe({
       next: data => {
@@ -63,7 +61,6 @@ export class PlayerProfileComponent implements OnInit {
       }
     })
   }
-
   openEditProfile() {
     this.router.navigate(['edit-profile']);
   }
@@ -128,6 +125,8 @@ export class PlayerProfileComponent implements OnInit {
           next: () => this.alertMessageService.show('Sent match request!', 'success'),
         })
         break;
+      case "MESSAGE":
+
       default:
         break;
     }

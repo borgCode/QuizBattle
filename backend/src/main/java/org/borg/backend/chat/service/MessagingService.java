@@ -2,7 +2,8 @@ package org.borg.backend.chat.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.chat.dto.ConversationDTO;
+import org.borg.backend.chat.dto.ConversationPreviewDTO;
+import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.mapper.ConversationMapper;
 import org.borg.backend.chat.model.Conversation;
@@ -54,8 +55,14 @@ public class MessagingService {
         conversation.setLatestMessage(message);
         conversationRepository.save(conversation);
     }
+    public FullConversationDTO getConversation(Long conversationId) {
+        //TODO implement
+        return null;
+    }
     
-    public List<ConversationDTO> getPlayerConversations(Long playerId) {
+    public List<ConversationPreviewDTO> getPlayerConversations(Long playerId) {
         return ConversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
     }
+
+    
 }

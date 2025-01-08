@@ -2,7 +2,7 @@ package org.borg.backend.chat.service;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.chat.dto.ConversationDTO;
+import org.borg.backend.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
@@ -211,11 +211,11 @@ public class MessageServiceIntegrationTest {
                 expectedMessages.put(sendingPlayer.getId(), message);
             }
             
-            List<ConversationDTO> conversationDTOS = messagingService.getPlayerConversations(receiverPlayer.getId());
+            List<ConversationPreviewDTO> conversationPreviewDTOS = messagingService.getPlayerConversations(receiverPlayer.getId());
             
             assertAll("Post get conversations check",
-                    () -> assertEquals(NUM_OF_PLAYERS, conversationDTOS.size(), String.format("There should be %s conversations", NUM_OF_PLAYERS)),
-                    () -> assertTrue(conversationDTOS.stream()
+                    () -> assertEquals(NUM_OF_PLAYERS, conversationPreviewDTOS.size(), String.format("There should be %s conversations", NUM_OF_PLAYERS)),
+                    () -> assertTrue(conversationPreviewDTOS.stream()
                                     .allMatch(dto -> expectedMessages.containsKey(dto.getOtherPlayer().getId()) &&
                                             expectedMessages.get(dto.getOtherPlayer().getId())
                                                     .equals(dto.getLatestMessage())),

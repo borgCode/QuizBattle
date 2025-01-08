@@ -1,6 +1,6 @@
 package org.borg.backend.chat.mapper;
 
-import org.borg.backend.chat.dto.ConversationDTO;
+import org.borg.backend.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class ConversationMapper {
 
-    public static ConversationDTO toDTO(Conversation conversation, Long currentPlayerId) {
+    public static ConversationPreviewDTO toDTO(Conversation conversation, Long currentPlayerId) {
         if (conversation == null) {
             return null;
         }
@@ -20,7 +20,7 @@ public class ConversationMapper {
                 ? conversation.getPlayer2()
                 : conversation.getPlayer1();
 
-        return ConversationDTO.builder()
+        return ConversationPreviewDTO.builder()
                 .id(conversation.getId())
                 .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
                 .latestMessageIsRead(conversation.isLatestMessageIsRead())
@@ -28,7 +28,7 @@ public class ConversationMapper {
                 .build();
     }
 
-    public static List<ConversationDTO> multipleToDTO(List<Conversation> conversations, Long currentPlayerId) {
+    public static List<ConversationPreviewDTO> multipleToDTO(List<Conversation> conversations, Long currentPlayerId) {
         if (conversations == null || conversations.isEmpty()) {
             return Collections.emptyList();
         }
