@@ -7,6 +7,8 @@ import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
 import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
+import org.borg.backend.player.model.Player;
+import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +20,20 @@ public class MessagingService {
 
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
+    private final PlayerRepository playerRepository;
 
     @Transactional
     public void sendMessage(SendMessageRequest request) {
         Conversation conversation;
         if (request.getConversationId() == null) {
+            Player player1 = playerRepository.findById(request.getSenderId())
+                    .orElseThrow(() -> new EntityNotFoundException("Sender not found"));
+            Player player2 = playerRepository.findById(request.getReceiverId())
+                    .orElseThrow(() -> new EntityNotFoundException("Receiver not found"));
+
             conversation = conversationRepository.save(Conversation.builder()
-                    .player1Id(request.getSenderId())
-                    .player2Id(request.getReceiverId())
+                    .player1(player1)
+                    .player2(player2)
                     .build());
         } else {
             conversation = conversationRepository.findById(request.getConversationId())
@@ -43,4 +51,6 @@ public class MessagingService {
         conversation.setLatestMessage(message);
         conversationRepository.save(conversation);
     }
+    
+    
 }
