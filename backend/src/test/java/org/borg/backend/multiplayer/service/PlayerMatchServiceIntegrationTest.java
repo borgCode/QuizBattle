@@ -8,7 +8,7 @@ import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.multiplayer.dto.RematchRequest;
-import org.borg.backend.multiplayer.dto.RematchResponse;
+import org.borg.backend.multiplayer.dto.MatchResponse;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.model.PendingSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
@@ -88,9 +88,9 @@ public class PlayerMatchServiceIntegrationTest {
 
     @Test
     void rematchRequestWhenNoRequestsHaveBeenSentAndAccept() {
-        RematchResponse rematchResponse = setupRematchScenario();
+        MatchResponse matchResponse = setupRematchScenario();
         
-        playerMatchService.handleRematchAccept(rematchResponse);
+        playerMatchService.handleMatchAccept(matchResponse);
 
         assertAll("Post-accept state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
@@ -108,9 +108,9 @@ public class PlayerMatchServiceIntegrationTest {
 
     @Test
     void rematchRequestWhenNoRequestsHaveBeenSentAndReject() {
-        RematchResponse rematchResponse = setupRematchScenario();
+        MatchResponse matchResponse = setupRematchScenario();
         
-        playerMatchService.handleRematchReject(rematchResponse);
+        playerMatchService.handleMatchReject(matchResponse);
 
         assertAll("Post-reject state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
@@ -125,7 +125,7 @@ public class PlayerMatchServiceIntegrationTest {
         assertEquals(NotificationType.REMATCH_DECLINED, sendingPlayerNotification.getType());
     }
     
-    private RematchResponse setupRematchScenario() {
+    private MatchResponse setupRematchScenario() {
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
         playerMatchService.requestRematch(rematchRequest);
 
@@ -141,11 +141,12 @@ public class PlayerMatchServiceIntegrationTest {
                 () -> assertEquals(NotificationType.REMATCH_REQUEST, opponentNotification.getType())
         );
 
-        return new RematchResponse(
+        return new MatchResponse(
                 opponentNotification.getSenderId(),
                 opponentPlayer.getDisplayName(),
                 opponentNotification.getPendingSessionId(),
-                opponentNotification.getId()
+                opponentNotification.getId(),
+                true
         );
     }
 

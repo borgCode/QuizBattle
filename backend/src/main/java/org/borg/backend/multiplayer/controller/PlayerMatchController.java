@@ -4,7 +4,7 @@ package org.borg.backend.multiplayer.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.multiplayer.dto.RematchRequest;
-import org.borg.backend.multiplayer.dto.RematchResponse;
+import org.borg.backend.multiplayer.dto.MatchResponse;
 import org.borg.backend.multiplayer.service.PlayerMatchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,13 +27,13 @@ public class PlayerMatchController {
     }
 
     @PostMapping("/sessions/accept")
-    public ResponseEntity<Long> acceptRematch(@RequestBody RematchResponse response) {
-        return ResponseEntity.ok(playerMatchService.handleRematchAccept(response));
+    public ResponseEntity<Long> acceptRematch(@RequestBody MatchResponse response) {
+        return ResponseEntity.ok(playerMatchService.handleMatchAccept(response));
     }
 
     @PostMapping("/sessions/reject")
-    public ResponseEntity<Void> rejectRematch(@RequestBody RematchResponse response) {
-        playerMatchService.handleRematchReject(response);
+    public ResponseEntity<Void> rejectRematch(@RequestBody MatchResponse response) {
+        playerMatchService.handleMatchReject(response);
         return ResponseEntity.ok().build();
     }
 }

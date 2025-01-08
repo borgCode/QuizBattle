@@ -5,11 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
-import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.GameException;
 import org.borg.backend.multiplayer.dto.MatchRequest;
+import org.borg.backend.multiplayer.dto.MatchResponse;
 import org.borg.backend.multiplayer.dto.RematchRequest;
-import org.borg.backend.multiplayer.dto.RematchResponse;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
 import org.borg.backend.multiplayer.model.PendingSession;
 import org.borg.backend.multiplayer.repository.MultiplayerSessionRepository;
@@ -21,8 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
-
-import static org.borg.backend.common.enums.NotificationType.*;
 
 @Slf4j
 @Service
@@ -93,44 +90,41 @@ public class PlayerMatchService {
             }
             pendingSessionRepository.delete(pendingSession);
 
-            NotificationType notificationType = originalSession != null ? REMATCH_ACCEPTED : MATCH_ACCEPTED;
-            notificationService.sendMatchStartedNotification(
-                    sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId, notificationType);
-            notificationService.sendMatchStartedNotification(
-                    receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId, notificationType);
+            if (originalSession != null) {
+                notificationService.sendRematchStartedNotification(sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId);
+                notificationService.sendRematchStartedNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
+            } else {
+                notificationService.sendMatchStartedNotification(sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId);
+                notificationService.sendMatchStartedNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
+            }
 
         } else {
             PendingSession newSession = pendingSessionRepository.save(new PendingSession(sendingPlayer.getId(), receivingPlayer.getId()));
-
-            NotificationType notificationType = originalSession != null ? REMATCH_REQUEST : MATCH_REQUEST;
-            notificationService.sendMatchRequestNotification(
-                    receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId(), notificationType);
+            
+            if (originalSession != null) {
+                notificationService.sendRematchRequestNotification(receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
+            } else {
+                notificationService.sendMatchRequestNotification(receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
+            }
         }
     }
 
 
     @Transactional
-    public Long handleRematchAccept(RematchResponse response) {
+    public Long handleMatchAccept(MatchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
         Long newSessionId = createMultiplayerSession(pendingSession);
 
-        notificationService.sendRematchAcceptedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
-
+        if (response.isRematch()) {
+            notificationService.sendRematchAcceptedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
+        } else {
+            notificationService.sendMatchAcceptedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
+        }
         pendingSessionRepository.delete(pendingSession);
         return newSessionId;
     }
 
-    @Transactional
-    public void handleRematchReject(RematchResponse response) {
-        PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
-                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
-
-        notificationService.sendRematchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
-        pendingSessionRepository.delete(pendingSession);
-
-        log.warn("Rematch rejected");
-    }
 
     private Long createMultiplayerSession(PendingSession pendingSession) {
         Player player1 = playerRepository.findById(pendingSession.getRequestingPlayerId())
@@ -146,5 +140,18 @@ public class PlayerMatchService {
                 new MultiplayerSession(player1, player2, startingPlayer));
         return session.getId();
 
+    }
+
+    @Transactional
+    public void handleMatchReject(MatchResponse response) {
+        PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
+                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+
+        if (response.isRematch()) {
+            notificationService.sendRematchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
+        } else {
+            notificationService.sendMatchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
+        }
+        pendingSessionRepository.delete(pendingSession);
     }
 }

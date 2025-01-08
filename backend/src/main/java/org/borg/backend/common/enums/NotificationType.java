@@ -11,5 +11,5 @@ public enum NotificationType {
     GAME_TIED,
     MATCH_REQUEST, 
     MATCH_ACCEPTED,
-    MATCH_REJECTED
+    MATCH_DECLINED,
 }
