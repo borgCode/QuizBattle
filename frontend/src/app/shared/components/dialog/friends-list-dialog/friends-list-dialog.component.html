@@ -3,7 +3,19 @@
   <mat-list>
     <ng-container *ngIf="data.friends.length > 0; else noFriends">
       <mat-list-item *ngFor="let friend of data.friends">
-        {{ friend.displayName }}
+        <div class="row align-items-center bg-light">
+          <div class="player-avatar col-4 p-2">
+            <img [src]="'data:image/jpeg;base64,' + friend.base64Image" style="max-height: 40px; max-width: 40px"
+                 alt="player avatar" class="rounded-circle"/>
+          </div>
+          <div class="player-name col-4 fw-bold">
+            {{ friend.displayName }}
+          </div>
+          <div class="btn btn-success col-4"
+               (click)="sendMatchRequest(friend.id)">
+            Send
+          </div>
+        </div>
       </mat-list-item>
     </ng-container>
     <ng-template #noFriends>

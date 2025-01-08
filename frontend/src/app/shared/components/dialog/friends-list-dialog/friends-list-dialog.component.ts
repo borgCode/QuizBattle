@@ -40,4 +40,8 @@ export class FriendsListDialogComponent {
   closeDialog() {
     this.dialogRef.close();
   }
+
+  sendMatchRequest(id: number) {
+    this.dialogRef.close({friendId: id})
+  }
 }

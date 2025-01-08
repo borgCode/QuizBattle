@@ -16,6 +16,7 @@ import {FriendshipService} from '../../../api/generated/services/friendship.serv
 import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
 import {MultiplayerGameService} from '../../../api/generated/services/multiplayer-game.service';
 import {MultiplayerMatchmakingService} from '../../../api/generated/services/multiplayer-matchmaking.service';
+import {MultiplayerMatchService} from '../../../api/generated/services/multiplayer-match.service';
 
 
 interface MatchDecision {
@@ -47,6 +48,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
   constructor(
     private loginStateService: LoginStateService,
     private multiplayerGameService: MultiplayerGameService,
+    private multiplayerMatchService: MultiplayerMatchService,
     private matchmakingService: MultiplayerMatchmakingService,
     private webSocketService: WebSocketService,
     private friendService: FriendshipService,
@@ -184,8 +186,17 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
       width: '300px',
       disableClose: true,
     })
-    dialogRef.afterClosed().subscribe(() => {
-      console.log("Closed friendsdialog");
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.friendId) {
+        this.multiplayerMatchService.requestMatch({
+          body: {
+            senderId: this.player.id,
+            receiverId: result.friendId
+          }
+        }).subscribe(() => {
+          this.alertMessageService.show("Sent match request!", "success")
+        })
+      }
     })
   }
 
