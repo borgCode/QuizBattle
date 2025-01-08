@@ -7,6 +7,7 @@ import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
 import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.GameException;
+import org.borg.backend.multiplayer.dto.MatchRequest;
 import org.borg.backend.multiplayer.dto.RematchRequest;
 import org.borg.backend.multiplayer.dto.MatchResponse;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
@@ -218,6 +219,37 @@ public class PlayerMatchServiceIntegrationTest {
                 () -> playerMatchService.requestRematch(secondRematchRequest));
 
         assertEquals(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT, exception.getErrorCode());
+    }
+
+    @Test
+    void regularMatchRequestShouldUseCorrectNotificationTypes() {
+        MatchRequest matchRequest = new MatchRequest(sendingPlayer.getId(), opponentPlayer.getId());
+        playerMatchService.requestMatch(matchRequest);
+        
+        PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
+                sendingPlayer.getId(), opponentPlayer.getId());
+        assertNotNull(pendingSession);
+        
+        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId());
+        Notification opponentNotification = opponentNotifications.get(0);
+        assertAll("Regular match notification checks",
+                () -> assertEquals(pendingSession.getId(), opponentNotification.getPendingSessionId()),
+                () -> assertEquals(sendingPlayer.getDisplayName() + " requested a match against you!",
+                        opponentNotification.getMessage()),
+                () -> assertEquals(NotificationType.MATCH_REQUEST, opponentNotification.getType())
+        );
+        
+        MatchResponse response = new MatchResponse(
+                opponentNotification.getSenderId(),
+                opponentPlayer.getDisplayName(),
+                opponentNotification.getPendingSessionId(),
+                opponentNotification.getId(),
+                false
+        );
+        playerMatchService.handleMatchAccept(response);
+
+        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
+        assertEquals(NotificationType.MATCH_ACCEPTED, sendingPlayerNotifications.get(0).getType());
     }
 
    
