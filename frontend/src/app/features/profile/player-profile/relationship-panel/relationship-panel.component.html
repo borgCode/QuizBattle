@@ -23,8 +23,7 @@
               Block player
             </button>
           </li>
-          <!-- Uncomment the following line to add another action -->
-          <!-- <li><button class="dropdown-item">Invite friend to play a game</button></li> -->
+           <li><button class="dropdown-item" (click)="emitSendGameInvite(player.id)">Invite friend to play a game</button></li>
         </ng-container>
         <ng-template #elseBlock>
           <li>

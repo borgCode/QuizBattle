@@ -30,4 +30,8 @@ export class RelationshipPanelComponent {
   emitUnblockPlayer(id: number) {
     this.relationshipActionSelected.emit({playerId: id, action: "UNBLOCK"})
   }
+
+  emitSendGameInvite(id: number) {
+    this.relationshipActionSelected.emit({playerId: id, action: "GAME_REQUEST"})
+  }
 }

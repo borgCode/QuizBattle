@@ -393,7 +393,6 @@ public class MultiplayerService {
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
 
     }
-
-   
+    
 }
             

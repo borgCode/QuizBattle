@@ -248,4 +248,6 @@ public class FriendshipService {
         }
         return friendship.getStatus();
     }
+    
+    
 }

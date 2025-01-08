@@ -7,6 +7,7 @@ import {Router} from '@angular/router';
 import {PlayerService} from '../../../api/generated/services/player.service';
 import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
+import {MultiplayerService} from '../../../api/generated/services/multiplayer.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -28,7 +29,8 @@ export class PlayerProfileComponent implements OnInit {
     private playerService: PlayerService,
     private friendshipService: FriendshipService,
     private router: Router,
-    private alertMessageService: AlertMessageService
+    private alertMessageService: AlertMessageService,
+    private multiplayerService: MultiplayerService
   ) {
   }
 
@@ -116,7 +118,15 @@ export class PlayerProfileComponent implements OnInit {
           }
         })
         break;
-      default:
+      // case "GAME_REQUEST":
+      //   this.multiplayerService.requestRematch({
+      //     body: {
+      //       playerId: this.player.id
+      //     }
+      //   }).subscribe({
+      //     next: () => this.alertMessageService.show('Sent match request!', 'success'),
+      //   })
+      // default:
         break;
     }
   }
