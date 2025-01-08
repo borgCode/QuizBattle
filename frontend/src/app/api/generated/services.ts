@@ -8,6 +8,7 @@ export { QuestionsService } from './services/questions.service';
 export { NotificationService } from './services/notification.service';
 export { MultiplayerMatchService } from './services/multiplayer-match.service';
 export { MultiplayerGameService } from './services/multiplayer-game.service';
+export { MessageService } from './services/message.service';
 export { FriendshipService } from './services/friendship.service';
 export { ChapterService } from './services/chapter.service';
 export { AuthenticationService } from './services/authentication.service';

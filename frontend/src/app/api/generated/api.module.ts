@@ -12,6 +12,7 @@ import { QuestionsService } from './services/questions.service';
 import { NotificationService } from './services/notification.service';
 import { MultiplayerMatchService } from './services/multiplayer-match.service';
 import { MultiplayerGameService } from './services/multiplayer-game.service';
+import { MessageService } from './services/message.service';
 import { FriendshipService } from './services/friendship.service';
 import { ChapterService } from './services/chapter.service';
 import { AuthenticationService } from './services/authentication.service';
@@ -32,6 +33,7 @@ import { MultiplayerMatchmakingService } from './services/multiplayer-matchmakin
     NotificationService,
     MultiplayerMatchService,
     MultiplayerGameService,
+    MessageService,
     FriendshipService,
     ChapterService,
     AuthenticationService,
