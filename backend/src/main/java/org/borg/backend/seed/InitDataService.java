@@ -8,7 +8,7 @@ import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.chapter.model.Chapter;
 import org.borg.backend.chapter.repository.ChapterRepository;
-import org.borg.backend.question.dto.Question;
+import org.borg.backend.question.model.Question;
 import org.borg.backend.question.repository.QuestionRepository;
 import org.borg.backend.story.model.Story;
 import org.borg.backend.story.repository.StoryRepository;

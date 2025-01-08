@@ -18,7 +18,7 @@ import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.question.dto.PlayerQuestionResult;
-import org.borg.backend.question.dto.Question;
+import org.borg.backend.question.model.Question;
 import org.borg.backend.question.service.QuestionSessionService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

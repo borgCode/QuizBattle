@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
 import org.borg.backend.game.singleplayer.SinglePlayerQuestionService;
 import org.borg.backend.question.dto.*;
-import org.borg.backend.question.service.QuestionService;
 import org.borg.backend.question.service.QuestionSessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

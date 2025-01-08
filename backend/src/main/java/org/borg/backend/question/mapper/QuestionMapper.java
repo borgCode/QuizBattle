@@ -1,7 +1,7 @@
 package org.borg.backend.question.mapper;
 
 
-import org.borg.backend.question.dto.Question;
+import org.borg.backend.question.model.Question;
 import org.borg.backend.question.dto.QuestionDTO;
 
 import java.util.ArrayList;

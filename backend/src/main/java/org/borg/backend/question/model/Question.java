@@ -1,4 +1,4 @@
-package org.borg.backend.question.dto;
+package org.borg.backend.question.model;
 
 import jakarta.persistence.*;
 import lombok.*;
