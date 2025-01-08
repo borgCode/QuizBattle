@@ -34,4 +34,6 @@ public class Conversation {
     @OneToOne
     @JoinColumn(name = "latest_message_id")
     private Message latestMessage;
+    
+    private boolean latestMessageIsRead;
 }

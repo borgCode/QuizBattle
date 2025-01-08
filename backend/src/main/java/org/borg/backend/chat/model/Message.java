@@ -2,7 +2,6 @@ package org.borg.backend.chat.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.player.model.Player;
 
 import java.time.Instant;
 
