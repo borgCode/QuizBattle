@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RematchRequest {
-    private Long sessionId;
-    private Long playerId;
+public class MatchRequest {
+    private Long senderId;
+    private Long receiverId;
 }

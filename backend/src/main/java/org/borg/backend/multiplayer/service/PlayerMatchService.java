@@ -1,10 +1,13 @@
 package org.borg.backend.multiplayer.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.common.enums.BusinessErrorCodes;
 import org.borg.backend.common.enums.GameStatus;
+import org.borg.backend.common.enums.NotificationType;
 import org.borg.backend.common.exceptions.GameException;
+import org.borg.backend.multiplayer.dto.MatchRequest;
 import org.borg.backend.multiplayer.dto.RematchRequest;
 import org.borg.backend.multiplayer.dto.RematchResponse;
 import org.borg.backend.multiplayer.model.MultiplayerSession;
@@ -17,8 +20,9 @@ import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
+
+import static org.borg.backend.common.enums.NotificationType.*;
 
 @Slf4j
 @Service
@@ -29,8 +33,18 @@ public class PlayerMatchService {
     private final PendingSessionRepository pendingSessionRepository;
     private final PlayerRepository playerRepository;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
-    
-    
+
+
+    @Transactional
+    public void requestMatch(MatchRequest matchRequest) {
+        Player sendingPlayer = playerRepository.findById(matchRequest.getSenderId())
+                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+        Player receivingPlayer = playerRepository.findById(matchRequest.getReceiverId())
+                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+
+        handleMatchRequest(sendingPlayer, receivingPlayer, null);
+
+    }
 
     @Transactional
     public void requestRematch(RematchRequest rematchRequest) {
@@ -53,55 +67,47 @@ public class PlayerMatchService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Opponent not found in session"));
 
-        if (multiplayerSessionRepository.checkIfOngoingSessionExists(sendingPlayer, opponentPlayer, GameStatus.ACTIVE)) {
+        handleMatchRequest(sendingPlayer, opponentPlayer, session);
+
+    }
+
+    private void handleMatchRequest(Player sendingPlayer, Player receivingPlayer, MultiplayerSession originalSession) {
+        if (multiplayerSessionRepository.checkIfOngoingSessionExists(sendingPlayer, receivingPlayer, GameStatus.ACTIVE)) {
             throw new GameException(BusinessErrorCodes.GAME_ALREADY_ONGOING);
         }
 
-        if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), opponentPlayer.getId())) {
-            log.warn("Sending player id: {} opponent id: {}", sendingPlayer.getId(), opponentPlayer.getId());
+        if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), receivingPlayer.getId())) {
             throw new GameException(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT);
         }
-        log.warn("Creating pending session");
-
-        PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(opponentPlayer.getId(), sendingPlayer.getId());
-        log.warn("Pending session is: " + pendingSession);
+        PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(receivingPlayer.getId(), sendingPlayer.getId());
 
         if (pendingSession != null) {
 
-            log.warn("Has pending session");
+            Player startingPlayer = Math.random() < 0.5 ? sendingPlayer : receivingPlayer;
 
-            Long newSessionId = createRematchSession(session);
-            log.warn("new session id: {}", newSessionId);
+            Long newSessionId = multiplayerSessionRepository.save(
+                    new MultiplayerSession(sendingPlayer, receivingPlayer, startingPlayer)).getId();
 
-
-            //Delete original notification
-            notificationService.deleteMatchRequestNotification(playerId, pendingSession.getId());
-
+            if (originalSession != null) {
+                notificationService.deleteMatchRequestNotification(sendingPlayer.getId(), pendingSession.getId());
+            }
             pendingSessionRepository.delete(pendingSession);
 
-
-            notificationService.sendRematchStartedNotification(playerId, opponentPlayer.getDisplayName(), newSessionId);
-            notificationService.sendRematchStartedNotification(opponentPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
-
+            NotificationType notificationType = originalSession != null ? REMATCH_ACCEPTED : MATCH_ACCEPTED;
+            notificationService.sendMatchStartedNotification(
+                    sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId, notificationType);
+            notificationService.sendMatchStartedNotification(
+                    receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId, notificationType);
 
         } else {
-            log.warn("No existing session, creating new pending");
+            PendingSession newSession = pendingSessionRepository.save(new PendingSession(sendingPlayer.getId(), receivingPlayer.getId()));
 
-            PendingSession newSession = pendingSessionRepository.save(new PendingSession(playerId, opponentPlayer.getId()));
-            notificationService.sendRematchRequestNotification(opponentPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
+            NotificationType notificationType = originalSession != null ? REMATCH_REQUEST : MATCH_REQUEST;
+            notificationService.sendMatchRequestNotification(
+                    receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId(), notificationType);
         }
     }
 
-    private Long createRematchSession(MultiplayerSession session) {
-        List<Player> players = session.getPlayers();
-
-        Player startingPlayer = Math.random() < 0.5 ? players.get(0) : players.get(1);
-
-
-        MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(
-                new MultiplayerSession(players.get(0), players.get(1), startingPlayer));
-        return multiplayerSession.getId();
-    }
 
     @Transactional
     public Long handleRematchAccept(RematchResponse response) {
@@ -122,7 +128,7 @@ public class PlayerMatchService {
 
         notificationService.sendRematchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
         pendingSessionRepository.delete(pendingSession);
-        
+
         log.warn("Rematch rejected");
     }
 

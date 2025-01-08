@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class MultiplayerServiceRematchIntegrationTest {
+public class PlayerMatchServiceIntegrationTest {
     @Autowired
     private NotificationRepository notificationRepository;
     @Autowired

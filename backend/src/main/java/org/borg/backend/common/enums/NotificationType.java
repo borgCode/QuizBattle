@@ -9,4 +9,7 @@ public enum NotificationType {
     GAME_WON,
     GAME_LOST,
     GAME_TIED,
+    MATCH_REQUEST, 
+    MATCH_ACCEPTED,
+    MATCH_REJECTED
 }

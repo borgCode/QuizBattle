@@ -38,14 +38,14 @@ public class NotificationService {
         buildAndSaveNotification(receiverId, sendingPlayer.getId(), NotificationType.FRIEND_ACCEPTED, message, null, null);
     }
 
-    public void sendRematchStartedNotification(Long receivingId, String senderDisplayName, Long newSessionId) {
+    public void sendMatchStartedNotification(Long receivingId, String senderDisplayName, Long newSessionId, NotificationType type) {
         String message = "Your rematch request against " + senderDisplayName + " was accepted!";
-        buildAndSaveNotification(receivingId, null, NotificationType.REMATCH_ACCEPTED, message, newSessionId, null);
+        buildAndSaveNotification(receivingId, null, type, message, newSessionId, null);
     }
 
-    public void sendRematchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId ) {
+    public void sendMatchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId, NotificationType type) {
         String message = senderDisplayName + " requested a rematch against you!";
-        buildAndSaveNotification(receivingId, senderId, NotificationType.REMATCH_REQUEST, message, null, pendingSessionId);
+        buildAndSaveNotification(receivingId, senderId, type, message, null, pendingSessionId);
     }
 
     public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
