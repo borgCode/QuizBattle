@@ -179,7 +179,6 @@ public class PlayerMatchServiceIntegrationTest {
 
         assertTrue(multiplayerSessionRepository.checkIfOngoingSessionExists(
                 sendingPlayer, opponentPlayer, GameStatus.ACTIVE));
-
     }
 
     @Test
@@ -251,8 +250,6 @@ public class PlayerMatchServiceIntegrationTest {
         List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
         assertEquals(NotificationType.MATCH_ACCEPTED, sendingPlayerNotifications.get(0).getType());
     }
-
-   
 }
 
 
