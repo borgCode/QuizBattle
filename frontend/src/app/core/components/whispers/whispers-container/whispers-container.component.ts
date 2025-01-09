@@ -21,6 +21,6 @@ export class WhispersContainerComponent {
   constructor(
     private whisperWindowService: WhisperWindowService
   ) {
-    this.conversations$ = whisperWindowService.conversations$;
+    this.conversations$ = this.whisperWindowService.conversations$;
   }
 }

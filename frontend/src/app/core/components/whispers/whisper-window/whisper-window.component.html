@@ -12,7 +12,7 @@
       </div>
     </div>
   </div>
-  <div class="message-area">
+  <div class="message-area" #messageArea>
     <ng-container *ngFor="let message of conversation.messages">
       <ng-container *ngIf="message.senderId == this.storedPlayer.id; else elseBlock">
         <div class="message-item text-break">
@@ -27,8 +27,7 @@
         </div>
       </ng-template>
     </ng-container>
-    <div class="message-item text-break"
-    *ngIf="(message$ | async) as message">
+    <ng-container *ngFor="let message of newMessages$ | async">
       <ng-container *ngIf="message.senderId == this.storedPlayer.id; else elseBlock">
         <div class="message-item text-break">
           <span class="player">{{ this.storedPlayer.displayName }}: </span>
@@ -41,7 +40,7 @@
           <span class="message-text">{{ message.content }}</span>
         </div>
       </ng-template>
-    </div>
+    </ng-container>
   </div>
   <div class="d-flex message-input-box">
     <input id="message-input" class="flex-grow-1" placeholder="Send message" [(ngModel)]="messageToSend">
