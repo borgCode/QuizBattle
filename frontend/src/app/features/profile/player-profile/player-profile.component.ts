@@ -133,7 +133,9 @@ export class PlayerProfileComponent implements OnInit {
             receiverId: $event.playerId
           }
         }).subscribe({
-          next: () => this.alertMessageService.show('Sent match request!', 'success'),
+          next: conversation => {
+
+          },
         })
         break;
       default:
