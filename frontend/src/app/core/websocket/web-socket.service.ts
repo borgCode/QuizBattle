@@ -31,6 +31,9 @@ export class WebSocketService {
         debug: msg => {
           console.log(msg);
         },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
         onConnect: (frame) => {
           if (!frame?.headers?.['user-name']) {
             this.stompClient?.deactivate();
@@ -42,13 +45,14 @@ export class WebSocketService {
         },
         onDisconnect: () => {
           console.log("Disconnected from websocket");
+          this.connectionState$.next(false);
         },
 
       });
 
       this.stompClient.activate();
     } else {
-      console.error("Token no available");
+      console.error("Token not available");
     }
 
   }
