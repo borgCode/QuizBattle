@@ -93,6 +93,7 @@ public class MessageServiceIntegrationTest {
             SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
                     .senderId(player1.getId())
                     .receiverId(player2.getId())
+                    .receiverUsername(player2.getUsername())
                     .conversationId(conversation.getId())
                     .message("Hello friend")
                     .build();
@@ -124,6 +125,7 @@ public class MessageServiceIntegrationTest {
             SendMessageRequest firstMessageRequest = SendMessageRequest.builder()
                     .senderId(player1.getId())
                     .receiverId(player2.getId())
+                    .receiverUsername(player2.getUsername())
                     .conversationId(conversation.getId())
                     .message("Hello friend")
                     .build();
@@ -135,6 +137,7 @@ public class MessageServiceIntegrationTest {
             SendMessageRequest secondMessageRequest = SendMessageRequest.builder()
                     .senderId(player2.getId())
                     .receiverId(player1.getId())
+                    .receiverUsername(player1.getUsername())
                     .conversationId(conversationId)
                     .message("Hello back")
                     .build();
@@ -179,6 +182,7 @@ public class MessageServiceIntegrationTest {
                 messagingService.sendMessage(SendMessageRequest.builder()
                         .senderId(sendingPlayer.getId())
                         .receiverId(receiverPlayer.getId())
+                        .receiverUsername(receiverPlayer.getUsername())
                         .conversationId(conversation.getId())
                         .message(message)
                         .build());
@@ -197,8 +201,8 @@ public class MessageServiceIntegrationTest {
                             "Each conversation should have matching sender ID and message content")
             );
         }
-        
+
     }
-    
-    
+
+
 }
