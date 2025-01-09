@@ -36,11 +36,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(
                                         "/auth/**",
-                                        "/api/**",
-                                        "/user/**",
-                                        "/player/**",
-                                        "/questions/**",
-                                        "/notification/**",
                                         "/socket/**",
                                         "/v3/api-docs",
                                         "/v3/api-docs/**",
@@ -57,7 +52,6 @@ public class SecurityConfig {
                 ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         
         return http.build();
