@@ -8,4 +8,5 @@
   padding-bottom: 5px;
   padding-right: 5px;
   overflow-x: auto;
+  pointer-events: none;
 }

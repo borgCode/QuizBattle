@@ -64,9 +64,8 @@ export class WhisperWindowService {
 
   sendMessage(param: {
     messageRequest: {
-      senderId: number; receiverId: number; conversationId: number; userName: string; message: string }
+      senderId: number; receiverId: number; conversationId: number; receiverUsername: string; message: string }
   }) {
     this.webSocketService.sendMessage("/app/messages/send", param.messageRequest);
-
   }
 }

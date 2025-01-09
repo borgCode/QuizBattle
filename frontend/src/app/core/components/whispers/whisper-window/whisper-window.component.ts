@@ -31,7 +31,7 @@ export class WhisperWindowComponent {
     console.log("Sending message")
     this.whisperWindowService.sendMessage({
       messageRequest: {
-        userName: userName,
+        receiverUsername: userName,
         senderId: this.storedPlayerId,
         conversationId: conversationId,
         receiverId: receiverId,

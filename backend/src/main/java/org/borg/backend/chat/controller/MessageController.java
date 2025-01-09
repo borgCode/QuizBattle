@@ -25,8 +25,9 @@ public class MessageController {
 
     private final MessagingService messagingService;
 
-    @MessageMapping("/send")
+    @MessageMapping("/messages/send")
     public void sendMessage(@Payload SendMessageRequest messageRequest) {
+        log.warn("Receiving message");
         messagingService.sendMessage(messageRequest);
     }
     

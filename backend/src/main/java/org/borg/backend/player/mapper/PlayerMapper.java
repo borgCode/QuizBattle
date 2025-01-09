@@ -37,6 +37,7 @@ public class PlayerMapper {
     public static PlayerConversationDTO toPlayerConversationDTO(Player player) {
         return PlayerConversationDTO.builder()
                 .id(player.getId())
+                .userName(player.getUsername())
                 .displayName(player.getDisplayName())
                 .base64Image(ImageUtil.encodeAvatarImageFileToBase64(player.getAvatarPath()))
                 .build();

@@ -4,6 +4,8 @@
   max-width: 100%;
   background: #A0A0A0;
 
+  pointer-events: auto;
+
   border: 3px solid black;
 }
 
