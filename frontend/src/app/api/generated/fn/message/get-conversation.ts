@@ -8,16 +8,17 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { ConversationRequest } from '../../models/conversation-request';
 import { FullConversationDto } from '../../models/full-conversation-dto';
 
 export interface GetConversation$Params {
-  conversationId: number;
+  request: ConversationRequest;
 }
 
 export function getConversation(http: HttpClient, rootUrl: string, params: GetConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<FullConversationDto>> {
   const rb = new RequestBuilder(rootUrl, getConversation.PATH, 'get');
   if (params) {
-    rb.path('conversationId', params.conversationId, {});
+    rb.query('request', params.request, {});
   }
 
   return http.request(
@@ -30,4 +31,4 @@ export function getConversation(http: HttpClient, rootUrl: string, params: GetCo
   );
 }
 
-getConversation.PATH = '/messages/conversations/{conversationId}';
+getConversation.PATH = '/messages/conversation';

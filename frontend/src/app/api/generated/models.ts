@@ -10,6 +10,7 @@ export { CategoryStats } from './models/category-stats';
 export { ChapterDto } from './models/chapter-dto';
 export { ChapterNoCategoriesDto } from './models/chapter-no-categories-dto';
 export { ConversationPreviewDto } from './models/conversation-preview-dto';
+export { ConversationRequest } from './models/conversation-request';
 export { FullConversationDto } from './models/full-conversation-dto';
 export { GameStateResponse } from './models/game-state-response';
 export { InitiateProgressRequest } from './models/initiate-progress-request';

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CreateConversationRequest {
+public class ConversationRequest {
     private Long senderId;
     private Long receiverId;
     

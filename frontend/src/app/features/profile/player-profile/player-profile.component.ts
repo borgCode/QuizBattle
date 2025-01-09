@@ -8,6 +8,7 @@ import {PlayerService} from '../../../api/generated/services/player.service';
 import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
 import {MultiplayerMatchService} from '../../../api/generated/services/multiplayer-match.service';
+import {MessageService} from '../../../api/generated/services/message.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -30,7 +31,8 @@ export class PlayerProfileComponent implements OnInit {
     private friendshipService: FriendshipService,
     private router: Router,
     private alertMessageService: AlertMessageService,
-    private multiplayerMatchService: MultiplayerMatchService
+    private multiplayerMatchService: MultiplayerMatchService,
+    private messageService: MessageService
   ) {
   }
 
@@ -126,7 +128,16 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "MESSAGE":
-
+      // case "MATCH_REQUEST":
+      //   this.messageService.({
+      //     body: {
+      //       senderId: this.player.id,
+      //       receiverId: $event.playerId
+      //     }
+      //   }).subscribe({
+      //     next: () => this.alertMessageService.show('Sent match request!', 'success'),
+      //   })
+      //   break;
       default:
         break;
     }

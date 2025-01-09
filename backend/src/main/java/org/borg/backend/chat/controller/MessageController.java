@@ -3,6 +3,7 @@ package org.borg.backend.chat.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
+import org.borg.backend.chat.dto.ConversationRequest;
 import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.service.MessagingService;
@@ -26,9 +27,9 @@ public class MessageController {
         return ResponseEntity.ok().build();
     }
     
-    @GetMapping("/conversations/{conversationId}")
-    public ResponseEntity<FullConversationDTO> getConversation(@PathVariable Long conversationId) {
-        return ResponseEntity.ok(messagingService.getConversation(conversationId));
+    @GetMapping("/conversation")
+    public ResponseEntity<FullConversationDTO> getConversation(@RequestBody ConversationRequest request) {
+        return ResponseEntity.ok(messagingService.getConversation(request));
     }
     
     @GetMapping("/conversations/{playerId}")

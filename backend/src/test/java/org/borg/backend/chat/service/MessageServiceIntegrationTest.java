@@ -3,7 +3,6 @@ package org.borg.backend.chat.service;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
-import org.borg.backend.chat.dto.CreateConversationRequest;
 import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.model.Conversation;
@@ -12,7 +11,10 @@ import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -86,7 +88,7 @@ public class MessageServiceIntegrationTest {
 
         @Test
         void createConversationAndSendMessage() {
-            FullConversationDTO conversation = messagingService.createConversation(new CreateConversationRequest(player1.getId(), player2.getId()));
+            FullConversationDTO conversation = messagingService.createConversation(player1.getId(), player2.getId());
 
             SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
                     .senderId(player1.getId())
@@ -117,7 +119,7 @@ public class MessageServiceIntegrationTest {
 
         @Test
         void sendMessageBackAndForth() {
-            FullConversationDTO conversation = messagingService.createConversation(new CreateConversationRequest(player1.getId(), player2.getId()));
+            FullConversationDTO conversation = messagingService.createConversation(player1.getId(), player2.getId());
 
             SendMessageRequest firstMessageRequest = SendMessageRequest.builder()
                     .senderId(player1.getId())
@@ -172,7 +174,7 @@ public class MessageServiceIntegrationTest {
                 Player sendingPlayer = players.get(i);
                 String message = "Hello from " + sendingPlayer.getDisplayName();
 
-                FullConversationDTO conversation = messagingService.createConversation(new CreateConversationRequest(sendingPlayer.getId(), receiverPlayer.getId()));
+                FullConversationDTO conversation = messagingService.createConversation(sendingPlayer.getId(), receiverPlayer.getId());
 
                 messagingService.sendMessage(SendMessageRequest.builder()
                         .senderId(sendingPlayer.getId())

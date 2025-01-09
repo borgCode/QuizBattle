@@ -3,7 +3,7 @@ package org.borg.backend.chat.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
-import org.borg.backend.chat.dto.CreateConversationRequest;
+import org.borg.backend.chat.dto.ConversationRequest;
 import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.mapper.ConversationMapper;
@@ -27,20 +27,6 @@ public class MessagingService {
     private final MessageRepository messageRepository;
     private final PlayerRepository playerRepository;
     
-    
-    public FullConversationDTO createConversation(CreateConversationRequest request) {
-        Player player1 = playerRepository.findById(request.getSenderId())
-                .orElseThrow(() -> new EntityNotFoundException("Sender not found"));
-        Player player2 = playerRepository.findById(request.getReceiverId())
-                .orElseThrow(() -> new EntityNotFoundException("Receiver not found"));
-
-        Conversation conversation = conversationRepository.save(Conversation.builder()
-                .player1(player1)
-                .player2(player2)
-                .build());
-        return ConversationMapper.toFullConversationDTO(conversation, request.getSenderId());
-    }
-
     @Transactional
     public void sendMessage(SendMessageRequest request) {
 
@@ -57,14 +43,28 @@ public class MessagingService {
         conversation.setLatestMessage(message);
         conversationRepository.save(conversation);
     }
-    public FullConversationDTO getConversation(Long conversationId) {
-        //TODO implement
-        return null;
+    public FullConversationDTO getConversation(ConversationRequest conversationRequest) {
+        Conversation conversation = conversationRepository.findByBothPlayerIds(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
+        if (conversation == null) {
+            return createConversation(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
+        }
+        return ConversationMapper.toFullConversationDTO(conversation, conversationRequest.getSenderId());
+    }
+    
+    public FullConversationDTO createConversation(Long senderId, Long receiverId) {
+        Player player1 = playerRepository.findById(senderId)
+                .orElseThrow(() -> new EntityNotFoundException("Sender not found"));
+        Player player2 = playerRepository.findById(receiverId)
+                .orElseThrow(() -> new EntityNotFoundException("Receiver not found"));
+
+        Conversation conversation = conversationRepository.save(Conversation.builder()
+                .player1(player1)
+                .player2(player2)
+                .build());
+        return ConversationMapper.toFullConversationDTO(conversation, senderId);
     }
     
     public List<ConversationPreviewDTO> getPlayerConversations(Long playerId) {
         return ConversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
     }
-
-    
 }

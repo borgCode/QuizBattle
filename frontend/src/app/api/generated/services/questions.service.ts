@@ -14,8 +14,6 @@ import { StrictHttpResponse } from '../strict-http-response';
 import { AnswerValidationResponse } from '../models/answer-validation-response';
 import { clearPlayerSession } from '../fn/questions/clear-player-session';
 import { ClearPlayerSession$Params } from '../fn/questions/clear-player-session';
-import { clearRoundResults } from '../fn/questions/clear-round-results';
-import { ClearRoundResults$Params } from '../fn/questions/clear-round-results';
 import { getActiveSessionQuestions } from '../fn/questions/get-active-session-questions';
 import { GetActiveSessionQuestions$Params } from '../fn/questions/get-active-session-questions';
 import { getNewQuestionsForCategory } from '../fn/questions/get-new-questions-for-category';
@@ -162,31 +160,6 @@ export class QuestionsService extends BaseService {
   getSinglePlayerRoundQuestions(params: GetSinglePlayerRoundQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
     return this.getSinglePlayerRoundQuestions$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
-    );
-  }
-
-  /** Path part for operation `clearRoundResults()` */
-  static readonly ClearRoundResultsPath = '/questions/chapter/clear-answers/{playerId}';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `clearRoundResults()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  clearRoundResults$Response(params: ClearRoundResults$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return clearRoundResults(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `clearRoundResults$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  clearRoundResults(params: ClearRoundResults$Params, context?: HttpContext): Observable<void> {
-    return this.clearRoundResults$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 

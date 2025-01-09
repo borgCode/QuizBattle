@@ -77,7 +77,7 @@ export class MessageService extends BaseService {
   }
 
   /** Path part for operation `getConversation()` */
-  static readonly GetConversationPath = '/messages/conversations/{conversationId}';
+  static readonly GetConversationPath = '/messages/conversation';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
