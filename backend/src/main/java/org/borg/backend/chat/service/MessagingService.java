@@ -2,6 +2,7 @@ package org.borg.backend.chat.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.chat.dto.ConversationRequest;
 import org.borg.backend.chat.dto.FullConversationDTO;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessagingService {
@@ -29,6 +31,7 @@ public class MessagingService {
     
     @Transactional
     public void sendMessage(SendMessageRequest request) {
+        log.warn("Sending message");
 
         Conversation conversation = conversationRepository.findById(request.getConversationId())
                 .orElseThrow(() -> new EntityNotFoundException("Conversation not found"));

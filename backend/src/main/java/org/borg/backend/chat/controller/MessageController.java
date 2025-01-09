@@ -2,6 +2,7 @@ package org.borg.backend.chat.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.chat.dto.ConversationRequest;
 import org.borg.backend.chat.dto.FullConversationDTO;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("messages")
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class MessageController {
 
     @PostMapping("/send")
     public ResponseEntity<Void> sendMessage(SendMessageRequest messageRequest) {
+        log.warn("Receiving message");
         messagingService.sendMessage(messageRequest);
         return ResponseEntity.ok().build();
     }

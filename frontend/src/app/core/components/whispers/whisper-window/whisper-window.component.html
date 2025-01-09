@@ -2,9 +2,10 @@
   <div class="title-bar">
     <div class="d-flex justify-content-between ">
       <div class="player-info justify-content-start d-flex align-items-center">
-        <img [src]="'data:image/jpeg;base64,' + conversation.otherPlayer.base64Image" style="max-height: 40px; max-width: 40px"
+        <img [src]="'data:image/jpeg;base64,' + conversation.otherPlayer.base64Image"
+             style="max-height: 40px; max-width: 40px"
              alt="player avatar" class="rounded-circle"/>
-        <h6 class="ms-2">{{conversation.otherPlayer.displayName}}</h6>
+        <h6 class="ms-2">{{ conversation.otherPlayer.displayName }}</h6>
       </div>
       <div class="btn btn-light d-flex">
         <i class="fa-solid fa-x"></i>
@@ -12,36 +13,15 @@
     </div>
   </div>
   <div class="message-area">
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
-    <div class="message-item text-break">
-      <span>asdasdasdasdasdasdasdaasdadsaasdsadasdsadsadasadasadadadas</span>
-    </div>
+    <ng-container *ngFor="let message of conversation.messages">
+      <div class="message-item text-break">
+        <span>{{message.content}}</span>
+      </div>
+    </ng-container>
   </div>
   <div class="d-flex message-input-box">
-  <input class="flex-grow-1" placeholder="Send message">
-<button class="btn-success">Send</button>
+    <input id="message-input" class="flex-grow-1" placeholder="Send message" [(ngModel)]="message">
+    <button class="btn-success"
+    (click)="sendMessage(conversation.id, conversation.otherPlayer.id)">Send</button>
   </div>
 </div>
