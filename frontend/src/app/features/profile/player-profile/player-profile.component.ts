@@ -128,16 +128,14 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "MESSAGE":
-      // case "MATCH_REQUEST":
-      //   this.messageService.({
-      //     body: {
-      //       senderId: this.player.id,
-      //       receiverId: $event.playerId
-      //     }
-      //   }).subscribe({
-      //     next: () => this.alertMessageService.show('Sent match request!', 'success'),
-      //   })
-      //   break;
+        this.messageService.getConversation({request: {
+            senderId: this.player.id,
+            receiverId: $event.playerId
+          }
+        }).subscribe({
+          next: () => this.alertMessageService.show('Sent match request!', 'success'),
+        })
+        break;
       default:
         break;
     }
