@@ -75,4 +75,7 @@ export class WhisperWindowComponent implements AfterViewChecked{
     })
   }
 
+  closeConversation() {
+    this.whisperWindowService.removeFromConversations(this.conversation);
+  }
 }
