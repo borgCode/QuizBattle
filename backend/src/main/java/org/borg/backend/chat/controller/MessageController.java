@@ -9,6 +9,8 @@ import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.service.MessagingService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +25,9 @@ public class MessageController {
 
     private final MessagingService messagingService;
 
-    @PostMapping("/send")
-    public ResponseEntity<Void> sendMessage(SendMessageRequest messageRequest) {
-        log.warn("Receiving message");
+    @MessageMapping("/send")
+    public void sendMessage(@Payload SendMessageRequest messageRequest) {
         messagingService.sendMessage(messageRequest);
-        return ResponseEntity.ok().build();
     }
     
     @PostMapping("/conversation")

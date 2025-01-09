@@ -17,38 +17,11 @@ import { getConversation } from '../fn/message/get-conversation';
 import { GetConversation$Params } from '../fn/message/get-conversation';
 import { getPlayerConversations } from '../fn/message/get-player-conversations';
 import { GetPlayerConversations$Params } from '../fn/message/get-player-conversations';
-import { sendMessage } from '../fn/message/send-message';
-import { SendMessage$Params } from '../fn/message/send-message';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
-  }
-
-  /** Path part for operation `sendMessage()` */
-  static readonly SendMessagePath = '/messages/send';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `sendMessage()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  sendMessage$Response(params: SendMessage$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return sendMessage(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `sendMessage$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  sendMessage(params: SendMessage$Params, context?: HttpContext): Observable<void> {
-    return this.sendMessage$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
   }
 
   /** Path part for operation `getConversation()` */

@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core';
 import {FullConversationDto} from '../../../../api/generated/models/full-conversation-dto';
 import {NgForOf} from '@angular/common';
-import {MessageService} from '../../../../api/generated/services/message.service';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {FormsModule} from '@angular/forms';
+import {WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
 
 @Component({
   selector: 'app-whisper-window',
@@ -21,25 +21,23 @@ export class WhisperWindowComponent {
   message: string
 
   constructor(
-    private messageService: MessageService,
+    private whisperWindowService: WhisperWindowService,
     private loginStateService: LoginStateService
   ) {
     this.storedPlayerId = this.loginStateService.loggedInUser.id;
   }
 
-  sendMessage(conversationId: number, receiverId: number) {
+  sendMessage(conversationId: number, receiverId: number, userName: string) {
     console.log("Sending message")
-    this.messageService.sendMessage({
+    this.whisperWindowService.sendMessage({
       messageRequest: {
+        userName: userName,
         senderId: this.storedPlayerId,
         conversationId: conversationId,
         receiverId: receiverId,
         message: this.message
       }
-    }).subscribe({
-      error: err => {
-        console.log(err)
-      }
     })
   }
+
 }

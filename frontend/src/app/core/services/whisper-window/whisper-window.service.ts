@@ -1,6 +1,16 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FullConversationDto} from '../../../api/generated/models/full-conversation-dto';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {WebSocketService} from '../../websocket/web-socket.service';
+import {filter} from 'rxjs/operators';
+
+export interface Message {
+  id: number,
+  senderId: number,
+  sentAt: string,
+  isRead: boolean,
+  content: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -8,14 +18,31 @@ import {BehaviorSubject, Observable} from 'rxjs';
 export class WhisperWindowService {
   private openConversations = new BehaviorSubject<FullConversationDto[]>([]);
 
+  private messageSubject = new Subject<Message>()
+  message$ = this.messageSubject.asObservable();
 
-  constructor() { }
+
+  constructor(
+    private webSocketService: WebSocketService
+
+  ) {
+    this.webSocketService.isConnected$
+      .pipe(
+        filter(connected => connected)
+      )
+      .subscribe(() => {
+        this.webSocketService.subscribe("/user/queue/message", message => {
+          this.messageSubject.next(message);
+        });
+      });
+  }
 
   addToConversations(conversation: FullConversationDto) {
     const currentConversations = this.openConversations.getValue();
     if (currentConversations.indexOf(conversation) === -1) {
       const newConversations = [...currentConversations, conversation];
       this.openConversations.next(newConversations);
+
     }
   }
 
@@ -31,7 +58,15 @@ export class WhisperWindowService {
     }
   }
 
-  get conversations$ () {
+  get conversations$() {
     return this.openConversations.asObservable();
+  }
+
+  sendMessage(param: {
+    messageRequest: {
+      senderId: number; receiverId: number; conversationId: number; userName: string; message: string }
+  }) {
+    this.webSocketService.sendMessage("/app/messages/send", param.messageRequest);
+
   }
 }

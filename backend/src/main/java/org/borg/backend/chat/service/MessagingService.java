@@ -14,6 +14,7 @@ import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +29,10 @@ public class MessagingService {
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
     private final PlayerRepository playerRepository;
-    
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
     @Transactional
     public void sendMessage(SendMessageRequest request) {
-        log.warn("Sending message");
 
         Conversation conversation = conversationRepository.findById(request.getConversationId())
                 .orElseThrow(() -> new EntityNotFoundException("Conversation not found"));
@@ -42,9 +43,11 @@ public class MessagingService {
                 .sentAt(Instant.now())
                 .isRead(false)
                 .build());
-
+        
         conversation.setLatestMessage(message);
         conversationRepository.save(conversation);
+        
+//        simpMessagingTemplate.convertAndSendToUser();
     }
     public FullConversationDTO getConversation(ConversationRequest conversationRequest) {
         Conversation conversation = conversationRepository.findByBothPlayerIds(conversationRequest.getSenderId(), conversationRequest.getReceiverId());

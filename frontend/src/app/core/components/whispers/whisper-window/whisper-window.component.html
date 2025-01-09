@@ -22,6 +22,6 @@
   <div class="d-flex message-input-box">
     <input id="message-input" class="flex-grow-1" placeholder="Send message" [(ngModel)]="message">
     <button class="btn-success"
-    (click)="sendMessage(conversation.id, conversation.otherPlayer.id)">Send</button>
+    (click)="sendMessage(conversation.id, conversation.otherPlayer.id, conversation.otherPlayer.userName)">Send</button>
   </div>
 </div>

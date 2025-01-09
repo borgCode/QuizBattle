@@ -10,5 +10,6 @@ import lombok.Setter;
 public class PlayerConversationDTO {
     private Long id;
     private String displayName;
+    private String userName;
     private String base64Image;
 }

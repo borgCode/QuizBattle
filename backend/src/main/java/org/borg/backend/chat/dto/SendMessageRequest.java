@@ -10,6 +10,7 @@ import lombok.Setter;
 public class SendMessageRequest {
     private Long senderId;
     private Long receiverId;
+    private String receiverUsername;
     private Long conversationId;
     private String message;
 }
