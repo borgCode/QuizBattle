@@ -10,4 +10,13 @@
     </div>
     <input class="search-whispers-input" placeholder="Search for players" type="text">
   </div>
+
+
+  <div class="conversation-list">
+    <div *ngFor="let conversation of unreadConversations$ | async">
+      <div class="notification-item p-3 border-bottom unread position-relative"
+           (click)="markAsRead(conversation.id)">
+      </div>
+    </div>
+  </div>
 </div>

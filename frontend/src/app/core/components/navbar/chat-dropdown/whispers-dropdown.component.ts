@@ -5,11 +5,14 @@ import {MessageService} from '../../../../api/generated/services/message.service
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
+import {AsyncPipe, NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-whispers-dropdown',
-    imports: [
-    ],
+  imports: [
+    AsyncPipe,
+    NgForOf
+  ],
   templateUrl: './whispers-dropdown.component.html',
   styleUrl: './whispers-dropdown.component.css'
 })
@@ -43,7 +46,6 @@ export class WhispersDropdownComponent implements OnInit {
         this.fetchConversations();
       }
     })
-
   }
 
   private fetchConversations() {
@@ -58,5 +60,9 @@ export class WhispersDropdownComponent implements OnInit {
         }
       )
     }
+  }
+
+  markAsRead(conversationId) {
+
   }
 }
