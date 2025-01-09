@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {Client} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {TokenService} from '../services/token/token.service';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
+import {Message} from '../services/whisper-window/whisper-window.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,12 @@ export class WebSocketService {
   private connectionState$ = new BehaviorSubject<boolean>(false);
   public isConnected$ = this.connectionState$.asObservable();
   private subscriptionQueue: { destination: string, callback: (message: any) => void }[] = [];
+
+  private achievementSubject = new Subject<any>();
+  public achievement$ = this.achievementSubject.asObservable();
+
+  private messageSubject = new Subject<Message>()
+  message$ = this.messageSubject.asObservable();
 
   constructor(
     private tokenService: TokenService,
@@ -42,6 +49,7 @@ export class WebSocketService {
           }
           this.connectionState$.next(true);
           this.processSubscriptionQueue();
+          this.initializeAppSubscriptions();
         },
         onDisconnect: () => {
           console.log("Disconnected from websocket");
@@ -61,6 +69,18 @@ export class WebSocketService {
     while (this.subscriptionQueue.length > 0) {
       const sub = this.subscriptionQueue.shift();
       this.initSub(sub.destination, sub.callback);
+    }
+  }
+
+   initializeAppSubscriptions() {
+    if (this.connectionState$.value) {
+      this.subscribe("/user/queue/achievements", message => {
+        this.achievementSubject.next(message);
+      });
+
+      this.subscribe("/user/queue/message", message => {
+        this.messageSubject.next(message);
+      });
     }
   }
 

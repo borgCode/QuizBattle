@@ -26,15 +26,9 @@ export class WhisperWindowService {
     private webSocketService: WebSocketService
 
   ) {
-    this.webSocketService.isConnected$
-      .pipe(
-        filter(connected => connected)
-      )
-      .subscribe(() => {
-        this.webSocketService.subscribe("/user/queue/message", message => {
-          this.messageSubject.next(message);
-        });
-      });
+    this.webSocketService.message$.subscribe(message => {
+      this.messageSubject.next(message);
+    });
   }
 
   addToConversations(conversation: FullConversationDto) {

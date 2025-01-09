@@ -20,17 +20,8 @@ export class AchievementNotificationService {
   constructor(
     private webSocketService: WebSocketService
   ) {
-    this.webSocketService.isConnected$
-      .pipe(
-        filter(connected => connected)
-      )
-      .subscribe(() => {
-        this.subscribeToAchievements();
-      });
-  }
-  private subscribeToAchievements() {
-    this.webSocketService.subscribe("/user/queue/achievements", message => {
+    this.webSocketService.achievement$.subscribe(message => {
       this.achievementSubject.next(message);
-    })
+    });
   }
 }
