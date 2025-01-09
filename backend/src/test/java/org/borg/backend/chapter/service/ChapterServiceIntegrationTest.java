@@ -9,7 +9,7 @@ import org.borg.backend.chapter.dto.InitiateProgressResponse;
 import org.borg.backend.chapter.model.Chapter;
 import org.borg.backend.chapter.repository.ChapterProgressRepository;
 import org.borg.backend.chapter.repository.ChapterRepository;
-import org.borg.backend.common.enums.ProgressStatus;
+import org.borg.backend.shared.enums.ProgressStatus;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;

@@ -3,10 +3,10 @@ package org.borg.backend.multiplayer.service;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.common.enums.BusinessErrorCodes;
-import org.borg.backend.common.enums.GameStatus;
-import org.borg.backend.common.enums.NotificationType;
-import org.borg.backend.common.exceptions.GameException;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.enums.GameStatus;
+import org.borg.backend.shared.enums.NotificationType;
+import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.game.multiplayer.dto.MatchRequest;
 import org.borg.backend.game.multiplayer.dto.RematchRequest;
 import org.borg.backend.game.multiplayer.dto.MatchResponse;

@@ -8,7 +8,7 @@ import org.borg.backend.achievement.model.AchievementNotification;
 import org.borg.backend.achievement.model.UserUnlockedAchievement;
 import org.borg.backend.achievement.repository.AchievementRepository;
 import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
-import org.borg.backend.common.util.ImageUtil;
+import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.model.CategoryStats;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;

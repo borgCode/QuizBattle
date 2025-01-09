@@ -1,4 +1,4 @@
-package org.borg.backend.common.enums;
+package org.borg.backend.shared.enums;
 
 public enum FriendshipStatus {
     PENDING,

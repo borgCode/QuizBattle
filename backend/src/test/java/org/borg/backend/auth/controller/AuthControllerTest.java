@@ -1,12 +1,10 @@
 package org.borg.backend.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.service.AuthService;
-import org.borg.backend.common.enums.BusinessErrorCodes;
-import org.borg.backend.common.exceptions.UserNameAlreadyTakenException;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.UserNameAlreadyTakenException;
 import org.borg.backend.security.JwtFilter;
 import org.borg.backend.security.JwtService;
 import org.borg.backend.security.UserDetailsServiceImpl;
@@ -16,14 +14,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Base64;
-import java.util.Date;
-
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

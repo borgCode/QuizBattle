@@ -1,6 +1,6 @@
 package org.borg.backend.player.mapper;
 
-import org.borg.backend.common.util.ImageUtil;
+import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.dto.PlayerConversationDTO;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.model.Player;

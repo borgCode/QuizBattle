@@ -1,4 +1,4 @@
-package org.borg.backend.common.exceptions;
+package org.borg.backend.shared.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;

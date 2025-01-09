@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.borg.backend.common.enums.GameStatus;
+import org.borg.backend.shared.enums.GameStatus;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.chapter.mapper.ChapterMapper;
 import org.borg.backend.chapter.model.Chapter;
 import org.borg.backend.chapter.repository.ChapterRepository;
-import org.borg.backend.common.enums.ProgressStatus;
-import org.borg.backend.common.util.ImageUtil;
+import org.borg.backend.shared.enums.ProgressStatus;
+import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.dto.PlayerProgressDTO;
 import org.borg.backend.player.mapper.PlayerProgressMapper;
 import org.borg.backend.player.model.Player;
@@ -70,7 +70,6 @@ public class StoryService {
     }
 
     public PlayerProgress getOrCreatePlayerProgress(Long playerId, Story story) {
-        log.warn("Creating player progress");
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(playerId, story.getId());
         
         if (playerProgress == null) {

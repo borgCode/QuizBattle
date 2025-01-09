@@ -1,4 +1,4 @@
-package org.borg.backend.common.enums;
+package org.borg.backend.shared.enums;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

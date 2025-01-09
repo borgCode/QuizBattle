@@ -4,7 +4,7 @@ package org.borg.backend.auth.service;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.common.exceptions.UserNameAlreadyTakenException;
+import org.borg.backend.shared.exceptions.UserNameAlreadyTakenException;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

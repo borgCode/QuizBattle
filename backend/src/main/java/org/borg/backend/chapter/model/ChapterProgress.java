@@ -4,7 +4,7 @@ package org.borg.backend.chapter.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.borg.backend.player.model.PlayerProgress;
-import org.borg.backend.common.enums.ProgressStatus;
+import org.borg.backend.shared.enums.ProgressStatus;
 
 import java.time.LocalDate;
 

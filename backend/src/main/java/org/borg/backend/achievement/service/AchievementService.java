@@ -7,7 +7,7 @@ import org.borg.backend.achievement.model.*;
 import org.borg.backend.achievement.repository.AchievementRepository;
 import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
-import org.borg.backend.common.util.ImageUtil;
+import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.context.event.EventListener;
@@ -19,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.awt.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j

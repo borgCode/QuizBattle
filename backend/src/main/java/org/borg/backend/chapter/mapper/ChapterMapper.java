@@ -3,7 +3,7 @@ package org.borg.backend.chapter.mapper;
 import org.borg.backend.chapter.dto.ChapterDTO;
 import org.borg.backend.chapter.dto.ChapterNoCategoriesDTO;
 import org.borg.backend.chapter.model.Chapter;
-import org.borg.backend.common.util.ImageUtil;
+import org.borg.backend.shared.util.ImageUtil;
 
 
 import java.util.ArrayList;

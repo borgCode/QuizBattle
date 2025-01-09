@@ -1,4 +1,4 @@
-package org.borg.backend.common.util;
+package org.borg.backend.shared.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;

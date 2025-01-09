@@ -2,10 +2,10 @@ package org.borg.backend.friendship.service;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.common.enums.BusinessErrorCodes;
-import org.borg.backend.common.enums.FriendshipStatus;
-import org.borg.backend.common.enums.NotificationType;
-import org.borg.backend.common.exceptions.FriendshipException;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.enums.FriendshipStatus;
+import org.borg.backend.shared.enums.NotificationType;
+import org.borg.backend.shared.exceptions.FriendshipException;
 import org.borg.backend.friendship.dto.PlayerInteraction;
 import org.borg.backend.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.friendship.dto.RelationshipStatusRequest;
@@ -25,7 +25,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

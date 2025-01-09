@@ -4,7 +4,7 @@ package org.borg.backend.friendship.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.common.enums.FriendshipStatus;
+import org.borg.backend.shared.enums.FriendshipStatus;
 import org.borg.backend.friendship.dto.RelationshipsDTO;
 import org.borg.backend.friendship.service.FriendshipService;
 import org.borg.backend.friendship.dto.PlayerInteraction;

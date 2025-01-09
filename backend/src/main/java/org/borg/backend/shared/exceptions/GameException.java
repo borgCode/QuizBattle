@@ -1,8 +1,8 @@
-package org.borg.backend.common.exceptions;
+package org.borg.backend.shared.exceptions;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.borg.backend.common.enums.BusinessErrorCodes;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
 
 @Getter
 @Builder

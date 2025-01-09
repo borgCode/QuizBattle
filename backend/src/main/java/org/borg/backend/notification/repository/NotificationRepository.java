@@ -1,7 +1,7 @@
 package org.borg.backend.notification.repository;
 
 import org.borg.backend.notification.model.Notification;
-import org.borg.backend.common.enums.NotificationType;
+import org.borg.backend.shared.enums.NotificationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

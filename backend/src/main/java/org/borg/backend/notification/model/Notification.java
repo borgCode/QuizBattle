@@ -2,10 +2,9 @@ package org.borg.backend.notification.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.common.enums.NotificationType;
+import org.borg.backend.shared.enums.NotificationType;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

@@ -13,7 +13,7 @@ import org.borg.backend.chapter.model.Chapter;
 import org.borg.backend.chapter.model.ChapterProgress;
 import org.borg.backend.chapter.repository.ChapterProgressRepository;
 import org.borg.backend.chapter.repository.ChapterRepository;
-import org.borg.backend.common.enums.ProgressStatus;
+import org.borg.backend.shared.enums.ProgressStatus;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -41,8 +40,6 @@ public class ChapterService {
 
     @Transactional
     public InitiateProgressResponse initiateProgress(InitiateProgressRequest request) {
-        log.warn("Request params:{}, {}, {}, {}", request.getChapterId(), request.getPlayerId(), request.getPlayerProgressId(), request.getStoryId());
-
         PlayerProgress playerProgress = playerProgressRepository.findById(request.getPlayerProgressId())
                 .orElseThrow(() -> new EntityNotFoundException("Progress not found"));
 
@@ -54,8 +51,7 @@ public class ChapterService {
 
         Chapter chapter = chapterRepository.findById(request.getChapterId())
                 .orElseThrow(() -> new EntityNotFoundException("Chapter not found"));
-
-
+        
         ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(request.getPlayerProgressId(), chapter.getId());
 
         if (chapterProgress == null) {
@@ -69,11 +65,7 @@ public class ChapterService {
 
             chapterProgress = chapterProgressRepository.save(chapterProgress);
         }
-
-        log.warn("Chapter info: {}, {}, {}", chapterProgress.getChapter().getTitle(),
-                chapterProgress.getPlayerProgress().getPlayer().getDisplayName(),
-                chapterProgress.getStartedAt());
-
+        
         return new InitiateProgressResponse(playerProgress.getId(), chapterProgress.getId());
     }
 
@@ -105,11 +97,7 @@ public class ChapterService {
                     playerProgress.getStory().getTitle()
             ));
         }
-
         chapterProgressRepository.save(chapterProgress);
         playerProgressRepository.save(playerProgress);
-
-        
-
     }
 }

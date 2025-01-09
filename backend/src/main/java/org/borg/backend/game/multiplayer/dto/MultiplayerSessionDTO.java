@@ -3,7 +3,7 @@ package org.borg.backend.game.multiplayer.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.common.enums.GameStatus;
+import org.borg.backend.shared.enums.GameStatus;
 import org.borg.backend.player.dto.PlayerDTO;
 
 import java.util.List;
