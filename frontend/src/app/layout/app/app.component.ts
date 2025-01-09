@@ -6,12 +6,16 @@ import {AlertMessageComponent} from '../../core/alert-message/notification/alert
 import {LoginStateService} from '../../core/services/login-state-service/login-state.service';
 import {WebSocketService} from '../../core/websocket/web-socket.service';
 import {AchievementPopupComponent} from '../../core/achievement-popup/achievement-popup.component';
+import {WhisperWindowComponent} from '../../core/components/whispers/whisper-window/whisper-window.component';
+import {
+  WhispersContainerComponent
+} from '../../core/components/whispers/whispers-container/whispers-container.component';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, RouterOutlet, AlertMessageComponent, AchievementPopupComponent],
+  imports: [CommonModule, NavbarComponent, RouterOutlet, AlertMessageComponent, AchievementPopupComponent, WhisperWindowComponent, WhispersContainerComponent],
   templateUrl: 'app.component.html',
   styleUrls: ['./app.component.css']
 })

@@ -1,0 +1,11 @@
+.whispers-container {
+  height: 40%;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  z-index: 9999;
+  padding-left: 5px;
+  padding-bottom: 5px;
+  padding-right: 5px;
+  overflow-x: auto;
+}
