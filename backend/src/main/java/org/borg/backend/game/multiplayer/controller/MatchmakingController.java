@@ -37,7 +37,7 @@ public class MatchmakingController {
     }
     
     @DeleteMapping("/matchmaking/cancel/{playerId}")
-    public ResponseEntity<Void> cancelMatchmaking(@PathVariable Long playerId) {
+    public ResponseEntity<Void> cancelMatchmaking(@PathVariable long playerId) {
         matchMakingService.cancelMatchmaking(playerId);
         return ResponseEntity.noContent().build();
     }

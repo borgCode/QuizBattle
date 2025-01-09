@@ -28,17 +28,17 @@ public class QuestionController {
     private final RoundSessionService roundSessionService;
 
     @GetMapping("/multiplayer/{sessionId}/categories")
-    public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
+    public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable long sessionId) {
         return ResponseEntity.ok(multiplayerQuestionService.getThreeRandomCategories(sessionId));
     }
     
     @GetMapping("/multiplayer/{playerId}/restore")
-    public ResponseEntity<List<QuestionDTO>> restoreSessionQuestions(@PathVariable Long playerId) {
+    public ResponseEntity<List<QuestionDTO>> restoreSessionQuestions(@PathVariable long playerId) {
         return ResponseEntity.ok(multiplayerQuestionService.restoreSessionQuestions(playerId));
     }
     
     @PostMapping("/multiplayer/{playerId}/clear")
-    public ResponseEntity<Void> clearPlayerSession(@PathVariable Long playerId) {
+    public ResponseEntity<Void> clearPlayerSession(@PathVariable long playerId) {
         roundSessionService.finishSession(playerId);
         return ResponseEntity.ok().build();
     }
@@ -54,7 +54,7 @@ public class QuestionController {
     }
 
     @GetMapping("/multiplayer/{sessionId}/{playerId}")
-    public ResponseEntity<List<QuestionDTO>> getActiveSessionQuestions(@PathVariable Long sessionId, @PathVariable Long playerId) {
+    public ResponseEntity<List<QuestionDTO>> getActiveSessionQuestions(@PathVariable long sessionId, @PathVariable long playerId) {
         return ResponseEntity.ok(multiplayerQuestionService.getActiveSessionQuestions(sessionId, playerId));
     }
     
@@ -69,7 +69,7 @@ public class QuestionController {
     }
     
     @GetMapping("/chapter/results/{playerId}")
-    public ResponseEntity<List<Boolean>> getRoundResults(@PathVariable Long playerId) {
+    public ResponseEntity<List<Boolean>> getRoundResults(@PathVariable long playerId) {
         return ResponseEntity.ok(singlePlayerQuestionService.getRoundResults(playerId));
     }
     

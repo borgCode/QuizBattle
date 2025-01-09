@@ -21,7 +21,7 @@ public class StoryController {
     private final StoryService storyService;
 
     @PostMapping("/all/{playerId}")
-    public ResponseEntity<AllStoriesDTO> getAllStories(@PathVariable Long playerId) {
+    public ResponseEntity<AllStoriesDTO> getAllStories(@PathVariable long playerId) {
         return ResponseEntity.ok().body(storyService.getAllStories(playerId));
     }
     

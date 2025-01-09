@@ -3,7 +3,7 @@ package org.borg.backend.auth.service;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.shared.exceptions.UserNameAlreadyTakenException;
+import org.borg.backend.shared.exceptions.DuplicateException;
 import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.mapper.PlayerMapper;
@@ -116,7 +116,7 @@ class AuthServiceTest {
         when(playerRepository.save(any(Player.class)))
                 .thenThrow(new DataIntegrityViolationException("Username already exists"));
 
-        assertThrows(UserNameAlreadyTakenException.class, () ->
+        assertThrows(DuplicateException.class, () ->
                 authService.register(request)
         );
     }

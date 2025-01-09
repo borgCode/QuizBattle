@@ -21,7 +21,7 @@ public class AchievementController {
     private final AchievementService achievementService;
 
     @GetMapping("/{playerId}")
-    public ResponseEntity<List<UserUnlockedAchievementDTO>> getUnlockedAchievements(@PathVariable Long playerId) {
+    public ResponseEntity<List<UserUnlockedAchievementDTO>> getUnlockedAchievements(@PathVariable long playerId) {
         return ResponseEntity.ok(achievementService.getUnlockedAchievements(playerId));
     }
 }

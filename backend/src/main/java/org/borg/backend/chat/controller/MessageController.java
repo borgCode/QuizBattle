@@ -37,7 +37,7 @@ public class MessageController {
     }
     
     @GetMapping("/conversations/{playerId}")
-    public ResponseEntity<List<ConversationPreviewDTO>> getPlayerConversations(@PathVariable Long playerId) {
+    public ResponseEntity<List<ConversationPreviewDTO>> getPlayerConversations(@PathVariable long playerId) {
         return ResponseEntity.ok(messagingService.getPlayerConversations(playerId));
     }
 }

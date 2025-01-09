@@ -18,7 +18,7 @@ public class ChapterController {
     private final ChapterService chapterService;
     
     @GetMapping("/{chapterId}")
-    public ResponseEntity<ChapterDTO> getChapter(@PathVariable Long chapterId) {
+    public ResponseEntity<ChapterDTO> getChapter(@PathVariable long chapterId) {
         return ResponseEntity.ok().body(chapterService.getChapter(chapterId));
     }
     
@@ -28,7 +28,7 @@ public class ChapterController {
     }
     
     @PostMapping("/progress/update/{chapterProgressId}")
-    public ResponseEntity<Void> updateChapterProgress(@PathVariable Long chapterProgressId) {
+    public ResponseEntity<Void> updateChapterProgress(@PathVariable long chapterProgressId) {
         chapterService.updateChapterProgress(chapterProgressId);
         return ResponseEntity.ok().build();
     }

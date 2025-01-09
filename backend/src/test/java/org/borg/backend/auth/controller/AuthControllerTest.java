@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.service.AuthService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.shared.exceptions.UserNameAlreadyTakenException;
+import org.borg.backend.shared.exceptions.DuplicateException;
 import org.borg.backend.security.JwtFilter;
 import org.borg.backend.security.JwtService;
 import org.borg.backend.security.UserDetailsServiceImpl;
@@ -69,7 +69,7 @@ class AuthControllerTest {
                 .displayName("Test User")
                 .build();
 
-        doThrow(new UserNameAlreadyTakenException(BusinessErrorCodes.USERNAME_TAKEN))
+        doThrow(new DuplicateException(BusinessErrorCodes.USERNAME_TAKEN))
                 .when(authService).register(any(RegistrationRequest.class));
 
 

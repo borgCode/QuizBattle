@@ -19,7 +19,7 @@ public class PlayerController {
     private final PlayerService playerService;
 
     @GetMapping("/{playerId}")
-    public PlayerDTO getPlayerById(@PathVariable Long playerId) {
+    public PlayerDTO getPlayerById(@PathVariable long playerId) {
         return playerService.getPlayerById(playerId);
     }
 
@@ -30,7 +30,7 @@ public class PlayerController {
     }
     
     @PostMapping(value = "/{playerId}/profile-picture-upload", consumes = "multipart/form-data")
-    public ResponseEntity<?> uploadProfilePicture(@PathVariable Long playerId, @Parameter() @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> uploadProfilePicture(@PathVariable long playerId, @Parameter() @RequestPart("file") MultipartFile file) {
         playerService.uploadProfilePicture(playerId, file);
         return ResponseEntity.accepted().build();
     }

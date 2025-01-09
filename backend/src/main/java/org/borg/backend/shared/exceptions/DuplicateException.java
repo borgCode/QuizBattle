@@ -6,11 +6,11 @@ import org.borg.backend.shared.enums.BusinessErrorCodes;
 
 @Getter
 @Builder
-public class UserNameAlreadyTakenException extends RuntimeException {
+public class DuplicateException extends RuntimeException {
 
     private final BusinessErrorCodes errorCode;
 
-    public UserNameAlreadyTakenException(BusinessErrorCodes errorCode) {
+    public DuplicateException(BusinessErrorCodes errorCode) {
         super(errorCode.getDescription());
         this.errorCode = errorCode;
     }

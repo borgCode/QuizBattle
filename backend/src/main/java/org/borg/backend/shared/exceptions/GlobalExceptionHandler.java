@@ -91,8 +91,8 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    @ExceptionHandler(UserNameAlreadyTakenException.class)
-    public ResponseEntity<ExceptionResponse> handleUsernameTaken(UserNameAlreadyTakenException exception) {
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<ExceptionResponse> handleUsernameTaken(DuplicateException exception) {
         return ResponseEntity.status(exception.getErrorCode().getHttpStatus())
                 .body(ExceptionResponse.builder()
                         .businessErrorCode(exception.getErrorCode().getCode())

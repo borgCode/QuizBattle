@@ -59,11 +59,11 @@ public class FriendshipController {
     }
     
     @GetMapping("/friends/{playerId}")
-    public ResponseEntity<List<PlayerDTO>> getFriends(@PathVariable Long playerId) {
+    public ResponseEntity<List<PlayerDTO>> getFriends(@PathVariable long playerId) {
         return ResponseEntity.ok(friendshipService.getFriends(playerId));
     }
     @GetMapping("/relationships/{playerId}")
-    public ResponseEntity<RelationshipsDTO> getRelationships(@PathVariable Long playerId) {
+    public ResponseEntity<RelationshipsDTO> getRelationships(@PathVariable long playerId) {
         return ResponseEntity.ok(friendshipService.getRelationships(playerId));
     }
     @GetMapping("/relationship/status")
