@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
+import {FullConversationDto} from '../../../../api/generated/models/full-conversation-dto';
 
 @Component({
   selector: 'app-whisper-window',
@@ -7,5 +8,6 @@ import { Component } from '@angular/core';
   styleUrl: './whisper-window.component.css'
 })
 export class WhisperWindowComponent {
+  @Input() conversation: FullConversationDto
 
 }

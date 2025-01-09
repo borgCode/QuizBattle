@@ -1,8 +1,8 @@
 import {Component} from '@angular/core';
-import {WhisperWindowComponent} from '../whisper-window/whisper-window.component';
 import {WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
-import { Observable } from 'rxjs';
-import { FullConversationDto } from '../../../../api/generated/models';
+import {Observable} from 'rxjs';
+import {FullConversationDto} from '../../../../api/generated/models';
+import {WhisperWindowComponent} from '../whisper-window/whisper-window.component';
 import {AsyncPipe, NgForOf} from '@angular/common';
 
 @Component({
@@ -10,7 +10,7 @@ import {AsyncPipe, NgForOf} from '@angular/common';
   imports: [
     WhisperWindowComponent,
     NgForOf,
-    AsyncPipe,
+    AsyncPipe
   ],
   templateUrl: './whispers-container.component.html',
   styleUrl: './whispers-container.component.css'

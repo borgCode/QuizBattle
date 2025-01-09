@@ -2,9 +2,9 @@
   <div class="title-bar">
     <div class="d-flex justify-content-between ">
       <div class="player-info justify-content-start d-flex align-items-center">
-        <img src="https://placehold.co/40" style="max-height: 40px; max-width: 40px"
+        <img [src]="'data:image/jpeg;base64,' + conversation.otherPlayer.base64Image" style="max-height: 40px; max-width: 40px"
              alt="player avatar" class="rounded-circle"/>
-        <h6 class="ms-2">Player name</h6>
+        <h6 class="ms-2">{{conversation.otherPlayer.displayName}}</h6>
       </div>
       <div class="btn btn-light d-flex">
         <i class="fa-solid fa-x"></i>
