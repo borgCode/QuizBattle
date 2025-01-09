@@ -1,9 +1,9 @@
 package org.borg.backend.game.shared.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.game.shared.RoundAnswer;
-import org.borg.backend.game.shared.RoundSession;
-import org.borg.backend.game.shared.RoundType;
+import org.borg.backend.game.shared.model.RoundAnswer;
+import org.borg.backend.game.shared.model.RoundSession;
+import org.borg.backend.game.shared.model.RoundType;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

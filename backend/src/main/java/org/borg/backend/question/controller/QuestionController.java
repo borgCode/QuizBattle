@@ -3,11 +3,14 @@ package org.borg.backend.question.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
+import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
 import org.borg.backend.game.shared.service.RoundSessionService;
-import org.borg.backend.game.singleplayer.SinglePlayerQuestionService;
+import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
+import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
+import org.borg.backend.game.singleplayer.dto.SingleplayerQuestionsRequest;
 import org.borg.backend.question.dto.*;
-import org.borg.backend.question.service.QuestionSessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +23,6 @@ import java.util.List;
 @Tag(name = "Questions")
 public class QuestionController {
     
-    private final QuestionSessionService questionSessionService;
     private final SinglePlayerQuestionService singlePlayerQuestionService;
     private final MultiplayerQuestionService multiplayerQuestionService;
     private final RoundSessionService roundSessionService;

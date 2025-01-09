@@ -17,10 +17,9 @@ import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.question.dto.MultiplayerQuestionsRequest;
+import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.model.Question;
-import org.borg.backend.question.service.QuestionSessionService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,6 @@ public class GameService {
 
 
     private final MultiplayerSessionRepository multiplayerSessionRepository;
-    private final QuestionSessionService questionSessionService;
     private final PlayerRepository playerRepository;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher applicationEventPublisher;

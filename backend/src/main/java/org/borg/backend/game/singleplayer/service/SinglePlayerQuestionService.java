@@ -1,17 +1,17 @@
-package org.borg.backend.game.singleplayer;
+package org.borg.backend.game.singleplayer.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
-import org.borg.backend.game.shared.RoundType;
+import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.service.RoundSessionService;
+import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
+import org.borg.backend.game.singleplayer.dto.SingleplayerQuestionsRequest;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.AnswerValidationResponse;
 import org.borg.backend.question.dto.QuestionDTO;
-import org.borg.backend.question.dto.SinglePlayerAnswerValidationRequest;
-import org.borg.backend.question.dto.SingleplayerQuestionsRequest;
 import org.borg.backend.question.mapper.QuestionMapper;
 import org.borg.backend.question.model.Question;
 import org.borg.backend.question.repository.QuestionRepository;

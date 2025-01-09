@@ -1,4 +1,4 @@
-package org.borg.backend.game.shared;
+package org.borg.backend.game.shared.model;
 
 import lombok.Data;
 

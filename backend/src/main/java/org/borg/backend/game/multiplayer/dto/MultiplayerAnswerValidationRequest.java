@@ -1,4 +1,4 @@
-package org.borg.backend.question.dto;
+package org.borg.backend.game.multiplayer.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -8,8 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class MultiplayerQuestionsRequest {
-    private String category;
+public class MultiplayerAnswerValidationRequest {
+    private Long questionId;
     private Long sessionId;
+    private String answer;
     private Long playerId;
 }

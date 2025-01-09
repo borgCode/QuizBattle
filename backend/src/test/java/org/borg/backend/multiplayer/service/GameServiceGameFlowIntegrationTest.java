@@ -12,20 +12,18 @@ import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.service.GameService;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
-import org.borg.backend.game.shared.RoundSession;
-import org.borg.backend.game.shared.RoundType;
+import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.question.dto.MultiplayerAnswerValidationRequest;
-import org.borg.backend.question.dto.MultiplayerQuestionsRequest;
+import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
+import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.model.Question;
 import org.borg.backend.question.repository.QuestionRepository;
-import org.borg.backend.question.service.QuestionSessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -58,8 +56,6 @@ public class GameServiceGameFlowIntegrationTest {
     private QuestionRepository questionRepository;
     @Autowired
     private RoundSessionService roundSessionService;
-    @Autowired
-    private QuestionSessionService questionSessionService;
     @MockitoBean
     private AchievementService achievementService;
     private Player player1;
