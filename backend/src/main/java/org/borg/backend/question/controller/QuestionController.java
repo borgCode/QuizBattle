@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
+import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.SinglePlayerQuestionService;
 import org.borg.backend.question.dto.*;
 import org.borg.backend.question.service.QuestionSessionService;
@@ -22,6 +23,7 @@ public class QuestionController {
     private final QuestionSessionService questionSessionService;
     private final SinglePlayerQuestionService singlePlayerQuestionService;
     private final MultiplayerQuestionService multiplayerQuestionService;
+    private final RoundSessionService roundSessionService;
 
     @GetMapping("/multiplayer/{sessionId}/categories")
     public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable Long sessionId) {
@@ -35,7 +37,7 @@ public class QuestionController {
     
     @PostMapping("/multiplayer/{playerId}/clear")
     public ResponseEntity<Void> clearPlayerSession(@PathVariable Long playerId) {
-        questionSessionService.finishSession(playerId);
+        roundSessionService.finishSession(playerId);
         return ResponseEntity.ok().build();
     }
 
@@ -66,12 +68,7 @@ public class QuestionController {
     
     @GetMapping("/chapter/results/{playerId}")
     public ResponseEntity<List<Boolean>> getRoundResults(@PathVariable Long playerId) {
-        return ResponseEntity.ok(questionSessionService.getSessionAnswers(playerId));
+        return ResponseEntity.ok(singlePlayerQuestionService.getRoundResults(playerId));
     }
     
-    @PostMapping("chapter/clear-answers/{playerId}")
-    public ResponseEntity<Void> clearRoundResults(@PathVariable Long playerId) {
-        singlePlayerQuestionService.finishSession(playerId);
-        return ResponseEntity.ok().build();
-    }
 }

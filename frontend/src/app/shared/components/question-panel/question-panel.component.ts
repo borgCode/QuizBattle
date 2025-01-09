@@ -36,12 +36,10 @@ ngOnChanges(changes: SimpleChanges) {
   if (changes['questions'] && !changes['questions'].firstChange) {
     this.resetQuestionPanel();
   }
-  if (changes['isCorrect'] || changes['correctAnswerIndex']) {
-    console.log('Validation changes:', {
-      isCorrect: this.isCorrect,
-      correctAnswerIndex: this.correctAnswerIndex,
-      selectedAnswerIndex: this.selectedAnswerIndex
-    });
+  if (changes['isCorrect'] && changes['isCorrect'].currentValue === null) {
+    this.selectedAnswerIndex = null;
+    this.hasClickedOption = false;
+    this.timerHasRanOut = false;
   }
 }
 
@@ -56,12 +54,11 @@ ngOnChanges(changes: SimpleChanges) {
 
   goToNextQuestion() {
     this.selectedAnswerIndex = null;
-    this.isCorrect = null;
-    this.correctAnswerIndex = null;
     this.hasClickedOption = false;
     this.timerHasRanOut = false;
     this.userClickedNext = true;
     this.resetQuestionState.emit();
+
     if (this.currentQuestionIndex < this.questions.length - 1) {
       console.log("Current question index: " + this.currentQuestionIndex)
       this.currentQuestionIndex++;
@@ -88,7 +85,14 @@ ngOnChanges(changes: SimpleChanges) {
   private resetQuestionPanel() {
 
     this.currentQuestionIndex = 0;
-    this.timerComponent.resetTimer();
-    this.timerComponent.startTimer();
+    this.selectedAnswerIndex = null;
+    this.hasClickedOption = false;
+    this.timerHasRanOut = false;
+    this.userClickedNext = false;
+
+    if (this.timerComponent) {
+      this.timerComponent.resetTimer();
+      this.timerComponent.startTimer();
+    }
   }
 }

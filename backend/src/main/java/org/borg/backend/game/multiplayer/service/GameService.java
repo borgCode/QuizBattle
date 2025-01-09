@@ -11,6 +11,7 @@ import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
+import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
@@ -40,6 +41,7 @@ public class GameService {
     private final PlayerRepository playerRepository;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final RoundSessionService roundSessionService;
 
     public GameStateResponse getGameState(Long sessionId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
@@ -106,7 +108,7 @@ public class GameService {
                     session.setCurrentPlayerTurn(opponent);
                 } else {
                     session.getQuestionIds().clear();
-                    questionSessionService.finishSession(playerId);
+                    roundSessionService.finishSession(playerId);
                 }
 
             }

@@ -12,6 +12,9 @@ import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.service.GameService;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
+import org.borg.backend.game.shared.RoundSession;
+import org.borg.backend.game.shared.RoundType;
+import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.dto.PlayerDTO;
@@ -53,6 +56,8 @@ public class GameServiceGameFlowIntegrationTest {
     private PlayerRepository playerRepository;
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private RoundSessionService roundSessionService;
     @Autowired
     private QuestionSessionService questionSessionService;
     @MockitoBean
@@ -109,7 +114,7 @@ public class GameServiceGameFlowIntegrationTest {
                 .map(Question::getId)
                 .toList();
 
-        questionSessionService.initializeSession(player1.getId(), expectedQuestionIds, "Sports");
+        roundSessionService.initializeSession(player1.getId(), expectedQuestionIds, "Sports", RoundType.MULTIPLAYER);
         gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
 
         questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
@@ -273,7 +278,7 @@ public class GameServiceGameFlowIntegrationTest {
         void setUp() {
             questions = loadQuestionsToDB();
 
-            questionSessionService.initializeSession(player1.getId(), questions.stream().map(Question::getId).toList(), "Sports");
+            roundSessionService.initializeSession(player1.getId(), questions.stream().map(Question::getId).toList(), "Sports", RoundType.MULTIPLAYER);
 
         }
 
