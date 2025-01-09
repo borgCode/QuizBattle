@@ -33,6 +33,7 @@ public class AuthService {
     private final JwtService jwtService;
 
     public void register(RegistrationRequest request) {
+        //TODO Här bör du nog använda annan typ av Exception eller någon form av "NotFoundException" då det är ingen riktigt IllegalStateException.
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
         Player player = Player.builder()
@@ -47,6 +48,8 @@ public class AuthService {
         try {
             playerRepository.save(player);
         } catch (DataIntegrityViolationException e) {
+            //TODO möjligtvis ta bort "Already" ur exception samt om du vill ha en mer generell exception kan du kalla det för "DuplicateException"
+            // för återanvänbarhet, sedan kan du skicka din specifika errorCode ned i den exception/message.
             throw new UserNameAlreadyTakenException(BusinessErrorCodes.USERNAME_TAKEN);
         }
        
@@ -63,7 +66,7 @@ public class AuthService {
         Player player = (Player) auth.getPrincipal();
         String accessToken = jwtService.generateToken(player);
         String refreshToken = jwtService.generateRefreshToken(player);
-        
+
 
         PlayerDTO playerDTO = PlayerMapper.toDTO(player);
         

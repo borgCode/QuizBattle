@@ -17,7 +17,9 @@ public class ChapterController {
 
     private final ChapterService chapterService;
     
-    @GetMapping("/{chapterId}")
+    @GetMapping("/{chapterId}") /**TODO Försök använda long allmänt om det går istället för Long.
+    TODO Nu borde jag tekniskt sett kunna skicka null som pathVariable och det går igenom. Använd bara det om du faktiskt behöver att den ska kunna vara null.
+     **/
     public ResponseEntity<ChapterDTO> getChapter(@PathVariable Long chapterId) {
         return ResponseEntity.ok().body(chapterService.getChapter(chapterId));
     }
@@ -27,7 +29,7 @@ public class ChapterController {
         return ResponseEntity.ok().body(chapterService.initiateProgress(request));
     }
     
-    @PostMapping("/progress/update/{chapterProgressId}")
+    @PostMapping("/progress/update/{chapterProgressId}") //TODO Försök använda long istället för Long, nu borde jag tekniskt sett kunna skicka null som pathVariable och det går igenom.
     public ResponseEntity<Void> updateChapterProgress(@PathVariable Long chapterProgressId) {
         chapterService.updateChapterProgress(chapterProgressId);
         return ResponseEntity.ok().build();
