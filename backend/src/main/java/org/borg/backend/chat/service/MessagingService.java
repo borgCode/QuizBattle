@@ -8,6 +8,7 @@ import org.borg.backend.chat.dto.ConversationRequest;
 import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.mapper.ConversationMapper;
+import org.borg.backend.chat.mapper.MessageMapper;
 import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
 import org.borg.backend.chat.repository.ConversationRepository;
@@ -46,8 +47,9 @@ public class MessagingService {
         
         conversation.setLatestMessage(message);
         conversationRepository.save(conversation);
+
+        simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/message", MessageMapper.toDTO(message));
         
-//        simpMessagingTemplate.convertAndSendToUser();
     }
     public FullConversationDTO getConversation(ConversationRequest conversationRequest) {
         Conversation conversation = conversationRepository.findByBothPlayerIds(conversationRequest.getSenderId(), conversationRequest.getReceiverId());

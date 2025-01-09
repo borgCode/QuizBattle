@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {FullConversationDto} from '../../../api/generated/models/full-conversation-dto';
-import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {WebSocketService} from '../../websocket/web-socket.service';
 import {filter} from 'rxjs/operators';
 
@@ -67,5 +67,15 @@ export class WhisperWindowService {
       senderId: number; receiverId: number; conversationId: number; receiverUsername: string; message: string }
   }) {
     this.webSocketService.sendMessage("/app/messages/send", param.messageRequest);
+
+    this.messageSubject.next(
+      {
+        id: Date.now(),
+        senderId: param.messageRequest.senderId,
+        sentAt: new Date().toISOString(),
+        isRead: true,
+        content: param.messageRequest.message
+      }
+    )
   }
 }

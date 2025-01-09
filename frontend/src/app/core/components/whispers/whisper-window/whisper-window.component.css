@@ -2,11 +2,11 @@
   width: 300px;
   height: 100%;
   max-width: 100%;
-  background: #A0A0A0;
+  background: #F8F9FA;
 
   pointer-events: auto;
 
-  border: 3px solid black;
+  border: 3px solid #2C3E50;
 }
 
 .title-bar {
@@ -14,16 +14,36 @@
   padding: 5px;
   margin-bottom: 2px;
 
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #2C3E50;
 }
 
 .message-area {
+  padding: 3px;
   height: 73%;
   overflow: hidden;
   overflow-y: scroll;
+  background: #EBF5FB;
+  border-bottom: 3px solid #2C3E50;
+}
+
+.other-player {
+  color: #27AE60;
+}
+
+.player {
+  color: #E74C3C
+}
+
+.message-text {
+  color: #2C3E50;
 }
 
 .message-input-box {
   width: 100%;
   height: 12%;
+  background: white;
+}
+
+.send-button {
+  background: #F39C12;
 }

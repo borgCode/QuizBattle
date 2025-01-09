@@ -1,15 +1,19 @@
 import {Component, Input} from '@angular/core';
 import {FullConversationDto} from '../../../../api/generated/models/full-conversation-dto';
-import {NgForOf} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {FormsModule} from '@angular/forms';
-import {WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
+import {Message, WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
+import {PlayerDto} from '../../../../api/generated/models/player-dto';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-whisper-window',
   imports: [
     NgForOf,
-    FormsModule
+    FormsModule,
+    NgIf,
+    AsyncPipe
   ],
   templateUrl: './whisper-window.component.html',
   styleUrl: './whisper-window.component.css'
@@ -17,14 +21,17 @@ import {WhisperWindowService} from '../../../services/whisper-window/whisper-win
 export class WhisperWindowComponent {
   @Input() conversation: FullConversationDto
 
-  storedPlayerId: number
-  message: string
+  storedPlayer: PlayerDto
+  messageToSend: string
+
+  message$: Observable<Message>
 
   constructor(
     private whisperWindowService: WhisperWindowService,
     private loginStateService: LoginStateService
   ) {
-    this.storedPlayerId = this.loginStateService.loggedInUser.id;
+    this.storedPlayer = this.loginStateService.loggedInUser;
+    this.message$ = this.whisperWindowService.message$;
   }
 
   sendMessage(conversationId: number, receiverId: number, userName: string) {
@@ -32,10 +39,10 @@ export class WhisperWindowComponent {
     this.whisperWindowService.sendMessage({
       messageRequest: {
         receiverUsername: userName,
-        senderId: this.storedPlayerId,
+        senderId: this.storedPlayer.id,
         conversationId: conversationId,
         receiverId: receiverId,
-        message: this.message
+        message: this.messageToSend
       }
     })
   }
