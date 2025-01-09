@@ -132,8 +132,7 @@ public class GameService {
         Map<Long, Integer> scores = session.getScore();
         int score1 = scores.get(player1Id);
         int score2 = scores.get(player2Id);
-
-
+        
         if (score1 > score2) {
             session.setWinnerId(player1Id);
             session.setLoserId(player2Id);
@@ -141,13 +140,10 @@ public class GameService {
 
             player1Stats.incrementWins();
             player2Stats.incrementLosses();
-
-
         } else if (score1 < score2) {
             session.setWinnerId(player2Id);
             session.setLoserId(player1Id);
             session.setIsTie(false);
-
             player1Stats.incrementLosses();
             player2Stats.incrementWins();
         } else {
@@ -156,16 +152,12 @@ public class GameService {
             player1Stats.incrementTies();
             player2Stats.incrementTies();
         }
-
-
+        
         players.get(0).setStats(player1Stats);
         players.get(1).setStats(player2Stats);
 
         playerRepository.saveAll(players);
-
-        log.warn("Winner id: {}", session.getWinnerId());
-
-
+        
         if (!session.getIsTie()) {
             applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
         }

@@ -15,13 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RoundSessionService {
     private final ConcurrentHashMap<Long, RoundSession> roundSessions = new ConcurrentHashMap<>();
 
-    public List<Long> initializeSession(Long playerId, List<Long> questionIds, String category, RoundType roundType) {
+    public void initializeSession(Long playerId, List<Long> questionIds, String category, RoundType roundType) {
         RoundSession existingSession = roundSessions.get(playerId);
 
         if (existingSession != null) {
             if (!existingSession.isComplete()) {
                 log.warn("Attempted to start new category while current category incomplete");
-                return existingSession.getQuestionIds();
+                return;
             }
             log.info("Round completed, removing session for player: {}", playerId);
             roundSessions.remove(playerId);
@@ -29,7 +29,6 @@ public class RoundSessionService {
 
         RoundSession session = new RoundSession(questionIds, category, roundType);
         roundSessions.put(playerId, session);
-        return questionIds;
     }
 
     public boolean saveAnswer(Long playerId, Long questionId, boolean isCorrect) {

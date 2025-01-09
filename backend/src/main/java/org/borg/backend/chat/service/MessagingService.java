@@ -3,6 +3,7 @@ package org.borg.backend.chat.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
+import org.borg.backend.chat.dto.CreateConversationRequest;
 import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.mapper.ConversationMapper;
@@ -25,25 +26,26 @@ public class MessagingService {
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
     private final PlayerRepository playerRepository;
+    
+    
+    public FullConversationDTO createConversation(CreateConversationRequest request) {
+        Player player1 = playerRepository.findById(request.getSenderId())
+                .orElseThrow(() -> new EntityNotFoundException("Sender not found"));
+        Player player2 = playerRepository.findById(request.getReceiverId())
+                .orElseThrow(() -> new EntityNotFoundException("Receiver not found"));
+
+        Conversation conversation = conversationRepository.save(Conversation.builder()
+                .player1(player1)
+                .player2(player2)
+                .build());
+        return ConversationMapper.toFullConversationDTO(conversation, request.getSenderId());
+    }
 
     @Transactional
     public void sendMessage(SendMessageRequest request) {
-        Conversation conversation;
-        if (request.getConversationId() == null) {
-            Player player1 = playerRepository.findById(request.getSenderId())
-                    .orElseThrow(() -> new EntityNotFoundException("Sender not found"));
-            Player player2 = playerRepository.findById(request.getReceiverId())
-                    .orElseThrow(() -> new EntityNotFoundException("Receiver not found"));
 
-            conversation = conversationRepository.save(Conversation.builder()
-                    .player1(player1)
-                    .player2(player2)
-                    .build());
-        } else {
-            conversation = conversationRepository.findById(request.getConversationId())
-                    .orElseThrow(() -> new EntityNotFoundException("Conversation not found"));
-        }
-
+        Conversation conversation = conversationRepository.findById(request.getConversationId())
+                .orElseThrow(() -> new EntityNotFoundException("Conversation not found"));
         Message message = messageRepository.save(Message.builder()
                 .conversation(conversation)
                 .senderId(request.getSenderId())

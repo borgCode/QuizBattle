@@ -3,6 +3,8 @@ package org.borg.backend.chat.service;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
+import org.borg.backend.chat.dto.CreateConversationRequest;
+import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
@@ -33,7 +35,7 @@ public class MessageServiceIntegrationTest {
     private MessagingService messagingService;
     @Autowired
     private PlayerRepository playerRepository;
-    
+
     @Autowired
     private RoleRepository roleRepository;
 
@@ -44,7 +46,7 @@ public class MessageServiceIntegrationTest {
             userRole.setName("USER");
             roleRepository.save(userRole);
         }
-        
+
     }
 
     private Player createAndSavePlayer(String name) {
@@ -62,19 +64,20 @@ public class MessageServiceIntegrationTest {
 
         return playerRepository.save(player);
     }
-    
+
     @AfterEach
     void tearDown() {
         conversationRepository.deleteAll();
         messageRepository.deleteAll();
         playerRepository.deleteAll();
-        
+
     }
 
     @Nested
     class sendMessageTests {
         private Player player1;
         private Player player2;
+
         @BeforeEach
         void setUp() {
             player1 = createAndSavePlayer("Player1");
@@ -82,10 +85,13 @@ public class MessageServiceIntegrationTest {
         }
 
         @Test
-        void sendMessageWhenConversationDoesNotExist_andCreateConversation() {
+        void createConversationAndSendMessage() {
+            FullConversationDTO conversation = messagingService.createConversation(new CreateConversationRequest(player1.getId(), player2.getId()));
+
             SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
                     .senderId(player1.getId())
                     .receiverId(player2.getId())
+                    .conversationId(conversation.getId())
                     .message("Hello friend")
                     .build();
 
@@ -110,48 +116,13 @@ public class MessageServiceIntegrationTest {
         }
 
         @Test
-        void sendMessageWhenConversationAlreadyExists() {
-            SendMessageRequest firstMessageRequest = SendMessageRequest.builder()
-                    .senderId(player1.getId())
-                    .receiverId(player2.getId())
-                    .message("Hello friend")
-                    .build();
-
-            messagingService.sendMessage(firstMessageRequest);
-
-            List<Conversation> conversationList = conversationRepository.findAll();
-            Long conversationId = conversationList.get(0).getId();
-
-            SendMessageRequest secondMessageRequest = SendMessageRequest.builder()
-                    .senderId(player1.getId())
-                    .receiverId(player2.getId())
-                    .conversationId(conversationId)
-                    .message("Bye friend")
-                    .build();
-            messagingService.sendMessage(secondMessageRequest);
-
-            List<Conversation> updatedConversationList = conversationRepository.findAll();
-
-            assertAll("Post first message conversation checks",
-                    () -> assertEquals(1, updatedConversationList.size(), "There should only be one conversation saved"),
-                    () -> assertEquals("Bye friend", updatedConversationList.get(0).getLatestMessage().getContent(), "The message content should be \"Bye friend\"")
-            );
-
-            List<Message> messageList = messageRepository.findAll();
-
-            assertAll("Post first message message checks",
-                    () -> assertEquals(2, messageList.size(), "There should be two messages saved"),
-                    () -> assertEquals("Hello friend", messageList.get(0).getContent(), "First message should be \"Hello friend\""),
-                    () -> assertEquals("Bye friend", messageList.get(1).getContent(), "Second message should be \"Bye friend\""),
-                    () -> assertEquals(updatedConversationList.get(0).getId(), messageList.get(1).getConversation().getId(), "Conversation Id and Message's conversation ID should match")
-            );
-        }
-
-        @Test
         void sendMessageBackAndForth() {
+            FullConversationDTO conversation = messagingService.createConversation(new CreateConversationRequest(player1.getId(), player2.getId()));
+
             SendMessageRequest firstMessageRequest = SendMessageRequest.builder()
                     .senderId(player1.getId())
                     .receiverId(player2.getId())
+                    .conversationId(conversation.getId())
                     .message("Hello friend")
                     .build();
             messagingService.sendMessage(firstMessageRequest);
@@ -178,14 +149,14 @@ public class MessageServiceIntegrationTest {
                     () -> assertEquals(player1.getId(), messageList.get(0).getSenderId(), "First message should be sent by player1")
             );
         }
-        
     }
-    
+
     @Nested
     class GettingConversationsTests {
         Player receiverPlayer;
         List<Player> players = new ArrayList<>();
         private final int NUM_OF_PLAYERS = 10;
+
         @BeforeEach
         void setUp() {
             receiverPlayer = createAndSavePlayer("Receiver");
@@ -193,26 +164,28 @@ public class MessageServiceIntegrationTest {
                 players.add(createAndSavePlayer("Player " + i));
             }
         }
-        
+
         @Test
         void shouldReturnAllConversationsForReceiverPlayer() {
-
             Map<Long, String> expectedMessages = new HashMap<>();
             for (int i = 0; i < NUM_OF_PLAYERS; i++) {
                 Player sendingPlayer = players.get(i);
                 String message = "Hello from " + sendingPlayer.getDisplayName();
-                
+
+                FullConversationDTO conversation = messagingService.createConversation(new CreateConversationRequest(sendingPlayer.getId(), receiverPlayer.getId()));
+
                 messagingService.sendMessage(SendMessageRequest.builder()
                         .senderId(sendingPlayer.getId())
                         .receiverId(receiverPlayer.getId())
+                        .conversationId(conversation.getId())
                         .message(message)
                         .build());
-                
+
                 expectedMessages.put(sendingPlayer.getId(), message);
             }
-            
+
             List<ConversationPreviewDTO> conversationPreviewDTOS = messagingService.getPlayerConversations(receiverPlayer.getId());
-            
+
             assertAll("Post get conversations check",
                     () -> assertEquals(NUM_OF_PLAYERS, conversationPreviewDTOS.size(), String.format("There should be %s conversations", NUM_OF_PLAYERS)),
                     () -> assertTrue(conversationPreviewDTOS.stream()
@@ -222,5 +195,8 @@ public class MessageServiceIntegrationTest {
                             "Each conversation should have matching sender ID and message content")
             );
         }
+        
     }
+    
+    
 }
