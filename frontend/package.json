@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "api-gen": "ng-openapi-gen --input ./src/openapi/openapi.json --output ./src/app/api/generated/"
+    "api-gen": "ng-openapi-gen --input ./src/openapi/openapi.json --output ./src/app/api/generated/ && node scripts/post-process.js"
   },
   "private": true,
   "dependencies": {

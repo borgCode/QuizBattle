@@ -12,13 +12,13 @@ import { ConversationRequest } from '../../models/conversation-request';
 import { FullConversationDto } from '../../models/full-conversation-dto';
 
 export interface GetConversation$Params {
-  request: ConversationRequest;
+      body: ConversationRequest
 }
 
 export function getConversation(http: HttpClient, rootUrl: string, params: GetConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<FullConversationDto>> {
-  const rb = new RequestBuilder(rootUrl, getConversation.PATH, 'get');
+  const rb = new RequestBuilder(rootUrl, getConversation.PATH, 'post');
   if (params) {
-    rb.query('request', params.request, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(

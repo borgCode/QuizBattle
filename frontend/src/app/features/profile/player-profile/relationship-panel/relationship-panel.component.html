@@ -14,16 +14,17 @@
       <ul class="dropdown-menu">
         <ng-container *ngIf="type == 'friends'; else elseBlock">
           <li>
-            <button class="dropdown-item" (click)="emitRemoveFriend(player.id)">
-              Remove friend
-            </button>
+            <button class="dropdown-item" (click)="emitRemoveFriend(player.id)">Remove friend</button>
           </li>
           <li>
-            <button class="dropdown-item" (click)="emitBlockPlayer(player.id)">
-              Block player
-            </button>
+            <button class="dropdown-item" (click)="emitBlockPlayer(player.id)">Block player</button>
           </li>
-           <li><button class="dropdown-item" (click)="emitSendGameInvite(player.id)">Invite friend to play a game</button></li>
+          <li>
+            <button class="dropdown-item" (click)="emitSendGameInvite(player.id)">Invite friend to play a game</button>
+          </li>
+          <li>
+            <button class="dropdown-item" (click)="emitSendMessage(player.id)">Send message</button>
+          </li>
         </ng-container>
         <ng-template #elseBlock>
           <li>

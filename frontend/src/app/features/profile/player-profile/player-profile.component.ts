@@ -9,6 +9,7 @@ import {AlertMessageService} from '../../../core/services/alert-message/alert-me
 import {FriendshipService} from '../../../api/generated/services/friendship.service';
 import {MultiplayerMatchService} from '../../../api/generated/services/multiplayer-match.service';
 import {MessageService} from '../../../api/generated/services/message.service';
+import {WhisperWindowService} from '../../../core/services/whisper-window/whisper-window.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -32,7 +33,8 @@ export class PlayerProfileComponent implements OnInit {
     private router: Router,
     private alertMessageService: AlertMessageService,
     private multiplayerMatchService: MultiplayerMatchService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private whisperWindowService: WhisperWindowService
   ) {
   }
 
@@ -54,6 +56,7 @@ export class PlayerProfileComponent implements OnInit {
       }
     })
   }
+
   private getFriends() {
     this.friendshipService.getRelationships({playerId: this.player.id}).subscribe({
       next: data => {
@@ -63,6 +66,7 @@ export class PlayerProfileComponent implements OnInit {
       }
     })
   }
+
   openEditProfile() {
     this.router.navigate(['edit-profile']);
   }
@@ -128,13 +132,16 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "MESSAGE":
-        this.messageService.getConversation({request: {
+        console.log(this.player.id)
+        console.log($event.playerId)
+        this.messageService.getConversation({
+          body: {
             senderId: this.player.id,
             receiverId: $event.playerId
           }
         }).subscribe({
           next: conversation => {
-
+            this.whisperWindowService.addToConversations(conversation)
           },
         })
         break;

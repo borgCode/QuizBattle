@@ -27,7 +27,7 @@ public class MessageController {
         return ResponseEntity.ok().build();
     }
     
-    @GetMapping("/conversation")
+    @PostMapping("/conversation")
     public ResponseEntity<FullConversationDTO> getConversation(@RequestBody ConversationRequest request) {
         return ResponseEntity.ok(messagingService.getConversation(request));
     }

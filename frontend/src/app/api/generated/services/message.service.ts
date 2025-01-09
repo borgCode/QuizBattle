@@ -51,6 +51,31 @@ export class MessageService extends BaseService {
     );
   }
 
+  /** Path part for operation `getConversation()` */
+  static readonly GetConversationPath = '/messages/conversation';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getConversation()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  getConversation$Response(params: GetConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<FullConversationDto>> {
+    return getConversation(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getConversation$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  getConversation(params: GetConversation$Params, context?: HttpContext): Observable<FullConversationDto> {
+    return this.getConversation$Response(params, context).pipe(
+      map((r: StrictHttpResponse<FullConversationDto>): FullConversationDto => r.body)
+    );
+  }
+
   /** Path part for operation `getPlayerConversations()` */
   static readonly GetPlayerConversationsPath = '/messages/conversations/{playerId}';
 
@@ -73,31 +98,6 @@ export class MessageService extends BaseService {
   getPlayerConversations(params: GetPlayerConversations$Params, context?: HttpContext): Observable<Array<ConversationPreviewDto>> {
     return this.getPlayerConversations$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<ConversationPreviewDto>>): Array<ConversationPreviewDto> => r.body)
-    );
-  }
-
-  /** Path part for operation `getConversation()` */
-  static readonly GetConversationPath = '/messages/conversation';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getConversation()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getConversation$Response(params: GetConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<FullConversationDto>> {
-    return getConversation(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getConversation$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getConversation(params: GetConversation$Params, context?: HttpContext): Observable<FullConversationDto> {
-    return this.getConversation$Response(params, context).pipe(
-      map((r: StrictHttpResponse<FullConversationDto>): FullConversationDto => r.body)
     );
   }
 
