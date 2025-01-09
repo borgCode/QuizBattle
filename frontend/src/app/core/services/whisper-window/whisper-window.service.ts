@@ -6,7 +6,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
   providedIn: 'root'
 })
 export class WhisperWindowService {
-  private openConversations: BehaviorSubject<FullConversationDto[]>;
+  private openConversations = new BehaviorSubject<FullConversationDto[]>([]);
 
 
   constructor() { }
