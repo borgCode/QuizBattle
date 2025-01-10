@@ -1,9 +1,10 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 import {FullConversationDto} from '../../../api/generated/models/full-conversation-dto';
-import {BehaviorSubject, Subject} from 'rxjs';
+import {BehaviorSubject, Subject, Subscription} from 'rxjs';
 import {WebSocketService} from '../../websocket/web-socket.service';
 import {filter} from 'rxjs/operators';
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
+import {LoginStateService} from "../login-state-service/login-state.service";
 
 export interface Message {
   id: number,
@@ -24,13 +25,25 @@ export class WhisperWindowService {
   private messageSubject = new Subject<Message>()
   message$ = this.messageSubject.asObservable();
 
+
+
   constructor(
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private loginStateService: LoginStateService
   ) {
     this.webSocketService.message$.subscribe(message => {
       this.messageSubject.next(message);
     });
+
+    this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
+      if (!isLoggedIn) {
+        console.log("Clearing convos")
+        this.openConversations.next([]);
+      }
+    })
   }
+
+
 
   addToConversations(conversation: FullConversationDto) {
     const currentConversations = this.openConversations.getValue();
