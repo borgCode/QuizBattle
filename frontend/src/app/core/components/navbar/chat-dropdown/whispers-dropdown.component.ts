@@ -5,13 +5,14 @@ import {MessageService} from '../../../../api/generated/services/message.service
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
-import {AsyncPipe, NgForOf} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-whispers-dropdown',
   imports: [
     AsyncPipe,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './whispers-dropdown.component.html',
   styleUrl: './whispers-dropdown.component.css'
@@ -64,5 +65,9 @@ export class WhispersDropdownComponent implements OnInit {
 
   markAsRead(conversationId) {
 
+  }
+
+  deleteConversation(id: number) {
+    
   }
 }

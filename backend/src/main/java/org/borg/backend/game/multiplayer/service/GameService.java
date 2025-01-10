@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static java.util.Map.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -47,8 +49,8 @@ public class GameService {
 
 
         Long playerWhoGaveUp = multiplayerSession.getPlayerHasGivenUp().entrySet().stream()
-                .filter(Map.Entry::getValue)
-                .map(Map.Entry::getKey)
+                .filter(Entry::getValue)
+                .map(Entry::getKey)
                 .findFirst()
                 .orElse(null);
         

@@ -3,20 +3,64 @@
           data-bs-auto-close="outside"
           aria-expanded="false">
     <i class="fa-regular fa-message"></i>
+    <ng-container *ngIf="unreadConversations$ | async as unreadConversations">
+      <span *ngIf="unreadConversations.length > 0"
+            class="conversation-badge position-absolute badge rounded-pill bg-danger">
+        {{ unreadConversations.length }}
+      </span>
+    </ng-container>
   </button>
   <div class="dropdown-menu dropdown-menu-end whispers-panel p-0">
     <div class="d-flex justify-content-center p-3 border-bottom">
       <h6>Whispers</h6>
     </div>
     <input class="search-whispers-input" placeholder="Search for players" type="text">
+    <ng-container *ngIf="unreadConversations$ | async as unreadConversations">
+      <div class="conversation-list">
+        <div *ngFor="let conversation of unreadConversations">
+          <div class="conversation-item p-1 unread position-relative"
+               (click)="markAsRead(conversation.id)">
+            <div class="player-info justify-content-start d-flex align-items-center">
+              <img [src]="'data:image/jpeg;base64,' + conversation.otherPlayer.base64Image"
+                   style="max-height: 40px; max-width: 40px"
+                   alt="player avatar" class="rounded-circle"/>
+              <div class="player-name-and-content ms-2">
+                <h6 class="other-player">{{ conversation.otherPlayer.displayName }}</h6>
+                <small class="message-preview-unread text-muted">{{ conversation.latestMessage }}</small>
+              </div>
+              <button class="garbage-btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                      data-bs-toggle="tooltip"
+                      title="Delete conversation"
+                      (click)="deleteConversation(conversation.id)">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="readConversations$ | async as readConversations">
+      <div class="conversation-list">
+        <div *ngFor="let conversation of readConversations">
+          <div class="conversation-item p-1 read position-relative">
+            <div class="player-info justify-content-start d-flex align-items-center">
+              <img [src]="'data:image/jpeg;base64,' + conversation.otherPlayer.base64Image"
+                   style="max-height: 40px; max-width: 40px"
+                   alt="player avatar" class="rounded-circle"/>
+              <div class="player-name-and-content ms-2">
+                <h6 class="other-player">{{ conversation.otherPlayer.displayName }}</h6>
+                <small class="message-preview text-muted">{{ conversation.latestMessage }}</small>
+              </div>
+              <button class="garbage-btn btn-sm btn-link text-muted position-absolute top-0 end-0"
+                      data-bs-toggle="tooltip"
+                      title="Delete conversation"
+                      (click)="deleteConversation(conversation.id)">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
   </div>
-
-
-<!--  <div class="conversation-list">-->
-<!--    <div *ngFor="let conversation of unreadConversations$ | async">-->
-<!--      <div class="notification-item p-3 border-bottom unread position-relative"-->
-<!--           (click)="markAsRead(conversation.id)">-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
 </div>
