@@ -21,6 +21,7 @@ import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.model.Question;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,10 +44,16 @@ public class GameService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RoundSessionService roundSessionService;
 
-    public GameStateResponse getGameState(Long sessionId) {
+    public GameStateResponse getGameState(long sessionId, long playerId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
-
+        
+        boolean playerExistsInSession = multiplayerSession.getPlayers().stream()
+                .anyMatch(player -> player.getId().equals(playerId));
+        
+        if (!playerExistsInSession) {
+            throw new AccessDeniedException("Not authorized to access this game session");
+        }
 
         Long playerWhoGaveUp = multiplayerSession.getPlayerHasGivenUp().entrySet().stream()
                 .filter(Entry::getValue)
@@ -54,7 +61,6 @@ public class GameService {
                 .findFirst()
                 .orElse(null);
         
-        log.warn("Getting game state, list is " + multiplayerSession.getQuestionIds());
         return GameStateResponse.builder()
                 .playerTurn(multiplayerSession.getCurrentPlayerTurn().getId())
                 .playerDTOS(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
@@ -100,9 +106,9 @@ public class GameService {
             sendGameOverNotifications(session);
 
         } else {
-
+            
             session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
-
+            
             if (session.getCurrentQuestionIndex() == 0) {
                 if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
                     session.setCurrentPlayerTurn(opponent);
@@ -110,12 +116,9 @@ public class GameService {
                     session.getQuestionIds().clear();
                     roundSessionService.finishSession(playerId);
                 }
-
             }
         }
-
         multiplayerSessionRepository.save(session);
-
     }
 
     private boolean isGameComplete(Map<Long, Integer> questionsAnswered) {
@@ -269,6 +272,5 @@ public class GameService {
         notificationService.sendGameLostNotification(loserPlayer.getId(), winnerPlayer.getDisplayName(), sessionId);
 
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
-
     }
 }

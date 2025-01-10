@@ -29,7 +29,7 @@ public class GameController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/sessions/{sessionId}")
     public ResponseEntity<GameStateResponse> getGameState(@PathVariable long sessionId, @RequestParam long playerId) {
-        return ResponseEntity.ok(gameService.getGameState(sessionId));
+        return ResponseEntity.ok(gameService.getGameState(sessionId, playerId));
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")

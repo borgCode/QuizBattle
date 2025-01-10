@@ -59,10 +59,8 @@ public class AchievementService {
         userUnlockedAchievementRepository.save(unlockedAchievement);
         sendAchievementNotification(player, unlockedAchievement);
     }
-
     
     public void handleCategoryAchievement(Long playerId, String category) {
-
         Achievement achievement = achievementRepository.findByName(category);
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new EntityNotFoundException("Player not found"));

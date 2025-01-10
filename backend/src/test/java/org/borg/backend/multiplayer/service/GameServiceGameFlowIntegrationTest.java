@@ -3,11 +3,9 @@ package org.borg.backend.multiplayer.service;
 import org.borg.backend.achievement.service.AchievementService;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.shared.enums.GameStatus;
-import org.borg.backend.shared.enums.NotificationType;
-import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
+import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
+import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.service.GameService;
@@ -19,11 +17,13 @@ import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
-import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.model.Question;
 import org.borg.backend.question.repository.QuestionRepository;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.enums.GameStatus;
+import org.borg.backend.shared.enums.NotificationType;
+import org.borg.backend.shared.exceptions.GameException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -115,7 +115,7 @@ public class GameServiceGameFlowIntegrationTest {
 
         questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-        GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
+        GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId(), player1.getId());
 
 
         List<Long> expectedPlayerIds = List.of(player1.getId(), player2.getId());
@@ -287,7 +287,7 @@ public class GameServiceGameFlowIntegrationTest {
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
+            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId(), player1.getId());
 
             assertAll("Post-win checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
@@ -309,7 +309,7 @@ public class GameServiceGameFlowIntegrationTest {
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
+            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId(), player1.getId());
 
             assertAll("Post-win checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
@@ -332,7 +332,7 @@ public class GameServiceGameFlowIntegrationTest {
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
-            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId());
+            GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId(), player1.getId());
 
             assertAll("Post-tie checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
@@ -359,7 +359,7 @@ public class GameServiceGameFlowIntegrationTest {
 
             
             
-            Map<Long, Boolean> firstAcknowledgements = gameService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
+            Map<Long, Boolean> firstAcknowledgements = gameService.getGameState(multiplayerSession.getId(), player1.getId()).getPlayerAcknowledgment();
             assertAll("First acknowledgement checks",
                     () -> assertTrue(firstAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
                     () -> assertFalse(firstAcknowledgements.get(player2.getId()), "Player2 acknowledgement should be false")
@@ -367,7 +367,7 @@ public class GameServiceGameFlowIntegrationTest {
             
             gameService.acknowledgeGameOver(multiplayerSession.getId(), player2.getId());
 
-            Map<Long, Boolean> secondAcknowledgements = gameService.getGameState(multiplayerSession.getId()).getPlayerAcknowledgment();
+            Map<Long, Boolean> secondAcknowledgements = gameService.getGameState(multiplayerSession.getId(), player1.getId()).getPlayerAcknowledgment();
 
             assertAll("Second acknowledgement checks",
                     () -> assertTrue(secondAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
