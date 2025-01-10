@@ -78,7 +78,7 @@ class AchievementServiceTest {
             when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                     .thenReturn(false);
 
-            achievementService.handleStoryCompleted(new AchievementEvents.StoryCompletedEvent(playerId, storyName));
+            achievementService.handleStoryAchievement(playerId, storyName);
 
             imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                     .thenReturn("base64Image");
@@ -119,7 +119,7 @@ class AchievementServiceTest {
                 .thenReturn(true);
 
 
-        achievementService.handleStoryCompleted(new AchievementEvents.StoryCompletedEvent(playerId, storyName));
+        achievementService.handleStoryAchievement(playerId, storyName);
 
         verify(userUnlockedAchievementRepository, never()).save(any());
         verify(simpMessagingTemplate, never()).convertAndSendToUser(
@@ -178,7 +178,7 @@ class AchievementServiceTest {
             when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
             when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingUnlock);
             
-            achievementService.handleCategoryCompletedEvent(new AchievementEvents.CategoryCompletedEvent(playerId, category));
+            achievementService.handleCategoryAchievement(playerId, category);
             
             imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                     .thenReturn("base64Image");
@@ -236,7 +236,7 @@ class AchievementServiceTest {
             when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                     .thenReturn(false);
 
-            achievementService.handleGameWonEvent(new AchievementEvents.GameWonEvent(playerId));
+            achievementService.handleVictoryAchievement(playerId);
 
             imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                     .thenReturn("base64Image");

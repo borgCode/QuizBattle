@@ -22,6 +22,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.time.Instant;
 import java.util.List;
 
+import static org.borg.backend.achievement.events.AchievementEvents.*;
+
 @Slf4j
 @Transactional
 @Service
@@ -37,18 +39,13 @@ public class AchievementService {
         return null;
     }
 
-    @EventListener
-    @Async
-    public void handleStoryCompleted(AchievementEvents.StoryCompletedEvent event) {
-        log.warn("Handling story completed");
+    public void handleStoryAchievement(Long playerId, String storyName) {
+        Achievement achievement = achievementRepository.findByName(storyName);
 
-        Achievement achievement = achievementRepository.findByName(event.storyName());
-
-        Player player = playerRepository.findById(event.playerId())
+        Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new EntityNotFoundException("Player not found"));
 
         if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
-            //TODO error handling for already exists
             return;
         }
 
@@ -59,23 +56,18 @@ public class AchievementService {
                 .achievedAt(Instant.now())
                 .build();
 
-        log.warn("Saving {} to DB", unlockedAchievement.getAchievement().getName());
-
         userUnlockedAchievementRepository.save(unlockedAchievement);
-        
         sendAchievementNotification(player, unlockedAchievement);
-
     }
 
-    @EventListener
-    @Async
-    public void handleCategoryCompletedEvent(AchievementEvents.CategoryCompletedEvent event) {
+    
+    public void handleCategoryAchievement(Long playerId, String category) {
 
-        Achievement achievement = achievementRepository.findByName(event.category());
-        Player player = playerRepository.findById(event.playerId())
+        Achievement achievement = achievementRepository.findByName(category);
+        Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new EntityNotFoundException("Player not found"));
 
-        int correctAnswers = player.getStats().getCategoryStats().get(event.category()).getCorrect();
+        int correctAnswers = player.getStats().getCategoryStats().get(category).getCorrect();
 
         UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
 
@@ -83,14 +75,12 @@ public class AchievementService {
         handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
         
     }
-
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Async
+    
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void handleGameWonEvent(AchievementEvents.GameWonEvent event) {
+    public void handleVictoryAchievement(Long playerId) {
         Achievement achievement = achievementRepository.findByName("Victories");
 
-        Player player = playerRepository.findById(event.playerId())
+        Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new EntityNotFoundException("Player not found"));
 
         int numOfWins = player.getStats().getNumOfWins();
@@ -104,21 +94,14 @@ public class AchievementService {
     private AchievementLevel determineNewAchievementLevel(UserUnlockedAchievement unlockedAchievement, Achievement achievement, int currentProgress) {
         if (unlockedAchievement == null) {
             AchievementLevel firstLevel = achievement.getLevels().get(0);
-            log.warn("First level requirement: {}", firstLevel);
             
             return firstLevel.getRequirementValue() <= currentProgress ? firstLevel : null;
         }
 
         int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
-        log.warn("Current level is: {}", currentLevel);
-        log.warn("Achievement levels size: " + achievement.getLevels().size());
         if (currentLevel >= achievement.getLevels().size()) {
-            log.warn("Returning null");
             return null;
         }
-        
-        log.warn("Checking if player is eligible for next level");
-        
         return achievement.getLevels().stream()
                 .filter(level -> level.getLevel() == currentLevel + 1)
                 .filter(level -> currentProgress >= level.getRequirementValue())
@@ -128,11 +111,9 @@ public class AchievementService {
 
     private void handleAchievementLevelUpdate(Player player, Achievement achievement, UserUnlockedAchievement unlockedAchievement, AchievementLevel newLevel) {
         if (newLevel == null) {
-            log.warn("New level is null");
             return;
         }
         if (unlockedAchievement == null) {
-            log.warn("Not unlocked, creating new achievement");
             unlockedAchievement = UserUnlockedAchievement.builder()
                     .player(player)
                     .achievement(achievement)
@@ -140,7 +121,6 @@ public class AchievementService {
                     .achievedAt(Instant.now())
                     .build();
         } else {
-            log.warn("Already unlocked, updating to new level is applicable, {}", newLevel);
             unlockedAchievement.setCurrentLevel(newLevel);
             unlockedAchievement.setAchievedAt(Instant.now());
         }
@@ -159,8 +139,6 @@ public class AchievementService {
                 .earnedAt(unlockedAchievement.getAchievedAt())
                 .build();
         
-        log.warn("Username is: {} ", player.getUsername());
-        log.warn("Sending achievement notif");
         simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
     }
 }
