@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.player.model.Player;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,6 +46,7 @@ public class JwtService {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
+        claims.put("playerId", ((Player) userDetails).getId());
 
         return Jwts
                 .builder()
@@ -82,6 +84,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+    
+    public Long extractPlayerId(String token) {
+        return extractClaim(token, claims -> claims.get("playerId", Long.class));
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimResolver) {

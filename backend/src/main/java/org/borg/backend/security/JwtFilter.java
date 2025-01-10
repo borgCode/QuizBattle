@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +47,14 @@ public class JwtFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtService.isTokenValid(jwt, userDetails)) {
+                
+                Long playerId = jwtService.extractPlayerId(jwt);
+                Map<String, Object> details = new HashMap<>();
+                details.put("playerId", playerId);
+                
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
-                        null,
+                        details,
                         userDetails.getAuthorities()
                 );
                 authenticationToken.setDetails(
