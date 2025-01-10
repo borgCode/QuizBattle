@@ -3,6 +3,7 @@ import {FullConversationDto} from '../../../api/generated/models/full-conversati
 import {BehaviorSubject, Subject} from 'rxjs';
 import {WebSocketService} from '../../websocket/web-socket.service';
 import {filter} from 'rxjs/operators';
+import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 
 export interface Message {
   id: number,
@@ -18,6 +19,7 @@ export interface Message {
 })
 export class WhisperWindowService {
   private openConversations = new BehaviorSubject<FullConversationDto[]>([]);
+  private openConversationsIds: number[] = [];
 
   private messageSubject = new Subject<Message>()
   message$ = this.messageSubject.asObservable();
@@ -32,8 +34,10 @@ export class WhisperWindowService {
 
   addToConversations(conversation: FullConversationDto) {
     const currentConversations = this.openConversations.getValue();
-    if (currentConversations.indexOf(conversation) === -1) {
+    console.log(conversation)
+    if (!this.openConversationsIds.includes(conversation.id)) {
       const newConversations = [...currentConversations, conversation];
+      this.openConversationsIds.push(conversation.id)
       this.openConversations.next(newConversations);
 
     }
@@ -47,6 +51,7 @@ export class WhisperWindowService {
         ...currentConversations.slice(index + 1)
       ];
       this.openConversations.next(newConversations);
+      this.openConversationsIds = this.openConversationsIds.filter((id) => id !== conversation.id);
     }
   }
   get conversations$() {

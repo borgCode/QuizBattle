@@ -69,7 +69,6 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   ngAfterViewInit() {
     const observer = new IntersectionObserver((entries) => {
-        console.log(entries)
         const visibleMessageIds = entries
           .filter(entry => entry.isIntersecting)
           .filter(entry => {
@@ -79,8 +78,8 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
           .map(entry => entry.target.getAttribute("data-message-id"));
 
         if (visibleMessageIds.length > 0) {
-          console.log(visibleMessageIds)
           const ids = visibleMessageIds.map(id => parseInt(id));
+
           this.messageService.markAsRead1({messageIds: ids, playerId: this.storedPlayer.id}).subscribe();
           visibleMessageIds.forEach(id => {
             const element = this.messageElements.find(el =>

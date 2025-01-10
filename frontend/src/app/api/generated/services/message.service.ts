@@ -27,7 +27,7 @@ export class MessageService extends BaseService {
   }
 
   /** Path part for operation `markAsRead1()` */
-  static readonly MarkAsRead1Path = '/messages/read';
+  static readonly MarkAsRead1Path = '/messages/mark-as-read';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
