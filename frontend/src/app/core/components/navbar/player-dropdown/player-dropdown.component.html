@@ -5,16 +5,25 @@
          alt="player avatar" class="rounded-circle"/>
   </button>
   <div class="dropdown-menu dropdown-menu-end p-0">
-    <div class="player-info justify-content-start d-flex align-items-center p-2 player-info-panel">
+    <div class="player-info justify-content-start d-flex align-items-center p-2">
       <img [src]="'data:image/jpeg;base64,' + this.player.base64Image"
            style="max-height: 50px; max-width: 60px"
            alt="player avatar" class="rounded-circle"/>
-      <h6 class="ms-2">{{ this.player.displayName }}</h6>
+      <h6 class="player-name ms-2">{{ this.player.displayName }}</h6>
     </div>
-    <div class="player-navigation-list p-2">
-      <a class="nav-link" routerLink="/profile" routerLinkActive="active">Profile</a>
-      <a class="nav-link" routerLink="/settings" routerLinkActive="active">Settings</a>
-      <a class="nav-link" routerLink="/profile" routerLinkActive="active" (click)="logout()">Logout</a>
+    <div class="nav-list p-2">
+      <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </a>
+      <a class="nav-link" routerLink="/settings" routerLinkActive="active">
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+      </a>
+      <a class="nav-link" routerLink="/profile" routerLinkActive="active" (click)="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </a>
     </div>
   </div>
 </div>

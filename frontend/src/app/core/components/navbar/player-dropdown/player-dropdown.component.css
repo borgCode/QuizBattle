@@ -1,5 +1,24 @@
-.player-info-panel {
+.dropdown-menu {
+  border-radius: 8px;
   border: 1px solid black;
+}
+
+.player-info {
+  border-bottom: 1px solid #eee;
+  border-radius: 8px 8px 0 0;
+}
+
+.player-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nav-link {
+  font-size: 16px;
+}
+
+.nav-link:hover {
+  background-color: #e7eaef;
 }
 
 
