@@ -1,5 +1,6 @@
 package org.borg.backend.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,7 +54,17 @@ public class SecurityConfig {
                                 .authenticated()
                 ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("Unauthorized: " + authException.getMessage());
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getWriter().write("Access Denied: " + accessDeniedException.getMessage());
+                        })
+                );
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         
         return http.build();
@@ -72,8 +83,4 @@ public class SecurityConfig {
         return source;
     }
     
-    @Bean
-    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
-        return new DefaultMethodSecurityExpressionHandler();
-    }
 }
