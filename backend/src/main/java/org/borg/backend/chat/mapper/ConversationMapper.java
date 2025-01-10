@@ -52,7 +52,7 @@ public class ConversationMapper {
                 .id(conversation.getId())
                 .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
                 .messages(MessageMapper.multipleToDTO(conversation.getMessages()))
-                .latestMessageIsRead(conversation.getLatestMessage().isRead())
+                .latestMessageIsRead(conversation.isLatestMessageIsRead())
                 .build();
     }
 }

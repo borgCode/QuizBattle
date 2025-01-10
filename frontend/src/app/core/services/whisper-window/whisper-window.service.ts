@@ -7,6 +7,7 @@ import {filter} from 'rxjs/operators';
 export interface Message {
   id: number,
   senderId: number,
+  receiverId: number,
   sentAt: string,
   isRead: boolean,
   content: string
@@ -21,10 +22,8 @@ export class WhisperWindowService {
   private messageSubject = new Subject<Message>()
   message$ = this.messageSubject.asObservable();
 
-
   constructor(
     private webSocketService: WebSocketService
-
   ) {
     this.webSocketService.message$.subscribe(message => {
       this.messageSubject.next(message);
@@ -39,7 +38,6 @@ export class WhisperWindowService {
 
     }
   }
-
   removeFromConversations(conversation: FullConversationDto) {
     const currentConversations = this.openConversations.getValue();
     const index = currentConversations.indexOf(conversation)
@@ -51,7 +49,6 @@ export class WhisperWindowService {
       this.openConversations.next(newConversations);
     }
   }
-
   get conversations$() {
     return this.openConversations.asObservable();
   }
@@ -66,6 +63,7 @@ export class WhisperWindowService {
       {
         id: Date.now(),
         senderId: param.messageRequest.senderId,
+        receiverId: param.messageRequest.receiverId,
         sentAt: new Date().toISOString(),
         isRead: true,
         content: param.messageRequest.message

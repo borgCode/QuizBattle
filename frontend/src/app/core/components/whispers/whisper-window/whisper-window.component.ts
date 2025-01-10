@@ -76,7 +76,6 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
         if (visibleMessageIds.length > 0) {
           console.log(visibleMessageIds)
-
           visibleMessageIds.forEach(id => {
             const element = this.unreadElements.find(el =>
               el.nativeElement.getAttribute('data-message-id') === id

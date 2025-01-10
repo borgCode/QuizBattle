@@ -17,11 +17,38 @@ import { getConversation } from '../fn/message/get-conversation';
 import { GetConversation$Params } from '../fn/message/get-conversation';
 import { getPlayerConversations } from '../fn/message/get-player-conversations';
 import { GetPlayerConversations$Params } from '../fn/message/get-player-conversations';
+import { markAsRead1 } from '../fn/message/mark-as-read-1';
+import { MarkAsRead1$Params } from '../fn/message/mark-as-read-1';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
+  }
+
+  /** Path part for operation `markAsRead1()` */
+  static readonly MarkAsRead1Path = '/messages/read';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `markAsRead1()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  markAsRead1$Response(params: MarkAsRead1$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return markAsRead1(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `markAsRead1$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  markAsRead1(params: MarkAsRead1$Params, context?: HttpContext): Observable<void> {
+    return this.markAsRead1$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `getConversation()` */

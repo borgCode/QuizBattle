@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, combineLatest, debounceTime, startWith} from 'rxjs';
 import {ConversationPreviewDto} from '../../../../api/generated/models/conversation-preview-dto';
 import {MessageService} from '../../../../api/generated/services/message.service';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
@@ -7,13 +7,15 @@ import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-whispers-dropdown',
   imports: [
     AsyncPipe,
     NgForOf,
-    NgIf
+    NgIf,
+    ReactiveFormsModule
   ],
   templateUrl: './whispers-dropdown.component.html',
   styleUrl: './whispers-dropdown.component.css'
@@ -23,7 +25,10 @@ export class WhispersDropdownComponent implements OnInit {
   unreadConversations$ = this.unreadConversations.asObservable();
 
   private readConversations = new BehaviorSubject<ConversationPreviewDto[]>([]);
-  readConversations$ = this.readConversations.asObservable();
+
+  searchControl = new FormControl("");
+  filteredUnread: ConversationPreviewDto[] = [];
+  filteredRead: ConversationPreviewDto[] = [];
 
   playerId: number;
 
@@ -52,6 +57,20 @@ export class WhispersDropdownComponent implements OnInit {
         this.fetchConversations();
       }
     })
+
+    combineLatest([
+      this.unreadConversations,
+      this.readConversations,
+      this.searchControl.valueChanges.pipe(
+        startWith(""),
+        debounceTime(150)
+      )
+    ]).subscribe(([unread, read, searchTerm]) => {
+      this.filteredUnread = unread.filter(conversation =>
+        conversation.otherPlayer.displayName.toLowerCase().includes(searchTerm.toLowerCase()));
+      this.filteredRead = read.filter(conversation =>
+        conversation.otherPlayer.displayName.toLowerCase().includes(searchTerm.toLowerCase()));
+    })
   }
 
   private fetchConversations() {
@@ -67,11 +86,6 @@ export class WhispersDropdownComponent implements OnInit {
       )
     }
   }
-
-  deleteConversation(id: number) {
-
-  }
-
   openConversation(otherPlayerId: number) {
     this.messageService.getConversation({
       body: {

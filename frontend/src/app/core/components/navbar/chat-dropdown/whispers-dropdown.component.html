@@ -13,10 +13,9 @@
     <div class="d-flex justify-content-center p-3 border-bottom">
       <h6>Whispers</h6>
     </div>
-    <input class="search-whispers-input" placeholder="Search for players" type="text">
-    <ng-container *ngIf="unreadConversations$ | async as unreadConversations">
+    <input class="search-whispers-input" [formControl]="searchControl" placeholder="Search for players" type="text">
       <div class="conversation-list">
-        <div *ngFor="let conversation of unreadConversations">
+        <div *ngFor="let conversation of filteredUnread">
           <div class="conversation-item p-1 unread position-relative"
                (click)="openConversation(conversation.otherPlayer.id)">
             <div class="player-info justify-content-start d-flex align-items-center">
@@ -29,18 +28,15 @@
               </div>
               <button class="garbage-btn btn-sm btn-link text-muted position-absolute top-0 end-0"
                       data-bs-toggle="tooltip"
-                      title="Delete conversation"
-                      (click)="deleteConversation(conversation.id)">
+                      title="Delete conversation">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
           </div>
         </div>
       </div>
-    </ng-container>
-    <ng-container *ngIf="readConversations$ | async as readConversations">
       <div class="conversation-list">
-        <div *ngFor="let conversation of readConversations">
+        <div *ngFor="let conversation of filteredRead">
           <div class="conversation-item p-1 read position-relative"
                (click)="openConversation(conversation.otherPlayer.id)">
             <div class="player-info justify-content-start d-flex align-items-center">
@@ -53,14 +49,12 @@
               </div>
               <button class="garbage-btn btn-sm btn-link text-muted position-absolute top-0 end-0"
                       data-bs-toggle="tooltip"
-                      title="Delete conversation"
-                      (click)="deleteConversation(conversation.id)">
+                      title="Delete conversation">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
           </div>
         </div>
       </div>
-    </ng-container>
   </div>
 </div>
