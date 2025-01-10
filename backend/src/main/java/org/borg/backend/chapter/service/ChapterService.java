@@ -17,6 +17,7 @@ import org.borg.backend.shared.enums.ProgressStatus;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,10 @@ public class ChapterService {
     public InitiateProgressResponse initiateProgress(InitiateProgressRequest request) {
         PlayerProgress playerProgress = playerProgressRepository.findById(request.getPlayerProgressId())
                 .orElseThrow(() -> new EntityNotFoundException("Progress not found"));
+        
+        if (!playerProgress.getPlayer().getId().equals(request.getPlayerId())) {
+            throw new AccessDeniedException("Not authorized to initiate chapter");
+        }
 
         playerProgress.setStartedAt(LocalDate.now());
         playerProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);

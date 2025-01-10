@@ -42,14 +42,14 @@ public class NotificationController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/read/all")
     public ResponseEntity<Void> markAllAsRead(@RequestParam List<Long> notificationIds, @RequestParam long playerId) {
-        notificationService.markAllAsRead(notificationIds);
+        notificationService.markAllAsRead(notificationIds, playerId);
         return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/archive/{notificationId}")
     public ResponseEntity<Void> archiveNotification(@PathVariable long notificationId, @RequestParam long playerId) {
-        notificationService.archiveNotification(notificationId);
+        notificationService.archiveNotification(notificationId, playerId);
         return ResponseEntity.ok().build();
     }
 }

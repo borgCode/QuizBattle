@@ -12,7 +12,6 @@ public enum BusinessErrorCodes {
     ACCOUNT_DISABLED(103, HttpStatus.FORBIDDEN, "User account is disabled"),
     BAD_CREDENTIALS(104, HttpStatus.FORBIDDEN, "Username and/or password is incorrect"),
     USERNAME_TAKEN(105, HttpStatus.BAD_REQUEST, "Username is taken"),
-    ACCESS_DENIED(130, HttpStatus.FORBIDDEN, "You don't have permission to perform this action"),
     
     CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER(200, HttpStatus.BAD_REQUEST, "Cannot send friend request to blocked user"),
     FRIENDSHIP_REQUEST_PENDING(201, HttpStatus.BAD_REQUEST, "Friend request is already pending"),

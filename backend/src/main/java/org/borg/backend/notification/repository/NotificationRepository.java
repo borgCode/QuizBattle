@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -37,4 +38,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("UPDATE Notification n SET n.isRead = true " +
             "WHERE n.id IN :notificationIds")
     void markNotificationsAsRead(@Param("notificationIds") List<Long> notificationIds);
+
+    long countByIdInAndPlayerIdNot(Collection<Long> ids, Long playerId);
 }

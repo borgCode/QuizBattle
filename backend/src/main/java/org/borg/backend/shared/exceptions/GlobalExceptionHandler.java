@@ -79,13 +79,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ExceptionResponse> handleException(AccessDeniedException exception) {
+    public ResponseEntity<ExceptionResponse> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ExceptionResponse.builder()
-                        .businessErrorCode(BusinessErrorCodes.ACCESS_DENIED.getCode())
-                        .businessErrorDescription(BusinessErrorCodes.ACCESS_DENIED.getDescription())
-                        .error(exception.getMessage())
+                        .businessErrorDescription("Access denied")
+                        .error(ex.getMessage())
                         .build());
     }
 

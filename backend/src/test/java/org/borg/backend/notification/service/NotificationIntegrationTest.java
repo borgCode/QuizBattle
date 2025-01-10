@@ -74,7 +74,7 @@ public class NotificationIntegrationTest {
         List<Long> notificationIds = notificationList.stream()
                 .map(Notification::getId)
                 .toList();
-        notificationService.markAllAsRead(notificationIds);
+        notificationService.markAllAsRead(notificationIds, playerWithNotificationsId);
 
         List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
         List<Notification> updatedReadNotifications = updatedNotificationsList.stream()
@@ -88,7 +88,7 @@ public class NotificationIntegrationTest {
         notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 
         List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
-        notificationService.archiveNotification(notificationList.get(0).getId());
+        notificationService.archiveNotification(notificationList.get(0).getId(), playerWithNotificationsId);
 
         List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
         assertEquals(0, updatedNotificationsList.size(), "Notification should be marked as archived");

@@ -7,6 +7,7 @@ import org.borg.backend.chapter.dto.InitiateProgressRequest;
 import org.borg.backend.chapter.dto.InitiateProgressResponse;
 import org.borg.backend.chapter.service.ChapterService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,7 +22,9 @@ public class ChapterController {
     public ResponseEntity<ChapterDTO> getChapter(@PathVariable long chapterId) {
         return ResponseEntity.ok().body(chapterService.getChapter(chapterId));
     }
-    
+
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
     @PostMapping("/progress/start") 
     public ResponseEntity<InitiateProgressResponse> initiateProgress(@RequestBody InitiateProgressRequest request) {
         return ResponseEntity.ok().body(chapterService.initiateProgress(request));

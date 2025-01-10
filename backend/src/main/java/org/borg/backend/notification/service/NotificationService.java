@@ -125,23 +125,34 @@ public class NotificationService {
                 .build());
     }
     
-    public void markAsRead(Long notificationId, long playerId) {
+    public void markAsRead(long notificationId, long playerId) {
         Notification notification = notificationRepository.findById(notificationId)
                         .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
         if (!notification.getPlayerId().equals(playerId)) {
-            throw new AccessDeniedException("Not authorized to archive this notification");
+            throw new AccessDeniedException("Not authorized to mark notification as read");
         }
         
         notification.setRead(true);
         notificationRepository.save(notification);
     }
-    public void markAllAsRead(List<Long> notificationIds) {
+    public void markAllAsRead(List<Long> notificationIds, long playerId) {
+        long invalidIdCount = notificationRepository.countByIdInAndPlayerIdNot(notificationIds, playerId);
+        
+        if (invalidIdCount > 0) {
+            throw new AccessDeniedException("Not authorized to mark notifications as read");
+        }
+        
         notificationRepository.markNotificationsAsRead(notificationIds);
     }
     
-    public void archiveNotification(Long notificationId) {
+    public void archiveNotification(long notificationId, long playerId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+
+        if (!notification.getPlayerId().equals(playerId)) {
+            throw new AccessDeniedException("Not authorized to mark notification as archived");
+        }
+        
         notification.setArchived(true);
         notificationRepository.save(notification);
     }
