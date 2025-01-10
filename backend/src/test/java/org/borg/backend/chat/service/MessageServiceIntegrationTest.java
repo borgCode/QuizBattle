@@ -154,8 +154,83 @@ public class MessageServiceIntegrationTest {
                     () -> assertEquals(player1.getId(), messageList.get(0).getSenderId(), "First message should be sent by player1")
             );
         }
-    }
 
+        @Test
+        void shouldMarkSingleMessageAsRead() {
+            
+            FullConversationDTO conversation = messagingService.createConversation(player1.getId(), player2.getId());
+            List<Message> messages = createAndSendMessages(2, conversation.getId());
+            Long messageIdToMark = messages.get(0).getId();
+            
+            messagingService.markMessagesAsRead(List.of(messageIdToMark));
+            
+            List<Message> updatedMessages = messageRepository.findAll();
+            assertAll(
+                    () -> assertTrue(isMessageMarkedAsRead(messageIdToMark, updatedMessages),
+                            "Target message should be marked as read"),
+                    () -> assertEquals(1, countUnreadMessages(updatedMessages),
+                            "One message should remain unread")
+            );
+        }
+
+        @Test
+        void shouldMarkAllMessagesInConversationAsRead() {
+            FullConversationDTO conversation = messagingService.createConversation(player1.getId(), player2.getId());
+            List<Message> messages = createAndSendMessages(10, conversation.getId());
+            List<Long> allMessageIds = getMessageIds(messages);
+            
+            messagingService.markMessagesAsRead(allMessageIds);
+            
+            List<Message> updatedMessages = messageRepository.findAll();
+            assertAll(
+                    () -> assertEquals(10, countReadMessages(updatedMessages),
+                            "All messages should be marked as read"),
+                    () -> assertEquals(0, countUnreadMessages(updatedMessages),
+                            "No messages should remain unread")
+            );
+        }
+
+        private List<Message> createAndSendMessages(int numOfMessages, Long conversationId) {
+            for (int i = 0; i < numOfMessages; i++) {
+                SendMessageRequest messageRequest = SendMessageRequest.builder()
+                        .senderId(player1.getId())
+                        .receiverId(player2.getId())
+                        .receiverUsername(player2.getUsername())
+                        .conversationId(conversationId)
+                        .message("Hello friend " + i)
+                        .build();
+                messagingService.sendMessage(messageRequest);
+            }
+            return messageRepository.findAll();
+        }
+
+        private List<Long> getMessageIds(List<Message> messages) {
+            return messages.stream()
+                    .map(Message::getId)
+                    .toList();
+        }
+
+        private boolean isMessageMarkedAsRead(Long messageId, List<Message> messages) {
+            return messages.stream()
+                    .filter(m -> m.getId().equals(messageId))
+                    .findFirst()
+                    .map(Message::isRead)
+                    .orElse(false);
+        }
+
+        private long countUnreadMessages(List<Message> messages) {
+            return messages.stream()
+                    .filter(message -> !message.isRead())
+                    .count();
+        }
+
+        private long countReadMessages(List<Message> messages) {
+            return messages.stream()
+                    .filter(Message::isRead)
+                    .count();
+        }
+    }
+    
     @Nested
     class GettingConversationsTests {
         Player receiverPlayer;
