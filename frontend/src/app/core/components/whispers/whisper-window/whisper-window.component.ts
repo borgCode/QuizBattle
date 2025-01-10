@@ -30,7 +30,7 @@ import {MessageDto} from '../../../../api/generated/models/message-dto';
 })
 export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
   @ViewChild("messageArea") private messageArea: ElementRef;
-  @ViewChildren("messageElement") private messageElements: QueryList<ElementRef>
+  @ViewChildren("unreadMessage") private unreadElements: QueryList<ElementRef>
   private isScrolledToBottom = true;
 
   @Input() conversation: FullConversationDto
@@ -75,7 +75,7 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
         if (visibleMessageIds.length > 0) {
           console.log(visibleMessageIds)
           visibleMessageIds.forEach(id => {
-            const element = this.messageElements.find(el =>
+            const element = this.unreadElements.find(el =>
               el.nativeElement.getAttribute('data-message-id') === id
             );
             if (element) {
@@ -85,16 +85,15 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
         }
       });
 
-    this.messageElements.changes.subscribe(() => {
-      this.messageElements.forEach(element => {
+    this.unreadElements.changes.subscribe(() => {
+      this.unreadElements.forEach(element => {
         observer.observe(element.nativeElement);
       });
     });
-    this.messageElements.forEach(element => {
+    this.unreadElements.forEach(element => {
       observer.observe(element.nativeElement)
     })
   }
-
   ngAfterViewChecked() {
     if (this.isScrolledToBottom) {
       const element = this.messageArea.nativeElement;

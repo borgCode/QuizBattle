@@ -15,13 +15,22 @@
   <div class="message-area" #messageArea>
     <ng-container *ngFor="let message of conversation.messages">
       <ng-container *ngIf="message.senderId == this.storedPlayer.id; else elseBlock">
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break">
           <span class="player">{{ this.storedPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
       </ng-container>
       <ng-template #elseBlock>
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break"
+             [attr.data-message-id]="message.id"
+             #unreadMessage
+             *ngIf="!message.read">
+          <span class="other-player">{{ conversation.otherPlayer.displayName }}: </span>
+          <span class="message-text">{{ message.content }}</span>
+        </div>
+        <div class="message-item text-break"
+             [attr.data-message-id]="message.id"
+             *ngIf="message.read">
           <span class="other-player">{{ conversation.otherPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
@@ -29,13 +38,13 @@
     </ng-container>
     <ng-container *ngFor="let message of newMessages$ | async">
       <ng-container *ngIf="message.senderId == this.storedPlayer.id; else newElseBlock">
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break">
           <span class="player">{{ this.storedPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
       </ng-container>
       <ng-template #newElseBlock>
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break" #unreadMessage [attr.data-message-id]="message.id">
           <span class="other-player">{{ conversation.otherPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
