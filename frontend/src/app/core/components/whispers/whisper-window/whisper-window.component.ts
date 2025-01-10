@@ -16,6 +16,7 @@ import {Message, WhisperWindowService} from '../../../services/whisper-window/wh
 import {PlayerDto} from '../../../../api/generated/models/player-dto';
 import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {MessageDto} from '../../../../api/generated/models/message-dto';
+import {MessageService} from '../../../../api/generated/services/message.service';
 
 @Component({
   selector: 'app-whisper-window',
@@ -45,7 +46,8 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   constructor(
     private whisperWindowService: WhisperWindowService,
-    private loginStateService: LoginStateService
+    private loginStateService: LoginStateService,
+    private messageService: MessageService
   ) {
     this.storedPlayer = this.loginStateService.loggedInUser;
     this.message$ = this.whisperWindowService.message$;
@@ -70,10 +72,16 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
         console.log(entries)
         const visibleMessageIds = entries
           .filter(entry => entry.isIntersecting)
+          .filter(entry => {
+            const messageElement = entry.target as HTMLElement;
+            return messageElement.querySelector(".other-player") !== null;
+          })
           .map(entry => entry.target.getAttribute("data-message-id"));
 
         if (visibleMessageIds.length > 0) {
           console.log(visibleMessageIds)
+          const ids = visibleMessageIds.map(id => parseInt(id));
+          this.messageService.markAsRead1({messageIds: ids, playerId: this.storedPlayer.id}).subscribe();
           visibleMessageIds.forEach(id => {
             const element = this.messageElements.find(el =>
               el.nativeElement.getAttribute('data-message-id') === id
