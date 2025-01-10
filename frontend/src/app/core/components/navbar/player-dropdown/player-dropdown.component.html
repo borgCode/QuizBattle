@@ -1,7 +1,20 @@
 <div class="dropdown">
-  <button class="btn btn-dark position-relative" id="chatDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+  <button class="btn btn-dark position-relative" id="chatDropdown" data-bs-toggle="dropdown"
           aria-expanded="false">
-    <img src="https://placehold.co/40" style="max-height: 40px; max-width: 40px"
+    <img [src]="'data:image/jpeg;base64,' + this.player.base64Image" style="max-height: 40px; max-width: 40px"
          alt="player avatar" class="rounded-circle"/>
   </button>
+  <div class="dropdown-menu dropdown-menu-end p-0">
+    <div class="player-info justify-content-start d-flex align-items-center p-2 player-info-panel">
+      <img [src]="'data:image/jpeg;base64,' + this.player.base64Image"
+           style="max-height: 50px; max-width: 60px"
+           alt="player avatar" class="rounded-circle"/>
+      <h6 class="ms-2">{{ this.player.displayName }}</h6>
+    </div>
+    <div class="player-navigation-list p-2">
+      <a class="nav-link" routerLink="/profile" routerLinkActive="active">Profile</a>
+      <a class="nav-link" routerLink="/settings" routerLinkActive="active">Settings</a>
+      <a class="nav-link" routerLink="/profile" routerLinkActive="active" (click)="logout()">Logout</a>
+    </div>
+  </div>
 </div>

@@ -14,14 +14,6 @@
         </ng-container>
 
         <!--        Protected routes-->
-        <ng-container *ngIf="loginStateService.isLoggedIn$ | async">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/profile" routerLinkActive="active">My profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" (click)="logout()" style="cursor: pointer;">Logout</a>
-          </li>
-        </ng-container>
       </ul>
       <ng-container *ngIf="loginStateService.isLoggedIn$ | async">
         <app-whispers-dropdown></app-whispers-dropdown>
