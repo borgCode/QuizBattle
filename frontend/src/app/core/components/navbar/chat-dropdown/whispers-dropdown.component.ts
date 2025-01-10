@@ -95,7 +95,6 @@ export class WhispersDropdownComponent implements OnInit {
     }).subscribe({
       next: conversation => {
         this.whisperWindowService.addToConversations(conversation)
-        this.fetchConversations();
       },
     })
   }
