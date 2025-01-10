@@ -34,8 +34,6 @@ public class FriendshipService {
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
-        log.warn("Friend request sender: " + request.getSenderId());
-        log.warn("Friend request receiver: " + request.getReceiverId());
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 

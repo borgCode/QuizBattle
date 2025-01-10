@@ -6,6 +6,7 @@ import {LoginStateService} from '../../../services/login-state-service/login-sta
 import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
 
 @Component({
   selector: 'app-whispers-dropdown',
@@ -24,22 +25,26 @@ export class WhispersDropdownComponent implements OnInit {
   private readConversations = new BehaviorSubject<ConversationPreviewDto[]>([]);
   readConversations$ = this.readConversations.asObservable();
 
+  playerId: number;
+
   constructor(
     private messageService: MessageService,
     private loginStateService: LoginStateService,
-    private router: Router
+    private router: Router,
+    private whisperWindowService: WhisperWindowService
   ) {
   }
 
   ngOnInit() {
-   this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
-     if (isLoggedIn) {
-       this.fetchConversations();
-     } else {
-       this.unreadConversations.next([]);
-       this.readConversations.next([]);
-     }
-   })
+    this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.playerId = this.loginStateService.loggedInUser.id;
+        this.fetchConversations();
+      } else {
+        this.unreadConversations.next([]);
+        this.readConversations.next([]);
+      }
+    })
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)).subscribe(() => {
@@ -51,7 +56,7 @@ export class WhispersDropdownComponent implements OnInit {
 
   private fetchConversations() {
     if (this.loginStateService.loggedInUser.id) {
-      this.messageService.getPlayerConversations({playerId: this.loginStateService.loggedInUser.id}).subscribe(
+      this.messageService.getPlayerConversations({playerId: this.playerId}).subscribe(
         conversations => {
           const unreadConversations = conversations.filter(conversation => !conversation.latestMessageIsRead);
           const readConversations = conversations.filter(conversation => conversation.latestMessageIsRead);
@@ -63,11 +68,21 @@ export class WhispersDropdownComponent implements OnInit {
     }
   }
 
-  markAsRead(conversationId) {
+  deleteConversation(id: number) {
 
   }
 
-  deleteConversation(id: number) {
-
+  openConversation(otherPlayerId: number) {
+    this.messageService.getConversation({
+      body: {
+        senderId: this.playerId,
+        receiverId: otherPlayerId
+      }
+    }).subscribe({
+      next: conversation => {
+        this.whisperWindowService.addToConversations(conversation)
+        this.fetchConversations();
+      },
+    })
   }
 }

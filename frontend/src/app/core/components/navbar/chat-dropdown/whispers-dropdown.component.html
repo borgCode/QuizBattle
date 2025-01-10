@@ -1,6 +1,5 @@
 <div class="dropdown">
   <button class="btn btn-dark position-relative" id="chatDropdown" data-bs-toggle="dropdown"
-          data-bs-auto-close="outside"
           aria-expanded="false">
     <i class="fa-regular fa-message"></i>
     <ng-container *ngIf="unreadConversations$ | async as unreadConversations">
@@ -19,7 +18,7 @@
       <div class="conversation-list">
         <div *ngFor="let conversation of unreadConversations">
           <div class="conversation-item p-1 unread position-relative"
-               (click)="markAsRead(conversation.id)">
+               (click)="openConversation(conversation.otherPlayer.id)">
             <div class="player-info justify-content-start d-flex align-items-center">
               <img [src]="'data:image/jpeg;base64,' + conversation.otherPlayer.base64Image"
                    style="max-height: 40px; max-width: 40px"
@@ -42,7 +41,8 @@
     <ng-container *ngIf="readConversations$ | async as readConversations">
       <div class="conversation-list">
         <div *ngFor="let conversation of readConversations">
-          <div class="conversation-item p-1 read position-relative">
+          <div class="conversation-item p-1 read position-relative"
+               (click)="openConversation(conversation.otherPlayer.id)">
             <div class="player-info justify-content-start d-flex align-items-center">
               <img [src]="'data:image/jpeg;base64,' + conversation.otherPlayer.base64Image"
                    style="max-height: 40px; max-width: 40px"

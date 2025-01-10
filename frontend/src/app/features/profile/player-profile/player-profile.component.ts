@@ -132,8 +132,6 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "MESSAGE":
-        console.log(this.player.id)
-        console.log($event.playerId)
         this.messageService.getConversation({
           body: {
             senderId: this.player.id,

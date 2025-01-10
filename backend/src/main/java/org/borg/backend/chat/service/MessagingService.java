@@ -58,10 +58,8 @@ public class MessagingService {
         if (messageIds.isEmpty()) {
             return;
         }
-
         long invalidIdCount = messageRepository.countByIdInAndReceiverIdNot(messageIds, playerId);
-        log.warn("Invalid id count {} for player {}", invalidIdCount, playerId);
-
+        
         if (invalidIdCount > 0) {
             throw new AccessDeniedException("Not authorized to mark messages as read");
         }
@@ -76,6 +74,8 @@ public class MessagingService {
         if (conversation == null) {
             return createConversation(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
         }
+        
+        
         return ConversationMapper.toFullConversationDTO(conversation, conversationRequest.getSenderId());
     }
 
@@ -95,4 +95,5 @@ public class MessagingService {
     public List<ConversationPreviewDTO> getPlayerConversations(Long playerId) {
         return ConversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
     }
+    
 }

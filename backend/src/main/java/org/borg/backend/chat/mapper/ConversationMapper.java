@@ -24,7 +24,7 @@ public class ConversationMapper {
         return ConversationPreviewDTO.builder()
                 .id(conversation.getId())
                 .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
-                .latestMessageIsRead(conversation.isLatestMessageIsRead())
+                .latestMessageIsRead(conversation.getLatestMessage().isRead())
                 .latestMessage(conversation.getLatestMessage().getContent())
                 .build();
     }
@@ -52,7 +52,7 @@ public class ConversationMapper {
                 .id(conversation.getId())
                 .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
                 .messages(MessageMapper.multipleToDTO(conversation.getMessages()))
-                .latestMessageIsRead(conversation.isLatestMessageIsRead())
+                .latestMessageIsRead(conversation.getLatestMessage().isRead())
                 .build();
     }
 }
