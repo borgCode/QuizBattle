@@ -51,6 +51,15 @@ public class MessagingService {
         simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/message", MessageMapper.toDTO(message));
         
     }
+    public void markMessagesAsRead(List<Long> messageIds) {
+        if (messageIds.isEmpty()) {
+            return;
+        }
+        
+        messageRepository.markMessagesAsRead(messageIds);
+    }
+    
+    
     public FullConversationDTO getConversation(ConversationRequest conversationRequest) {
         Conversation conversation = conversationRepository.findByBothPlayerIds(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
         if (conversation == null) {

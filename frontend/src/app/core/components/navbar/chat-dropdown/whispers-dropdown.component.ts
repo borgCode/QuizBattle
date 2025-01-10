@@ -68,6 +68,6 @@ export class WhispersDropdownComponent implements OnInit {
   }
 
   deleteConversation(id: number) {
-    
+
   }
 }
