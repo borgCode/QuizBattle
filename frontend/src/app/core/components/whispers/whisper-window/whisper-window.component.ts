@@ -16,7 +16,6 @@ import {Message, WhisperWindowService} from '../../../services/whisper-window/wh
 import {PlayerDto} from '../../../../api/generated/models/player-dto';
 import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {MessageDto} from '../../../../api/generated/models/message-dto';
-import {MessageService} from '../../../../api/generated/services/message.service';
 
 @Component({
   selector: 'app-whisper-window',
@@ -31,7 +30,7 @@ import {MessageService} from '../../../../api/generated/services/message.service
 })
 export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
   @ViewChild("messageArea") private messageArea: ElementRef;
-  @ViewChildren("unreadMessage") private unreadElements: QueryList<ElementRef>
+  @ViewChildren("messageElement") private messageElements: QueryList<ElementRef>
   private isScrolledToBottom = true;
 
   @Input() conversation: FullConversationDto
@@ -46,8 +45,7 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   constructor(
     private whisperWindowService: WhisperWindowService,
-    private loginStateService: LoginStateService,
-    private messageService: MessageService
+    private loginStateService: LoginStateService
   ) {
     this.storedPlayer = this.loginStateService.loggedInUser;
     this.message$ = this.whisperWindowService.message$;
@@ -77,7 +75,7 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
         if (visibleMessageIds.length > 0) {
           console.log(visibleMessageIds)
           visibleMessageIds.forEach(id => {
-            const element = this.unreadElements.find(el =>
+            const element = this.messageElements.find(el =>
               el.nativeElement.getAttribute('data-message-id') === id
             );
             if (element) {
@@ -87,15 +85,16 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
         }
       });
 
-    this.unreadElements.changes.subscribe(() => {
-      this.unreadElements.forEach(element => {
+    this.messageElements.changes.subscribe(() => {
+      this.messageElements.forEach(element => {
         observer.observe(element.nativeElement);
       });
     });
-    this.unreadElements.forEach(element => {
+    this.messageElements.forEach(element => {
       observer.observe(element.nativeElement)
     })
   }
+
   ngAfterViewChecked() {
     if (this.isScrolledToBottom) {
       const element = this.messageArea.nativeElement;
