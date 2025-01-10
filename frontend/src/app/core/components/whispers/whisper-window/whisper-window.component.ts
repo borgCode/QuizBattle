@@ -1,4 +1,13 @@
-import {AfterViewChecked, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {
+  AfterViewChecked,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import {FullConversationDto} from '../../../../api/generated/models/full-conversation-dto';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
@@ -19,8 +28,9 @@ import {MessageDto} from '../../../../api/generated/models/message-dto';
   templateUrl: './whisper-window.component.html',
   styleUrl: './whisper-window.component.css'
 })
-export class WhisperWindowComponent implements AfterViewChecked{
+export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
   @ViewChild("messageArea") private messageArea: ElementRef;
+  @ViewChildren("messageElement") private messageElements: QueryList<ElementRef>
   private isScrolledToBottom = true;
 
   @Input() conversation: FullConversationDto
@@ -52,6 +62,36 @@ export class WhisperWindowComponent implements AfterViewChecked{
         const element = this.messageArea.nativeElement;
         this.isScrolledToBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 1;
       })
+    })
+  }
+
+  ngAfterViewInit() {
+    const observer = new IntersectionObserver((entries) => {
+        console.log(entries)
+        const visibleMessageIds = entries
+          .filter(entry => entry.isIntersecting)
+          .map(entry => entry.target.getAttribute("data-message-id"));
+
+        if (visibleMessageIds.length > 0) {
+          console.log(visibleMessageIds)
+          visibleMessageIds.forEach(id => {
+            const element = this.messageElements.find(el =>
+              el.nativeElement.getAttribute('data-message-id') === id
+            );
+            if (element) {
+              observer.unobserve(element.nativeElement);
+            }
+          });
+        }
+      });
+
+    this.messageElements.changes.subscribe(() => {
+      this.messageElements.forEach(element => {
+        observer.observe(element.nativeElement);
+      });
+    });
+    this.messageElements.forEach(element => {
+      observer.observe(element.nativeElement)
     })
   }
 

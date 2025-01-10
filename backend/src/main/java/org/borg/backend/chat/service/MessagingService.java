@@ -55,7 +55,6 @@ public class MessagingService {
         if (messageIds.isEmpty()) {
             return;
         }
-        
         messageRepository.markMessagesAsRead(messageIds);
     }
     
