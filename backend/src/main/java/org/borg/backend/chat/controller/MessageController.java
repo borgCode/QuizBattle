@@ -35,7 +35,7 @@ public class MessageController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("read")
     public ResponseEntity<Void> markAsRead(@RequestParam List<Long> messageIds, @RequestParam long playerId) {
-        messagingService.markMessagesAsRead(messageIds);
+        messagingService.markMessagesAsRead(messageIds, playerId);
         return ResponseEntity.ok().build();
     }
 

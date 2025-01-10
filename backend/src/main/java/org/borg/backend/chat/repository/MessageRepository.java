@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -18,4 +19,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("UPDATE Message m SET m.isRead = true " +
             "WHERE m.id IN :ids")
     void markMessagesAsRead(@Param("ids") List<Long> messageIds);
+
+    long countByIdInAndReceiverIdNot(Collection<Long> ids, Long receiverId);
 }

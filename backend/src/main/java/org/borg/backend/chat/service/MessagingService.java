@@ -16,6 +16,7 @@ import org.borg.backend.chat.repository.MessageRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,25 +41,36 @@ public class MessagingService {
         Message message = messageRepository.save(Message.builder()
                 .conversation(conversation)
                 .senderId(request.getSenderId())
+                .receiverId(request.getReceiverId())
                 .content(request.getMessage())
                 .sentAt(Instant.now())
                 .isRead(false)
                 .build());
-        
+
         conversation.setLatestMessage(message);
         conversationRepository.save(conversation);
 
         simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/message", MessageMapper.toDTO(message));
-        
+
     }
-    public void markMessagesAsRead(List<Long> messageIds) {
+
+    public void markMessagesAsRead(List<Long> messageIds, long playerId) {
         if (messageIds.isEmpty()) {
             return;
         }
+
+        long invalidIdCount = messageRepository.countByIdInAndReceiverIdNot(messageIds, playerId);
+        log.warn("Invalid id count {} for player {}", invalidIdCount, playerId);
+
+        if (invalidIdCount > 0) {
+            throw new AccessDeniedException("Not authorized to mark messages as read");
+        }
+
+
         messageRepository.markMessagesAsRead(messageIds);
     }
-    
-    
+
+
     public FullConversationDTO getConversation(ConversationRequest conversationRequest) {
         Conversation conversation = conversationRepository.findByBothPlayerIds(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
         if (conversation == null) {
@@ -66,7 +78,7 @@ public class MessagingService {
         }
         return ConversationMapper.toFullConversationDTO(conversation, conversationRequest.getSenderId());
     }
-    
+
     public FullConversationDTO createConversation(Long senderId, Long receiverId) {
         Player player1 = playerRepository.findById(senderId)
                 .orElseThrow(() -> new EntityNotFoundException("Sender not found"));
@@ -79,7 +91,7 @@ public class MessagingService {
                 .build());
         return ConversationMapper.toFullConversationDTO(conversation, senderId);
     }
-    
+
     public List<ConversationPreviewDTO> getPlayerConversations(Long playerId) {
         return ConversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
     }

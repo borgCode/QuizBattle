@@ -162,7 +162,7 @@ public class MessageServiceIntegrationTest {
             List<Message> messages = createAndSendMessages(2, conversation.getId());
             Long messageIdToMark = messages.get(0).getId();
             
-            messagingService.markMessagesAsRead(List.of(messageIdToMark));
+            messagingService.markMessagesAsRead(List.of(messageIdToMark), player2.getId());
             
             List<Message> updatedMessages = messageRepository.findAll();
             assertAll(
@@ -179,7 +179,7 @@ public class MessageServiceIntegrationTest {
             List<Message> messages = createAndSendMessages(10, conversation.getId());
             List<Long> allMessageIds = getMessageIds(messages);
             
-            messagingService.markMessagesAsRead(allMessageIds);
+            messagingService.markMessagesAsRead(allMessageIds, player2.getId());
             
             List<Message> updatedMessages = messageRepository.findAll();
             assertAll(
