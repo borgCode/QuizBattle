@@ -117,9 +117,9 @@ public class PlayerMatchService {
         Long newSessionId = createMultiplayerSession(pendingSession);
 
         if (response.isRematch()) {
-            notificationService.sendRematchAcceptedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
+            notificationService.sendRematchAcceptedNotification(response.getReceiverId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
         } else {
-            notificationService.sendMatchAcceptedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
+            notificationService.sendMatchAcceptedNotification(response.getReceiverId(), response.getPlayerDisplayName(), response.getNotificationId(), newSessionId);
         }
         pendingSessionRepository.delete(pendingSession);
         return newSessionId;
@@ -148,9 +148,9 @@ public class PlayerMatchService {
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));
 
         if (response.isRematch()) {
-            notificationService.sendRematchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
+            notificationService.sendRematchRejectedNotification(response.getReceiverId(), response.getPlayerDisplayName(), response.getNotificationId());
         } else {
-            notificationService.sendMatchRejectedNotification(response.getOriginalSenderId(), response.getPlayerDisplayName(), response.getNotificationId());
+            notificationService.sendMatchRejectedNotification(response.getReceiverId(), response.getPlayerDisplayName(), response.getNotificationId());
         }
         pendingSessionRepository.delete(pendingSession);
     }

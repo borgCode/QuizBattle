@@ -30,6 +30,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   private readNotifications = new BehaviorSubject<Notification[]>([]);
   readNotifications$ = this.readNotifications.asObservable();
 
+  playerId: number;
+
 
   constructor(
     protected notificationService: NotificationService,
@@ -44,6 +46,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
       if (isLoggedIn) {
+        this.playerId = this.loginStateService.loggedInUser.id;
         this.fetchNotifications();
       } else {
         this.unreadNotifications.next([]);
@@ -68,9 +71,9 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
 
   private fetchNotifications() {
-    console.log("User id: " + this.loginStateService.loggedInUser.id)
-    if (this.loginStateService.loggedInUser.id) {
-      this.notificationService.getActivePlayerNotifications({playerId: this.loginStateService.loggedInUser.id}).subscribe(
+    console.log("User id: " + this.playerId)
+    if (this.playerId) {
+      this.notificationService.getActivePlayerNotifications({playerId: this.playerId}).subscribe(
         notifications => {
           const readNotifications = notifications.filter(notification => notification.read);
           const unreadNotifications = notifications.filter(notification => !notification.read);
@@ -87,7 +90,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
     this.friendshipService.acceptFriend({
       body: {
-        senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
+        senderId: this.playerId, receiverId: originalSender, notificationId: notificationId
       }
     }).subscribe({
       next: () => {
@@ -100,7 +103,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   declineFriendRequest(originalSender: number, notificationId: number) {
     this.friendshipService.rejectFriendship({
       body: {
-        senderId: this.loginStateService.loggedInUser.id, receiverId: originalSender, notificationId: notificationId
+        senderId: this.playerId, receiverId: originalSender, notificationId: notificationId
       }
     }).subscribe({
       next: () => {
@@ -113,7 +116,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   acceptRematch(senderId: number, pendingSessionId: number, notificationId: number) {
     this.multiplayerMatchService.acceptMatch({
       body: {
-        originalSenderId: senderId,
+        senderId: this.playerId,
+        receiverId: senderId,
         notificationId: notificationId,
         pendingSessionId: pendingSessionId,
         playerDisplayName: this.loginStateService.loggedInUser.displayName,
@@ -152,7 +156,8 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   declineRematchRequest(senderId: number, pendingSessionId: number, notificationId: number) {
     this.multiplayerMatchService.rejectMatch({
       body: {
-        originalSenderId: senderId,
+        senderId: this.playerId,
+        receiverId: senderId,
         notificationId: notificationId,
         pendingSessionId: pendingSessionId,
         playerDisplayName: this.loginStateService.loggedInUser.displayName,
@@ -184,7 +189,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   markAsRead(notificationId: number) {
-    this.notificationService.markAsRead({notificationId: notificationId}).subscribe({
+    this.notificationService.markAsRead({notificationId: notificationId, playerId: this.playerId}).subscribe({
       next: () => {
         this.fetchNotifications();
       }
@@ -192,7 +197,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   archiveNotification(notificationId: number) {
-    this.notificationService.archiveNotification({notificationId: notificationId}).subscribe({
+    this.notificationService.archiveNotification({notificationId: notificationId, playerId: this.playerId}).subscribe({
       next: () => {
         this.fetchNotifications();
       }
@@ -201,7 +206,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
   markAllAsRead() {
     const notificationIds: number[] = this.unreadNotifications.value.map(notification => notification.id)
-    this.notificationService.markAllAsRead({notificationIds: notificationIds}).subscribe({
+    this.notificationService.markAllAsRead({notificationIds: notificationIds, playerId: this.playerId}).subscribe({
       next: () => {
         this.fetchNotifications();
       }

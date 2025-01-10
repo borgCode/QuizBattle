@@ -34,42 +34,55 @@ public class FriendshipController {
         friendshipService.sendFriendRequest(request);
         return ResponseEntity.ok().build();
     }
+    
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#response.senderId)")
     @PostMapping("/accept")
     public ResponseEntity<Void> acceptFriend(@RequestBody PlayerInteractionResponse response) {
         friendshipService.handleFriendshipResponse(response, true);
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#response.senderId)")
     @PostMapping("/reject")
     public ResponseEntity<Void> rejectFriendship(@RequestBody PlayerInteractionResponse response) {
         friendshipService.handleFriendshipResponse(response, false);
         return ResponseEntity.ok().build();
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/block")
     public ResponseEntity<Void> blockPlayer(@RequestBody PlayerInteraction request) {
         friendshipService.blockPlayer(request);
         return ResponseEntity.ok().build();
     }
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/unblock")
     public ResponseEntity<Void> unblockPlayer(@RequestBody PlayerInteraction request) {
         friendshipService.unblockPlayer(request);
         return ResponseEntity.ok().build();
     }
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/remove")
     public ResponseEntity<Void> removeAsFriend(@RequestBody PlayerInteraction request) {
         friendshipService.removeAsFriend(request);
         return ResponseEntity.ok().build();
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/friends/{playerId}")
     public ResponseEntity<List<PlayerDTO>> getFriends(@PathVariable long playerId) {
         return ResponseEntity.ok(friendshipService.getFriends(playerId));
     }
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/relationships/{playerId}")
     public ResponseEntity<RelationshipsDTO> getRelationships(@PathVariable long playerId) {
         return ResponseEntity.ok(friendshipService.getRelationships(playerId));
     }
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#relationshipStatusRequest.playerId)")
     @GetMapping("/relationship/status")
     public ResponseEntity<FriendshipStatus> getRelationshipStatus(RelationshipStatusRequest relationshipStatusRequest) {
         return ResponseEntity.ok(friendshipService.getRelationshipStatus(relationshipStatusRequest));

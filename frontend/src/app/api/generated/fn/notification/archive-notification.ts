@@ -11,12 +11,14 @@ import { RequestBuilder } from '../../request-builder';
 
 export interface ArchiveNotification$Params {
   notificationId: number;
+  playerId: number;
 }
 
 export function archiveNotification(http: HttpClient, rootUrl: string, params: ArchiveNotification$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, archiveNotification.PATH, 'post');
   if (params) {
     rb.path('notificationId', params.notificationId, {});
+    rb.query('playerId', params.playerId, {});
   }
 
   return http.request(

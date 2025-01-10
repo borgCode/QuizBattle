@@ -94,7 +94,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   private getGameState() {
 
-    this.multiplayerGameService.getGameState({sessionId: this.sessionId}).subscribe({
+    this.multiplayerGameService.getGameState({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
       next: gameState => {
         this.gameState = gameState;
 

@@ -86,7 +86,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   private loadCategorySelection() {
     this.resetState();
 
-    this.questionService.getThreeRandomCategories({sessionId: this.sessionId}).subscribe({
+    this.questionService.getThreeRandomCategories({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
       next: categories =>
         this.categories = categories
     })

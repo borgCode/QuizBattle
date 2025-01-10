@@ -8,6 +8,7 @@ import org.borg.backend.game.multiplayer.service.MatchMakingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +36,8 @@ public class MatchmakingController {
     public void declineMatch(@Payload MatchDecision matchDecision) {
         matchMakingService.handleMatchResponse(matchDecision.getMatchmakingSessionId(), matchDecision.getPlayerId(), false);
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @DeleteMapping("/matchmaking/cancel/{playerId}")
     public ResponseEntity<Void> cancelMatchmaking(@PathVariable long playerId) {
         matchMakingService.cancelMatchmaking(playerId);

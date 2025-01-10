@@ -9,6 +9,7 @@ import org.borg.backend.story.dto.StoryOverviewDTO;
 import org.borg.backend.story.dto.StoryOverviewRequest;
 import org.borg.backend.story.service.StoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -20,11 +21,13 @@ public class StoryController {
 
     private final StoryService storyService;
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/all/{playerId}")
     public ResponseEntity<AllStoriesDTO> getAllStories(@PathVariable long playerId) {
         return ResponseEntity.ok().body(storyService.getAllStories(playerId));
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
     @PostMapping("/story-overview")
     public ResponseEntity<StoryOverviewDTO> getStoryOverview(@RequestBody StoryOverviewRequest request) {
         return ResponseEntity.ok().body(storyService.getStoryOverview(request));

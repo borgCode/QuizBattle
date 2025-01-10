@@ -12,6 +12,7 @@ import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
 import org.borg.backend.game.singleplayer.dto.SingleplayerQuestionsRequest;
 import org.borg.backend.question.dto.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,47 +28,56 @@ public class QuestionController {
     private final MultiplayerQuestionService multiplayerQuestionService;
     private final RoundSessionService roundSessionService;
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/multiplayer/{sessionId}/categories")
-    public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable long sessionId) {
+    public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable long sessionId, @RequestParam long playerId) {
         return ResponseEntity.ok(multiplayerQuestionService.getThreeRandomCategories(sessionId));
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/multiplayer/{playerId}/restore")
     public ResponseEntity<List<QuestionDTO>> restoreSessionQuestions(@PathVariable long playerId) {
         return ResponseEntity.ok(multiplayerQuestionService.restoreSessionQuestions(playerId));
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/multiplayer/{playerId}/clear")
     public ResponseEntity<Void> clearPlayerSession(@PathVariable long playerId) {
         roundSessionService.finishSession(playerId);
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
     @PostMapping("/multiplayer/questions")
     public ResponseEntity<List<QuestionDTO>> getNewQuestionsForCategory(@RequestBody MultiplayerQuestionsRequest request) {
         return ResponseEntity.ok(multiplayerQuestionService.getNewQuestionsForCategory(request));
     }
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
     @PostMapping("/multiplayer/answer")
     public ResponseEntity<AnswerValidationResponse> validateMultiplayerAnswer(@RequestBody MultiplayerAnswerValidationRequest request) {
         return ResponseEntity.ok(multiplayerQuestionService.validateMultiplayerAnswer(request));
     }
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/multiplayer/{sessionId}/{playerId}")
     public ResponseEntity<List<QuestionDTO>> getActiveSessionQuestions(@PathVariable long sessionId, @PathVariable long playerId) {
         return ResponseEntity.ok(multiplayerQuestionService.getActiveSessionQuestions(sessionId, playerId));
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
     @PostMapping("/chapter/random-questions")
     public ResponseEntity<List<QuestionDTO>> getSinglePlayerRoundQuestions(@RequestBody SingleplayerQuestionsRequest request) {
         return ResponseEntity.ok(singlePlayerQuestionService.getSinglePlayerRoundQuestions(request));
     }
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
     @PostMapping("/chapter/validate-answer")
     public ResponseEntity<AnswerValidationResponse> validateSingleplayerAnswer(@RequestBody SinglePlayerAnswerValidationRequest request) {
         return ResponseEntity.ok(singlePlayerQuestionService.validateSingleplayerAnswer(request));
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/chapter/results/{playerId}")
     public ResponseEntity<List<Boolean>> getRoundResults(@PathVariable long playerId) {
         return ResponseEntity.ok(singlePlayerQuestionService.getRoundResults(playerId));

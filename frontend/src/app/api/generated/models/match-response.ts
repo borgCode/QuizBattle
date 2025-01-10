@@ -4,8 +4,9 @@
 
 export interface MatchResponse {
   notificationId?: number;
-  originalSenderId?: number;
   pendingSessionId?: number;
   playerDisplayName?: string;
+  receiverId?: number;
   rematch?: boolean;
+  senderId?: number;
 }

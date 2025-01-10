@@ -144,6 +144,7 @@ public class PlayerMatchServiceIntegrationTest {
         );
 
         return new MatchResponse(
+                opponentPlayer.getId(),
                 opponentNotification.getSenderId(),
                 opponentPlayer.getDisplayName(),
                 opponentNotification.getPendingSessionId(),
@@ -240,6 +241,7 @@ public class PlayerMatchServiceIntegrationTest {
         );
         
         MatchResponse response = new MatchResponse(
+                opponentPlayer.getId(),
                 opponentNotification.getSenderId(),
                 opponentPlayer.getDisplayName(),
                 opponentNotification.getPendingSessionId(),

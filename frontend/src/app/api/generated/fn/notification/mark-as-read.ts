@@ -11,12 +11,14 @@ import { RequestBuilder } from '../../request-builder';
 
 export interface MarkAsRead$Params {
   notificationId: number;
+  playerId: number;
 }
 
 export function markAsRead(http: HttpClient, rootUrl: string, params: MarkAsRead$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, markAsRead.PATH, 'post');
   if (params) {
     rb.path('notificationId', params.notificationId, {});
+    rb.query('playerId', params.playerId, {});
   }
 
   return http.request(

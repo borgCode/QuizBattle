@@ -11,12 +11,14 @@ import { RequestBuilder } from '../../request-builder';
 
 export interface GetThreeRandomCategories$Params {
   sessionId: number;
+  playerId: number;
 }
 
 export function getThreeRandomCategories(http: HttpClient, rootUrl: string, params: GetThreeRandomCategories$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<string>>> {
   const rb = new RequestBuilder(rootUrl, getThreeRandomCategories.PATH, 'get');
   if (params) {
     rb.path('sessionId', params.sessionId, {});
+    rb.query('playerId', params.playerId, {});
   }
 
   return http.request(

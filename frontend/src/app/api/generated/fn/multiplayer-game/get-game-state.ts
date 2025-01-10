@@ -12,12 +12,14 @@ import { GameStateResponse } from '../../models/game-state-response';
 
 export interface GetGameState$Params {
   sessionId: number;
+  playerId: number;
 }
 
 export function getGameState(http: HttpClient, rootUrl: string, params: GetGameState$Params, context?: HttpContext): Observable<StrictHttpResponse<GameStateResponse>> {
   const rb = new RequestBuilder(rootUrl, getGameState.PATH, 'get');
   if (params) {
     rb.path('sessionId', params.sessionId, {});
+    rb.query('playerId', params.playerId, {});
   }
 
   return http.request(

@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class MatchResponse {
-    private Long originalSenderId;
+    private Long senderId;
+    private Long receiverId;
     private String playerDisplayName;
     private Long pendingSessionId;
     private Long notificationId;

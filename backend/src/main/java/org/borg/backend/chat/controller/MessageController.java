@@ -11,6 +11,7 @@ import org.borg.backend.chat.service.MessagingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +31,14 @@ public class MessageController {
         log.warn("Receiving message");
         messagingService.sendMessage(messageRequest);
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/conversation")
     public ResponseEntity<FullConversationDTO> getConversation(@RequestBody ConversationRequest request) {
         return ResponseEntity.ok(messagingService.getConversation(request));
     }
-    
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/conversations/{playerId}")
     public ResponseEntity<List<ConversationPreviewDTO>> getPlayerConversations(@PathVariable long playerId) {
         return ResponseEntity.ok(messagingService.getPlayerConversations(playerId));
