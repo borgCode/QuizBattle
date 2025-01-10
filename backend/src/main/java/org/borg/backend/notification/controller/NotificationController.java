@@ -35,7 +35,7 @@ public class NotificationController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/read/{notificationId}")
     public ResponseEntity<Void> markAsRead(@PathVariable long notificationId, @RequestParam long playerId) {
-        notificationService.markAsRead(notificationId);
+        notificationService.markAsRead(notificationId, playerId);
         return ResponseEntity.ok().build();
     }
 

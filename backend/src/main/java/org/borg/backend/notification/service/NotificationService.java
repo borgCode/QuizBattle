@@ -8,6 +8,7 @@ import org.borg.backend.notification.model.Notification;
 import org.borg.backend.shared.enums.NotificationType;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -124,9 +125,13 @@ public class NotificationService {
                 .build());
     }
     
-    public void markAsRead(Long notificationId) {
+    public void markAsRead(Long notificationId, long playerId) {
         Notification notification = notificationRepository.findById(notificationId)
                         .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+        if (!notification.getPlayerId().equals(playerId)) {
+            throw new AccessDeniedException("Not authorized to archive this notification");
+        }
+        
         notification.setRead(true);
         notificationRepository.save(notification);
     }

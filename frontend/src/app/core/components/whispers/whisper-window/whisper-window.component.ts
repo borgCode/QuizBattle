@@ -16,6 +16,7 @@ import {Message, WhisperWindowService} from '../../../services/whisper-window/wh
 import {PlayerDto} from '../../../../api/generated/models/player-dto';
 import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {MessageDto} from '../../../../api/generated/models/message-dto';
+import {MessageService} from '../../../../api/generated/services/message.service';
 
 @Component({
   selector: 'app-whisper-window',
@@ -45,7 +46,8 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   constructor(
     private whisperWindowService: WhisperWindowService,
-    private loginStateService: LoginStateService
+    private loginStateService: LoginStateService,
+    private messageService: MessageService
   ) {
     this.storedPlayer = this.loginStateService.loggedInUser;
     this.message$ = this.whisperWindowService.message$;
@@ -74,6 +76,7 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
         if (visibleMessageIds.length > 0) {
           console.log(visibleMessageIds)
+
           visibleMessageIds.forEach(id => {
             const element = this.unreadElements.find(el =>
               el.nativeElement.getAttribute('data-message-id') === id

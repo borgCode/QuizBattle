@@ -52,7 +52,7 @@ public class NotificationIntegrationTest {
         assertEquals(1, notificationList.size(), "Player should have one notification");
         assertFalse(notificationList.get(0).isRead(), "Notification should be unread");
         
-        notificationService.markAsRead(notificationList.get(0).getId());
+        notificationService.markAsRead(notificationList.get(0).getId(), playerWithNotificationsId);
 
         List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
         assertEquals(1, notificationList.size(), "Player should have one notification");

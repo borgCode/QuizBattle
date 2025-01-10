@@ -32,6 +32,13 @@ public class MessageController {
         messagingService.sendMessage(messageRequest);
     }
 
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
+    @PostMapping("read")
+    public ResponseEntity<Void> markAsRead(@RequestParam List<Long> messageIds, @RequestParam long playerId) {
+        messagingService.markMessagesAsRead(messageIds);
+        return ResponseEntity.ok().build();
+    }
+
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/conversation")
     public ResponseEntity<FullConversationDTO> getConversation(@RequestBody ConversationRequest request) {

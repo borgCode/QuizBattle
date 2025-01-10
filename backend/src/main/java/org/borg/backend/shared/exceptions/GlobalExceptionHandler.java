@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -76,6 +78,16 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionResponse> handleException(AccessDeniedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(BusinessErrorCodes.ACCESS_DENIED.getCode())
+                        .businessErrorDescription(BusinessErrorCodes.ACCESS_DENIED.getDescription())
+                        .error(exception.getMessage())
+                        .build());
+    }
 
 
     @ExceptionHandler(GameException.class)
@@ -85,7 +97,7 @@ public class GlobalExceptionHandler {
                 .businessErrorDescription(exception.getErrorCode().getDescription())
                 .error(exception.getMessage())
                 .build();
-        
+
         return ResponseEntity
                 .status(exception.getErrorCode().getHttpStatus())
                 .body(response);
@@ -113,7 +125,7 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
-    
+
     @ExceptionHandler(FriendshipException.class)
     public ResponseEntity<ExceptionResponse> handleException(FriendshipException exception) {
         ExceptionResponse response = ExceptionResponse.builder()
@@ -121,13 +133,13 @@ public class GlobalExceptionHandler {
                 .businessErrorDescription(exception.getErrorCode().getDescription())
                 .error(exception.getMessage())
                 .build();
-        
+
         return ResponseEntity
                 .status(exception.getErrorCode().getHttpStatus())
                 .body(response);
     }
-    
-    
+
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
         return ResponseEntity
@@ -137,5 +149,5 @@ public class GlobalExceptionHandler {
                         .error(exception.getMessage())
                         .build());
     }
-    
+
 }
