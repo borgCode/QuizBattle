@@ -83,6 +83,7 @@ public class ChapterService {
         if (chapterProgress.getProgressStatus().equals(ProgressStatus.COMPLETED)) {
             return;
         }
+        
 
         chapterProgress.setCompletedAt(LocalDate.now());
         chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
