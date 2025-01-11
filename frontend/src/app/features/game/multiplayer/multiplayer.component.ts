@@ -17,6 +17,9 @@ import {AlertMessageService} from '../../../core/services/alert-message/alert-me
 import {MultiplayerGameService} from '../../../api/generated/services/multiplayer-game.service';
 import {MultiplayerMatchmakingService} from '../../../api/generated/services/multiplayer-matchmaking.service';
 import {MultiplayerMatchService} from '../../../api/generated/services/multiplayer-match.service';
+import {
+  ConfirmationDialogComponent
+} from '../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
 
 
 interface MatchDecision {
@@ -56,7 +59,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
     private matchFoundDialog: MatDialog,
     private matchConfirmedDialog: MatDialog,
     private friendListDialog: MatDialog,
-    private alertMessageService: AlertMessageService
+    private alertMessageService: AlertMessageService,
   ) {
   }
 
