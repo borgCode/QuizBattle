@@ -8,12 +8,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { ChapterRoundResults } from '../../models/chapter-round-results';
 
 export interface GetRoundResults$Params {
   playerId: number;
 }
 
-export function getRoundResults(http: HttpClient, rootUrl: string, params: GetRoundResults$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<boolean>>> {
+export function getRoundResults(http: HttpClient, rootUrl: string, params: GetRoundResults$Params, context?: HttpContext): Observable<StrictHttpResponse<ChapterRoundResults>> {
   const rb = new RequestBuilder(rootUrl, getRoundResults.PATH, 'get');
   if (params) {
     rb.path('playerId', params.playerId, {});
@@ -24,7 +25,7 @@ export function getRoundResults(http: HttpClient, rootUrl: string, params: GetRo
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<boolean>>;
+      return r as StrictHttpResponse<ChapterRoundResults>;
     })
   );
 }

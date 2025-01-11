@@ -4,6 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
+import org.borg.backend.chapter.model.ChapterProgress;
+import org.borg.backend.chapter.repository.ChapterProgressRepository;
+import org.borg.backend.chapter.service.ChapterService;
 import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
@@ -32,9 +35,14 @@ public class SinglePlayerQuestionService {
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChapterSessionService chapterSessionService;
+    private final ChapterProgressRepository chapterProgressRepository;
+    private final ChapterService chapterService;
 
     public List<QuestionDTO> getSinglePlayerRoundQuestions(SingleplayerQuestionsRequest request) {
-        List<Question> questions = questionRepository.findFiveRandomQuestionsByCategory(request.getCategory());
+        ChapterSession session = chapterSessionService.getSession(request.getPlayerId());
+        String currentCategory = session.getCurrentCategory();
+
+        List<Question> questions = questionRepository.findFiveRandomQuestionsByCategory(currentCategory);
 
         List<Long> questionIds = questions.stream()
                 .map(Question::getId)
@@ -43,7 +51,7 @@ public class SinglePlayerQuestionService {
         roundSessionService.initializeSession(
                 request.getPlayerId(),
                 questionIds,
-                request.getCategory(),
+                currentCategory,
                 RoundType.SINGLE_PLAYER
         );
 
@@ -105,7 +113,15 @@ public class SinglePlayerQuestionService {
         List<Boolean> results = roundSessionService.getSessionAnswers(playerId);
         roundSessionService.finishSession(playerId);
 
+        ChapterRoundResults roundResults = chapterSessionService.getRoundResults(playerId, results);
         
-        return chapterSessionService.getRoundResults(playerId, results);
+        if (roundResults.isChapterComplete() && !roundResults.isGameOver()) {
+            ChapterProgress progress = chapterProgressRepository
+                    .findByPlayerIdAndChapterId(playerId, chapterSessionService.getSession(playerId).getChapterId());
+            chapterService.updateChapterProgress(progress.getId());
+            chapterSessionService.clearSession(playerId);
+        }
+
+        return roundResults;
     }
 }

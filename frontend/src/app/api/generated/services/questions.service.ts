@@ -12,6 +12,7 @@ import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
 import { AnswerValidationResponse } from '../models/answer-validation-response';
+import { ChapterRoundResults } from '../models/chapter-round-results';
 import { clearPlayerSession } from '../fn/questions/clear-player-session';
 import { ClearPlayerSession$Params } from '../fn/questions/clear-player-session';
 import { getActiveSessionQuestions } from '../fn/questions/get-active-session-questions';
@@ -247,7 +248,7 @@ export class QuestionsService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getRoundResults$Response(params: GetRoundResults$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<boolean>>> {
+  getRoundResults$Response(params: GetRoundResults$Params, context?: HttpContext): Observable<StrictHttpResponse<ChapterRoundResults>> {
     return getRoundResults(this.http, this.rootUrl, params, context);
   }
 
@@ -257,9 +258,9 @@ export class QuestionsService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getRoundResults(params: GetRoundResults$Params, context?: HttpContext): Observable<Array<boolean>> {
+  getRoundResults(params: GetRoundResults$Params, context?: HttpContext): Observable<ChapterRoundResults> {
     return this.getRoundResults$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<boolean>>): Array<boolean> => r.body)
+      map((r: StrictHttpResponse<ChapterRoundResults>): ChapterRoundResults => r.body)
     );
   }
 

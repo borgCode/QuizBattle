@@ -83,26 +83,7 @@ export class PlayChapterComponent implements OnInit {
       this.chapterId = +params.get("chapterId");
     })
 
-    this.initProgress();
-
-    this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
-      next: chapter => {
-        this.categories = chapter.categories;
-        this.rewardText = chapter.rewardText
-        this.chapterTitle = chapter.title
-        this.chapterWinCondition = chapter.roundWinCondition;
-
-        console.log(this.rewardText)
-
-
-        this.fetchQuestions();
-      }
-    })
-
-  }
-
-  private initProgress() {
-    this.chapterService.initiateProgress({
+    this.chapterService.startChapter({
       body: {
         playerId: this.storedPlayerId,
         playerProgressId: this.playerProgressId,
@@ -110,25 +91,34 @@ export class PlayChapterComponent implements OnInit {
         chapterId: this.chapterId
       }
     }).subscribe({
-      next: response => {
-        this.playerProgressId = response.playerProgressId;
-        this.chapterProgressId = response.chapterProgressId;
+      next: () => {
+        this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
+          next: chapter => {
+            this.categories = chapter.categories;
+            this.rewardText = chapter.rewardText;
+            this.chapterTitle = chapter.title;
+            this.chapterWinCondition = chapter.roundWinCondition;
+            this.fetchQuestions();
+          }
+        });
       },
       error: err => {
         console.log(err)
       }
-    })
+    });
   }
+
 
   get hasQuestions(): boolean {
     return this.questions.length > 0;
   }
 
+  //TODO remove category null - send only ID
   private fetchQuestions() {
     this.resetQuestionState()
     this.questionService.getSinglePlayerRoundQuestions({
       body: {
-        category: this.categories[this.round],
+        category: null,
         playerId: this.storedPlayerId
       }
     }).subscribe({
@@ -187,31 +177,29 @@ export class PlayChapterComponent implements OnInit {
 
   handleRoundFinished() {
     this.questionService.getRoundResults({playerId: this.storedPlayerId}).subscribe({
-      next: results => {
-
-        console.log("Getting round results")
-        console.log(results)
-
+      next: (roundResults) => {
         const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
           data: {
-            roundResults: results,
+            roundResults: roundResults.questionResults,
             winCondition: this.chapterWinCondition
           },
           maxHeight: "90vh",
           width: "300px"
-        })
+        });
 
         dialogRef.afterClosed().subscribe(async () => {
-          console.log("Dialog is closed")
-          const correctCount = results.filter(value => value).length;
+          if (this.currentHealth !== roundResults.currentHealth) {
+            this.lastLostHeart = this.currentHealth;
+            this.currentHealth = roundResults.currentHealth;
+            this.animationState = "lostHeart";
 
-          if (correctCount <= 2) {
-            this.loseHeart();
-          } else {
-            this.round++;
+            setTimeout(() => {
+              this.animationState = "normal";
+              this.lastLostHeart = null;
+            }, 500);
           }
 
-          if (this.currentHealth == 0) {
+          if (roundResults.gameOver) {
             const retry = await this.handleLostGame();
             if (!retry) {
               return;
@@ -220,28 +208,17 @@ export class PlayChapterComponent implements OnInit {
 
           this.currentQuestionIndex = 0;
 
-          if (this.round >= this.categories.length) {
+          if (roundResults.chapterComplete) {
             this.handleChapterComplete();
           } else {
             this.fetchQuestions();
           }
-        })
+        });
       }
-    })
+    });
   }
 
-  loseHeart() {
-    if (this.currentHealth > 0) {
-      this.lastLostHeart = this.currentHealth;
-      this.currentHealth--;
-      this.animationState = "lostHeart"
 
-      setTimeout(() => {
-        this.animationState = "normal";
-        this.lastLostHeart = null;
-      }, 500)
-    }
-  }
 
   private handleLostGame(): Promise<boolean> {
     return new Promise((resolve) => {
@@ -253,40 +230,42 @@ export class PlayChapterComponent implements OnInit {
         }
       }).afterClosed().subscribe(result => {
         if (result === "yes") {
-          this.resetChapter();
-          resolve(true);
+          this.currentHealth = 3;
+          this.currentQuestionIndex = 0;
+          this.chapterService.startChapter({
+            body: {
+              playerId: this.storedPlayerId,
+              playerProgressId: this.playerProgressId,
+              storyId: this.storyId,
+              chapterId: this.chapterId
+            }
+          }).subscribe({
+            next: () => {
+              this.fetchQuestions();
+              resolve(true);
+            }
+          });
         } else {
-          this.router.navigate(['singleplayer/story', this.storyId])
+          this.router.navigate(['singleplayer/story', this.storyId]);
           resolve(false);
         }
-      })
-    })
+      });
+    });
 
   }
-
-  private resetChapter() {
-    this.currentHealth = 3;
-    this.round = 0;
-    this.fetchQuestions();
-  }
-
 
   private handleChapterComplete() {
-    this.chapterService.updateChapterProgress({chapterProgressId: this.chapterProgressId}).subscribe({
-      next: () => {
-        console.log(this.rewardText)
-        const refDialog = this.endGameDialog.open(ContentDialogComponent, {
-          data: {
-            contentTitle: "Chapter completed!",
-            message: this.rewardText,
-            onlyOkButton: true
-          }
-        })
-        refDialog.afterClosed().subscribe(() => {
-          this.router.navigate(['singleplayer/story', this.storyId])
-        })
+    const refDialog = this.endGameDialog.open(ContentDialogComponent, {
+      data: {
+        contentTitle: "Chapter completed!",
+        message: this.rewardText,
+        onlyOkButton: true
       }
-    })
+    });
+
+    refDialog.afterClosed().subscribe(() => {
+      this.router.navigate(['singleplayer/story', this.storyId]);
+    });
   }
 
 

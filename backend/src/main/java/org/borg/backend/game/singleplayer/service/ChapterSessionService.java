@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -39,8 +38,6 @@ public class ChapterSessionService {
         );
     }
     
-    
-    
     public void processRoundCompletion(Long playerId, List<Boolean> roundResults) {
         ChapterSession currentSession = activeSessions.get(playerId);
         
@@ -48,11 +45,22 @@ public class ChapterSessionService {
                 .filter(results -> results)
                 .count();
         
-        if (correctAnswers <= 2) {
+        if (correctAnswers <= currentSession.getWinCondition()) {
             currentSession.decrementHealth();
         } else {
             currentSession.incrementRound();
         }
+    }
+
+    public ChapterSession getSession(Long playerId) {
+        ChapterSession session = activeSessions.get(playerId);
+        if (session == null) {
+            throw new IllegalStateException("No active session found for player: " + playerId);
+        }
+        return session;
+    }
+    public void clearSession(Long playerId) {
+        activeSessions.remove(playerId);
     }
     
 }

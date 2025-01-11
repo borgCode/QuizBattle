@@ -14,9 +14,8 @@ import { StrictHttpResponse } from '../strict-http-response';
 import { ChapterDto } from '../models/chapter-dto';
 import { getChapter } from '../fn/chapter/get-chapter';
 import { GetChapter$Params } from '../fn/chapter/get-chapter';
-import { initiateProgress } from '../fn/chapter/initiate-progress';
-import { InitiateProgress$Params } from '../fn/chapter/initiate-progress';
-import { InitiateProgressResponse } from '../models/initiate-progress-response';
+import { startChapter } from '../fn/chapter/start-chapter';
+import { StartChapter$Params } from '../fn/chapter/start-chapter';
 import { updateChapterProgress } from '../fn/chapter/update-chapter-progress';
 import { UpdateChapterProgress$Params } from '../fn/chapter/update-chapter-progress';
 
@@ -51,28 +50,28 @@ export class ChapterService extends BaseService {
     );
   }
 
-  /** Path part for operation `initiateProgress()` */
-  static readonly InitiateProgressPath = '/chapter/progress/start';
+  /** Path part for operation `startChapter()` */
+  static readonly StartChapterPath = '/chapter/progress/start';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `initiateProgress()` instead.
+   * To access only the response body, use `startChapter()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  initiateProgress$Response(params: InitiateProgress$Params, context?: HttpContext): Observable<StrictHttpResponse<InitiateProgressResponse>> {
-    return initiateProgress(this.http, this.rootUrl, params, context);
+  startChapter$Response(params: StartChapter$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return startChapter(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `initiateProgress$Response()` instead.
+   * To access the full response (for headers, for example), `startChapter$Response()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  initiateProgress(params: InitiateProgress$Params, context?: HttpContext): Observable<InitiateProgressResponse> {
-    return this.initiateProgress$Response(params, context).pipe(
-      map((r: StrictHttpResponse<InitiateProgressResponse>): InitiateProgressResponse => r.body)
+  startChapter(params: StartChapter$Params, context?: HttpContext): Observable<void> {
+    return this.startChapter$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 
