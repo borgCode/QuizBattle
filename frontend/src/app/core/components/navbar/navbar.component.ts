@@ -1,8 +1,7 @@
 import {Component} from '@angular/core';
-import { Router, RouterLink, RouterLinkActive} from '@angular/router';
+import { RouterLink, RouterLinkActive} from '@angular/router';
 import {LoginStateService} from '../../services/login-state-service/login-state.service';
-import {AsyncPipe, NgIf} from '@angular/common';
-import {TokenService} from '../../services/token/token.service';
+import {AsyncPipe, Location, NgIf} from '@angular/common';
 import {WhispersDropdownComponent} from './chat-dropdown/whispers-dropdown.component';
 import {PlayerDropdownComponent} from './player-dropdown/player-dropdown.component';
 import {NotificationDropdownComponent} from './notification-dropdown/notification-dropdown.component';
@@ -26,15 +25,11 @@ export class NavbarComponent {
 
   constructor(
     protected loginStateService: LoginStateService,
-    private tokenService: TokenService,
-    private router: Router
+    private location: Location
   ) {
   }
 
-
-  logout() {
-    this.tokenService.clearTokens();
-    this.loginStateService.clearLoggedInUser();
-    this.router.navigate(['/login']);
+  goBack() {
+    this.location.back();
   }
 }
