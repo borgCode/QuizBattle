@@ -28,6 +28,7 @@ public enum BusinessErrorCodes {
     MUST_ANSWER_EXISTING_QUESTIONS(304, HttpStatus.BAD_REQUEST, "Player must answer the current questions before selecting a new category"),
     INVALID_QUESTION(305, HttpStatus.BAD_REQUEST, "The question does not belong to this session"),
     QUESTION_ALREADY_ANSWERED(306, HttpStatus.BAD_REQUEST, "Player has already answered this question"),
+    NO_ACTIVE_SESSION(307 , HttpStatus.BAD_REQUEST, "No active sessions found for player"),
     
     PROFILE_PIC_TOO_LARGE(400, HttpStatus.PAYLOAD_TOO_LARGE, "File size exceeds the maximum allowed limit of 500KB");
 

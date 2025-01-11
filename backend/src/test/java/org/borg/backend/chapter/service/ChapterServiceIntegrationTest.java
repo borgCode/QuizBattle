@@ -1,7 +1,7 @@
 package org.borg.backend.chapter.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.achievement.service.AchievementService;
+import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.game.singleplayer.dto.StartChapterRequest;

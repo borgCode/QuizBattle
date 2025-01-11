@@ -9,6 +9,7 @@ import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -54,11 +55,25 @@ public class GameValidationService {
         validateIfQuestionAnswered(request.getPlayerId(), request.getQuestionId());
     }
 
+    public void validateSinglePlayerAnswer(Long playerId, Long questionId) {
+        List<Long> sessionQuestions = roundSessionService.getSessionQuestions(playerId);
+        if (sessionQuestions.isEmpty()) {
+            log.warn("No active round session found for player: {}", playerId);
+            throw new GameException(BusinessErrorCodes.NO_ACTIVE_SESSION);
+        }
+
+        if (!sessionQuestions.contains(questionId)) {
+            log.warn("Question {} not in current round session for player: {}", questionId, playerId);
+            throw new GameException(BusinessErrorCodes.INVALID_QUESTION);
+        }
+        
+        validateIfQuestionAnswered(playerId, questionId);
+    }
+
     private void validateIfQuestionAnswered(Long playerId, Long questionId) {
         if (roundSessionService.isQuestionAnswered(playerId, questionId)) {
             log.warn("Attempt to answer already answered question: {}", questionId);
             throw new GameException(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED);
         }
     }
-
 }

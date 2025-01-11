@@ -1,4 +1,4 @@
-package org.borg.backend.achievement.model;
+package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,6 +1,6 @@
-package org.borg.backend.achievement.repository;
+package org.borg.backend.player.repository;
 
-import org.borg.backend.achievement.model.Achievement;
+import org.borg.backend.player.model.Achievement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

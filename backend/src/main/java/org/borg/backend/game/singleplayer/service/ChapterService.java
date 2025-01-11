@@ -4,7 +4,7 @@ package org.borg.backend.game.singleplayer.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.achievement.events.AchievementEvents;
+import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.game.singleplayer.dto.ChapterDTO;
 import org.borg.backend.game.singleplayer.dto.StartChapterRequest;
 import org.borg.backend.game.singleplayer.mapper.ChapterMapper;

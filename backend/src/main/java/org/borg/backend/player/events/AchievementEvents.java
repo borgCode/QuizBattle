@@ -1,4 +1,4 @@
-package org.borg.backend.achievement.events;
+package org.borg.backend.player.events;
 
 public class AchievementEvents {
     public record StoryCompletedEvent(Long playerId, String storyName) {}

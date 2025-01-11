@@ -1,7 +1,7 @@
-package org.borg.backend.achievement.listener;
+package org.borg.backend.player.listener;
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.achievement.service.AchievementService;
+import org.borg.backend.player.service.AchievementService;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import static org.borg.backend.achievement.events.AchievementEvents.*;
+import static org.borg.backend.player.events.AchievementEvents.*;
 
 @Component
 @RequiredArgsConstructor

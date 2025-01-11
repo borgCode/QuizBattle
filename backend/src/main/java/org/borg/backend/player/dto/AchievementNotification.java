@@ -1,9 +1,8 @@
-package org.borg.backend.achievement.model;
+package org.borg.backend.player.dto;
 
 import lombok.*;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Getter

@@ -1,28 +1,25 @@
-package org.borg.backend.achievement.service;
+package org.borg.backend.player.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.achievement.model.*;
-import org.borg.backend.achievement.repository.AchievementRepository;
-import org.borg.backend.achievement.events.AchievementEvents;
-import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
+import org.borg.backend.player.repository.AchievementRepository;
+import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
+import org.borg.backend.player.dto.AchievementNotification;
+import org.borg.backend.player.dto.UserUnlockedAchievementDTO;
+import org.borg.backend.player.model.Achievement;
+import org.borg.backend.player.model.AchievementLevel;
+import org.borg.backend.player.model.UserUnlockedAchievement;
 import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.Instant;
 import java.util.List;
-
-import static org.borg.backend.achievement.events.AchievementEvents.*;
 
 @Slf4j
 @Transactional

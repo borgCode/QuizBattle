@@ -1,12 +1,10 @@
-package org.borg.backend.achievement.model;
+package org.borg.backend.player.model;
 
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.player.model.Player;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor

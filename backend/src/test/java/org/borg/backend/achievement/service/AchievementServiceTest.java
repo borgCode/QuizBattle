@@ -1,13 +1,13 @@
 package org.borg.backend.achievement.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.achievement.events.AchievementEvents;
-import org.borg.backend.achievement.model.Achievement;
-import org.borg.backend.achievement.model.AchievementLevel;
-import org.borg.backend.achievement.model.AchievementNotification;
-import org.borg.backend.achievement.model.UserUnlockedAchievement;
-import org.borg.backend.achievement.repository.AchievementRepository;
-import org.borg.backend.achievement.repository.UserUnlockedAchievementRepository;
+import org.borg.backend.player.model.Achievement;
+import org.borg.backend.player.model.AchievementLevel;
+import org.borg.backend.player.dto.AchievementNotification;
+import org.borg.backend.player.model.UserUnlockedAchievement;
+import org.borg.backend.player.repository.AchievementRepository;
+import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
+import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.model.CategoryStats;
 import org.borg.backend.player.model.Player;

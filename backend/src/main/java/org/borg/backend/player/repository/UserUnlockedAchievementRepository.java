@@ -1,7 +1,7 @@
-package org.borg.backend.achievement.repository;
+package org.borg.backend.player.repository;
 
-import org.borg.backend.achievement.model.Achievement;
-import org.borg.backend.achievement.model.UserUnlockedAchievement;
+import org.borg.backend.player.model.Achievement;
+import org.borg.backend.player.model.UserUnlockedAchievement;
 import org.borg.backend.player.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

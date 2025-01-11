@@ -3,13 +3,15 @@ package org.borg.backend.game.singleplayer.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.achievement.events.AchievementEvents;
+import org.borg.backend.player.events.AchievementEvents;
+import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.singleplayer.model.ChapterProgress;
 import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
+import org.borg.backend.player.events.StatsEvents;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.AnswerValidationResponse;
@@ -35,6 +37,7 @@ public class SinglePlayerQuestionService {
     private final ChapterSessionService chapterSessionService;
     private final ChapterProgressRepository chapterProgressRepository;
     private final ChapterService chapterService;
+    private final GameValidationService gameValidationService;
 
     public List<QuestionDTO> getSinglePlayerRoundQuestions(long playerId) {
         ChapterSession session = chapterSessionService.getSession(playerId);
@@ -61,6 +64,8 @@ public class SinglePlayerQuestionService {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
+        
+        gameValidationService.validateSinglePlayerAnswer(request.getPlayerId(), request.getQuestionId());
 
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
@@ -88,23 +93,11 @@ public class SinglePlayerQuestionService {
         boolean isCorrect = question.getCorrectAnswer().equals(answer);
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
 
-        updatePlayerStats(playerId, question.getCategory(), isCorrect);
+        applicationEventPublisher.publishEvent(new StatsEvents.QuestionAnsweredEvent(playerId, question.getCategory(), isCorrect));
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }
-
-    private void updatePlayerStats(Long playerId, String category, boolean isCorrect) {
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
-
-        player.getStats().incrementQuestionsAnswered(category);
-
-        if (isCorrect) {
-            player.getStats().incrementCorrectAnswer(category);
-        }
-
-        playerRepository.save(player);
-    }
+    
 
     public ChapterRoundResults getRoundResults(Long playerId) {
         List<Boolean> results = roundSessionService.getSessionAnswers(playerId);
