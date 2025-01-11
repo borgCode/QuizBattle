@@ -71,11 +71,11 @@ public class RoundSessionService {
     public List<Long> getSessionQuestions(Long playerId) {
         RoundSession session = roundSessions.get(playerId);
         if (session == null) {
-            return Collections.emptyList();
+            return List.of();
         }
         if (session.isComplete()) {
             roundSessions.remove(playerId);
-            return Collections.emptyList();
+            return List.of();
         }
         return session.getQuestionIds();
     }

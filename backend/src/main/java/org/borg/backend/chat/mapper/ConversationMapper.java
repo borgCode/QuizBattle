@@ -31,7 +31,7 @@ public class ConversationMapper {
 
     public static List<ConversationPreviewDTO> multipleToDTO(List<Conversation> conversations, Long currentPlayerId) {
         if (conversations == null || conversations.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return conversations.stream()

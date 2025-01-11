@@ -42,7 +42,7 @@ public class MultiplayerQuestionService {
     public List<QuestionDTO> restoreSessionQuestions(Long playerId) {
         List<Long> questionIds = roundSessionService.getSessionQuestions(playerId);
         if (questionIds.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
         return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
     }
@@ -56,7 +56,7 @@ public class MultiplayerQuestionService {
 
         String currentCategory = roundSessionService.getCurrentCategory(request.getPlayerId());
         if (currentCategory != null && currentCategory.equalsIgnoreCase(request.getCategory())) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<Question> questions = questionRepository.findThreeRandomQuestionsByCategory(request.getCategory());

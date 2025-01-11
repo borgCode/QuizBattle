@@ -22,5 +22,4 @@ public class AchievementLevel {
     private int requirementValue;
     private String description;
     private String imageUrl;
-    
 }

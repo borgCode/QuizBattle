@@ -26,7 +26,7 @@ public class PlayerMapper {
     
     public static List<PlayerDTO> multipleToDTO(List<Player> players) {
         if (players == null || players.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return players.stream()

@@ -24,7 +24,7 @@ public class MessageMapper {
     
     public static List<MessageDTO> multipleToDTO(List<Message> messages) {
         if (messages == null || messages.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
         return messages.stream()
                 .map(MessageMapper::toDTO)

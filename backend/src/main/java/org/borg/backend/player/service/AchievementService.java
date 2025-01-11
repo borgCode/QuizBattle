@@ -33,6 +33,8 @@ public class AchievementService {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     public List<UserUnlockedAchievementDTO> getUnlockedAchievements(Long playerId) {
+        
+        
         return null;
     }
 
