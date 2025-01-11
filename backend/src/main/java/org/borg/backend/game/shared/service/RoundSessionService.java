@@ -6,7 +6,6 @@ import org.borg.backend.game.shared.model.RoundSession;
 import org.borg.backend.game.shared.model.RoundType;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 

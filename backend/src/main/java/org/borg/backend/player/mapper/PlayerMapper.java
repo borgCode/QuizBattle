@@ -1,11 +1,10 @@
 package org.borg.backend.player.mapper;
 
-import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.dto.PlayerConversationDTO;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.model.Player;
+import org.borg.backend.shared.util.ImageUtil;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,7 +13,7 @@ public class PlayerMapper {
         if (player == null) {
             return null;
         }
-        
+
         return PlayerDTO.builder()
                 .id(player.getId())
                 .username(player.getUsername())
@@ -23,7 +22,7 @@ public class PlayerMapper {
                 .base64Image(ImageUtil.encodeAvatarImageFileToBase64(player.getAvatarPath()))
                 .build();
     }
-    
+
     public static List<PlayerDTO> multipleToDTO(List<Player> players) {
         if (players == null || players.isEmpty()) {
             return List.of();
@@ -33,7 +32,7 @@ public class PlayerMapper {
                 .map(PlayerMapper::toDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public static PlayerConversationDTO toPlayerConversationDTO(Player player) {
         return PlayerConversationDTO.builder()
                 .id(player.getId())
@@ -42,5 +41,4 @@ public class PlayerMapper {
                 .base64Image(ImageUtil.encodeAvatarImageFileToBase64(player.getAvatarPath()))
                 .build();
     }
-    
 }

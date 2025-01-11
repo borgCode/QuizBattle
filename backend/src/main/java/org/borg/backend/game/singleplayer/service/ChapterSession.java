@@ -2,7 +2,6 @@ package org.borg.backend.game.singleplayer.service;
 
 import lombok.Data;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -23,11 +22,11 @@ public class ChapterSession {
         this.categories = new ArrayList<>(categories);
         this.winCondition = winCondition;
     }
-    
+
     public void decrementHealth() {
         this.currentHealth--;
     }
-    
+
     public void incrementRound() {
         this.currentRound++;
     }
