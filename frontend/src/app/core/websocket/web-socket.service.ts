@@ -55,6 +55,14 @@ export class WebSocketService {
           console.log("Disconnected from websocket");
           this.connectionState$.next(false);
         },
+        onStompError: (frame) => {
+          console.error('STOMP protocol error:', frame);
+          this.connectionState$.next(false);
+        },
+        onWebSocketError: (event) => {
+          console.error('WebSocket error:', event);
+          this.connectionState$.next(false);
+        }
 
       });
 

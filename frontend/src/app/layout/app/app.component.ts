@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {NavbarComponent} from '../../core/components/navbar/navbar.component';
 import {RouterOutlet} from '@angular/router';
 import {AlertMessageComponent} from '../../core/alert-message/notification/alert-message.component';
@@ -9,6 +9,7 @@ import {AchievementPopupComponent} from '../../core/achievement-popup/achievemen
 import {
   WhispersContainerComponent
 } from '../../core/components/whispers/whispers-container/whispers-container.component';
+import {distinctUntilChanged, Subscription} from 'rxjs';
 
 
 @Component({
@@ -19,6 +20,7 @@ import {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  private connectionInitialized = false;
 
   constructor(
     private loginStateService: LoginStateService,
@@ -27,14 +29,16 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
-      if (isLoggedIn) {
+    this.loginStateService.isLoggedIn$.pipe(
+      distinctUntilChanged()
+    ).subscribe(isLoggedIn => {
+      if (isLoggedIn && !this.connectionInitialized) {
         this.webSocketService.initWebSocketConnection();
-      } else {
+        this.connectionInitialized = true;
+      } else if (!isLoggedIn) {
         this.webSocketService.disconnectWebSocket();
+        this.connectionInitialized = false;
       }
     })
   }
-
-
 }
