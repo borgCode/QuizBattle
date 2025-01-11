@@ -1,0 +1,17 @@
+<div class="achievements-container">
+  <div class="row">
+  <div class="col-md-3 mb-2" *ngFor="let achievement of achievements">
+    <div class="card">
+      <img [src]="'data:image/jpeg;base64,' +achievement.imageUrl" class="img-fluid" style="max-height: 150px; width: auto;">
+      <div class="card-body">
+        <h5 class="card-title">
+          {{achievement.achievementName}}
+        </h5>
+        <p class="card-text">
+          {{achievement.description}}
+        </p>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>

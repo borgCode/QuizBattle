@@ -12,6 +12,9 @@ import {MessageService} from '../../../api/generated/services/message.service';
 import {WhisperWindowService} from '../../../core/services/whisper-window/whisper-window.service';
 import {Observable, tap} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
+import {UserUnlockedAchievementDto} from '../../../api/generated/models/user-unlocked-achievement-dto';
+import {AchievementService} from '../../../api/generated/services/achievement.service';
+import {AchievementsPanelComponent} from './achievements-panel/achievements-panel.component';
 
 @Component({
   selector: 'app-user-profile',
@@ -19,7 +22,8 @@ import {AsyncPipe, NgIf} from '@angular/common';
     CategoryPieChartComponent,
     RelationshipPanelComponent,
     NgIf,
-    AsyncPipe
+    AsyncPipe,
+    AchievementsPanelComponent
   ],
   templateUrl: './player-profile.component.html',
   styleUrl: './player-profile.component.css'
@@ -28,9 +32,11 @@ export class PlayerProfileComponent implements OnInit {
   player!: PlayerDto;
   friendsList!: PlayerDto[]
   blockedList!: PlayerDto[]
+  achievements: UserUnlockedAchievementDto[]
   image: string = '';
 
   playerData$: Observable<PlayerDto>;
+
 
   constructor(
     private loginStateService: LoginStateService,
@@ -40,7 +46,8 @@ export class PlayerProfileComponent implements OnInit {
     private alertMessageService: AlertMessageService,
     private multiplayerMatchService: MultiplayerMatchService,
     private messageService: MessageService,
-    private whisperWindowService: WhisperWindowService
+    private whisperWindowService: WhisperWindowService,
+    private achievementService: AchievementService
   ) {
   }
 
@@ -58,6 +65,7 @@ export class PlayerProfileComponent implements OnInit {
       this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
 
       this.getFriends();
+      this.getAchievements();
 
     })
     );
@@ -69,6 +77,14 @@ export class PlayerProfileComponent implements OnInit {
         this.friendsList = data.friends;
         this.blockedList = data.blocked;
         console.log(this.friendsList)
+      }
+    })
+  }
+
+  private getAchievements() {
+    this.achievementService.getUnlockedAchievements({playerId: this.player.id}).subscribe({
+      next: achievements => {
+        this.achievements = achievements;
       }
     })
   }
@@ -153,5 +169,4 @@ export class PlayerProfileComponent implements OnInit {
         break;
     }
   }
-
 }

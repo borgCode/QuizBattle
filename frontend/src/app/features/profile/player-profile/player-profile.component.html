@@ -54,17 +54,28 @@
     <div class="col-12">
       <ul class="nav nav-tabs nav-justified">
         <li class="nav-item">
-          <a class="nav-link active" data-bs-toggle="tab" href="#category">Friends</a>
+          <a class="nav-link active" data-bs-toggle="tab" href="#category">Category performance</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="tab" href="#achievements">Blocked</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#achievements">Achievements</a>
         </li>
       </ul>
-      <ng-container *ngIf="playerData$ | async as player">
-        <app-category-pie-chart
-          [categoryStats]="player.stats.categoryStats">
-        </app-category-pie-chart>
-      </ng-container>
+      <div class="tab-content relationship-panel" style="overflow-y: auto;">
+        <div class="tab-pane fade show active p-2" id="category">
+          <ng-container *ngIf="playerData$ | async as player">
+            <app-category-pie-chart
+              [categoryStats]="player.stats.categoryStats">
+            </app-category-pie-chart>
+          </ng-container>
+        </div>
+        <div class="tab-pane fade p-2" id="achievements">
+          <ng-container *ngIf="playerData$ | async as player">
+            <app-achievements-panel
+              [achievements]="achievements">
+            </app-achievements-panel>
+          </ng-container>
+        </div>
+      </div>
     </div>
   </div>
 </div>
