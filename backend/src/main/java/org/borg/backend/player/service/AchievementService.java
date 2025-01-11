@@ -3,6 +3,7 @@ package org.borg.backend.player.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.player.mapper.AchievementMapper;
 import org.borg.backend.player.repository.AchievementRepository;
 import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
 import org.borg.backend.player.dto.AchievementNotification;
@@ -32,10 +33,8 @@ public class AchievementService {
     private final UserUnlockedAchievementRepository userUnlockedAchievementRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public List<UserUnlockedAchievementDTO> getUnlockedAchievements(Long playerId) {
-        
-        
-        return null;
+    public List<UserUnlockedAchievementDTO> getUnlockedAchievements(long playerId) {
+        return AchievementMapper.multipleToUnlockedAchievementDTO(userUnlockedAchievementRepository.findAllByPlayerId(playerId));
     }
 
     public void handleStoryAchievement(Long playerId, String storyName) {

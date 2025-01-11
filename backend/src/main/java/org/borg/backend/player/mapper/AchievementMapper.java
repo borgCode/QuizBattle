@@ -6,7 +6,6 @@ import org.borg.backend.player.model.AchievementLevel;
 import org.borg.backend.player.model.UserUnlockedAchievement;
 import org.borg.backend.shared.util.ImageUtil;
 
-import java.util.Collections;
 import java.util.List;
 
 public class AchievementMapper {
@@ -17,14 +16,15 @@ public class AchievementMapper {
 
         Achievement achievement = unlockedAchievement.getAchievement();
         AchievementLevel currentLevel = unlockedAchievement.getCurrentLevel();
+        List<AchievementLevel> levels = achievement.getLevels();
 
         return UserUnlockedAchievementDTO.builder()
                 .achievementName(achievement.getName())
                 .achievementLevelName(currentLevel.getName())
                 .description(currentLevel.getDescription())
                 .imageUrl(ImageUtil.encodeAchievementImageToBase64(currentLevel.getImageUrl()))
-                .nextLevelRequirement(determineNextLevelRequirement(achievement, currentLevel))
-                .isMaxLevel(isMaxLevel(achievement, currentLevel))
+                .nextLevelRequirement(determineNextLevelRequirement(levels, currentLevel))
+                .isMaxLevel(isMaxLevel(levels, currentLevel))
                 .build();
     }
 
@@ -38,12 +38,11 @@ public class AchievementMapper {
                 .toList();
     }
     
-    private static int determineNextLevelRequirement(Achievement achievement, AchievementLevel currentLevel) {
-        if (isMaxLevel(achievement, currentLevel)) {
+    private static int determineNextLevelRequirement(List<AchievementLevel> levels, AchievementLevel currentLevel) {
+        if (isMaxLevel(levels, currentLevel)) {
             return currentLevel.getRequirementValue();
         }
-
-        List<AchievementLevel> levels = achievement.getLevels();
+        
         int currentLevelIndex = levels.indexOf(currentLevel);
 
         if (currentLevelIndex == -1 || currentLevelIndex + 1 >= levels.size()) {
@@ -53,7 +52,7 @@ public class AchievementMapper {
         return levels.get(currentLevelIndex + 1).getRequirementValue();
     }
 
-    private static boolean isMaxLevel(Achievement achievement, AchievementLevel currentLevel) {
-        return achievement.getLevels().getLast().equals(currentLevel);
+    private static boolean isMaxLevel(List<AchievementLevel> levels, AchievementLevel currentLevel) {
+        return levels.get(levels.size() - 1).equals(currentLevel);
     }
 }
