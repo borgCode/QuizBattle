@@ -3,6 +3,8 @@ package org.borg.backend.game.multiplayer.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.events.AchievementEvents;
+import org.borg.backend.player.events.StatsEvents;
+import org.borg.backend.shared.enums.GameResult;
 import org.borg.backend.shared.enums.GameStatus;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
 import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
@@ -125,9 +127,7 @@ public class GameService {
 
     private void determineGameOutcome(MultiplayerSession session) {
         List<Player> players = session.getPlayers();
-        Stats player1Stats = players.get(0).getStats();
-        Stats player2Stats = players.get(1).getStats();
-
+        
         Long player1Id = players.get(0).getId();
         Long player2Id = players.get(1).getId();
 
@@ -135,34 +135,23 @@ public class GameService {
         int score1 = scores.get(player1Id);
         int score2 = scores.get(player2Id);
         
+        GameResult result;
         if (score1 > score2) {
             session.setWinnerId(player1Id);
             session.setLoserId(player2Id);
             session.setIsTie(false);
-
-            player1Stats.incrementWins();
-            player2Stats.incrementLosses();
+            result = GameResult.WIN_PLAYER1;
         } else if (score1 < score2) {
             session.setWinnerId(player2Id);
             session.setLoserId(player1Id);
             session.setIsTie(false);
-            player1Stats.incrementLosses();
-            player2Stats.incrementWins();
+            result = GameResult.WIN_PLAYER2;
         } else {
             session.setIsTie(true);
-
-            player1Stats.incrementTies();
-            player2Stats.incrementTies();
+            result = GameResult.TIE;
         }
         
-        players.get(0).setStats(player1Stats);
-        players.get(1).setStats(player2Stats);
-
-        playerRepository.saveAll(players);
-        
-        if (!session.getIsTie()) {
-            applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
-        }
+        applicationEventPublisher.publishEvent(new StatsEvents.GameCompletedEvent(players.get(0), players.get(1), result));
     }
 
     private void sendGameOverNotifications(MultiplayerSession session) {
