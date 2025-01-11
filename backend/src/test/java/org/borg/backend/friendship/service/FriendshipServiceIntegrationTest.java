@@ -95,12 +95,13 @@ class FriendshipServiceIntegrationTest {
             assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
 
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
+            assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
 
+            Friendship actualFriendship = friendship.get();
             assertAll("Post-accept friendship",
-                    () -> assertTrue(friendship.isPresent(), "Friendship was not saved to repository"),
-                    () -> assertEquals(player1, friendship.get().getPlayer1(), "Expected sender was not the actual sender"),
-                    () -> assertEquals(player2, friendship.get().getPlayer2(), "Expected receiver was not the actual receiver"),
-                    () -> assertEquals(FriendshipStatus.ACTIVE, friendship.get().getStatus(), "Friendship should be PENDING")
+                    () -> assertEquals(player1, actualFriendship.getPlayer1(), "Expected sender was not the actual sender"),
+                    () -> assertEquals(player2, actualFriendship.getPlayer2(), "Expected receiver was not the actual receiver"),
+                    () -> assertEquals(FriendshipStatus.ACTIVE, actualFriendship.getStatus(), "Friendship should be ACTIVE")
             );
 
             List<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId());
@@ -254,11 +255,14 @@ class FriendshipServiceIntegrationTest {
             friendshipService.blockPlayer(playerInteraction);
 
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
+
+            assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
+            
+            Friendship actualFriendship = friendship.get();
             assertAll("Post-block friendship",
-                    () -> assertTrue(friendship.isPresent(), "Friendship was not saved to repository"),
-                    () -> assertEquals(player1, friendship.get().getPlayer1(), "The player who blocked was not the expected player"),
-                    () -> assertEquals(player2, friendship.get().getPlayer2(), "The blocked player was not the expected player"),
-                    () -> assertEquals(FriendshipStatus.BLOCKED, friendship.get().getStatus(), "Friendship should be BLOCKED")
+                    () -> assertEquals(player1, actualFriendship.getPlayer1(), "The player who blocked was not the expected player"),
+                    () -> assertEquals(player2, actualFriendship.getPlayer2(), "The blocked player was not the expected player"),
+                    () -> assertEquals(FriendshipStatus.BLOCKED, actualFriendship.getStatus(), "Friendship should be BLOCKED")
             );
         }
         @Test
@@ -429,11 +433,13 @@ class FriendshipServiceIntegrationTest {
         List<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId());
         Notification friendRequestNotification = notifications.get(0);
 
+        assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
+        
+        Friendship actualFriendship = friendship.get();
         assertAll("Post-request friendship",
-                () -> assertTrue(friendship.isPresent(), "Friendship was not saved to repository"),
-                () -> assertEquals(player1, friendship.get().getPlayer1(), "Expected sender was not the actual sender"),
-                () -> assertEquals(player2, friendship.get().getPlayer2(), "Expected receiver was not the actual receiver"),
-                () -> assertEquals(FriendshipStatus.PENDING, friendship.get().getStatus(), "Friendship should be PENDING"),
+                () -> assertEquals(player1, actualFriendship.getPlayer1(), "Expected sender was not the actual sender"),
+                () -> assertEquals(player2, actualFriendship.getPlayer2(), "Expected receiver was not the actual receiver"),
+                () -> assertEquals(FriendshipStatus.PENDING, actualFriendship.getStatus(), "Friendship should be PENDING"),
                 () -> assertEquals(NotificationType.FRIEND_REQUEST, friendRequestNotification.getType(), "Notification type was not FRIEND_REQUEST")
         );
 

@@ -114,6 +114,7 @@ public class ChapterFullFlowIntegrationTest {
         chapterProgressRepository.deleteAll();
         playerProgressRepository.deleteAll();
         playerRepository.deleteAll();
+        testDataLoader.cleanup();
     }
 
     @BeforeEach
@@ -244,7 +245,7 @@ public class ChapterFullFlowIntegrationTest {
                 () -> assertFalse(results.isGameOver(), "Game should not be over"),
                 () -> assertFalse(results.isRoundPassed(), "Round should not be passed")
         );
-        
+
         playTwoFailedRounds();
 
         ChapterRoundResults resultsAfterLastRound = singlePlayerQuestionService.getRoundResults(player.getId());

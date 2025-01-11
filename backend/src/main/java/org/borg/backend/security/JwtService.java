@@ -57,25 +57,24 @@ public class JwtService {
                 .claim("authorities", authorities)
                 .signWith(getSignInKey())
                 .compact();
-
     }
+
     public String createNewAccessToken(String refreshToken) {
         final String username = extractUsername(refreshToken);
-        if (username != null && !isTokenExpired(refreshToken)) {
+        if (username != null && isTokenActive(refreshToken)) {
             UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
             return generateToken(userDetails);
         }
         return null;
     }
-    
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername())) && isTokenActive(token);
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private boolean isTokenActive(String token) {
+        return extractExpiration(token).after(new Date());
     }
 
     private Date extractExpiration(String token) {
@@ -85,7 +84,7 @@ public class JwtService {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-    
+
     public Long extractPlayerId(String token) {
         return extractClaim(token, claims -> claims.get("playerId", Long.class));
     }

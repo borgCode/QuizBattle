@@ -1,24 +1,24 @@
 package org.borg.backend.game.multiplayer.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.game.shared.dto.AnswerValidationResponse;
-import org.borg.backend.game.shared.dto.QuestionDTO;
-import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
 import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.game.shared.model.RoundType;
-import org.borg.backend.game.shared.service.RoundSessionService;
-import org.borg.backend.player.model.Player;
-import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.game.shared.dto.AnswerValidationResponse;
+import org.borg.backend.game.shared.dto.QuestionDTO;
 import org.borg.backend.game.shared.mapper.QuestionMapper;
 import org.borg.backend.game.shared.model.Question;
+import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.repository.QuestionRepository;
+import org.borg.backend.game.shared.service.GameValidationService;
+import org.borg.backend.game.shared.service.RoundSessionService;
+import org.borg.backend.player.events.AchievementEvents;
+import org.borg.backend.player.events.StatsEvents;
+import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +36,6 @@ public class MultiplayerQuestionService {
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final GameService gameService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final PlayerRepository playerRepository;
     private final GameValidationService gameValidationService;
 
     public List<QuestionDTO> restoreSessionQuestions(Long playerId) {
@@ -99,9 +98,7 @@ public class MultiplayerQuestionService {
             );
             roundSessionService.finishSession(request.getPlayerId());
         }
-
-        gameService.updateGameState(request.getSessionId(), request.getPlayerId(), request.getQuestionId(), validationResponse.isCorrect()
-        );
+        gameService.updateGameState(request.getSessionId(), request.getPlayerId(), request.getQuestionId(), validationResponse.isCorrect());
 
         return validationResponse;
     }
@@ -110,27 +107,21 @@ public class MultiplayerQuestionService {
         boolean isCorrect = question.getCorrectAnswer().equals(answer);
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
 
-        updatePlayerStats(playerId, question.getCategory(), isCorrect);
+        applicationEventPublisher.publishEvent(new StatsEvents.QuestionAnsweredEvent(playerId, question.getCategory(), isCorrect));
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }
-
-    private void updatePlayerStats(Long playerId, String category, boolean isCorrect) {
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
-
-        player.getStats().incrementQuestionsAnswered(category);
-
-        if (isCorrect) {
-            player.getStats().incrementCorrectAnswer(category);
-        }
-
-        playerRepository.save(player);
-    }
-
-    public List<String> getThreeRandomCategories(Long sessionId) {
+    
+    public List<String> getThreeRandomCategories(Long sessionId, long playerId) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
+
+        boolean playerExistsInSession = session.getPlayers().stream()
+                .anyMatch(player -> player.getId().equals(playerId));
+
+        if (!playerExistsInSession) {
+            throw new AccessDeniedException("Not authorized to get categories for this session");
+        }
 
         List<String> allCategories = questionRepository.findAllCategories();
 
@@ -154,6 +145,14 @@ public class MultiplayerQuestionService {
 
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
+
+        boolean playerExistsInSession = session.getPlayers().stream()
+                .anyMatch(player -> player.getId().equals(playerId));
+
+        if (!playerExistsInSession) {
+            throw new AccessDeniedException("Not authorized to get questions for this session");
+        }
+
         List<Long> questionIds = session.getQuestionIds();
 
         List<Question> questions = questionRepository.findAllById(questionIds);
@@ -167,5 +166,4 @@ public class MultiplayerQuestionService {
 
         return QuestionMapper.multipleToDTO(questions);
     }
-
 }

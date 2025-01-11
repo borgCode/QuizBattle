@@ -11,7 +11,6 @@ import {animate, keyframes, style, transition, trigger} from '@angular/animation
 import {MatDialog} from '@angular/material/dialog';
 import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
 import {ContentDialogComponent} from "../shared-components/content-dialog/content-dialog.component";
-import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-play-chapter',

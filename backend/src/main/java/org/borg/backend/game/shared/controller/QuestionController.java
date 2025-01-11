@@ -32,7 +32,7 @@ public class QuestionController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/multiplayer/{sessionId}/categories")
     public ResponseEntity<List<String>> getThreeRandomCategories(@PathVariable long sessionId, @RequestParam long playerId) {
-        return ResponseEntity.ok(multiplayerQuestionService.getThreeRandomCategories(sessionId));
+        return ResponseEntity.ok(multiplayerQuestionService.getThreeRandomCategories(sessionId, playerId));
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")

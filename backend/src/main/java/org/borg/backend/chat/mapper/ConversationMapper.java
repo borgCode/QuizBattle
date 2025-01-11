@@ -6,7 +6,6 @@ import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
