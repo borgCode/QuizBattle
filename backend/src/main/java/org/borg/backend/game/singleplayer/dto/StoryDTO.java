@@ -1,6 +1,5 @@
-package org.borg.backend.story.dto;
+package org.borg.backend.game.singleplayer.dto;
 
-import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

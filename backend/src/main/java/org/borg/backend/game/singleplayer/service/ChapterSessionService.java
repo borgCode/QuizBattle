@@ -2,7 +2,7 @@ package org.borg.backend.game.singleplayer.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.chapter.model.Chapter;
+import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.springframework.stereotype.Service;
 

@@ -1,9 +1,8 @@
-package org.borg.backend.chapter.model;
+package org.borg.backend.game.singleplayer.model;
 
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.story.model.Story;
 
 import java.util.HashSet;
 import java.util.Set;

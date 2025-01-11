@@ -4,20 +4,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.service.AchievementService;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.chapter.dto.InitiateProgressRequest;
-import org.borg.backend.chapter.model.Chapter;
-import org.borg.backend.chapter.model.ChapterProgress;
-import org.borg.backend.chapter.repository.ChapterProgressRepository;
-import org.borg.backend.chapter.repository.ChapterRepository;
+import org.borg.backend.game.singleplayer.dto.StartChapterRequest;
+import org.borg.backend.game.singleplayer.model.Chapter;
+import org.borg.backend.game.singleplayer.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
+import org.borg.backend.game.singleplayer.repository.ChapterRepository;
+import org.borg.backend.game.singleplayer.service.ChapterService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.seed.InitDataService;
 import org.borg.backend.shared.enums.ProgressStatus;
-import org.borg.backend.story.model.Story;
-import org.borg.backend.story.repository.StoryRepository;
-import org.borg.backend.story.service.StoryService;
+import org.borg.backend.game.singleplayer.model.Story;
+import org.borg.backend.game.singleplayer.repository.StoryRepository;
+import org.borg.backend.game.singleplayer.service.StoryService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -135,7 +136,7 @@ class ChapterServiceIntegrationTest {
 //                expectedCompleteChapters++;
 //            }
 //            
-//            chapterService.startChapter(new InitiateProgressRequest(
+//            chapterService.startChapter(new StartChapterRequest(
 //                    player.getId(),
 //                    playerProgress.getId(),
 //                    story.getId(),
@@ -166,7 +167,7 @@ class ChapterServiceIntegrationTest {
         }
 
         private void initChapterProgressAndAssertStatus(Long chapterId, int expectedCompleteChapters) {
-            chapterService.startChapter(new InitiateProgressRequest(
+            chapterService.startChapter(new StartChapterRequest(
                     player.getId(),
                     story.getId(),
                     chapterId
@@ -192,7 +193,7 @@ class ChapterServiceIntegrationTest {
         }
         @Test
         void shouldNotIncrementCompleteChaptersOnDuplicateCompletion() {
-            chapterService.startChapter(new InitiateProgressRequest(
+            chapterService.startChapter(new StartChapterRequest(
                     player.getId(),
                     story.getId(),
                     chapters.get(0).getId()
@@ -202,7 +203,7 @@ class ChapterServiceIntegrationTest {
                     .findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapters.get(0).getId());
             chapterService.updateChapterProgress(firstProgress.getId());
             
-            chapterService.startChapter(new InitiateProgressRequest(
+            chapterService.startChapter(new StartChapterRequest(
                     player.getId(),
                     story.getId(),
                     chapters.get(0).getId()
@@ -257,7 +258,7 @@ class ChapterServiceIntegrationTest {
 
                         List<Chapter> chapters = chapterRepository.findByStoryId(storyId);
 
-                        chapterService.startChapter(new InitiateProgressRequest(
+                        chapterService.startChapter(new StartChapterRequest(
                                 player.getId(),
                                 storyId,
                                 chapters.get(0).getId()

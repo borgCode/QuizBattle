@@ -1,10 +1,9 @@
-package org.borg.backend.story.dto;
+package org.borg.backend.game.singleplayer.dto;
 
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.chapter.dto.ChapterNoCategoriesDTO;
 import org.borg.backend.player.dto.PlayerProgressDTO;
 
 import java.util.List;

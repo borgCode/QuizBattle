@@ -1,6 +1,6 @@
-package org.borg.backend.story.repository;
+package org.borg.backend.game.singleplayer.repository;
 
-import org.borg.backend.story.model.Story;
+import org.borg.backend.game.singleplayer.model.Story;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

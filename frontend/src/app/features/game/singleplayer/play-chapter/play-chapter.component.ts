@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ChapterService} from '../../../../api/generated/services/chapter.service';
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
@@ -11,6 +11,7 @@ import {animate, keyframes, style, transition, trigger} from '@angular/animation
 import {MatDialog} from '@angular/material/dialog';
 import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
 import {ContentDialogComponent} from "../shared-components/content-dialog/content-dialog.component";
+import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-play-chapter',
@@ -37,9 +38,8 @@ import {ContentDialogComponent} from "../shared-components/content-dialog/conten
     ])
   ]
 })
-export class PlayChapterComponent implements OnInit {
+export class PlayChapterComponent implements OnInit, OnDestroy {
   playerProgressId: number;
-  chapterProgressId: number;
   storyTitle: string;
   storyId: number;
   chapterId: number;
@@ -258,6 +258,14 @@ export class PlayChapterComponent implements OnInit {
     refDialog.afterClosed().subscribe(() => {
       this.router.navigate(['singleplayer/story', this.storyId]);
     });
+  }
+
+  ngOnDestroy() {
+    this.chapterService.clearChapter({
+      playerId: this.storedPlayerId
+    }).subscribe({
+      error: err => console.warn("Failed to clear chapter session: ", err)
+    })
   }
 
 

@@ -1,6 +1,6 @@
-package org.borg.backend.chapter.repository;
+package org.borg.backend.game.singleplayer.repository;
 
-import org.borg.backend.chapter.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.model.ChapterProgress;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

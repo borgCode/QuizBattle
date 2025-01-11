@@ -12,6 +12,8 @@ import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
 import { ChapterDto } from '../models/chapter-dto';
+import { clearChapter } from '../fn/chapter/clear-chapter';
+import { ClearChapter$Params } from '../fn/chapter/clear-chapter';
 import { getChapter } from '../fn/chapter/get-chapter';
 import { GetChapter$Params } from '../fn/chapter/get-chapter';
 import { startChapter } from '../fn/chapter/start-chapter';
@@ -24,7 +26,7 @@ export class ChapterService extends BaseService {
   }
 
   /** Path part for operation `startChapter()` */
-  static readonly StartChapterPath = '/chapter/progress/start';
+  static readonly StartChapterPath = '/chapter/start';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -44,6 +46,31 @@ export class ChapterService extends BaseService {
    */
   startChapter(params: StartChapter$Params, context?: HttpContext): Observable<void> {
     return this.startChapter$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `clearChapter()` */
+  static readonly ClearChapterPath = '/chapter/clear/{playerId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `clearChapter()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  clearChapter$Response(params: ClearChapter$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return clearChapter(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `clearChapter$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  clearChapter(params: ClearChapter$Params, context?: HttpContext): Observable<void> {
+    return this.clearChapter$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }

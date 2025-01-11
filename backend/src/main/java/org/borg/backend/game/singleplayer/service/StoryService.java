@@ -1,10 +1,10 @@
-package org.borg.backend.story.service;
+package org.borg.backend.game.singleplayer.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.chapter.mapper.ChapterMapper;
-import org.borg.backend.chapter.model.Chapter;
-import org.borg.backend.chapter.repository.ChapterRepository;
+import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
+import org.borg.backend.game.singleplayer.model.Chapter;
+import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.shared.enums.ProgressStatus;
 import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.dto.PlayerProgressDTO;
@@ -13,12 +13,12 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.story.dto.AllStoriesDTO;
-import org.borg.backend.story.dto.StoryDTO;
-import org.borg.backend.story.dto.StoryOverviewDTO;
-import org.borg.backend.story.dto.StoryOverviewRequest;
-import org.borg.backend.story.model.Story;
-import org.borg.backend.story.repository.StoryRepository;
+import org.borg.backend.game.singleplayer.dto.AllStoriesDTO;
+import org.borg.backend.game.singleplayer.dto.StoryDTO;
+import org.borg.backend.game.singleplayer.dto.StoryOverviewDTO;
+import org.borg.backend.game.singleplayer.dto.StoryOverviewRequest;
+import org.borg.backend.game.singleplayer.model.Story;
+import org.borg.backend.game.singleplayer.repository.StoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

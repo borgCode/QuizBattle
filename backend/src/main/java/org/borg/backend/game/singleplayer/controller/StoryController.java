@@ -1,13 +1,13 @@
-package org.borg.backend.story.controller;
+package org.borg.backend.game.singleplayer.controller;
 
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.story.dto.AllStoriesDTO;
-import org.borg.backend.story.dto.StoryOverviewDTO;
-import org.borg.backend.story.dto.StoryOverviewRequest;
-import org.borg.backend.story.service.StoryService;
+import org.borg.backend.game.singleplayer.dto.AllStoriesDTO;
+import org.borg.backend.game.singleplayer.dto.StoryOverviewDTO;
+import org.borg.backend.game.singleplayer.dto.StoryOverviewRequest;
+import org.borg.backend.game.singleplayer.service.StoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

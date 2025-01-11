@@ -1,4 +1,4 @@
-package org.borg.backend.story.model;
+package org.borg.backend.game.singleplayer.model;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -4,9 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
-import org.borg.backend.chapter.model.ChapterProgress;
-import org.borg.backend.chapter.repository.ChapterProgressRepository;
-import org.borg.backend.chapter.service.ChapterService;
+import org.borg.backend.game.singleplayer.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
@@ -122,5 +121,10 @@ public class SinglePlayerQuestionService {
         }
 
         return roundResults;
+    }
+
+    public void clearSession(long playerId) {
+        roundSessionService.finishSession(playerId);
+        chapterSessionService.clearSession(playerId);
     }
 }

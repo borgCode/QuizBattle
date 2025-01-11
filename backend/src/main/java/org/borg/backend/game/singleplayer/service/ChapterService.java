@@ -1,18 +1,17 @@
-package org.borg.backend.chapter.service;
+package org.borg.backend.game.singleplayer.service;
 
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
-import org.borg.backend.chapter.dto.ChapterDTO;
-import org.borg.backend.chapter.dto.InitiateProgressRequest;
-import org.borg.backend.chapter.mapper.ChapterMapper;
-import org.borg.backend.chapter.model.Chapter;
-import org.borg.backend.chapter.model.ChapterProgress;
-import org.borg.backend.chapter.repository.ChapterProgressRepository;
-import org.borg.backend.chapter.repository.ChapterRepository;
-import org.borg.backend.game.singleplayer.service.ChapterSessionService;
+import org.borg.backend.game.singleplayer.dto.ChapterDTO;
+import org.borg.backend.game.singleplayer.dto.StartChapterRequest;
+import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
+import org.borg.backend.game.singleplayer.model.Chapter;
+import org.borg.backend.game.singleplayer.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
+import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.shared.enums.ProgressStatus;
@@ -40,7 +39,7 @@ public class ChapterService {
     }
 
     @Transactional
-    public void startChapter(InitiateProgressRequest request) {
+    public void startChapter(StartChapterRequest request) {
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(request.getPlayerId(), request.getStoryId());
 
         playerProgress.setStartedAt(LocalDate.now());
@@ -101,4 +100,5 @@ public class ChapterService {
         chapterProgressRepository.save(chapterProgress);
         playerProgressRepository.save(playerProgress);
     }
+    
 }

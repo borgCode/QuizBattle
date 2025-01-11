@@ -1,4 +1,4 @@
-package org.borg.backend.story.dto;
+package org.borg.backend.game.singleplayer.dto;
 
 import lombok.Getter;
 import lombok.Setter;

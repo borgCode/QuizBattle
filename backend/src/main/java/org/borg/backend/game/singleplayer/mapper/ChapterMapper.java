@@ -1,8 +1,8 @@
-package org.borg.backend.chapter.mapper;
+package org.borg.backend.game.singleplayer.mapper;
 
-import org.borg.backend.chapter.dto.ChapterDTO;
-import org.borg.backend.chapter.dto.ChapterNoCategoriesDTO;
-import org.borg.backend.chapter.model.Chapter;
+import org.borg.backend.game.singleplayer.dto.ChapterDTO;
+import org.borg.backend.game.singleplayer.dto.ChapterNoCategoriesDTO;
+import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.shared.util.ImageUtil;
 
 
