@@ -60,7 +60,7 @@ public class SinglePlayerQuestionService {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
-        
+
         gameValidationService.validateSinglePlayerAnswer(request.getPlayerId(), request.getQuestionId());
 
         Question question = questionRepository.findById(request.getQuestionId())
@@ -93,7 +93,6 @@ public class SinglePlayerQuestionService {
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }
-    
 
     public ChapterRoundResults getRoundResults(Long playerId) {
         List<Boolean> results = roundSessionService.getSessionAnswers(playerId);
@@ -107,7 +106,6 @@ public class SinglePlayerQuestionService {
             chapterService.updateChapterProgress(progress.getId());
             chapterSessionService.clearSession(playerId);
         }
-
         return roundResults;
     }
 

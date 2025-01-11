@@ -1,6 +1,5 @@
 package org.borg.backend.game.singleplayer.service;
 
-
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ public class ChapterService {
     private final ChapterProgressRepository chapterProgressRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChapterSessionService chapterSessionService;
-
 
     public ChapterDTO getChapter(Long chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId)
@@ -73,11 +71,10 @@ public class ChapterService {
         log.warn("Update chapter progress");
         ChapterProgress chapterProgress = chapterProgressRepository.findById(chapterProgressId)
                 .orElseThrow(() -> new EntityNotFoundException("ChapterProgress not found"));
-        
+
         if (chapterProgress.getProgressStatus().equals(ProgressStatus.COMPLETED)) {
             return;
         }
-        
 
         chapterProgress.setCompletedAt(LocalDate.now());
         chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
@@ -91,7 +88,7 @@ public class ChapterService {
         if (playerProgress.getCompletedChapters() >= playerProgress.getStory().getNumOfChapters()) {
             playerProgress.setCompletedAt(LocalDate.now());
             playerProgress.setProgressStatus(ProgressStatus.COMPLETED);
-            
+
             applicationEventPublisher.publishEvent(new AchievementEvents.StoryCompletedEvent(
                     playerProgress.getPlayer().getId(),
                     playerProgress.getStory().getTitle()
@@ -100,5 +97,4 @@ public class ChapterService {
         chapterProgressRepository.save(chapterProgress);
         playerProgressRepository.save(playerProgress);
     }
-    
 }

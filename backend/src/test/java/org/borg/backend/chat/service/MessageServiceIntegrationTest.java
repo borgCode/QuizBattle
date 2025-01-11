@@ -48,7 +48,6 @@ public class MessageServiceIntegrationTest {
             userRole.setName("USER");
             roleRepository.save(userRole);
         }
-
     }
 
     private Player createAndSavePlayer(String name) {
@@ -72,7 +71,6 @@ public class MessageServiceIntegrationTest {
         conversationRepository.deleteAll();
         messageRepository.deleteAll();
         playerRepository.deleteAll();
-
     }
 
     @Nested
@@ -157,13 +155,13 @@ public class MessageServiceIntegrationTest {
 
         @Test
         void shouldMarkSingleMessageAsRead() {
-            
+
             FullConversationDTO conversation = messagingService.createConversation(player1.getId(), player2.getId());
             List<Message> messages = createAndSendMessages(2, conversation.getId());
             Long messageIdToMark = messages.get(0).getId();
-            
+
             messagingService.markMessagesAsRead(List.of(messageIdToMark), player2.getId());
-            
+
             List<Message> updatedMessages = messageRepository.findAll();
             assertAll(
                     () -> assertTrue(isMessageMarkedAsRead(messageIdToMark, updatedMessages),
@@ -178,9 +176,9 @@ public class MessageServiceIntegrationTest {
             FullConversationDTO conversation = messagingService.createConversation(player1.getId(), player2.getId());
             List<Message> messages = createAndSendMessages(10, conversation.getId());
             List<Long> allMessageIds = getMessageIds(messages);
-            
+
             messagingService.markMessagesAsRead(allMessageIds, player2.getId());
-            
+
             List<Message> updatedMessages = messageRepository.findAll();
             assertAll(
                     () -> assertEquals(10, countReadMessages(updatedMessages),
@@ -230,7 +228,7 @@ public class MessageServiceIntegrationTest {
                     .count();
         }
     }
-    
+
     @Nested
     class GettingConversationsTests {
         Player receiverPlayer;
@@ -276,8 +274,5 @@ public class MessageServiceIntegrationTest {
                             "Each conversation should have matching sender ID and message content")
             );
         }
-
     }
-
-
 }

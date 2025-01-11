@@ -152,7 +152,6 @@ class ChapterServiceIntegrationTest {
             assertEquals(1, progressAfterDuplicate.getCompletedChapters(),
                     "Completing same chapter twice should not increment counter");
         }
-
     }
 
     @RepeatedTest(5)
@@ -199,7 +198,6 @@ class ChapterServiceIntegrationTest {
                         playerProgresses.put(player.getId(), playerProgress);
 
                         finishLatch.countDown();
-
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -227,7 +225,6 @@ class ChapterServiceIntegrationTest {
                 assertEquals(playerSelectedStoryId, storedProgress.get().getStory().getId(),
                         "Story ID doesn't match selected story");
             });
-
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
