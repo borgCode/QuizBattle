@@ -213,28 +213,7 @@ public class GameService {
         }
         return multiplayerSessionDTOS;
     }
-
-    public void validatePlayerTurn(MultiplayerQuestionsRequest request, MultiplayerSession session) {
-        if (!session.getCurrentPlayerTurn().getId().equals(request.getPlayerId())) {
-            throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN);
-        }
-
-        Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
-        Long opponentId = session.getPlayers().stream()
-                .filter(p -> !p.getId().equals(request.getPlayerId()))
-                .findFirst()
-                .map(Player::getId)
-                .orElseThrow();
-
-        if (questionsAnswered.get(request.getPlayerId()) > questionsAnswered.get(opponentId)) {
-            throw new GameException(BusinessErrorCodes.MUST_WAIT_FOR_OPPONENT);
-        }
-
-        if (!session.getQuestionIds().isEmpty()) {
-            throw new GameException(BusinessErrorCodes.MUST_ANSWER_EXISTING_QUESTIONS);
-        }
-    }
-
+    
     public void acknowledgeGameOver(Long sessionId, Long playerId) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NoSuchElementException("Session not found!"));

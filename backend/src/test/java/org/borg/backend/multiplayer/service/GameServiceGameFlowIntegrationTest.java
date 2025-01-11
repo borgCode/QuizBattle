@@ -11,6 +11,7 @@ import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository
 import org.borg.backend.game.multiplayer.service.GameService;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
 import org.borg.backend.game.shared.model.RoundType;
+import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
@@ -62,7 +63,8 @@ public class GameServiceGameFlowIntegrationTest {
     private Player player2;
     @Autowired
     private MultiplayerQuestionService multiplayerQuestionService;
-
+    @Autowired
+    private GameValidationService gameValidationService;
 
     @BeforeEach
     void setUp() {
@@ -200,7 +202,7 @@ public class GameServiceGameFlowIntegrationTest {
                     "Geography", session.getId(), player1.getId());
 
             GameException exception = assertThrows(GameException.class,
-                    () -> gameService.validatePlayerTurn(request, session),
+                    () -> gameValidationService.validatePlayerTurn(request, session),
                     "Should throw exception when player tries to request questions after answering more than opponent"
             );
 

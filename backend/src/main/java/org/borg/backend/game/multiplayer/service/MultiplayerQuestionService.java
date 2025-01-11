@@ -1,10 +1,10 @@
 package org.borg.backend.game.multiplayer.service;
 
-
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
+import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
@@ -38,6 +38,7 @@ public class MultiplayerQuestionService {
     private final GameService gameService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final PlayerRepository playerRepository;
+    private final GameValidationService gameValidationService;
 
     public List<QuestionDTO> restoreSessionQuestions(Long playerId) {
         List<Long> questionIds = roundSessionService.getSessionQuestions(playerId);
@@ -52,7 +53,7 @@ public class MultiplayerQuestionService {
         MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
-        gameService.validatePlayerTurn(request, session);
+        gameValidationService.validatePlayerTurn(request, session);
 
         String currentCategory = roundSessionService.getCurrentCategory(request.getPlayerId());
         if (currentCategory != null && currentCategory.equalsIgnoreCase(request.getCategory())) {
@@ -65,8 +66,7 @@ public class MultiplayerQuestionService {
                 .map(Question::getId)
                 .toList();
 
-        roundSessionService.initializeSession(request.getPlayerId(), questionIds, request.getCategory(), RoundType.MULTIPLAYER
-        );
+        roundSessionService.initializeSession(request.getPlayerId(), questionIds, request.getCategory(), RoundType.MULTIPLAYER);
 
         gameService.updateSessionQuestionsAndCategory(session, questions, request.getCategory());
 
@@ -82,18 +82,7 @@ public class MultiplayerQuestionService {
         MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
                 .orElseThrow(() -> new NoSuchElementException("Session not found"));
 
-        if (!session.getCurrentPlayerTurn().getId().equals(request.getPlayerId())) {
-            throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN);
-        }
-
-        if (!session.getQuestionIds().contains(request.getQuestionId())) {
-            throw new GameException(BusinessErrorCodes.INVALID_QUESTION);
-        }
-        
-        if (roundSessionService.isQuestionAnswered(request.getPlayerId(), request.getQuestionId())) {
-            log.warn("Attempt to answer already answered question: {}", request.getQuestionId());
-            throw new GameException(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED);
-        }
+        gameValidationService.validateMultiplayerAnswer(request, session);
 
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new NoSuchElementException("Question not found"));
@@ -117,6 +106,7 @@ public class MultiplayerQuestionService {
 
         return validationResponse;
     }
+
     private AnswerValidationResponse validateAnswer(Long playerId, Question question, String answer) {
         boolean isCorrect = question.getCorrectAnswer().equals(answer);
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
