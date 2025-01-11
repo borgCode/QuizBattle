@@ -2,10 +2,6 @@ package org.borg.backend.game.multiplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.player.events.StatsEvents;
-import org.borg.backend.shared.enums.GameResult;
-import org.borg.backend.shared.enums.GameStatus;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
 import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
@@ -13,12 +9,15 @@ import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository
 import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.notification.service.NotificationService;
+import org.borg.backend.player.events.AchievementEvents;
+import org.borg.backend.player.events.StatsEvents;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.PlayerQuestionResult;
 import org.borg.backend.question.model.Question;
+import org.borg.backend.shared.enums.GameResult;
+import org.borg.backend.shared.enums.GameStatus;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static java.util.Map.*;
+import static java.util.Map.Entry;
 
 @Slf4j
 @Service

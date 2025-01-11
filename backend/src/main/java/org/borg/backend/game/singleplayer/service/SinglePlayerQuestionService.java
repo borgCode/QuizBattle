@@ -1,19 +1,16 @@
 package org.borg.backend.game.singleplayer.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.game.shared.service.GameValidationService;
-import org.borg.backend.game.singleplayer.model.ChapterProgress;
-import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.game.shared.model.RoundType;
+import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
+import org.borg.backend.game.singleplayer.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
+import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.events.StatsEvents;
-import org.borg.backend.player.model.Player;
-import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.AnswerValidationResponse;
 import org.borg.backend.question.dto.QuestionDTO;
 import org.borg.backend.question.mapper.QuestionMapper;
@@ -32,7 +29,6 @@ import java.util.NoSuchElementException;
 public class SinglePlayerQuestionService {
     private final QuestionRepository questionRepository;
     private final RoundSessionService roundSessionService;
-    private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChapterSessionService chapterSessionService;
     private final ChapterProgressRepository chapterProgressRepository;
