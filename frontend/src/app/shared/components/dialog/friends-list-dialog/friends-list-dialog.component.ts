@@ -35,8 +35,6 @@ export class FriendsListDialogComponent {
     console.log(data.friends)
 
   }
-
-
   closeDialog() {
     this.dialogRef.close();
   }
