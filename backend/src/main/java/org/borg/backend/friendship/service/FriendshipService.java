@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.friendship.dto.RelationshipStatusRequest;
 import org.borg.backend.friendship.dto.RelationshipsDTO;
 import org.borg.backend.friendship.model.Friendship;
-import org.borg.backend.shared.enums.FriendshipStatus;
+import org.borg.backend.friendship.model.FriendshipStatus;
 import org.borg.backend.friendship.dto.PlayerInteraction;
 import org.borg.backend.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.shared.enums.BusinessErrorCodes;

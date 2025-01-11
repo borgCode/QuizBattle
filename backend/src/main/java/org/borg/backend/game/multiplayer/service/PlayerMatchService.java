@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.shared.enums.GameStatus;
+import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.game.multiplayer.dto.MatchRequest;
 import org.borg.backend.game.multiplayer.dto.MatchResponse;

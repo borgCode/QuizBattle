@@ -3,7 +3,7 @@ package org.borg.backend.player.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.shared.enums.ProgressStatus;
+import org.borg.backend.player.model.ProgressStatus;
 
 import java.time.LocalDate;
 

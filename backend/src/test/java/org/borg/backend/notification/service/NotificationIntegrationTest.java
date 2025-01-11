@@ -1,6 +1,6 @@
 package org.borg.backend.notification.service;
 
-import org.borg.backend.shared.enums.NotificationType;
+import org.borg.backend.notification.model.NotificationType;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;

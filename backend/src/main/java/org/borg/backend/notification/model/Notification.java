@@ -2,7 +2,6 @@ package org.borg.backend.notification.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.shared.enums.NotificationType;
 
 import java.time.Instant;
 

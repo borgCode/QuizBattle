@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.service.StatsService;
-import org.borg.backend.shared.enums.GameResult;
+import org.borg.backend.game.shared.enums.GameResult;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;

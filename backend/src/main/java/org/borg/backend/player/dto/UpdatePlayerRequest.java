@@ -3,7 +3,7 @@ package org.borg.backend.player.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.shared.enums.UpdateField;
+import org.borg.backend.player.model.UpdateField;
 
 @Getter
 @Setter

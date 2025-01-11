@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
 import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.repository.ChapterRepository;
-import org.borg.backend.shared.enums.ProgressStatus;
+import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.dto.PlayerProgressDTO;
 import org.borg.backend.player.mapper.PlayerProgressMapper;

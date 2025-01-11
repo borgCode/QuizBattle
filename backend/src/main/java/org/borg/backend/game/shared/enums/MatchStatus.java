@@ -1,4 +1,4 @@
-package org.borg.backend.shared.enums;
+package org.borg.backend.game.shared.enums;
 
 public enum MatchStatus {
     WAITING,

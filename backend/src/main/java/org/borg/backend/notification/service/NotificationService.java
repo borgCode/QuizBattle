@@ -5,7 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.notification.model.Notification;
-import org.borg.backend.shared.enums.NotificationType;
+import org.borg.backend.notification.model.NotificationType;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 
-import static org.borg.backend.shared.enums.NotificationType.*;
+import static org.borg.backend.notification.model.NotificationType.*;
 
 @Slf4j
 @Service

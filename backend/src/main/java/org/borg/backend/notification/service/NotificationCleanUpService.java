@@ -2,7 +2,7 @@ package org.borg.backend.notification.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.shared.enums.NotificationType;
+import org.borg.backend.notification.model.NotificationType;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

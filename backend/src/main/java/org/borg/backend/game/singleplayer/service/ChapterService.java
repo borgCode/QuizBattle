@@ -13,7 +13,7 @@ import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
-import org.borg.backend.shared.enums.ProgressStatus;
+import org.borg.backend.player.model.ProgressStatus;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

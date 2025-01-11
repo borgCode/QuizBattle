@@ -3,7 +3,7 @@ package org.borg.backend.game.multiplayer.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.borg.backend.shared.enums.MatchStatus;
+import org.borg.backend.game.shared.enums.MatchStatus;
 
 
 @Data

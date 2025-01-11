@@ -1,4 +1,4 @@
-package org.borg.backend.shared.enums;
+package org.borg.backend.player.model;
 
 public enum ProgressStatus {
     NOT_STARTED,

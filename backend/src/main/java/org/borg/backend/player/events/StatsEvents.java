@@ -1,7 +1,7 @@
 package org.borg.backend.player.events;
 
 import org.borg.backend.player.model.Player;
-import org.borg.backend.shared.enums.GameResult;
+import org.borg.backend.game.shared.enums.GameResult;
 
 public class StatsEvents {
     public record QuestionAnsweredEvent(Long playerId, String category, boolean isCorrect) {}

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.shared.enums.GameResult;
+import org.borg.backend.game.shared.enums.GameResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

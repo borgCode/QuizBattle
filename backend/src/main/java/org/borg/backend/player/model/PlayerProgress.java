@@ -2,7 +2,6 @@ package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.shared.enums.ProgressStatus;
 import org.borg.backend.game.singleplayer.model.Story;
 
 import java.time.LocalDate;
