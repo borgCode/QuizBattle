@@ -175,7 +175,7 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
         const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
           data: {
             roundResults: roundResults.questionResults,
-            winCondition: this.chapterWinCondition
+            isRoundPassed: roundResults.roundPassed
           },
           maxHeight: "90vh",
           width: "300px"
@@ -211,7 +211,6 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
       }
     });
   }
-
 
   private handleLostGame(): Promise<boolean> {
     return new Promise((resolve) => {

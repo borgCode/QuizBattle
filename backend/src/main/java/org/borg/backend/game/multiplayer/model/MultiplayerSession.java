@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.borg.backend.shared.enums.GameStatus;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.question.dto.PlayerQuestionResult;
+import org.borg.backend.game.shared.dto.PlayerQuestionResult;
 
 import java.util.*;
 

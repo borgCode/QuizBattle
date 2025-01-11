@@ -1,0 +1,181 @@
+package org.borg.backend.chapter;
+
+import Config.TestDataLoader;
+import org.borg.backend.auth.model.Role;
+import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.game.shared.dto.QuestionDTO;
+import org.borg.backend.game.shared.model.Question;
+import org.borg.backend.game.shared.repository.QuestionRepository;
+import org.borg.backend.game.shared.service.RoundSessionService;
+import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
+import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
+import org.borg.backend.game.singleplayer.dto.StartChapterRequest;
+import org.borg.backend.game.singleplayer.model.Chapter;
+import org.borg.backend.game.singleplayer.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.model.Story;
+import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
+import org.borg.backend.game.singleplayer.repository.ChapterRepository;
+import org.borg.backend.game.singleplayer.repository.StoryRepository;
+import org.borg.backend.game.singleplayer.service.ChapterService;
+import org.borg.backend.game.singleplayer.service.ChapterSessionService;
+import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
+import org.borg.backend.game.singleplayer.service.StoryService;
+import org.borg.backend.player.model.Player;
+import org.borg.backend.player.model.PlayerProgress;
+import org.borg.backend.player.repository.PlayerProgressRepository;
+import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.shared.enums.ProgressStatus;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(TestDataLoader.class)
+public class ChapterFullFlowIntegrationTest {
+
+    @Autowired
+    private ChapterProgressRepository chapterProgressRepository;
+    @Autowired
+    private ChapterRepository chapterRepository;
+    @Autowired
+    private PlayerProgressRepository playerProgressRepository;
+    @Autowired
+    private PlayerRepository playerRepository;
+    @Autowired
+    private StoryRepository storyRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private StoryService storyService;
+
+    Player player;
+    Story story;
+    PlayerProgress playerProgress;
+    Chapter chapter;
+    @Autowired
+    private ChapterService chapterService;
+    @Autowired
+    private TestDataLoader testDataLoader;
+    @Autowired
+    private ChapterSessionService chapterSessionService;
+    @Autowired
+    private SinglePlayerQuestionService singlePlayerQuestionService;
+    @Autowired
+    private RoundSessionService roundSessionService;
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    @BeforeAll
+    void setUpOnce() {
+        chapterProgressRepository.deleteAll();
+        chapterRepository.deleteAll();
+        playerProgressRepository.deleteAll();
+        playerRepository.deleteAll();
+        storyRepository.deleteAll();
+
+        if (roleRepository.findByName("USER").isEmpty()) {
+            Role userRole = new Role();
+            userRole.setName("USER");
+            roleRepository.save(userRole);
+        }
+    }
+
+    @AfterAll
+    void cleanUpAll() {
+        chapterProgressRepository.deleteAll();
+        chapterRepository.deleteAll();
+        playerProgressRepository.deleteAll();
+        playerRepository.deleteAll();
+        storyRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        chapterProgressRepository.deleteAll();
+        playerProgressRepository.deleteAll();
+        playerRepository.deleteAll();
+    }
+
+    @BeforeEach
+    void setUp() {
+        Role userRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
+
+        chapter = testDataLoader.createTestChapter(new String[]{"Science & Nature", "Sports", "Geography"});
+
+        player = Player.builder()
+                .username("testPlayer")
+                .password("password")
+                .displayName("Test Player ")
+                .accountLocked(false)
+                .enabled(true)
+                .roles(new ArrayList<>(List.of(userRole)))
+                .build();
+
+        playerRepository.save(player);
+
+        story = storyRepository.findById(1L)
+                .orElseThrow();
+
+        playerProgress = storyService.getOrCreatePlayerProgress(player.getId(), story);
+    }
+
+    @Test
+    void fullHappyPathFlow() {
+        chapterService.startChapter(new StartChapterRequest(player.getId(), story.getId(), chapter.getId()));
+
+        PlayerProgress savedProgress = playerProgressRepository.findByPlayerIdAndStoryId(player.getId(), story.getId());
+        ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(savedProgress.getId(), chapter.getId());
+
+        assertAll(
+                () -> assertEquals(LocalDate.now(), savedProgress.getStartedAt(), "Started date should be set to today"),
+                () -> assertEquals(ProgressStatus.IN_PROGRESS, savedProgress.getProgressStatus(), "Status should be IN_PROGRESS"),
+                () -> assertEquals(chapter.getId(), savedProgress.getCurrentChapterId(), "Current chapter ID should match requested chapter"),
+                () -> assertEquals(LocalDate.now(), chapterProgress.getStartedAt(), "Started date should be set to today"),
+                () -> assertEquals(ProgressStatus.IN_PROGRESS, chapterProgress.getProgressStatus(), "Status should be IN_PROGRESS"),
+                () -> assertNotNull(chapterSessionService.getSession(player.getId()), "Player should be in started chapter session")
+        );
+
+        List<QuestionDTO> questions = singlePlayerQuestionService.getSinglePlayerRoundQuestions(player.getId());
+        List<Long> questionIds = questions.stream()
+                .map(QuestionDTO::getQuestionId)
+                .toList();
+
+        assertNotNull(roundSessionService.getSessionQuestions(player.getId()), "Player should be in a started round session");
+
+        List<Long> initializedQuestionIds = roundSessionService.getSessionQuestions(player.getId());
+
+        assertEquals(questionIds, initializedQuestionIds, "Initialized ids should match player's ids");
+        
+        List<Question> fullQuestions = questionRepository.findAllById(initializedQuestionIds);
+
+        for (int i = 0; i < fullQuestions.size(); i++) {
+            singlePlayerQuestionService.validateSingleplayerAnswer(
+                    new SinglePlayerAnswerValidationRequest(questions.get(i).getQuestionId(), fullQuestions.get(i).getCorrectAnswer(), player.getId()));
+        }
+        
+        ChapterRoundResults results  = singlePlayerQuestionService.getRoundResults(player.getId());
+        
+//        assertAll("Post first round checks",
+//                () -> assertTrue(results.getQuestionResults().stream()
+//                        .allMatch(Boolean::booleanValue), "All results should be marked as true (correct)"),
+//                () -> assertEquals(3, results.getCurrentHealth(), "Player should be at full health"),
+//                () -> assertFalse(results.isGameOver(), "Game should not be over"),
+//                () -> assertFalse(results.isChapterComplete(), "Chapter should not be complete"),
+//                () -> ass
+//        );
+//        
+        
+        
+    }
+}

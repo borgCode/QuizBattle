@@ -15,6 +15,7 @@ public class ChapterSession {
     private final int winCondition;
     private int currentRound = 0;
     private int currentHealth = 3;
+    private boolean isRoundPassed;
     private final Set<Long> completeRoundIds = ConcurrentHashMap.newKeySet();
 
     public ChapterSession(Long chapterId, Set<String> categories, int winCondition) {

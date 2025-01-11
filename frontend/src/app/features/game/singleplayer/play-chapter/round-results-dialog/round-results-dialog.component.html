@@ -1,5 +1,5 @@
 <div class="game-over-dialog">
-  <h2 mat-dialog-title [innerText]="numOfCorrect >= data.winCondition ?
+  <h2 mat-dialog-title [innerText]="data.isRoundPassed ?
    'Congratulations, you passed this category':
    'Not enough correct answers for this category, better luck next time!'"></h2>
   <mat-dialog-content>

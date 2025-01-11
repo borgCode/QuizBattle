@@ -1,4 +1,4 @@
-package org.borg.backend.question.dto;
+package org.borg.backend.game.shared.dto;
 
 import lombok.Builder;
 import lombok.Getter;

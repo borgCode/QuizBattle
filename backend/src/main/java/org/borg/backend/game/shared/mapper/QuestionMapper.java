@@ -1,8 +1,8 @@
-package org.borg.backend.question.mapper;
+package org.borg.backend.game.shared.mapper;
 
 
-import org.borg.backend.question.model.Question;
-import org.borg.backend.question.dto.QuestionDTO;
+import org.borg.backend.game.shared.model.Question;
+import org.borg.backend.game.shared.dto.QuestionDTO;
 
 import java.util.ArrayList;
 import java.util.List;

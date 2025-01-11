@@ -31,7 +31,7 @@ public class ChapterSessionService {
         
         return new ChapterRoundResults(
                 results,
-                results.stream().filter(r -> r).count() > session.getWinCondition(),
+                session.isRoundPassed(), 
                 session.isGameOver(),
                 session.isChapterComplete(),
                 session.getCurrentHealth()
@@ -44,8 +44,11 @@ public class ChapterSessionService {
         long correctAnswers = roundResults.stream()
                 .filter(results -> results)
                 .count();
-        
-        if (correctAnswers <= currentSession.getWinCondition()) {
+
+
+        currentSession.setRoundPassed(correctAnswers >= currentSession.getWinCondition());
+
+        if (correctAnswers < currentSession.getWinCondition()) {
             currentSession.decrementHealth();
         } else {
             currentSession.incrementRound();

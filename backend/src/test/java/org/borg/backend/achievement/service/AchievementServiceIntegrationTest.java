@@ -86,11 +86,11 @@ public class AchievementServiceIntegrationTest {
                     .roles(new ArrayList<>(List.of(userRole)))
                     .build();
         }
-        
+
         @Test
         void testPlayerProgressThroughAllLevels() {
             createAchievements();
-            
+
             CategoryStats categoryStats = CategoryStats.builder()
                     .category("Geography")
                     .correct(0)
@@ -103,15 +103,13 @@ public class AchievementServiceIntegrationTest {
             stats.setPlayer(player);
             player.setStats(stats);
             player = playerRepository.save(player);
-            
+
             increaseStatsToNextLevelAndPublish(5);
             assertUnlockedAchievement(1);
             increaseStatsToNextLevelAndPublish(5);
             assertUnlockedAchievement(2);
             increaseStatsToNextLevelAndPublish(5);
             assertUnlockedAchievement(3);
-
-
         }
 
         private void createAchievements() {
@@ -152,12 +150,12 @@ public class AchievementServiceIntegrationTest {
             log.warn("Increase to next level");
             CategoryStats categoryStats = player.getStats().getCategoryStats().get("Geography");
             int previousCorrect = categoryStats.getCorrect();
-            
+
             categoryStats.setCorrect(previousCorrect + i);
             playerRepository.save(player);
 
             assertEquals(previousCorrect + i, categoryStats.getCorrect());
-            
+
             applicationEventPublisher.publishEvent(new AchievementEvents.CategoryCompletedEvent(player.getId(), "Geography"));
         }
 
@@ -178,7 +176,6 @@ public class AchievementServiceIntegrationTest {
                     () -> assertEquals(achievementLevel, unlockedAchievement.getCurrentLevel().getLevel())
             );
         }
-        
     }
 
     @Nested
@@ -188,7 +185,6 @@ public class AchievementServiceIntegrationTest {
         void setUp() {
             initDataService.initAchievements();
         }
-
 
         @RepeatedTest(5)
         void multiplePlayersUnlockAchievementsSimultaneously() {
@@ -203,7 +199,6 @@ public class AchievementServiceIntegrationTest {
             );
 
             Map<Long, Set<String>> playerAwardedAchievements = new ConcurrentHashMap<>();
-
 
             TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
@@ -233,14 +228,12 @@ public class AchievementServiceIntegrationTest {
 
                             playerAwardedAchievements.put(player.getId(), ConcurrentHashMap.newKeySet());
 
-
                             for (String category : selectedCategories) {
                                 CategoryStats stats = player.getStats().getCategoryStats().get(category);
                                 stats.setCorrect(5);
                                 stats.setQuestionsAnswered(5);
 
                                 playerRepository.save(player);
-
 
                                 applicationEventPublisher.publishEvent(
                                         new AchievementEvents.CategoryCompletedEvent(
@@ -264,9 +257,8 @@ public class AchievementServiceIntegrationTest {
             try {
                 boolean completed = finishLatch.await(10, TimeUnit.SECONDS);
                 assertTrue(completed, "Not all achievement operations completed in time");
-                
-                Thread.sleep(100);
 
+                Thread.sleep(100);
 
                 for (Player player : players) {
                     Set<String> playedCategories = playerAwardedAchievements.get(player.getId());
@@ -282,11 +274,9 @@ public class AchievementServiceIntegrationTest {
                     List<UserUnlockedAchievement> userUnlockedAchievements = userUnlockedAchievementRepository.findAllByPlayerId(player.getId());
                     assertEquals(playedCategories.size(), userUnlockedAchievements.size(), String.format("Number of achievements mismatched for player: %s", player.getId()));
                 }
-
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-
         }
 
         private List<Player> createTestPlayers() {
@@ -325,12 +315,7 @@ public class AchievementServiceIntegrationTest {
 
                 player.setStats(stats);
                 playerRepository.save(player);
-
             }
-
         }
-
     }
-
-
 }

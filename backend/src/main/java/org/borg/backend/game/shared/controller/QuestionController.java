@@ -1,4 +1,4 @@
-package org.borg.backend.question.controller;
+package org.borg.backend.game.shared.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,8 @@ import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
-import org.borg.backend.question.dto.AnswerValidationResponse;
-import org.borg.backend.question.dto.QuestionDTO;
+import org.borg.backend.game.shared.dto.AnswerValidationResponse;
+import org.borg.backend.game.shared.dto.QuestionDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

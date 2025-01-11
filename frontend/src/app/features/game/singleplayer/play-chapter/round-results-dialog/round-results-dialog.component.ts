@@ -15,11 +15,10 @@ import {NgForOf} from '@angular/common';
 })
 export class RoundResultsDialogComponent {
 
-  numOfCorrect: number;
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: {roundResults: boolean[], winCondition: number},
+    @Inject(MAT_DIALOG_DATA) public data: {roundResults: boolean[], isRoundPassed: boolean},
 
   ) {
-    this.numOfCorrect = data.roundResults.filter(value => value).length
+
   }
 }
