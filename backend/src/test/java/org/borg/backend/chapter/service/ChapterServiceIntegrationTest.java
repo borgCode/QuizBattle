@@ -168,7 +168,6 @@ class ChapterServiceIntegrationTest {
         private void initChapterProgressAndAssertStatus(Long chapterId, int expectedCompleteChapters) {
             chapterService.startChapter(new InitiateProgressRequest(
                     player.getId(),
-                    playerProgress.getId(),
                     story.getId(),
                     chapterId
             ));
@@ -195,7 +194,6 @@ class ChapterServiceIntegrationTest {
         void shouldNotIncrementCompleteChaptersOnDuplicateCompletion() {
             chapterService.startChapter(new InitiateProgressRequest(
                     player.getId(),
-                    playerProgress.getId(),
                     story.getId(),
                     chapters.get(0).getId()
             ));
@@ -206,7 +204,6 @@ class ChapterServiceIntegrationTest {
             
             chapterService.startChapter(new InitiateProgressRequest(
                     player.getId(),
-                    playerProgress.getId(),
                     story.getId(),
                     chapters.get(0).getId()
             ));
@@ -262,7 +259,6 @@ class ChapterServiceIntegrationTest {
 
                         chapterService.startChapter(new InitiateProgressRequest(
                                 player.getId(),
-                                playerProgress.getId(),
                                 storyId,
                                 chapters.get(0).getId()
                         ));

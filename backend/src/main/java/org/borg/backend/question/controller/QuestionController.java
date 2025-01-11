@@ -10,8 +10,8 @@ import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
-import org.borg.backend.game.singleplayer.dto.SingleplayerQuestionsRequest;
-import org.borg.backend.question.dto.*;
+import org.borg.backend.question.dto.AnswerValidationResponse;
+import org.borg.backend.question.dto.QuestionDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -66,10 +66,10 @@ public class QuestionController {
         return ResponseEntity.ok(multiplayerQuestionService.getActiveSessionQuestions(sessionId, playerId));
     }
 
-    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/chapter/random-questions")
-    public ResponseEntity<List<QuestionDTO>> getSinglePlayerRoundQuestions(@RequestBody SingleplayerQuestionsRequest request) {
-        return ResponseEntity.ok(singlePlayerQuestionService.getSinglePlayerRoundQuestions(request));
+    public ResponseEntity<List<QuestionDTO>> getSinglePlayerRoundQuestions(@RequestParam long playerId) {
+        return ResponseEntity.ok(singlePlayerQuestionService.getSinglePlayerRoundQuestions(playerId));
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")

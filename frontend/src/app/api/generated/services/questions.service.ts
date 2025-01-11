@@ -146,7 +146,7 @@ export class QuestionsService extends BaseService {
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `getSinglePlayerRoundQuestions()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method doesn't expect any request body.
    */
   getSinglePlayerRoundQuestions$Response(params: GetSinglePlayerRoundQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
     return getSinglePlayerRoundQuestions(this.http, this.rootUrl, params, context);
@@ -156,7 +156,7 @@ export class QuestionsService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `getSinglePlayerRoundQuestions$Response()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method doesn't expect any request body.
    */
   getSinglePlayerRoundQuestions(params: GetSinglePlayerRoundQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
     return this.getSinglePlayerRoundQuestions$Response(params, context).pipe(

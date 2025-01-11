@@ -5,6 +5,5 @@
 export interface InitiateProgressRequest {
   chapterId?: number;
   playerId?: number;
-  playerProgressId?: number;
   storyId?: number;
 }

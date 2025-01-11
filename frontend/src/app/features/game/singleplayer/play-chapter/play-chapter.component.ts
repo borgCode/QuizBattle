@@ -49,7 +49,6 @@ export class PlayChapterComponent implements OnInit {
   chapterWinCondition: number;
 
   questions: QuestionDto[];
-  round: number = 0;
   storedPlayerId: number;
   answerIsCorrect: boolean = null;
   correctAnswerIndex: number;
@@ -86,7 +85,6 @@ export class PlayChapterComponent implements OnInit {
     this.chapterService.startChapter({
       body: {
         playerId: this.storedPlayerId,
-        playerProgressId: this.playerProgressId,
         storyId: this.storyId,
         chapterId: this.chapterId
       }
@@ -113,14 +111,10 @@ export class PlayChapterComponent implements OnInit {
     return this.questions.length > 0;
   }
 
-  //TODO remove category null - send only ID
   private fetchQuestions() {
     this.resetQuestionState()
     this.questionService.getSinglePlayerRoundQuestions({
-      body: {
-        category: null,
-        playerId: this.storedPlayerId
-      }
+      playerId: this.storedPlayerId
     }).subscribe({
       next: questions => {
         this.questions = questions;
@@ -219,7 +213,6 @@ export class PlayChapterComponent implements OnInit {
   }
 
 
-
   private handleLostGame(): Promise<boolean> {
     return new Promise((resolve) => {
       this.endGameDialog.open(ContentDialogComponent, {
@@ -235,7 +228,6 @@ export class PlayChapterComponent implements OnInit {
           this.chapterService.startChapter({
             body: {
               playerId: this.storedPlayerId,
-              playerProgressId: this.playerProgressId,
               storyId: this.storyId,
               chapterId: this.chapterId
             }

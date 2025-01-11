@@ -11,7 +11,6 @@ import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
-import org.borg.backend.game.singleplayer.dto.SingleplayerQuestionsRequest;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.question.dto.AnswerValidationResponse;
@@ -38,8 +37,8 @@ public class SinglePlayerQuestionService {
     private final ChapterProgressRepository chapterProgressRepository;
     private final ChapterService chapterService;
 
-    public List<QuestionDTO> getSinglePlayerRoundQuestions(SingleplayerQuestionsRequest request) {
-        ChapterSession session = chapterSessionService.getSession(request.getPlayerId());
+    public List<QuestionDTO> getSinglePlayerRoundQuestions(long playerId) {
+        ChapterSession session = chapterSessionService.getSession(playerId);
         String currentCategory = session.getCurrentCategory();
 
         List<Question> questions = questionRepository.findFiveRandomQuestionsByCategory(currentCategory);
@@ -49,7 +48,7 @@ public class SinglePlayerQuestionService {
                 .toList();
 
         roundSessionService.initializeSession(
-                request.getPlayerId(),
+                playerId,
                 questionIds,
                 currentCategory,
                 RoundType.SINGLE_PLAYER

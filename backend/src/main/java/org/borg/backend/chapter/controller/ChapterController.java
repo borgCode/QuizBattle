@@ -30,12 +30,4 @@ public class ChapterController {
         return ResponseEntity.ok().build();
     }
     
-    //TODO should not be an endpoint
-    
-    @PostMapping("/progress/update/{chapterProgressId}")
-    public ResponseEntity<Void> updateChapterProgress(@PathVariable long chapterProgressId) {
-        chapterService.updateChapterProgress(chapterProgressId);
-        return ResponseEntity.ok().build();
-    }
-    
 }

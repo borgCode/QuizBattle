@@ -36,7 +36,6 @@ export type { RelationshipsDto } from './models/relationships-dto';
 export type { RelationshipStatusRequest } from './models/relationship-status-request';
 export type { RematchRequest } from './models/rematch-request';
 export type { SinglePlayerAnswerValidationRequest } from './models/single-player-answer-validation-request';
-export type { SingleplayerQuestionsRequest } from './models/singleplayer-questions-request';
 export type { Stats } from './models/stats';
 export type { StoryDto } from './models/story-dto';
 export type { StoryOverviewDto } from './models/story-overview-dto';

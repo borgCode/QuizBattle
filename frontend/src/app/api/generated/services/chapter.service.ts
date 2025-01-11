@@ -16,38 +16,11 @@ import { getChapter } from '../fn/chapter/get-chapter';
 import { GetChapter$Params } from '../fn/chapter/get-chapter';
 import { startChapter } from '../fn/chapter/start-chapter';
 import { StartChapter$Params } from '../fn/chapter/start-chapter';
-import { updateChapterProgress } from '../fn/chapter/update-chapter-progress';
-import { UpdateChapterProgress$Params } from '../fn/chapter/update-chapter-progress';
 
 @Injectable({ providedIn: 'root' })
 export class ChapterService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
-  }
-
-  /** Path part for operation `updateChapterProgress()` */
-  static readonly UpdateChapterProgressPath = '/chapter/progress/update/{chapterProgressId}';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `updateChapterProgress()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  updateChapterProgress$Response(params: UpdateChapterProgress$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return updateChapterProgress(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `updateChapterProgress$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  updateChapterProgress(params: UpdateChapterProgress$Params, context?: HttpContext): Observable<void> {
-    return this.updateChapterProgress$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
   }
 
   /** Path part for operation `startChapter()` */

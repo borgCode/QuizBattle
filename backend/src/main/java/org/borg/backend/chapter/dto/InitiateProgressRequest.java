@@ -10,7 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class InitiateProgressRequest {
     private Long playerId;
-    private Long playerProgressId;
     private Long storyId;
     private Long chapterId;
 }

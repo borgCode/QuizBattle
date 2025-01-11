@@ -9,16 +9,15 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { QuestionDto } from '../../models/question-dto';
-import { SingleplayerQuestionsRequest } from '../../models/singleplayer-questions-request';
 
 export interface GetSinglePlayerRoundQuestions$Params {
-      body: SingleplayerQuestionsRequest
+  playerId: number;
 }
 
 export function getSinglePlayerRoundQuestions(http: HttpClient, rootUrl: string, params: GetSinglePlayerRoundQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
   const rb = new RequestBuilder(rootUrl, getSinglePlayerRoundQuestions.PATH, 'post');
   if (params) {
-    rb.body(params.body, 'application/json');
+    rb.query('playerId', params.playerId, {});
   }
 
   return http.request(
