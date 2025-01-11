@@ -34,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -137,11 +138,12 @@ public class ChapterFullFlowIntegrationTest {
                 .orElseThrow();
 
         playerProgress = storyService.getOrCreatePlayerProgress(player.getId(), story);
+
+        chapterService.startChapter(new StartChapterRequest(player.getId(), story.getId(), chapter.getId()));
     }
 
     @Test
     void fullHappyPathFlow() {
-        chapterService.startChapter(new StartChapterRequest(player.getId(), story.getId(), chapter.getId()));
 
         PlayerProgress savedProgress = playerProgressRepository.findByPlayerIdAndStoryId(player.getId(), story.getId());
         ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(savedProgress.getId(), chapter.getId());
@@ -215,7 +217,60 @@ public class ChapterFullFlowIntegrationTest {
                 singlePlayerQuestionService.validateSingleplayerAnswer(
                         new SinglePlayerAnswerValidationRequest(questions.get(j).getQuestionId(), fullQuestions.get(j).getCorrectAnswer(), player.getId()));
             }
-            if (i < 1) { 
+            if (i < 1) {
+                singlePlayerQuestionService.getRoundResults(player.getId());
+            }
+        }
+    }
+
+    @Test
+    @Transactional
+    void healthDepletionAndGameOver() {
+        List<QuestionDTO> questions = singlePlayerQuestionService.getSinglePlayerRoundQuestions(player.getId());
+        List<Long> initializedQuestionIds = roundSessionService.getSessionQuestions(player.getId());
+        List<Question> fullQuestions = questionRepository.findAllById(initializedQuestionIds);
+
+        for (int i = 0; i < fullQuestions.size(); i++) {
+            singlePlayerQuestionService.validateSingleplayerAnswer(
+                    new SinglePlayerAnswerValidationRequest(questions.get(i).getQuestionId(), fullQuestions.get(i).getOptions().get(2), player.getId()));
+        }
+
+        ChapterRoundResults results = singlePlayerQuestionService.getRoundResults(player.getId());
+
+        assertAll("Post first round checks",
+                () -> assertTrue(results.getQuestionResults().stream()
+                        .noneMatch(Boolean::booleanValue), "All results should be marked as false (incorrect)"),
+                () -> assertEquals(2, results.getCurrentHealth(), "Player should be at 2 health"),
+                () -> assertFalse(results.isGameOver(), "Game should not be over"),
+                () -> assertFalse(results.isRoundPassed(), "Round should not be passed")
+        );
+        
+        playTwoFailedRounds();
+
+        ChapterRoundResults resultsAfterLastRound = singlePlayerQuestionService.getRoundResults(player.getId());
+
+        assertAll("Post last round checks",
+                () -> assertFalse(resultsAfterLastRound.isChapterComplete(), "Chapter should not be complete"),
+                () -> assertFalse(resultsAfterLastRound.isRoundPassed(), "Round should not be passed"),
+                () -> assertTrue(resultsAfterLastRound.isGameOver(), "Game should be over"),
+                () -> assertEquals(0, resultsAfterLastRound.getCurrentHealth(), "Health should be at 0")
+        );
+    }
+
+    private void playTwoFailedRounds() {
+        for (int i = 0; i < 2; i++) {
+
+            List<QuestionDTO> questions = singlePlayerQuestionService.getSinglePlayerRoundQuestions(player.getId());
+
+            List<Long> initializedQuestionIds = roundSessionService.getSessionQuestions(player.getId());
+
+            List<Question> fullQuestions = questionRepository.findAllById(initializedQuestionIds);
+
+            for (int j = 0; j < fullQuestions.size(); j++) {
+                singlePlayerQuestionService.validateSingleplayerAnswer(
+                        new SinglePlayerAnswerValidationRequest(questions.get(j).getQuestionId(), fullQuestions.get(i).getOptions().get(2), player.getId()));
+            }
+            if (i < 1) {
                 singlePlayerQuestionService.getRoundResults(player.getId());
             }
         }
