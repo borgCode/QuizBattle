@@ -45,9 +45,9 @@ export class PlayerProfileComponent implements OnInit {
       console.warn('No logged-in user found!');
     }
     this.playerService.getPlayerById({playerId: this.player.id}).subscribe({
-      next: value => {
-        this.player = value;
-        this.loginStateService.loggedInUser = value;
+      next: playerDTO => {
+        this.player = playerDTO;
+        this.loginStateService.loggedInUser = playerDTO;
 
         this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
 

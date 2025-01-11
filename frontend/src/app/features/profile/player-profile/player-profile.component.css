@@ -3,3 +3,11 @@
   overflow-y: scroll;
   height: 90%;
 }
+
+.card-img-top {
+  height: 80%;
+  width: 100%;
+}
+.card-body {
+  height: 20%;
+}
