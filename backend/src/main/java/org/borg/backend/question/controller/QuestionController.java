@@ -7,6 +7,7 @@ import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
 import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
 import org.borg.backend.game.shared.service.RoundSessionService;
+import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
 import org.borg.backend.game.singleplayer.dto.SingleplayerQuestionsRequest;
@@ -79,7 +80,7 @@ public class QuestionController {
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/chapter/results/{playerId}")
-    public ResponseEntity<List<Boolean>> getRoundResults(@PathVariable long playerId) {
+    public ResponseEntity<ChapterRoundResults> getRoundResults(@PathVariable long playerId) {
         return ResponseEntity.ok(singlePlayerQuestionService.getRoundResults(playerId));
     }
     

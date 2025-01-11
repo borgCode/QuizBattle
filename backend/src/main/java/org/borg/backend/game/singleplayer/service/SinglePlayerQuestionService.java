@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.achievement.events.AchievementEvents;
 import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.service.RoundSessionService;
+import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
 import org.borg.backend.game.singleplayer.dto.SingleplayerQuestionsRequest;
 import org.borg.backend.player.model.Player;
@@ -30,6 +31,7 @@ public class SinglePlayerQuestionService {
     private final RoundSessionService roundSessionService;
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChapterSessionService chapterSessionService;
 
     public List<QuestionDTO> getSinglePlayerRoundQuestions(SingleplayerQuestionsRequest request) {
         List<Question> questions = questionRepository.findFiveRandomQuestionsByCategory(request.getCategory());
@@ -99,9 +101,11 @@ public class SinglePlayerQuestionService {
         playerRepository.save(player);
     }
 
-    public List<Boolean> getRoundResults(Long playerId) {
+    public ChapterRoundResults getRoundResults(Long playerId) {
         List<Boolean> results = roundSessionService.getSessionAnswers(playerId);
         roundSessionService.finishSession(playerId);
-        return results;
+
+        
+        return chapterSessionService.getRoundResults(playerId, results);
     }
 }

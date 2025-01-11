@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.chapter.dto.ChapterDTO;
 import org.borg.backend.chapter.dto.InitiateProgressRequest;
-import org.borg.backend.chapter.dto.InitiateProgressResponse;
 import org.borg.backend.chapter.service.ChapterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,8 +25,9 @@ public class ChapterController {
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
     @PostMapping("/progress/start") 
-    public ResponseEntity<InitiateProgressResponse> initiateProgress(@RequestBody InitiateProgressRequest request) {
-        return ResponseEntity.ok().body(chapterService.initiateProgress(request));
+    public ResponseEntity<Void> startChapter(@RequestBody InitiateProgressRequest request) {
+        chapterService.startChapter(request);
+        return ResponseEntity.ok().build();
     }
     
     //TODO should not be an endpoint

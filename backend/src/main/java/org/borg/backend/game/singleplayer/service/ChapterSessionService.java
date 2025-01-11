@@ -3,6 +3,7 @@ package org.borg.backend.game.singleplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.chapter.model.Chapter;
+import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,13 +16,27 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChapterSessionService {
     private final Map<Long, ChapterSession> activeSessions = new ConcurrentHashMap<>();
     
-    public void initializeChapterSession(Long playerId, Set<String> categories, Chapter chapter) {
+    public void initializeChapterSession(Long playerId, Chapter chapter) {
         ChapterSession chapterSession = new ChapterSession(
                 chapter.getId(),
-                categories,
+                chapter.getCategories(),
                 chapter.getRoundWinCondition());
         
         activeSessions.put(playerId, chapterSession);
+    }
+    
+    public ChapterRoundResults getRoundResults(Long playerId, List<Boolean> results) {
+        processRoundCompletion(playerId, results);
+        
+        ChapterSession session = activeSessions.get(playerId);
+        
+        return new ChapterRoundResults(
+                results,
+                results.stream().filter(r -> r).count() > session.getWinCondition(),
+                session.isGameOver(),
+                session.isChapterComplete(),
+                session.getCurrentHealth()
+        );
     }
     
     
