@@ -44,8 +44,7 @@ public class ChapterSessionService {
         long correctAnswers = roundResults.stream()
                 .filter(results -> results)
                 .count();
-
-
+        
         currentSession.setRoundPassed(correctAnswers >= currentSession.getWinCondition());
 
         if (correctAnswers < currentSession.getWinCondition()) {

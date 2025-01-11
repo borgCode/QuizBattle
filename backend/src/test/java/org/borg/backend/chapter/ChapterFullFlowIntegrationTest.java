@@ -1,6 +1,7 @@
 package org.borg.backend.chapter;
 
 import Config.TestDataLoader;
+import jakarta.persistence.EntityNotFoundException;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.game.shared.dto.QuestionDTO;
@@ -20,6 +21,8 @@ import org.borg.backend.game.singleplayer.service.ChapterService;
 import org.borg.backend.game.singleplayer.service.ChapterSessionService;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
 import org.borg.backend.game.singleplayer.service.StoryService;
+import org.borg.backend.player.listener.AchievementListener;
+import org.borg.backend.player.listener.StatsListener;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
@@ -30,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,6 +61,11 @@ public class ChapterFullFlowIntegrationTest {
     private RoleRepository roleRepository;
     @Autowired
     private StoryService storyService;
+    @MockitoBean
+    private AchievementListener achievementListener;
+
+    @MockitoBean
+    private StatsListener statsListener;
 
     Player player;
     Story story;
@@ -156,26 +165,59 @@ public class ChapterFullFlowIntegrationTest {
         List<Long> initializedQuestionIds = roundSessionService.getSessionQuestions(player.getId());
 
         assertEquals(questionIds, initializedQuestionIds, "Initialized ids should match player's ids");
-        
+
         List<Question> fullQuestions = questionRepository.findAllById(initializedQuestionIds);
 
         for (int i = 0; i < fullQuestions.size(); i++) {
             singlePlayerQuestionService.validateSingleplayerAnswer(
                     new SinglePlayerAnswerValidationRequest(questions.get(i).getQuestionId(), fullQuestions.get(i).getCorrectAnswer(), player.getId()));
         }
-        
-        ChapterRoundResults results  = singlePlayerQuestionService.getRoundResults(player.getId());
-        
-//        assertAll("Post first round checks",
-//                () -> assertTrue(results.getQuestionResults().stream()
-//                        .allMatch(Boolean::booleanValue), "All results should be marked as true (correct)"),
-//                () -> assertEquals(3, results.getCurrentHealth(), "Player should be at full health"),
-//                () -> assertFalse(results.isGameOver(), "Game should not be over"),
-//                () -> assertFalse(results.isChapterComplete(), "Chapter should not be complete"),
-//                () -> ass
-//        );
-//        
-        
-        
+
+        ChapterRoundResults results = singlePlayerQuestionService.getRoundResults(player.getId());
+
+        assertAll("Post first round checks",
+                () -> assertTrue(results.getQuestionResults().stream()
+                        .allMatch(Boolean::booleanValue), "All results should be marked as true (correct)"),
+                () -> assertEquals(3, results.getCurrentHealth(), "Player should be at full health"),
+                () -> assertFalse(results.isGameOver(), "Game should not be over"),
+                () -> assertFalse(results.isChapterComplete(), "Chapter should not be complete"),
+                () -> assertTrue(results.isRoundPassed(), "Round should be passed")
+        );
+
+        playTwoRounds();
+
+        ChapterRoundResults resultsAfterLastRound = singlePlayerQuestionService.getRoundResults(player.getId());
+
+        assertAll("Post last round checks",
+                () -> assertTrue(resultsAfterLastRound.isChapterComplete(), "Chapter should be complete"),
+                () -> assertTrue(resultsAfterLastRound.isRoundPassed(), "Round should be passed")
+        );
+
+        ChapterProgress updatedChapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(playerProgress.getId(), player.getId());
+        PlayerProgress playerProgress = playerProgressRepository.findById(chapterProgress.getPlayerProgress().getId())
+                .orElseThrow(() -> new EntityNotFoundException("PlayerProgress not found"));
+
+        assertAll("Progress updates after chapter complete",
+                () -> assertEquals(ProgressStatus.COMPLETED, updatedChapterProgress.getProgressStatus(), "Chapter should be marked as complete"),
+                () -> assertEquals(1, playerProgress.getCompletedChapters(), "Player progress should have one chapter completed"));
+    }
+
+    private void playTwoRounds() {
+        for (int i = 0; i < 2; i++) {
+
+            List<QuestionDTO> questions = singlePlayerQuestionService.getSinglePlayerRoundQuestions(player.getId());
+
+            List<Long> initializedQuestionIds = roundSessionService.getSessionQuestions(player.getId());
+
+            List<Question> fullQuestions = questionRepository.findAllById(initializedQuestionIds);
+
+            for (int j = 0; j < fullQuestions.size(); j++) {
+                singlePlayerQuestionService.validateSingleplayerAnswer(
+                        new SinglePlayerAnswerValidationRequest(questions.get(j).getQuestionId(), fullQuestions.get(j).getCorrectAnswer(), player.getId()));
+            }
+            if (i < 1) { 
+                singlePlayerQuestionService.getRoundResults(player.getId());
+            }
+        }
     }
 }
