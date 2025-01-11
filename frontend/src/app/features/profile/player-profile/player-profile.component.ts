@@ -10,12 +10,16 @@ import {FriendshipService} from '../../../api/generated/services/friendship.serv
 import {MultiplayerMatchService} from '../../../api/generated/services/multiplayer-match.service';
 import {MessageService} from '../../../api/generated/services/message.service';
 import {WhisperWindowService} from '../../../core/services/whisper-window/whisper-window.service';
+import {Observable, tap} from 'rxjs';
+import {AsyncPipe, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-user-profile',
   imports: [
     CategoryPieChartComponent,
-    RelationshipPanelComponent
+    RelationshipPanelComponent,
+    NgIf,
+    AsyncPipe
   ],
   templateUrl: './player-profile.component.html',
   styleUrl: './player-profile.component.css'
@@ -25,6 +29,8 @@ export class PlayerProfileComponent implements OnInit {
   friendsList!: PlayerDto[]
   blockedList!: PlayerDto[]
   image: string = '';
+
+  playerData$: Observable<PlayerDto>;
 
   constructor(
     private loginStateService: LoginStateService,
@@ -44,17 +50,17 @@ export class PlayerProfileComponent implements OnInit {
     if (!this.player) {
       console.warn('No logged-in user found!');
     }
-    this.playerService.getPlayerById({playerId: this.player.id}).subscribe({
-      next: playerDTO => {
-        this.player = playerDTO;
-        this.loginStateService.loggedInUser = playerDTO;
+    this.playerData$ = this.playerService.getPlayerById({playerId: this.player.id}).pipe(
+      tap(playerDTO => {
+      this.player = playerDTO;
+      this.loginStateService.loggedInUser = playerDTO;
 
-        this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
+      this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
 
-        this.getFriends();
+      this.getFriends();
 
-      }
     })
+    );
   }
 
   private getFriends() {

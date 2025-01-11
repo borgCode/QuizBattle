@@ -51,7 +51,9 @@
   </div>
   <div class="row mt-5">
     <div class="col-md-5 offset-md-4">
-      <app-category-pie-chart [categoryStats]=player.stats.categoryStats></app-category-pie-chart>
+      <ng-container *ngIf="playerData$ | async as player">
+        <app-category-pie-chart [categoryStats]=player.stats.categoryStats></app-category-pie-chart>
+      </ng-container>
     </div>
   </div>
 </div>
