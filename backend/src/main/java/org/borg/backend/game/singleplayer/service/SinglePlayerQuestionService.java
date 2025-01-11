@@ -72,7 +72,7 @@ public class SinglePlayerQuestionService {
                 question.getId(),
                 validationResponse.isCorrect()
         );
-        
+
         if (isRoundComplete) {
             applicationEventPublisher.publishEvent(
                     new AchievementEvents.CategoryCompletedEvent(
@@ -81,7 +81,6 @@ public class SinglePlayerQuestionService {
                     )
             );
         }
-
         return validationResponse;
     }
 
@@ -112,7 +111,7 @@ public class SinglePlayerQuestionService {
         roundSessionService.finishSession(playerId);
 
         ChapterRoundResults roundResults = chapterSessionService.getRoundResults(playerId, results);
-        
+
         if (roundResults.isChapterComplete() && !roundResults.isGameOver()) {
             ChapterProgress progress = chapterProgressRepository
                     .findByPlayerIdAndChapterId(playerId, chapterSessionService.getSession(playerId).getChapterId());

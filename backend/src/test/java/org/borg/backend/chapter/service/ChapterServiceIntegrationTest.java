@@ -7,18 +7,17 @@ import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.game.singleplayer.dto.StartChapterRequest;
 import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.model.Story;
 import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.game.singleplayer.repository.ChapterRepository;
+import org.borg.backend.game.singleplayer.repository.StoryRepository;
 import org.borg.backend.game.singleplayer.service.ChapterService;
+import org.borg.backend.game.singleplayer.service.StoryService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.seed.InitDataService;
-import org.borg.backend.shared.enums.ProgressStatus;
-import org.borg.backend.game.singleplayer.model.Story;
-import org.borg.backend.game.singleplayer.repository.StoryRepository;
-import org.borg.backend.game.singleplayer.service.StoryService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,8 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @SpringBootTest
@@ -72,7 +71,6 @@ class ChapterServiceIntegrationTest {
         playerRepository.deleteAll();
         storyRepository.deleteAll();
 
-
         if (roleRepository.findByName("USER").isEmpty()) {
             Role userRole = new Role();
             userRole.setName("USER");
@@ -89,7 +87,6 @@ class ChapterServiceIntegrationTest {
         playerRepository.deleteAll();
         storyRepository.deleteAll();
     }
-
 
     @AfterEach
     void tearDown() {
@@ -127,70 +124,7 @@ class ChapterServiceIntegrationTest {
             playerProgress = storyService.getOrCreatePlayerProgress(player.getId(), story);
             chapters = chapterRepository.findByStoryId(story.getId());
         }
-        
-        @Test
-        void shouldUpdateChapterProgressAndCompleteStory() {
-//            int expectedCompleteChapters = 1;
-//            for (int i = 0; i < chapters.size() - 1; i++) {
-//                initChapterProgressAndAssertStatus(chapters.get(i).getId(), expectedCompleteChapters);
-//                expectedCompleteChapters++;
-//            }
-//            
-//            chapterService.startChapter(new StartChapterRequest(
-//                    player.getId(),
-//                    playerProgress.getId(),
-//                    story.getId(),
-//                    chapters.get(chapters.size() - 1).getId()
-//            ));
-//
-//            ChapterProgress lastChapterProgress = chapterProgressRepository
-//                    .findByPlayerProgressIdAndChapterId(playerProgress.getId(),
-//                            chapters.get(chapters.size() - 1).getId());
-//
-//            chapterService.updateChapterProgress(lastChapterProgress.getId());
-//
-//            PlayerProgress newPlayerProgress = playerProgressRepository
-//                    .findByPlayerIdAndStoryId(player.getId(), story.getId());
-//
-//            assertAll("Post story-complete progress checks",
-//                    () -> assertEquals(ProgressStatus.COMPLETED,
-//                            lastChapterProgress.getProgressStatus(),
-//                            "Chapter should be marked as complete"),
-//                    () -> assertEquals(story.getNumOfChapters(),
-//                            newPlayerProgress.getCompletedChapters(),
-//                            "Player progress completed chapters should be incremented"),
-//                    () -> assertEquals(ProgressStatus.COMPLETED,
-//                            newPlayerProgress.getProgressStatus(),
-//                            "Story should be marked as complete")
-//            );
 
-        }
-
-        private void initChapterProgressAndAssertStatus(Long chapterId, int expectedCompleteChapters) {
-            chapterService.startChapter(new StartChapterRequest(
-                    player.getId(),
-                    story.getId(),
-                    chapterId
-            ));
-            
-            ChapterProgress chapterProgress = chapterProgressRepository
-                    .findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapterId);
-
-            chapterService.updateChapterProgress(chapterProgress.getId());
-
-            assertAll("Post chapter-update progress checks",
-                    () -> assertEquals(ProgressStatus.COMPLETED,
-                            chapterProgressRepository.findById(chapterProgress.getId())
-                                    .get()
-                                    .getProgressStatus(),
-                            "Chapter should be marked as complete"),
-                    () -> assertEquals(expectedCompleteChapters,
-                            playerProgressRepository.findByPlayerIdAndStoryId(player.getId(), story.getId())
-                                    .getCompletedChapters(),
-                            "Player progress completed chapters should be incremented")
-            );
-
-        }
         @Test
         void shouldNotIncrementCompleteChaptersOnDuplicateCompletion() {
             chapterService.startChapter(new StartChapterRequest(
@@ -202,7 +136,7 @@ class ChapterServiceIntegrationTest {
             ChapterProgress firstProgress = chapterProgressRepository
                     .findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapters.get(0).getId());
             chapterService.updateChapterProgress(firstProgress.getId());
-            
+
             chapterService.startChapter(new StartChapterRequest(
                     player.getId(),
                     story.getId(),
@@ -218,8 +152,6 @@ class ChapterServiceIntegrationTest {
             assertEquals(1, progressAfterDuplicate.getCompletedChapters(),
                     "Completing same chapter twice should not increment counter");
         }
-        
-
 
     }
 
@@ -263,7 +195,7 @@ class ChapterServiceIntegrationTest {
                                 storyId,
                                 chapters.get(0).getId()
                         ));
-                        
+
                         playerProgresses.put(player.getId(), playerProgress);
 
                         finishLatch.countDown();
@@ -320,7 +252,4 @@ class ChapterServiceIntegrationTest {
         }
         return players;
     }
-    
-    
-
 }

@@ -89,7 +89,7 @@ public class MultiplayerQuestionService {
         if (!session.getQuestionIds().contains(request.getQuestionId())) {
             throw new GameException(BusinessErrorCodes.INVALID_QUESTION);
         }
-
+        
         if (roundSessionService.isQuestionAnswered(request.getPlayerId(), request.getQuestionId())) {
             log.warn("Attempt to answer already answered question: {}", request.getQuestionId());
             throw new GameException(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED);
