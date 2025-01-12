@@ -45,13 +45,12 @@ public class AuthService {
                 .enabled(true)
                 .roles(List.of(userRole))
                 .build();
-        
+
         try {
             playerRepository.save(player);
         } catch (DataIntegrityViolationException e) {
-            throw new DuplicateException(BusinessErrorCodes.USERNAME_TAKEN);
+            throw new DuplicateException(BusinessErrorCodes.USERNAME_TAKEN, String.format("Username is taken for: %s", request.getUsername()));
         }
-       
     }
 
     public AuthResponse authenticate(AuthRequest authRequest) {
@@ -59,16 +58,13 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(
                         authRequest.getUsername(),
                         authRequest.getPassword()
-                )
-        );
+                ));
 
         Player player = (Player) auth.getPrincipal();
         String accessToken = jwtService.generateToken(player);
         String refreshToken = jwtService.generateRefreshToken(player);
-        
 
         PlayerDTO playerDTO = PlayerMapper.toDTO(player);
-        
 
         return AuthResponse.builder()
                 .message("Login successful")
@@ -76,7 +72,6 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
     }
 
     public RefreshTokenResponse refresh(RefreshTokenRequest request) {

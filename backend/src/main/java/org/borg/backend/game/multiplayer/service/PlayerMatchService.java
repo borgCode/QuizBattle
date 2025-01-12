@@ -29,7 +29,6 @@ public class PlayerMatchService {
 
     private final NotificationService notificationService;
     private final PendingSessionRepository pendingSessionRepository;
-    private final PlayerRepository playerRepository;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final PlayerService playerService;
 
@@ -44,10 +43,12 @@ public class PlayerMatchService {
     @Transactional
     public void requestRematch(RematchRequest rematchRequest) {
         MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Session not found for " + rematchRequest.getSessionId()));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND,
+                String.format("Multiplayer session with ID %d not found", rematchRequest.getSessionId())));
 
         if (session.getStatus().equals(GameStatus.ACTIVE)) {
-            throw new GameException(GAME_ALREADY_ONGOING);
+            throw new GameException(GAME_ALREADY_ONGOING,
+                    String.format("Cannot request rematch - game session %d is still active", session.getId()));
         }
 
         Long playerId = rematchRequest.getPlayerId();
@@ -55,23 +56,29 @@ public class PlayerMatchService {
         Player sendingPlayer = session.getPlayers().stream()
                 .filter(player -> player.getId().equals(playerId))
                 .findFirst()
-                .orElseThrow(() -> new GameException(INVALID_SESSION_STATE));
+                .orElseThrow(() -> new GameException(INVALID_SESSION_STATE,
+                String.format("Player %d is not part of session %d", playerId, session.getId())));
 
         Player opponentPlayer = session.getPlayers().stream()
                 .filter(player -> !player.equals(sendingPlayer))
                 .findFirst()
-                .orElseThrow(() -> new GameException(INVALID_SESSION_STATE));
+                .orElseThrow(() -> new GameException(INVALID_SESSION_STATE,
+                String.format("Could not find opponent in session %d", session.getId())));
 
         handleMatchRequest(sendingPlayer, opponentPlayer, session);
     }
 
     private void handleMatchRequest(Player sendingPlayer, Player receivingPlayer, MultiplayerSession originalSession) {
         if (multiplayerSessionRepository.checkIfOngoingSessionExists(sendingPlayer, receivingPlayer, GameStatus.ACTIVE)) {
-            throw new GameException(GAME_ALREADY_ONGOING);
+            throw new GameException(GAME_ALREADY_ONGOING,
+                    String.format("Active game already exists between players %d and %d",
+                            sendingPlayer.getId(), receivingPlayer.getId()));
         }
 
         if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), receivingPlayer.getId())) {
-            throw new GameException(REMATCH_REQUEST_ALREADY_SENT);
+            throw new GameException(REMATCH_REQUEST_ALREADY_SENT,
+                    String.format("Player %d has already sent a match request to player %d",
+                            sendingPlayer.getId(), receivingPlayer.getId()));
         }
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(receivingPlayer.getId(), sendingPlayer.getId());
 
@@ -108,10 +115,13 @@ public class PlayerMatchService {
     @Transactional
     public Long handleMatchAccept(MatchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Pending session not found for: " + response.getPendingSessionId()));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND,
+                String.format("Pending session with ID %d not found", response.getPendingSessionId())));
 
         if (!pendingSession.getOpponentId().equals(response.getSenderId())) {
-            throw new AccessDeniedException("Not authorized to accept this request");
+            throw new AccessDeniedException(
+                    String.format("Player %d not authorized to accept match request %d",
+                            response.getSenderId(), response.getPendingSessionId()));
         }
 
         Long newSessionId = createMultiplayerSession(pendingSession);
@@ -141,7 +151,8 @@ public class PlayerMatchService {
     @Transactional
     public void handleMatchReject(MatchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Pending session not found for: " + response.getPendingSessionId()));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND,
+                        String.format("Pending session with ID %d not found", response.getPendingSessionId())));
 
         if (response.isRematch()) {
             notificationService.sendRematchRejectedNotification(response.getReceiverId(), response.getPlayerDisplayName(), response.getNotificationId());

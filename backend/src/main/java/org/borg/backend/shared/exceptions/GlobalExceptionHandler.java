@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
                         .error(ex.getMessage())
                         .build());
     }
-    
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(ResourceNotFoundException exception) {
         ExceptionResponse response = ExceptionResponse.builder()
@@ -150,7 +150,6 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
         return ResponseEntity
@@ -160,5 +159,4 @@ public class GlobalExceptionHandler {
                         .error(exception.getMessage())
                         .build());
     }
-
 }

@@ -6,11 +6,9 @@ import org.borg.backend.shared.enums.BusinessErrorCodes;
 
 @Getter
 @Builder
-public class GameException extends RuntimeException{
-    private final BusinessErrorCodes errorCode;
+public class GameException extends BaseException{
     
-    public GameException(BusinessErrorCodes errorCode) {
-    super(errorCode.getDescription());
-    this.errorCode = errorCode;
+    public GameException(BusinessErrorCodes errorCode, String message) {
+    super(errorCode, message);
     }
 }

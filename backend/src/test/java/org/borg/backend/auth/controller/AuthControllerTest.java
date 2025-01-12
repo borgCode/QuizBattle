@@ -69,7 +69,7 @@ class AuthControllerTest {
                 .displayName("Test User")
                 .build();
 
-        doThrow(new DuplicateException(BusinessErrorCodes.USERNAME_TAKEN))
+        doThrow(new DuplicateException(BusinessErrorCodes.USERNAME_TAKEN, "Username is taken for: " + request.getUsername()))
                 .when(authService).register(any(RegistrationRequest.class));
 
 

@@ -94,7 +94,7 @@ public class GameService {
         Player opponent = session.getPlayers().stream()
                 .filter(p -> !p.getId().equals(playerId))
                 .findFirst()
-                .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE));
+                .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session"));
 
         if (isGameComplete(questionsAnswered)) {
             session.setStatus(GameStatus.COMPLETED);
@@ -217,7 +217,7 @@ public class GameService {
                 .filter(player -> !player.getId().equals(playerId))
                 .findFirst()
                 .map(Player::getId)
-                .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE)));
+                .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session")));
 
         multiplayerSessionRepository.save(session);
         

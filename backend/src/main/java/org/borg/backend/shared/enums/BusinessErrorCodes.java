@@ -19,6 +19,7 @@ public enum BusinessErrorCodes {
     FRIENDSHIP_NOT_FOUND(203, HttpStatus.BAD_REQUEST, "The friendship was not found"),
     CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP(204, HttpStatus.BAD_REQUEST, "Can't unblock friendship that isn't blocked"),
     ALREADY_BLOCKED_FRIENDSHIP(205, HttpStatus.BAD_REQUEST, "The player is already blocked"),
+    CANNOT_FRIEND_SELF(206, HttpStatus.BAD_REQUEST, "Player cannot friend themselves"),
     
     
     REMATCH_REQUEST_ALREADY_SENT(300, HttpStatus.BAD_REQUEST, "Rematch request already sent"),

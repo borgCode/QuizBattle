@@ -34,6 +34,11 @@ public class FriendshipService {
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
+        if (request.getSenderId().equals(request.getReceiverId())) {
+            throw new FriendshipException(BusinessErrorCodes.CANNOT_FRIEND_SELF,
+                    String.format("Player %d attempted to send friend request to themselves", request.getSenderId()));
+        }
+
         Player sendingPlayer = playerService.getPlayerById(request.getSenderId());
         Player receivingPlayer = playerService.getPlayerById(request.getReceiverId());
 
@@ -55,16 +60,25 @@ public class FriendshipService {
             Friendship friendship = existingFriendships.get(0);
             if (friendship.getPlayer1().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
-                    case BLOCKED ->
-                            throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
-                    case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING);
-                    case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+                    case BLOCKED -> throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER,
+                                    String.format("Player %d attempted to send friend request to blocked player %d",
+                                            sendingPlayer.getId(), receivingPlayer.getId()));
+                    case PENDING -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING,
+                            String.format("Friend request from player %d to player %d is already pending",
+                                    sendingPlayer.getId(), receivingPlayer.getId()));
+                    case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
+                            String.format("Friendship already exists between players %d and %d",
+                                    sendingPlayer.getId(), receivingPlayer.getId()));
                 }
             } else if (friendship.getPlayer2().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
-                    case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+                    case ACTIVE -> throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
+                            String.format("Friendship already exists between players %d and %d",
+                                    sendingPlayer.getId(), receivingPlayer.getId()));
                     case BLOCKED ->
-                            throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER);
+                            throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER,
+                                    String.format("Player %d attempted to send friend request to blocked player %d",
+                                            sendingPlayer.getId(), receivingPlayer.getId()));
                     case PENDING -> {
                         friendship.setStatus(FriendshipStatus.ACTIVE);
                         friendshipRepository.save(friendship);
@@ -90,13 +104,17 @@ public class FriendshipService {
 
         if (existingFriendships.isEmpty()) {
             notificationRepository.deleteById(response.getNotificationId());
-            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
+            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND,
+                    String.format("No friendship found between players %d and %d",
+                            sendingPlayer.getId(), receivingPlayer.getId()));
         }
 
         Friendship friendship = existingFriendships.get(0);
 
         if (friendship.getStatus().equals(FriendshipStatus.ACTIVE)) {
-            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS);
+            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
+                    String.format("Friendship already exists between players %d and %d",
+                            sendingPlayer.getId(), receivingPlayer.getId()));
         }
 
         if (wantsFriendship) {
@@ -127,7 +145,9 @@ public class FriendshipService {
             Friendship existingFriendship = existingFriendships.get(0);
             if (existingFriendship.getStatus() == FriendshipStatus.BLOCKED &&
                     existingFriendship.getPlayer1().equals(sendingPlayer)) {
-                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
+                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP,
+                        String.format("Player %d has already blocked player %d",
+                                sendingPlayer.getId(), receivingPlayer.getId()));
             }
             friendshipRepository.delete(existingFriendship);
         }
@@ -148,14 +168,18 @@ public class FriendshipService {
         if (existingFriendship.isPresent()) {
             Friendship friendship = existingFriendship.get();
             if (friendship.getStatus() == FriendshipStatus.PENDING || friendship.getStatus() == FriendshipStatus.ACTIVE) {
-                throw new FriendshipException(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP);
+                throw new FriendshipException(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP,
+                        String.format("Cannot unblock active or pending friendship between players %d and %d",
+                                sendingPlayer.getId(), receivingPlayer.getId()));
             }
 
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
                 friendshipRepository.delete(friendship);
             }
         } else {
-            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
+            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND,
+                    String.format("No friendship found between players %d and %d",
+                            sendingPlayer.getId(), receivingPlayer.getId()));
         }
     }
 
@@ -171,7 +195,9 @@ public class FriendshipService {
         if (!existingFriendships.isEmpty()) {
             Friendship friendship = existingFriendships.get(0);
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
-                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP);
+                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP,
+                        String.format("Cannot remove blocked friendship between players %d and %d",
+                                sendingPlayer.getId(), receivingPlayer.getId()));
             }
             if (friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 friendshipRepository.delete(friendship);

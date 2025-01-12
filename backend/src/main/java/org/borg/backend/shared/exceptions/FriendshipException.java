@@ -6,12 +6,9 @@ import org.borg.backend.shared.enums.BusinessErrorCodes;
 
 @Getter
 @Builder
-public class FriendshipException extends RuntimeException {
-    private final BusinessErrorCodes errorCode;
-
-    public FriendshipException(BusinessErrorCodes errorCode) {
-        super(errorCode.getDescription());
-        this.errorCode = errorCode;
+public class FriendshipException extends BaseException {
+    
+    public FriendshipException(BusinessErrorCodes errorCode, String message) {
+        super(errorCode, message);
     }
-
 }

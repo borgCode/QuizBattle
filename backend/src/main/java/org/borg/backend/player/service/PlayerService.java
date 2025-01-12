@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class PlayerService {
-    
+
     private final PlayerRepository playerRepository;
     private final FileStorageService fileStorageService;
 
@@ -25,16 +25,13 @@ public class PlayerService {
         return playerRepository.findById(playerId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
     }
- 
 
     public PlayerDTO getPlayerDTOById(Long playerId) {
         return PlayerMapper.toDTO(getPlayerById(playerId));
     }
 
     public void updatePlayer(UpdatePlayerRequest request) {
-        Player player = playerRepository.findById(request.getPlayerId())
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + request.getPlayerId()));
-        log.warn("Updating player: " + player.getUsername());
+        Player player = getPlayerById(request.getPlayerId());
 
         switch (request.getUpdateField()) {
             case DISPLAY_NAME:
@@ -44,14 +41,12 @@ public class PlayerService {
             default:
                 throw new IllegalArgumentException("Invalid update field");
         }
-        log.warn("SAving to repo");
-
         playerRepository.save(player);
     }
 
     public void uploadProfilePicture(Long playerId, MultipartFile file) {
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
+        Player player = getPlayerById(playerId);
+
         log.warn("Saving profile pic");
         String profilePicturePath = fileStorageService.saveProfilePicture(file, playerId);
         log.warn("Saved + {}", profilePicturePath);

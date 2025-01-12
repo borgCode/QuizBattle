@@ -1,6 +1,5 @@
 package org.borg.backend.friendship.controller;
 
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +25,13 @@ public class FriendshipController {
 
     private final FriendshipService friendshipService;
 
-
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/add")
     public ResponseEntity<Void> addFriend(@RequestBody PlayerInteraction request) {
         friendshipService.sendFriendRequest(request);
         return ResponseEntity.ok().build();
     }
-    
+
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#response.senderId)")
     @PostMapping("/accept")
     public ResponseEntity<Void> acceptFriend(@RequestBody PlayerInteractionResponse response) {
