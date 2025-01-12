@@ -1,12 +1,8 @@
 package org.borg.backend.chat.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.chat.dto.ConversationPreviewDTO;
-import org.borg.backend.chat.dto.ConversationRequest;
-import org.borg.backend.chat.dto.FullConversationDTO;
-import org.borg.backend.chat.dto.SendMessageRequest;
+import org.borg.backend.chat.dto.*;
 import org.borg.backend.chat.mapper.ConversationMapper;
 import org.borg.backend.chat.mapper.MessageMapper;
 import org.borg.backend.chat.model.Conversation;
@@ -14,7 +10,6 @@ import org.borg.backend.chat.model.Message;
 import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
@@ -57,7 +52,10 @@ public class MessagingService {
         simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/message", MessageMapper.toDTO(message));
     }
 
-    public void markMessagesAsRead(List<Long> messageIds, long playerId) {
+    public void markMessagesAsRead(MarkAsReadRequest markAsReadRequest) {
+        List<Long> messageIds = markAsReadRequest.getMessageIds();
+        Long playerId = markAsReadRequest.getPlayerId();
+        
         if (messageIds.isEmpty()) {
             return;
         }
@@ -66,8 +64,17 @@ public class MessagingService {
         if (invalidIdCount > 0) {
             throw new AccessDeniedException("Not authorized to mark messages as read");
         }
-
+        
         messageRepository.markMessagesAsRead(messageIds);
+        
+        Long conversationId = markAsReadRequest.getConversationId();
+        
+        boolean isLastMessageRead = conversationRepository.isLatestMessageRead(conversationId);
+        
+        if (isLastMessageRead) {
+            log.warn("Latest message is read for: {}", playerId);
+            simpMessagingTemplate.convertAndSendToUser(markAsReadRequest.getUsername(), "/queue/conversation/read", conversationId);
+        }
     }
 
     public FullConversationDTO getConversation(ConversationRequest conversationRequest) {

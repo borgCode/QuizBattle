@@ -19,6 +19,10 @@ export class WebSocketService {
   private messageSubject = new Subject<Message>()
   message$ = this.messageSubject.asObservable();
 
+
+  private conversationReadSubject = new Subject<number>();
+  conversationReadEvent$ = this.conversationReadSubject.asObservable();
+
   constructor(
     private tokenService: TokenService,
   ) {
@@ -94,6 +98,9 @@ export class WebSocketService {
 
       this.subscribe("/user/queue/message", message => {
         this.messageSubject.next(message);
+      });
+      this.subscribe("/user/queue/conversation/read", (conversationId: number) => {
+        this.conversationReadSubject.next(conversationId);
       });
     }
   }

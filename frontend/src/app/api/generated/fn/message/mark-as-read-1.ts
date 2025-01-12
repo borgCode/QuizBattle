@@ -8,17 +8,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { MarkAsReadRequest } from '../../models/mark-as-read-request';
 
 export interface MarkAsRead1$Params {
-  messageIds: Array<number>;
-  playerId: number;
+      body: MarkAsReadRequest
 }
 
 export function markAsRead1(http: HttpClient, rootUrl: string, params: MarkAsRead1$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, markAsRead1.PATH, 'post');
   if (params) {
-    rb.query('messageIds', params.messageIds, {});
-    rb.query('playerId', params.playerId, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(

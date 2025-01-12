@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.chat.dto.ConversationPreviewDTO;
-import org.borg.backend.chat.dto.ConversationRequest;
-import org.borg.backend.chat.dto.FullConversationDTO;
-import org.borg.backend.chat.dto.SendMessageRequest;
+import org.borg.backend.chat.dto.*;
 import org.borg.backend.chat.service.MessagingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -32,10 +29,10 @@ public class MessageController {
         messagingService.sendMessage(messageRequest);
     }
 
-    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#markAsReadRequest.playerId)")
     @PostMapping("/mark-as-read")
-    public ResponseEntity<Void> markAsRead(@RequestParam List<Long> messageIds, @RequestParam long playerId) {
-        messagingService.markMessagesAsRead(messageIds, playerId);
+    public ResponseEntity<Void> markAsRead(@RequestBody MarkAsReadRequest markAsReadRequest) {
+        messagingService.markMessagesAsRead(markAsReadRequest);
         return ResponseEntity.ok().build();
     }
 

@@ -15,7 +15,6 @@ import {FormsModule} from '@angular/forms';
 import {Message, WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
 import {PlayerDto} from '../../../../api/generated/models/player-dto';
 import {BehaviorSubject, Observable, tap} from 'rxjs';
-import {MessageDto} from '../../../../api/generated/models/message-dto';
 import {MessageService} from '../../../../api/generated/services/message.service';
 
 @Component({
@@ -69,28 +68,34 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   ngAfterViewInit() {
     const observer = new IntersectionObserver((entries) => {
-        const visibleMessageIds = entries
-          .filter(entry => entry.isIntersecting)
-          .filter(entry => {
-            const messageElement = entry.target as HTMLElement;
-            return messageElement.querySelector(".other-player") !== null;
-          })
-          .map(entry => entry.target.getAttribute("data-message-id"));
+      const visibleMessageIds = entries
+        .filter(entry => entry.isIntersecting)
+        .filter(entry => {
+          const messageElement = entry.target as HTMLElement;
+          return messageElement.querySelector(".other-player") !== null;
+        })
+        .map(entry => entry.target.getAttribute("data-message-id"));
 
-        if (visibleMessageIds.length > 0) {
-          const ids = visibleMessageIds.map(id => parseInt(id));
-
-          this.messageService.markAsRead1({messageIds: ids, playerId: this.storedPlayer.id}).subscribe();
-          visibleMessageIds.forEach(id => {
-            const element = this.messageElements.find(el =>
-              el.nativeElement.getAttribute('data-message-id') === id
-            );
-            if (element) {
-              observer.unobserve(element.nativeElement);
-            }
-          });
-        }
-      });
+      if (visibleMessageIds.length > 0) {
+        const ids = visibleMessageIds.map(id => parseInt(id));
+        this.messageService.markAsRead1({
+          body: {
+            messageIds: ids,
+            playerId: this.storedPlayer.id,
+            conversationId: this.conversation.id,
+            username: this.storedPlayer.username
+          }
+        }).subscribe();
+        visibleMessageIds.forEach(id => {
+          const element = this.messageElements.find(el =>
+            el.nativeElement.getAttribute('data-message-id') === id
+          );
+          if (element) {
+            observer.unobserve(element.nativeElement);
+          }
+        });
+      }
+    });
 
     this.messageElements.changes.subscribe(() => {
       this.messageElements.forEach(element => {

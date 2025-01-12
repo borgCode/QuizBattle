@@ -33,7 +33,7 @@ export class MessageService extends BaseService {
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `markAsRead1()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
   markAsRead1$Response(params: MarkAsRead1$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     return markAsRead1(this.http, this.rootUrl, params, context);
@@ -43,7 +43,7 @@ export class MessageService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `markAsRead1$Response()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
   markAsRead1(params: MarkAsRead1$Params, context?: HttpContext): Observable<void> {
     return this.markAsRead1$Response(params, context).pipe(

@@ -8,6 +8,7 @@ import {NavigationEnd, Router} from '@angular/router';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {WebSocketService} from '../../../websocket/web-socket.service';
 
 @Component({
   selector: 'app-whispers-dropdown',
@@ -36,9 +37,18 @@ export class WhispersDropdownComponent implements OnInit {
     private messageService: MessageService,
     private loginStateService: LoginStateService,
     private router: Router,
-    private whisperWindowService: WhisperWindowService
+    private whisperWindowService: WhisperWindowService,
+    private websocketService: WebSocketService
   ) {
+    this.websocketService.conversationReadEvent$.subscribe(conversationId => {
+      const currentUnread = this.unreadConversations.getValue();
+      const updatedUnread = currentUnread.filter(
+        conv => conv.id !== conversationId);
+      this.unreadConversations.next(updatedUnread);
+
+    })
   }
+
 
   ngOnInit() {
     this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
@@ -86,6 +96,7 @@ export class WhispersDropdownComponent implements OnInit {
       )
     }
   }
+
   openConversation(otherPlayerId: number) {
     this.messageService.getConversation({
       body: {

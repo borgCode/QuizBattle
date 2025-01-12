@@ -14,6 +14,7 @@ export type { ConversationPreviewDto } from './models/conversation-preview-dto';
 export type { ConversationRequest } from './models/conversation-request';
 export type { FullConversationDto } from './models/full-conversation-dto';
 export type { GameStateResponse } from './models/game-state-response';
+export type { MarkAsReadRequest } from './models/mark-as-read-request';
 export type { MatchRequest } from './models/match-request';
 export type { MatchResponse } from './models/match-response';
 export type { MessageDto } from './models/message-dto';

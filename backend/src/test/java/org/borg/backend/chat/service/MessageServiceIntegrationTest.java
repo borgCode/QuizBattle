@@ -4,6 +4,7 @@ import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.chat.dto.FullConversationDTO;
+import org.borg.backend.chat.dto.MarkAsReadRequest;
 import org.borg.backend.chat.dto.SendMessageRequest;
 import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
@@ -160,7 +161,7 @@ public class MessageServiceIntegrationTest {
             List<Message> messages = createAndSendMessages(2, conversation.getId());
             Long messageIdToMark = messages.get(0).getId();
 
-            messagingService.markMessagesAsRead(List.of(messageIdToMark), player2.getId());
+            messagingService.markMessagesAsRead(new MarkAsReadRequest(List.of(messageIdToMark), conversation.getId(), player2.getId(), player2.getUsername()));
 
             List<Message> updatedMessages = messageRepository.findAll();
             assertAll(
@@ -177,7 +178,7 @@ public class MessageServiceIntegrationTest {
             List<Message> messages = createAndSendMessages(10, conversation.getId());
             List<Long> allMessageIds = getMessageIds(messages);
 
-            messagingService.markMessagesAsRead(allMessageIds, player2.getId());
+            messagingService.markMessagesAsRead(new MarkAsReadRequest(allMessageIds, conversation.getId(), player2.getId(), player2.getUsername()));
 
             List<Message> updatedMessages = messageRepository.findAll();
             assertAll(
