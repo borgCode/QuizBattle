@@ -110,16 +110,17 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
   }
 
   sendMessage(conversationId: number, receiverId: number, userName: string) {
-    console.log("Sending message")
-    this.whisperWindowService.sendMessage({
-      messageRequest: {
-        receiverUsername: userName,
-        senderId: this.storedPlayer.id,
-        conversationId: conversationId,
-        receiverId: receiverId,
-        message: this.messageToSend
-      }
-    })
+    if (this.messageToSend) {
+      this.whisperWindowService.sendMessage({
+        messageRequest: {
+          receiverUsername: userName,
+          senderId: this.storedPlayer.id,
+          conversationId: conversationId,
+          receiverId: receiverId,
+          message: this.messageToSend
+        }
+      })
+    }
   }
 
   closeConversation() {

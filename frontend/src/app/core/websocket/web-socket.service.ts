@@ -11,7 +11,6 @@ import {Message} from '../services/whisper-window/whisper-window.service';
 export class WebSocketService {
   private stompClient: Client;
   private connectionState$ = new BehaviorSubject<boolean>(false);
-  public isConnected$ = this.connectionState$.asObservable();
   private subscriptionQueue: { destination: string, callback: (message: any) => void }[] = [];
 
   private achievementSubject = new Subject<any>();
@@ -54,6 +53,13 @@ export class WebSocketService {
         onDisconnect: () => {
           console.log("Disconnected from websocket");
           this.connectionState$.next(false);
+
+          setTimeout(() => {
+            if (!this.connectionState$.value) {
+              console.log("Attempting to reactivate connection...");
+              this.stompClient?.activate();
+            }
+          }, 1000)
         },
         onStompError: (frame) => {
           console.error('STOMP protocol error:', frame);

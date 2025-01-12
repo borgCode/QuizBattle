@@ -20,14 +20,17 @@ public class ConversationMapper {
                 ? conversation.getPlayer2()
                 : conversation.getPlayer1();
 
+        boolean isRead = isRead(conversation, currentPlayerId);
+
         return ConversationPreviewDTO.builder()
                 .id(conversation.getId())
                 .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
-                .latestMessageIsRead(conversation.getLatestMessage().isRead())
+                .latestMessageIsRead(isRead)
                 .latestMessage(conversation.getLatestMessage().getContent())
                 .build();
     }
 
+    
     public static List<ConversationPreviewDTO> multipleToDTO(List<Conversation> conversations, Long currentPlayerId) {
         if (conversations == null || conversations.isEmpty()) {
             return List.of();
@@ -47,11 +50,22 @@ public class ConversationMapper {
                 ? conversation.getPlayer2()
                 : conversation.getPlayer1();
         
+        boolean isRead = isRead(conversation, currentPlayerId);
+
         return FullConversationDTO.builder()
                 .id(conversation.getId())
                 .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
                 .messages(MessageMapper.multipleToDTO(conversation.getMessages()))
-                .latestMessageIsRead(conversation.isLatestMessageIsRead())
+                .latestMessageIsRead(isRead)
                 .build();
+    }
+
+    private static boolean isRead(Conversation conversation, Long currentPlayerId) {
+        if (conversation.getLatestMessage() == null) {
+            return true;
+        }
+        return conversation.getLatestMessage().getSenderId().equals(currentPlayerId) ||
+                (conversation.getLatestMessage().getReceiverId().equals(currentPlayerId) &&
+                        conversation.getLatestMessage().isRead());
     }
 }
