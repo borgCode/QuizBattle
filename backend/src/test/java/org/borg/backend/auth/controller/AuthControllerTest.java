@@ -80,7 +80,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.businessErrorCode").value(105))
                 .andExpect(jsonPath("$.businessErrorDescription")
                         .value("Username is taken"))
-                .andExpect(jsonPath("$.error").value("Username is taken"));
+                .andExpect(jsonPath("$.error").value("Username is taken for: " + request.getUsername()));
     }
     
 

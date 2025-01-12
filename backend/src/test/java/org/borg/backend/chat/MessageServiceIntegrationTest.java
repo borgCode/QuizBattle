@@ -1,4 +1,4 @@
-package org.borg.backend.chat.service;
+package org.borg.backend.chat;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
@@ -10,6 +10,7 @@ import org.borg.backend.chat.model.Conversation;
 import org.borg.backend.chat.model.Message;
 import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
+import org.borg.backend.chat.service.MessagingService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.junit.jupiter.api.AfterEach;
