@@ -13,10 +13,12 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { ConversationPreviewDto } from '../models/conversation-preview-dto';
 import { FullConversationDto } from '../models/full-conversation-dto';
-import { getConversation } from '../fn/message/get-conversation';
-import { GetConversation$Params } from '../fn/message/get-conversation';
+import { getFullConversation } from '../fn/message/get-full-conversation';
+import { GetFullConversation$Params } from '../fn/message/get-full-conversation';
 import { getPlayerConversations } from '../fn/message/get-player-conversations';
 import { GetPlayerConversations$Params } from '../fn/message/get-player-conversations';
+import { getPreviewConversation } from '../fn/message/get-preview-conversation';
+import { GetPreviewConversation$Params } from '../fn/message/get-preview-conversation';
 import { markAsRead1 } from '../fn/message/mark-as-read-1';
 import { MarkAsRead1$Params } from '../fn/message/mark-as-read-1';
 
@@ -51,28 +53,53 @@ export class MessageService extends BaseService {
     );
   }
 
-  /** Path part for operation `getConversation()` */
-  static readonly GetConversationPath = '/messages/conversation';
+  /** Path part for operation `getFullConversation()` */
+  static readonly GetFullConversationPath = '/messages/conversation';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getConversation()` instead.
+   * To access only the response body, use `getFullConversation()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  getConversation$Response(params: GetConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<FullConversationDto>> {
-    return getConversation(this.http, this.rootUrl, params, context);
+  getFullConversation$Response(params: GetFullConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<FullConversationDto>> {
+    return getFullConversation(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getConversation$Response()` instead.
+   * To access the full response (for headers, for example), `getFullConversation$Response()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  getConversation(params: GetConversation$Params, context?: HttpContext): Observable<FullConversationDto> {
-    return this.getConversation$Response(params, context).pipe(
+  getFullConversation(params: GetFullConversation$Params, context?: HttpContext): Observable<FullConversationDto> {
+    return this.getFullConversation$Response(params, context).pipe(
       map((r: StrictHttpResponse<FullConversationDto>): FullConversationDto => r.body)
+    );
+  }
+
+  /** Path part for operation `getPreviewConversation()` */
+  static readonly GetPreviewConversationPath = '/messages/conversation/{conversationId}/player/{playerId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getPreviewConversation()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getPreviewConversation$Response(params: GetPreviewConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<ConversationPreviewDto>> {
+    return getPreviewConversation(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getPreviewConversation$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getPreviewConversation(params: GetPreviewConversation$Params, context?: HttpContext): Observable<ConversationPreviewDto> {
+    return this.getPreviewConversation$Response(params, context).pipe(
+      map((r: StrictHttpResponse<ConversationPreviewDto>): ConversationPreviewDto => r.body)
     );
   }
 

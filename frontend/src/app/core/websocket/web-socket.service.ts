@@ -23,6 +23,9 @@ export class WebSocketService {
   private conversationReadSubject = new Subject<number>();
   conversationReadEvent$ = this.conversationReadSubject.asObservable();
 
+  private conversationUnreadSubject = new Subject<number>();
+  conversationUnreadEvent$ = this.conversationUnreadSubject.asObservable()
+
   constructor(
     private tokenService: TokenService,
   ) {
@@ -101,6 +104,9 @@ export class WebSocketService {
       });
       this.subscribe("/user/queue/conversation/read", (conversationId: number) => {
         this.conversationReadSubject.next(conversationId);
+      });
+      this.subscribe("/user/queue/conversation/unread", (conversationId: number) => {
+        this.conversationUnreadSubject.next(conversationId);
       });
     }
   }

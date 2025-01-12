@@ -3,7 +3,6 @@ package org.borg.backend.chat.mapper;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.model.Conversation;
-import org.borg.backend.chat.model.Message;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 
@@ -12,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class ConversationMapper {
 
-    public static ConversationPreviewDTO toDTO(Conversation conversation, Long currentPlayerId) {
+    public static ConversationPreviewDTO toPreviewDTO(Conversation conversation, Long currentPlayerId) {
         if (conversation == null) {
             return null;
         }
@@ -38,7 +37,7 @@ public class ConversationMapper {
         }
 
         return conversations.stream()
-                .map(conversation -> toDTO(conversation, currentPlayerId))
+                .map(conversation -> toPreviewDTO(conversation, currentPlayerId))
                 .collect(Collectors.toList());
     }
 

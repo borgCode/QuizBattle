@@ -38,13 +38,19 @@ public class MessageController {
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/conversation")
-    public ResponseEntity<FullConversationDTO> getConversation(@RequestBody ConversationRequest request) {
-        return ResponseEntity.ok(messagingService.getConversation(request));
+    public ResponseEntity<FullConversationDTO> getFullConversation(@RequestBody ConversationRequest request) {
+        return ResponseEntity.ok(messagingService.getFullConversation(request));
+    }
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
+    @PostMapping("/conversation/{conversationId}/player/{playerId}")
+    public ResponseEntity<ConversationPreviewDTO> getPreviewConversation(@PathVariable long conversationId, long playerId) {
+        return ResponseEntity.ok(messagingService.getPreviewConversation(conversationId, playerId));
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/conversations/{playerId}")
     public ResponseEntity<List<ConversationPreviewDTO>> getPlayerConversations(@PathVariable long playerId) {
-        return ResponseEntity.ok(messagingService.getPlayerConversations(playerId));
+        return ResponseEntity.ok(messagingService.getPlayerPreviewConversations(playerId));
     }
 }

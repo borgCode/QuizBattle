@@ -8,15 +8,15 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ConversationRequest } from '../../models/conversation-request';
-import { FullConversationDto } from '../../models/full-conversation-dto';
+import { ChangePasswordRequest } from '../../models/change-password-request';
 
-export interface GetConversation$Params {
-      body: ConversationRequest
+export interface ChangePassword$Params {
+      body: ChangePasswordRequest
 }
 
-export function getConversation(http: HttpClient, rootUrl: string, params: GetConversation$Params, context?: HttpContext): Observable<StrictHttpResponse<FullConversationDto>> {
-  const rb = new RequestBuilder(rootUrl, getConversation.PATH, 'post');
+export function changePassword(http: HttpClient, rootUrl: string, params: ChangePassword$Params, context?: HttpContext): Observable<StrictHttpResponse<{
+}>> {
+  const rb = new RequestBuilder(rootUrl, changePassword.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/json');
   }
@@ -26,9 +26,10 @@ export function getConversation(http: HttpClient, rootUrl: string, params: GetCo
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<FullConversationDto>;
+      return r as StrictHttpResponse<{
+      }>;
     })
   );
 }
 
-getConversation.PATH = '/messages/conversation';
+changePassword.PATH = '/player';

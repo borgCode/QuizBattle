@@ -47,6 +47,20 @@ export class WhispersDropdownComponent implements OnInit {
       this.unreadConversations.next(updatedUnread);
 
     })
+    this.websocketService.conversationUnreadEvent$.subscribe(conversationId => {
+      const currentUnread = this.unreadConversations.getValue();
+
+      if (!currentUnread.some(conv => conv.id === conversationId)) {
+        this.messageService.getPreviewConversation({
+          playerId: this.playerId,
+          conversationId: conversationId
+        }).subscribe({
+          next: conversation => {
+            this.unreadConversations.next([...currentUnread, conversation]);
+          }
+        })
+      }
+    });
   }
 
 
@@ -98,7 +112,7 @@ export class WhispersDropdownComponent implements OnInit {
   }
 
   openConversation(otherPlayerId: number) {
-    this.messageService.getConversation({
+    this.messageService.getFullConversation({
       body: {
         senderId: this.playerId,
         receiverId: otherPlayerId

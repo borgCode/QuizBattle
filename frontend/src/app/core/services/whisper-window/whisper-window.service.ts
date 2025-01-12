@@ -26,7 +26,6 @@ export class WhisperWindowService {
   message$ = this.messageSubject.asObservable();
 
 
-
   constructor(
     private webSocketService: WebSocketService,
     private loginStateService: LoginStateService
@@ -44,7 +43,6 @@ export class WhisperWindowService {
   }
 
 
-
   addToConversations(conversation: FullConversationDto) {
     const currentConversations = this.openConversations.getValue();
     console.log(conversation)
@@ -55,6 +53,7 @@ export class WhisperWindowService {
 
     }
   }
+
   removeFromConversations(conversation: FullConversationDto) {
     const currentConversations = this.openConversations.getValue();
     const index = currentConversations.indexOf(conversation)
@@ -67,13 +66,15 @@ export class WhisperWindowService {
       this.openConversationsIds = this.openConversationsIds.filter((id) => id !== conversation.id);
     }
   }
+
   get conversations$() {
     return this.openConversations.asObservable();
   }
 
   sendMessage(param: {
     messageRequest: {
-      senderId: number; receiverId: number; conversationId: number; receiverUsername: string; message: string }
+      senderId: number; receiverId: number; conversationId: number; receiverUsername: string; message: string
+    }
   }) {
     this.webSocketService.sendMessage("/app/messages/send", param.messageRequest);
 

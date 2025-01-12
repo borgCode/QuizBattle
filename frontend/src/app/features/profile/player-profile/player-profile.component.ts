@@ -154,7 +154,7 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "MESSAGE":
-        this.messageService.getConversation({
+        this.messageService.getFullConversation({
           body: {
             senderId: this.player.id,
             receiverId: $event.playerId

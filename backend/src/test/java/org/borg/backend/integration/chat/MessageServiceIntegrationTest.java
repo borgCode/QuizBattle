@@ -265,7 +265,7 @@ public class MessageServiceIntegrationTest {
                 expectedMessages.put(sendingPlayer.getId(), message);
             }
 
-            List<ConversationPreviewDTO> conversationPreviewDTOS = messagingService.getPlayerConversations(receiverPlayer.getId());
+            List<ConversationPreviewDTO> conversationPreviewDTOS = messagingService.getPlayerPreviewConversations(receiverPlayer.getId());
 
             assertAll("Post get conversations check",
                     () -> assertEquals(NUM_OF_PLAYERS, conversationPreviewDTOS.size(), String.format("There should be %s conversations", NUM_OF_PLAYERS)),
