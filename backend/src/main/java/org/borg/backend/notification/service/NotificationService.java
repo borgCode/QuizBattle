@@ -1,6 +1,5 @@
 package org.borg.backend.notification.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.notification.model.Notification;

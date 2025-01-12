@@ -6,9 +6,11 @@ import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
@@ -124,5 +126,50 @@ public class NotificationIntegrationTest {
         assertEquals(0, laterActiveNotifications.size(),
                 "There should be no active notifications after 49 hours");
         
+    }
+    
+    @Nested
+    class exceptionTests {
+        
+        @Test
+        void shouldThrowErrorWhenArchiving_WhenNotMatchingPlayerId() {
+            notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
+
+            List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+            
+            
+            AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+                    () -> notificationService.archiveNotification(notificationList.get(0).getId(), sendingPlayer.getId()));
+            
+            assertEquals("Not authorized to mark notification as archived", exception.getMessage());
+        }
+
+        @Test
+        void shouldThrowErrorWhenMarkingAsRead_WhenNotMatchingPlayerId() {
+            notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
+
+            List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+
+            AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+                    () -> notificationService.markAsRead(notificationList.get(0).getId(), sendingPlayer.getId()));
+
+            assertEquals("Not authorized to mark notification as read", exception.getMessage());
+        }
+        
+        @Test
+        void shouldThrowErrorWhenMarkingAllAsRead_WhenNotMatchingPlayerId() {
+            notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
+            notificationService.sendGameWonNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
+
+            List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+            List<Long> notificationIds = notificationList.stream()
+                    .map(Notification::getId)
+                    .toList();
+
+            AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+                    () -> notificationService.markAllAsRead(notificationIds, sendingPlayer.getId()));
+
+            assertEquals("Not authorized to mark notifications as read", exception.getMessage());
+        }
     }
 }
