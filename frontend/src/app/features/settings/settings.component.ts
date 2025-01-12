@@ -3,6 +3,7 @@ import {AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModul
 import {PlayerService} from "../../api/generated/services/player.service";
 import {NgIf} from "@angular/common";
 import {LoginStateService} from '../../core/services/login-state-service/login-state.service';
+import {AlertMessageService} from '../../core/services/alert-message/alert-message.service';
 
 @Component({
     selector: 'app-settings',
@@ -22,13 +23,13 @@ export class SettingsComponent {
     constructor(
         private fb: FormBuilder,
         private playerService: PlayerService,
-        private loginStateService: LoginStateService
+        private loginStateService: LoginStateService,
+        private alertMessageService: AlertMessageService
     ) {
 
         this.passwordForm = this.fb.group({
                 currentPassword: ['', [
                     Validators.required,
-                    Validators.minLength(8)
                 ]],
                 newPassword: ['', [
                     Validators.required,
@@ -73,17 +74,21 @@ export class SettingsComponent {
 
     if (this.passwordForm.valid) {
       const {currentPassword, newPassword, confirmPassword} = this.passwordForm.value;
-        this.playerService.changePassword({
-          body: {
-            playerId: this.loginStateService.loggedInUser.id,
-            currentPassword: currentPassword,
-            newPassword: newPassword,
-            confirmationPassword: confirmPassword
-          }
-        }).subscribe({
-
-        })
-    } else {
+      this.playerService.changePassword({
+        body: {
+          playerId: this.loginStateService.loggedInUser.id,
+          currentPassword: currentPassword,
+          newPassword: newPassword,
+          confirmationPassword: confirmPassword
+        }
+      }).subscribe({
+        next: () => {
+          this.isVisible = false;
+          this.passwordForm.reset();
+          this.submitted = false;
+          this.alertMessageService.show("Successfully changed password!", "success")
+        }
+      })
     }
   }
 }

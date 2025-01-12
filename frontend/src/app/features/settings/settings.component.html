@@ -25,7 +25,6 @@
                         class="form-control">
                 <div class="alert alert-danger" *ngIf="submitted && currentPassword.invalid">
                     <div *ngIf="currentPassword.errors?.['required']">Please enter your current password</div>
-                    <div *ngIf="currentPassword.errors">The password you entered is incorrect</div>
                 </div>
             </div>
 
@@ -37,7 +36,9 @@
                         formControlName="newPassword"
                         class="form-control">
                 <div class="alert alert-danger" *ngIf="submitted && newPassword.invalid">
-                    <div *ngIf="newPassword.errors?.['required']">New Password is required.</div>
+                  <div *ngIf="newPassword.errors?.['required']">New Password is required.</div>
+                  <div *ngIf="newPassword.errors?.['minlength']">Password must be at least 8 characters long.</div>
+                  <div *ngIf="newPassword.errors?.['pattern']">Password must contain at least one uppercase letter, one lowercase letter, and one number.</div>
                 </div>
             </div>
 
