@@ -81,6 +81,7 @@ public class AchievementServiceIntegrationTest {
                     .username("testPlayer")
                     .password("password")
                     .displayName("Test Player")
+                    .stats(new Stats())
                     .accountLocked(false)
                     .enabled(true)
                     .roles(new ArrayList<>(List.of(userRole)))
@@ -97,11 +98,9 @@ public class AchievementServiceIntegrationTest {
                     .questionsAnswered(0)
                     .build();
 
-            Stats stats = new Stats();
+            Stats stats = player.getStats();
             categoryStats.setStats(stats);
             stats.setCategoryStats(Map.of("Geography", categoryStats));
-            stats.setPlayer(player);
-            player.setStats(stats);
             player = playerRepository.save(player);
 
             increaseStatsToNextLevelAndPublish(5);
@@ -289,6 +288,7 @@ public class AchievementServiceIntegrationTest {
                         .username("testPlayer" + i)
                         .password("password")
                         .displayName("Test Player " + i)
+                        .stats(new Stats())
                         .accountLocked(false)
                         .enabled(true)
                         .roles(new ArrayList<>(List.of(userRole)))
@@ -312,8 +312,6 @@ public class AchievementServiceIntegrationTest {
                     categoryStats.setStats(stats);
                     stats.getCategoryStats().put(category, categoryStats);
                 }
-
-                player.setStats(stats);
                 playerRepository.save(player);
             }
         }

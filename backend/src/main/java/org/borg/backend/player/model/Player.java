@@ -28,9 +28,9 @@ public class Player implements UserDetails {
 
     private String password;
     private String displayName;
-    
+
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "stats_id")
+    @JoinColumn(name = "stats_id", referencedColumnName = "id")
     private Stats stats;
     private boolean accountLocked;
     private boolean enabled;
@@ -49,17 +49,6 @@ public class Player implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
     
-
-    @PrePersist
-    @PreUpdate
-    public void prePersist() {
-        if (this.stats == null) {
-            this.stats = new Stats();
-            this.stats.setPlayer(this);
-        }
-    }
-    
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.player.model.Stats;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.DuplicateException;
 import org.borg.backend.player.dto.PlayerDTO;
@@ -41,6 +42,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .displayName(request.getDisplayName())
+                .stats(new Stats())
                 .accountLocked(false)
                 .enabled(true)
                 .roles(List.of(userRole))
