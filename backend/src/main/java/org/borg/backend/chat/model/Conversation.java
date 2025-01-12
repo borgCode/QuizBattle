@@ -28,7 +28,7 @@ public class Conversation {
     private Player player2;
     
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL)
-    @OrderBy("sentAt DESC")
+    @OrderBy("sentAt ASC")
     private List<Message> messages = new ArrayList<>();
 
     @OneToOne

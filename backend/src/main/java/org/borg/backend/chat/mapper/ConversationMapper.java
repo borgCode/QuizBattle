@@ -3,6 +3,7 @@ package org.borg.backend.chat.mapper;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.chat.dto.FullConversationDTO;
 import org.borg.backend.chat.model.Conversation;
+import org.borg.backend.chat.model.Message;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 
