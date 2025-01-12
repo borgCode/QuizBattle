@@ -1,4 +1,4 @@
-<div class="settings-container">
+<div class="settings-container p-5">
     <h2 class="settings-title">Settings</h2>
     <div class="setting-item">
         <span>Password</span>
@@ -7,11 +7,10 @@
     </div>
 </div>
 
-<div class="modal-overlay" *ngIf="isVisible">
+<div class="modal-overlay p-5 w-100 w-md-75 w-lg-50" *ngIf="isVisible">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Change Password</h3>
-            <button class="close-btn">&times;</button>
         </div>
 
         <form [formGroup]="passwordForm" (ngSubmit)="submit()">
@@ -61,7 +60,7 @@
                 <button type="submit" class="btn-primary">
                     Change Password
                 </button>
-                <button type="button" class="btn-secondary">
+                <button type="button" class="btn-secondary" (click)="isVisible = false">
                     Cancel
                 </button>
             </div>
