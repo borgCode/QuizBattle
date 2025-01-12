@@ -1,4 +1,4 @@
-package org.borg.backend.chapter;
+package org.borg.backend.integration.chapter;
 
 import Config.TestDataLoader;
 import org.borg.backend.auth.model.Role;

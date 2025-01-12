@@ -41,6 +41,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
   player!: PlayerDto;
   gameSessions: Array<MultiplayerSessionDto> = [];
   isSearching: boolean = false;
+  shouldShowCancelMatchmaking = false;
   waitingForOpponent: boolean = false;
   friends: PlayerDto[] = [];
   image: string = '';
@@ -98,8 +99,11 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
   findGame() {
     this.isSearching = true;
 
-    this.webSocketService.sendMessage('/app/matchmaking/find', this.player.id);
+    setTimeout(() => {
+      this.shouldShowCancelMatchmaking = true;
+    }, 500);
 
+    this.webSocketService.sendMessage('/app/matchmaking/find', this.player.id);
 
     this.webSocketService.subscribe('/topic/match' + this.player.id,
       (matchUpdate) => {
@@ -127,6 +131,7 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
 
   leaveMatchmakingQueue() {
     this.isSearching = false;
+    this.shouldShowCancelMatchmaking = false;
     this.matchmakingService.cancelMatchmaking({playerId: this.player.id}).subscribe({
       next: () => {
         console.log("Left queue")

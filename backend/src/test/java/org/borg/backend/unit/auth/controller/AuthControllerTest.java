@@ -1,6 +1,7 @@
-package org.borg.backend.auth.controller;
+package org.borg.backend.unit.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.borg.backend.auth.controller.AuthController;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.service.AuthService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;

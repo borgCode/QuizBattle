@@ -66,6 +66,11 @@ public class MatchMakingService {
         MatchmakingSession matchmakingSession = matchmakingSessionRepository.findById(matchmakingSessionId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Matchmaking session not found for " + matchmakingSessionId));
 
+        if (matchmakingSession == null) {
+            log.debug("Ignoring response for non-existent session {}", matchmakingSessionId);
+            return;
+        }
+        
         if (!hasAccepted) {
             try {
                 cancelMatch(matchmakingSession, playerId);

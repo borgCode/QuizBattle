@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.service;
+package org.borg.backend.integration.multiplayer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.auth.model.Role;

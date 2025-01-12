@@ -1,4 +1,4 @@
-package org.borg.backend.chat;
+package org.borg.backend.integration.chat;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;

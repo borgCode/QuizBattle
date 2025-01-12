@@ -1,8 +1,10 @@
-package org.borg.backend.notification.service;
+package org.borg.backend.integration.notification;
 
 import org.borg.backend.notification.model.NotificationType;
 import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.repository.NotificationRepository;
+import org.borg.backend.notification.service.NotificationCleanUpService;
+import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

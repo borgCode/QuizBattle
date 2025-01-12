@@ -1,8 +1,9 @@
-package org.borg.backend.auth.service;
+package org.borg.backend.integration.auth;
 
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.auth.service.AuthService;
 import org.borg.backend.shared.exceptions.DuplicateException;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;

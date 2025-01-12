@@ -1,4 +1,4 @@
-package org.borg.backend.chapter;
+package org.borg.backend.integration.chapter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.service.AchievementService;

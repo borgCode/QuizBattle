@@ -1,4 +1,4 @@
-package org.borg.backend.multiplayer.service;
+package org.borg.backend.integration.multiplayer;
 
 import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.auth.model.Role;

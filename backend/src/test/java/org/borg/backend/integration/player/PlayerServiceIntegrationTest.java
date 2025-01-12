@@ -1,4 +1,4 @@
-package org.borg.backend.player.service;
+package org.borg.backend.integration.player;
 
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.auth.dto.RegistrationRequest;
@@ -8,6 +8,7 @@ import org.borg.backend.auth.service.AuthService;
 import org.borg.backend.player.dto.ChangePasswordRequest;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.PasswordException;
 import org.junit.jupiter.api.AfterEach;

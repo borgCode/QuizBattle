@@ -1,7 +1,8 @@
-package org.borg.backend.friendship.service;
+package org.borg.backend.integration.friendship;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.friendship.service.FriendshipService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.friendship.model.FriendshipStatus;
 import org.borg.backend.notification.model.NotificationType;
