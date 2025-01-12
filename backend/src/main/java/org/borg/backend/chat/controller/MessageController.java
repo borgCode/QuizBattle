@@ -1,6 +1,7 @@
 package org.borg.backend.chat.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.chat.dto.ConversationPreviewDTO;
@@ -27,8 +28,7 @@ public class MessageController {
     private final MessagingService messagingService;
 
     @MessageMapping("/messages/send")
-    public void sendMessage(@Payload SendMessageRequest messageRequest) {
-        log.warn("Receiving message");
+    public void sendMessage(@Valid @Payload SendMessageRequest messageRequest) {
         messagingService.sendMessage(messageRequest);
     }
 

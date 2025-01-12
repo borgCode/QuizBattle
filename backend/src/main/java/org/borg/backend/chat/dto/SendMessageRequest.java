@@ -1,5 +1,6 @@
 package org.borg.backend.chat.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +13,6 @@ public class SendMessageRequest {
     private Long receiverId;
     private String receiverUsername;
     private Long conversationId;
+    @NotBlank(message = "Message content cannot be empty")
     private String message;
 }
