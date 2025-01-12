@@ -7,6 +7,10 @@ import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
+import org.borg.backend.game.shared.dto.PlayerQuestionResult;
+import org.borg.backend.game.shared.enums.GameResult;
+import org.borg.backend.game.shared.enums.GameStatus;
+import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.events.AchievementEvents;
@@ -14,10 +18,9 @@ import org.borg.backend.player.events.StatsEvents;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.game.shared.dto.PlayerQuestionResult;
-import org.borg.backend.game.shared.model.Question;
-import org.borg.backend.game.shared.enums.GameResult;
-import org.borg.backend.game.shared.enums.GameStatus;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.GameException;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static java.util.Map.Entry;
 
@@ -34,7 +36,6 @@ import static java.util.Map.Entry;
 @Service
 @RequiredArgsConstructor
 public class GameService {
-
 
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final PlayerRepository playerRepository;
@@ -44,11 +45,11 @@ public class GameService {
 
     public GameStateResponse getGameState(long sessionId, long playerId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
-        
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
+
         boolean playerExistsInSession = multiplayerSession.getPlayers().stream()
                 .anyMatch(player -> player.getId().equals(playerId));
-        
+
         if (!playerExistsInSession) {
             throw new AccessDeniedException("Not authorized to access this game session");
         }
@@ -58,7 +59,7 @@ public class GameService {
                 .map(Entry::getKey)
                 .findFirst()
                 .orElse(null);
-        
+
         return GameStateResponse.builder()
                 .playerTurn(multiplayerSession.getCurrentPlayerTurn().getId())
                 .playerDTOS(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
@@ -74,13 +75,12 @@ public class GameService {
                 .loserId(multiplayerSession.getLoserId())
                 .isTie(multiplayerSession.getIsTie())
                 .build();
-
     }
 
     @Transactional
     public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
 
         if (isCorrect) {
             Map<Long, Integer> scores = session.getScore();
@@ -96,17 +96,16 @@ public class GameService {
         Player opponent = session.getPlayers().stream()
                 .filter(p -> !p.getId().equals(playerId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No opponent found in session"));
+                .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE));
 
         if (isGameComplete(questionsAnswered)) {
             session.setStatus(GameStatus.COMPLETED);
             determineGameOutcome(session);
             sendGameOverNotifications(session);
-
         } else {
-            
+
             session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
-            
+
             if (session.getCurrentQuestionIndex() == 0) {
                 if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
                     session.setCurrentPlayerTurn(opponent);
@@ -126,14 +125,14 @@ public class GameService {
 
     private void determineGameOutcome(MultiplayerSession session) {
         List<Player> players = session.getPlayers();
-        
+
         Long player1Id = players.get(0).getId();
         Long player2Id = players.get(1).getId();
 
         Map<Long, Integer> scores = session.getScore();
         int score1 = scores.get(player1Id);
         int score2 = scores.get(player2Id);
-        
+
         GameResult result;
         if (score1 > score2) {
             session.setWinnerId(player1Id);
@@ -149,7 +148,7 @@ public class GameService {
             session.setIsTie(true);
             result = GameResult.TIE;
         }
-        
+
         applicationEventPublisher.publishEvent(new StatsEvents.GameCompletedEvent(players.get(0), players.get(1), result));
     }
 
@@ -168,7 +167,7 @@ public class GameService {
         return session.getPlayers().stream()
                 .filter(p -> p.getId().equals(playerId))
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
     }
 
     public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
@@ -198,10 +197,10 @@ public class GameService {
         }
         return multiplayerSessionDTOS;
     }
-    
+
     public void acknowledgeGameOver(Long sessionId, Long playerId) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
 
         session.getPlayerAcknowledgment().put(playerId, true);
         multiplayerSessionRepository.save(session);
@@ -210,7 +209,7 @@ public class GameService {
     @Transactional
     public void handleGiveUp(Long sessionId, Long playerId) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
 
         session.getPlayerHasGivenUp().put(playerId, true);
         session.setStatus(GameStatus.COMPLETED);
@@ -220,7 +219,7 @@ public class GameService {
                 .filter(player -> !player.getId().equals(playerId))
                 .findFirst()
                 .map(Player::getId)
-                .orElseThrow(() -> new IllegalStateException("Player not found in session")));
+                .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE)));
 
         multiplayerSessionRepository.save(session);
 

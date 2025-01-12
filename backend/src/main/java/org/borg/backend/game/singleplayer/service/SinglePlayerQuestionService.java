@@ -2,7 +2,12 @@ package org.borg.backend.game.singleplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.game.shared.dto.AnswerValidationResponse;
+import org.borg.backend.game.shared.dto.QuestionDTO;
+import org.borg.backend.game.shared.mapper.QuestionMapper;
+import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.model.RoundType;
+import org.borg.backend.game.shared.repository.QuestionRepository;
 import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
@@ -11,17 +16,13 @@ import org.borg.backend.game.singleplayer.model.ChapterProgress;
 import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.events.StatsEvents;
-import org.borg.backend.game.shared.dto.AnswerValidationResponse;
-import org.borg.backend.game.shared.dto.QuestionDTO;
-import org.borg.backend.game.shared.mapper.QuestionMapper;
-import org.borg.backend.game.shared.model.Question;
-import org.borg.backend.game.shared.repository.QuestionRepository;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -64,7 +65,7 @@ public class SinglePlayerQuestionService {
         gameValidationService.validateSinglePlayerAnswer(request.getPlayerId(), request.getQuestionId());
 
         Question question = questionRepository.findById(request.getQuestionId())
-                .orElseThrow(() -> new NoSuchElementException("Question not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Question not found for " + request.getQuestionId()));
 
         AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), question, request.getAnswer());
 

@@ -16,7 +16,8 @@ import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.events.StatsEvents;
-import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,7 +49,7 @@ public class MultiplayerQuestionService {
     @Transactional
     public List<QuestionDTO> getNewQuestionsForCategory(MultiplayerQuestionsRequest request) {
         MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + request.getSessionId()));
 
         gameValidationService.validatePlayerTurn(request, session);
 
@@ -78,12 +78,12 @@ public class MultiplayerQuestionService {
         }
 
         MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + request.getSessionId()));
 
         gameValidationService.validateMultiplayerAnswer(request, session);
 
         Question question = questionRepository.findById(request.getQuestionId())
-                .orElseThrow(() -> new NoSuchElementException("Question not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Question not found for " + request.getQuestionId()));
 
         AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), question, request.getAnswer());
 
@@ -111,10 +111,10 @@ public class MultiplayerQuestionService {
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }
-    
+
     public List<String> getThreeRandomCategories(Long sessionId, long playerId) {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
 
         boolean playerExistsInSession = session.getPlayers().stream()
                 .anyMatch(player -> player.getId().equals(playerId));
@@ -144,7 +144,7 @@ public class MultiplayerQuestionService {
         }
 
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NoSuchElementException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
 
         boolean playerExistsInSession = session.getPlayers().stream()
                 .anyMatch(player -> player.getId().equals(playerId));

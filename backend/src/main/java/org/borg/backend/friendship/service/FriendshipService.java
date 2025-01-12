@@ -17,6 +17,7 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +36,10 @@ public class FriendshipService {
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
         Player sendingPlayer = playerRepository.findById(request.getSenderId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Sender player not found for " + request.getSenderId()));
 
         Player receivingPlayer = playerRepository.findById(request.getReceiverId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Receiver player not found for " + request.getReceiverId()));
 
         List<Friendship> existingFriendships = friendshipRepository.
                 findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
@@ -88,10 +89,10 @@ public class FriendshipService {
     @Transactional
     public void handleFriendshipResponse(PlayerInteractionResponse response, boolean wantsFriendship) {
         Player sendingPlayer = playerRepository.findById(response.getSenderId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Sender player not found for " + response.getSenderId()));
 
         Player receivingPlayer = playerRepository.findById(response.getReceiverId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Receiver player not found for " + response.getReceiverId()));
 
         List<Friendship> existingFriendships = friendshipRepository.
                 findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
@@ -126,10 +127,10 @@ public class FriendshipService {
     @Transactional
     public void blockPlayer(PlayerInteraction blockRequest) {
         Player sendingPlayer = playerRepository.findById(blockRequest.getSenderId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Sender player not found for " + blockRequest.getSenderId()));
 
         Player receivingPlayer = playerRepository.findById(blockRequest.getReceiverId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Receiver player not found for " + blockRequest.getReceiverId()));
 
         List<Friendship> existingFriendships = friendshipRepository
                 .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
@@ -154,10 +155,10 @@ public class FriendshipService {
 
     public void unblockPlayer(PlayerInteraction unblockRequest) {
         Player sendingPlayer = playerRepository.findById(unblockRequest.getSenderId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Sender player not found for " + unblockRequest.getSenderId()));
 
         Player receivingPlayer = playerRepository.findById(unblockRequest.getReceiverId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Receiver player not found for " + unblockRequest.getReceiverId()));
 
         Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
         if (existingFriendship.isPresent()) {
@@ -179,10 +180,10 @@ public class FriendshipService {
         log.warn("Remove request sender: {}", removeFriendRequest.getSenderId());
         log.warn("Remove request receiver: {}", removeFriendRequest.getReceiverId());
         Player sendingPlayer = playerRepository.findById(removeFriendRequest.getSenderId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Sender player not found for " + removeFriendRequest.getSenderId()));
 
         Player receivingPlayer = playerRepository.findById(removeFriendRequest.getReceiverId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Receiver player not found for " + removeFriendRequest.getReceiverId()));
 
         List<Friendship> existingFriendships = friendshipRepository
                 .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
