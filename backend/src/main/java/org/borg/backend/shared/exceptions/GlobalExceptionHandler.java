@@ -88,8 +88,8 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(ResourceNotFoundException exception) {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ExceptionResponse> handleException(BaseException exception) {
         ExceptionResponse response = ExceptionResponse.builder()
                 .businessErrorCode(exception.getErrorCode().getCode())
                 .businessErrorDescription(exception.getErrorCode().getDescription())
@@ -99,29 +99,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(exception.getErrorCode().getHttpStatus())
                 .body(response);
-    }
-
-    @ExceptionHandler(GameException.class)
-    public ResponseEntity<ExceptionResponse> handleException(GameException exception) {
-        ExceptionResponse response = ExceptionResponse.builder()
-                .businessErrorCode(exception.getErrorCode().getCode())
-                .businessErrorDescription(exception.getErrorCode().getDescription())
-                .error(exception.getMessage())
-                .build();
-
-        return ResponseEntity
-                .status(exception.getErrorCode().getHttpStatus())
-                .body(response);
-    }
-
-    @ExceptionHandler(DuplicateException.class)
-    public ResponseEntity<ExceptionResponse> handleUsernameTaken(DuplicateException exception) {
-        return ResponseEntity.status(exception.getErrorCode().getHttpStatus())
-                .body(ExceptionResponse.builder()
-                        .businessErrorCode(exception.getErrorCode().getCode())
-                        .businessErrorDescription(exception.getErrorCode().getDescription())
-                        .error(exception.getMessage())
-                        .build());
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
@@ -135,19 +112,6 @@ public class GlobalExceptionHandler {
                                 .error(e.getMessage())
                                 .build()
                 );
-    }
-
-    @ExceptionHandler(FriendshipException.class)
-    public ResponseEntity<ExceptionResponse> handleException(FriendshipException exception) {
-        ExceptionResponse response = ExceptionResponse.builder()
-                .businessErrorCode(exception.getErrorCode().getCode())
-                .businessErrorDescription(exception.getErrorCode().getDescription())
-                .error(exception.getMessage())
-                .build();
-
-        return ResponseEntity
-                .status(exception.getErrorCode().getHttpStatus())
-                .body(response);
     }
 
     @ExceptionHandler(Exception.class)

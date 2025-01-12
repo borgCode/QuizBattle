@@ -11,7 +11,7 @@
       <button class="btn btn-info btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
         Actions
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu position-fixed">
         <ng-container *ngIf="type == 'friends'; else elseBlock">
           <li>
             <button class="dropdown-item" (click)="emitRemoveFriend(player.id)">Remove friend</button>
