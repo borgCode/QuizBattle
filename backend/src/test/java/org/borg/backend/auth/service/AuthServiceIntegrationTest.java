@@ -1,6 +1,5 @@
 package org.borg.backend.auth.service;
 
-
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
@@ -27,14 +26,12 @@ public class AuthServiceIntegrationTest {
     private RoleRepository roleRepository;
     @Autowired
     private AuthService authService;
-    
+
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_PASSWORD = "password123";
     private static final String TEST_DISPLAY_NAME = "Test User";
 
     private RegistrationRequest request;
-    
-
 
     @BeforeEach
     void setUp() {
@@ -50,7 +47,7 @@ public class AuthServiceIntegrationTest {
                 .password(TEST_PASSWORD)
                 .displayName(TEST_DISPLAY_NAME)
                 .build();
-        
+
         authService.register(request);
     }
 
@@ -58,12 +55,12 @@ public class AuthServiceIntegrationTest {
     void registerNewUserSuccess() {
         assertTrue(playerRepository.findByUsername(TEST_USERNAME).isPresent());
     }
-    
+
     @Test
     void registerDuplicateUserFailed() {
         assertThrows(DuplicateException.class, () -> authService.register(request));
     }
-    
+
     @Test
     void authenticateValidUserSuccess() {
         AuthRequest authRequest = AuthRequest.builder()
@@ -72,15 +69,14 @@ public class AuthServiceIntegrationTest {
                 .build();
 
         AuthResponse authResponse = authService.authenticate(authRequest);
-        
+
         assertNotNull(authResponse);
         assertNotNull(authResponse.getRefreshToken());
         assertNotNull(authResponse.getAccessToken());
         assertEquals("Login successful", authResponse.getMessage());
         assertEquals(TEST_USERNAME, authResponse.getPlayerDTO().getUsername());
-        
     }
-    
+
     @Test
     void authenticateWrongPasswordFail() {
 
@@ -91,7 +87,7 @@ public class AuthServiceIntegrationTest {
 
         assertThrows(BadCredentialsException.class, () -> authService.authenticate(authRequest));
     }
-    
+
     @Test
     void refreshTokenSuccess() {
         AuthRequest authRequest = AuthRequest.builder()

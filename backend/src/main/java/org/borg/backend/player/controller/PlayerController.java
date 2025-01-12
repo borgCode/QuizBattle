@@ -3,6 +3,7 @@ package org.borg.backend.player.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.player.dto.ChangePasswordRequest;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.dto.UpdatePlayerRequest;
@@ -30,6 +31,13 @@ public class PlayerController {
     public ResponseEntity<Void> updatePlayer(@RequestBody UpdatePlayerRequest request) {
         playerService.updatePlayer(request);
         return ResponseEntity.ok().build();  
+    }
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")
+    @PostMapping()
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        playerService.changePassword(request);
+        return ResponseEntity.accepted().build();
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")

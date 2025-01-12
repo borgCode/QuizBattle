@@ -83,7 +83,6 @@ class FriendshipServiceIntegrationTest {
         return playerRepository.save(player);
     }
 
-
     @Nested
     class FriendRequestTests {
         @Test
@@ -134,9 +133,8 @@ class FriendshipServiceIntegrationTest {
                     () -> friendshipService.sendFriendRequest(newFriendRequest));
 
             assertEquals(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS, exception.getErrorCode());
-
         }
-        
+
         @Test
         void automaticallyAcceptFriendshipWhenBothPlayersSendRequest() {
             PlayerInteraction firstPlayerInteraction = new PlayerInteraction(player1.getId(), player2.getId());
@@ -156,7 +154,6 @@ class FriendshipServiceIntegrationTest {
             );
 
             assertFalse(friendshipRepository.findByPlayer1AndPlayer2OrPlayer1AndPlayer2(player1, player2, player2, player1).isEmpty());
-
         }
 
         @Test
@@ -195,7 +192,6 @@ class FriendshipServiceIntegrationTest {
             assertEquals(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND, exception.getErrorCode());
 
             assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
-
         }
 
         @Test
@@ -210,12 +206,9 @@ class FriendshipServiceIntegrationTest {
                     () -> friendshipService.sendFriendRequest(otherPlayerInteraction));
 
             assertEquals(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER, exception.getErrorCode());
-
-
         }
-
     }
-    
+
     @Nested
     class removeFriendTests {
         @Test
@@ -240,7 +233,6 @@ class FriendshipServiceIntegrationTest {
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
             assertFalse(friendship.isPresent(), "Relationship was not deleted from repo after removing friend");
 
-
             assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
         }
     }
@@ -257,7 +249,7 @@ class FriendshipServiceIntegrationTest {
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
 
             assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
-            
+
             Friendship actualFriendship = friendship.get();
             assertAll("Post-block friendship",
                     () -> assertEquals(player1, actualFriendship.getPlayer1(), "The player who blocked was not the expected player"),
@@ -265,6 +257,7 @@ class FriendshipServiceIntegrationTest {
                     () -> assertEquals(FriendshipStatus.BLOCKED, actualFriendship.getStatus(), "Friendship should be BLOCKED")
             );
         }
+
         @Test
         void blockingShouldRemoveFriendRequest() {
             PlayerInteraction friendRequest = new PlayerInteraction(player1.getId(), player2.getId());
@@ -272,11 +265,9 @@ class FriendshipServiceIntegrationTest {
 
             PlayerInteraction blockInteraction = new PlayerInteraction(player2.getId(), player1.getId());
             friendshipService.blockPlayer(blockInteraction);
-            
+
             assertEquals(0, notificationRepository.findByPlayerId(player2.getId()).size(),
                     "Player 1 should have no notifications after blocking player2");
-            
-            
         }
 
         @Test
@@ -291,7 +282,6 @@ class FriendshipServiceIntegrationTest {
                     () -> friendshipService.blockPlayer(secondPlayerInteraction));
 
             assertEquals(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP, exception.getErrorCode());
-
         }
 
         @Test
@@ -304,7 +294,6 @@ class FriendshipServiceIntegrationTest {
 
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
             assertFalse(friendship.isPresent(), "Relationship was not deleted from repo after unblock");
-
         }
 
         @Test
@@ -318,7 +307,6 @@ class FriendshipServiceIntegrationTest {
                     () -> friendshipService.unblockPlayer(unblockInteraction));
 
             assertEquals(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP, exception.getErrorCode());
-
         }
     }
 
@@ -355,7 +343,6 @@ class FriendshipServiceIntegrationTest {
 
             FriendshipStatus blockedPlayerStatus = friendshipService.getRelationshipStatus(receiverRequest);
             assertEquals(FriendshipStatus.NONE, blockedPlayerStatus, "Blocked player should see NONE status");
-            
         }
 
         @Test
@@ -380,12 +367,12 @@ class FriendshipServiceIntegrationTest {
                             "Player1 should see player2 as blocked"),
                     () -> assertTrue(senderRelationships.getFriends().isEmpty(),
                             "Player1 should have no friends"),
-                    
+
                     () -> assertTrue(receiverRelationships.getBlocked().isEmpty(),
                             "Player2 should see no blocked players"),
                     () -> assertTrue(receiverRelationships.getFriends().isEmpty(),
                             "Player2 should have no friends"),
-                    
+
                     () -> assertEquals(1, thirdPlayerRelationships.getBlocked().size(),
                             "ThirdPlayer should see one blocked player"),
                     () -> assertTrue(thirdPlayerRelationships.getBlocked().stream()
@@ -400,10 +387,10 @@ class FriendshipServiceIntegrationTest {
         void blockingActivePlayerRemovesBidirectionalFriendship() {
             PlayerInteractionResponse response = setupFriendRequestScenario();
             friendshipService.handleFriendshipResponse(response, true);
-            
+
             PlayerInteraction blockInteraction = new PlayerInteraction(player1.getId(), player2.getId());
             friendshipService.blockPlayer(blockInteraction);
-            
+
             RelationshipsDTO player1Relationships = friendshipService.getRelationships(player1.getId());
             RelationshipsDTO player2Relationships = friendshipService.getRelationships(player2.getId());
 
@@ -413,14 +400,13 @@ class FriendshipServiceIntegrationTest {
                     () -> assertTrue(player1Relationships.getBlocked().stream()
                                     .anyMatch(blocked -> blocked.getId().equals(player2.getId())),
                             "Player1 should see Player2 as blocked"),
-                    
+
                     () -> assertTrue(player2Relationships.getFriends().isEmpty(),
                             "Player2 should no longer see Player1 as friend"),
                     () -> assertTrue(player2Relationships.getBlocked().isEmpty(),
                             "Player2 should have no blocked players")
             );
         }
-
     }
 
     private PlayerInteractionResponse setupFriendRequestScenario() {
@@ -428,13 +414,12 @@ class FriendshipServiceIntegrationTest {
         friendshipService.sendFriendRequest(playerInteraction);
 
         Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
-        
-        
+
         List<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId());
         Notification friendRequestNotification = notifications.get(0);
 
         assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
-        
+
         Friendship actualFriendship = friendship.get();
         assertAll("Post-request friendship",
                 () -> assertEquals(player1, actualFriendship.getPlayer1(), "Expected sender was not the actual sender"),
