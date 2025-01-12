@@ -1,0 +1,70 @@
+<div class="settings-container">
+    <h2 class="settings-title">Settings</h2>
+    <div class="setting-item">
+        <span>Password</span>
+        <p>••••••••</p>
+        <button class="btn-secondary" (click)="isVisible = true">Change Password</button>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isVisible">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Change Password</h3>
+            <button class="close-btn">&times;</button>
+        </div>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="submit()">
+
+            <div class="form-group">
+                <label>Current Password</label>
+                <input
+                        type="password"
+                        id="currentPassword"
+                        formControlName="currentPassword"
+                        class="form-control">
+                <div class="alert alert-danger" *ngIf="submitted && currentPassword.invalid">
+                    <div *ngIf="currentPassword.errors?.['required']">Please enter your current password</div>
+                    <div *ngIf="currentPassword.errors">The password you entered is incorrect</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>New Password</label>
+                <input
+                        type="password"
+                        id="newPassword"
+                        formControlName="newPassword"
+                        class="form-control">
+                <div class="alert alert-danger" *ngIf="submitted && newPassword.invalid">
+                    <div *ngIf="newPassword.errors?.['required']">New Password is required.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input
+                        type="password"
+                        id="confirmPassword"
+                        formControlName="confirmPassword"
+                        class="form-control">
+                <div class="alert alert-danger" *ngIf="submitted && confirmPassword.invalid">
+                    <div *ngIf="confirmPassword.errors?.['required']">Confirm Password is required.</div>
+                </div>
+                <div class="alert alert-danger" *ngIf="submitted && confirmPassword.valid && passwordForm.invalid && passwordForm.errors?.['passwordMismatch']">
+                    Passwords do not match.
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    Change Password
+                </button>
+                <button type="button" class="btn-secondary">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+

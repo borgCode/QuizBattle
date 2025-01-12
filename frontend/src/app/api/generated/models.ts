@@ -7,6 +7,7 @@ export type { AnswerValidationResponse } from './models/answer-validation-respon
 export type { AuthRequest } from './models/auth-request';
 export type { AuthResponse } from './models/auth-response';
 export type { CategoryStats } from './models/category-stats';
+export type { ChangePasswordRequest } from './models/change-password-request';
 export type { ChapterDto } from './models/chapter-dto';
 export type { ChapterNoCategoriesDto } from './models/chapter-no-categories-dto';
 export type { ChapterRoundResults } from './models/chapter-round-results';
