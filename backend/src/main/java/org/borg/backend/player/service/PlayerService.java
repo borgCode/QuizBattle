@@ -21,12 +21,14 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final FileStorageService fileStorageService;
 
-
-
-    public PlayerDTO getPlayerById(Long playerId) {
-        Player player = playerRepository.findById(playerId)
+    public Player getPlayerById(Long playerId) {
+        return playerRepository.findById(playerId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
-        return PlayerMapper.toDTO(player);
+    }
+ 
+
+    public PlayerDTO getPlayerDTOById(Long playerId) {
+        return PlayerMapper.toDTO(getPlayerById(playerId));
     }
 
     public void updatePlayer(UpdatePlayerRequest request) {

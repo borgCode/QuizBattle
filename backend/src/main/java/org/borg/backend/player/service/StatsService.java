@@ -1,13 +1,10 @@
 package org.borg.backend.player.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.borg.backend.game.shared.enums.GameResult;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.game.shared.enums.GameResult;
-import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +15,11 @@ import java.util.List;
 public class StatsService {
 
     private final PlayerRepository playerRepository;
+    private final PlayerService playerService;
 
     @Transactional
     public void handleQuestionStats(Long playerId, String category, boolean isCorrect) {
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
+        Player player = playerService.getPlayerById(playerId);
 
         player.getStats().incrementQuestionsAnswered(category);
 

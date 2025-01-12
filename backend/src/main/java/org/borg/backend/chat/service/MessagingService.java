@@ -15,6 +15,7 @@ import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -32,8 +33,8 @@ public class MessagingService {
 
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
-    private final PlayerRepository playerRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final PlayerService playerService;
 
     @Transactional
     public void sendMessage(SendMessageRequest request) {
@@ -79,10 +80,8 @@ public class MessagingService {
     }
 
     public FullConversationDTO createConversation(Long senderId, Long receiverId) {
-        Player player1 = playerRepository.findById(senderId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Sender not found for " + senderId));
-        Player player2 = playerRepository.findById(receiverId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Receiver not found for " + receiverId));
+        Player player1 = playerService.getPlayerById(senderId);
+        Player player2 = playerService.getPlayerById(receiverId);
 
         Conversation conversation = conversationRepository.save(Conversation.builder()
                 .player1(player1)

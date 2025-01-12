@@ -45,7 +45,6 @@ public class StatsListener {
                 applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(winnerId));
             }
         } catch (Exception e) {
-        
             log.error("Failed to process game stats and achievements", e);
         }
     }

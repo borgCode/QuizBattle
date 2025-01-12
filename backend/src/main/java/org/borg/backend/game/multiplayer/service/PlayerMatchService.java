@@ -13,6 +13,7 @@ import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,13 +31,12 @@ public class PlayerMatchService {
     private final PendingSessionRepository pendingSessionRepository;
     private final PlayerRepository playerRepository;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
+    private final PlayerService playerService;
 
     @Transactional
     public void requestMatch(MatchRequest matchRequest) {
-        Player sendingPlayer = playerRepository.findById(matchRequest.getSenderId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Sender not found for " + matchRequest.getSenderId()));
-        Player receivingPlayer = playerRepository.findById(matchRequest.getReceiverId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Receiver not found for " + matchRequest.getReceiverId()));
+        Player sendingPlayer = playerService.getPlayerById(matchRequest.getSenderId());
+        Player receivingPlayer = playerService.getPlayerById(matchRequest.getReceiverId());
 
         handleMatchRequest(sendingPlayer, receivingPlayer, null);
     }
@@ -45,7 +45,6 @@ public class PlayerMatchService {
     public void requestRematch(RematchRequest rematchRequest) {
         MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Session not found for " + rematchRequest.getSessionId()));
-        ;
 
         if (session.getStatus().equals(GameStatus.ACTIVE)) {
             throw new GameException(GAME_ALREADY_ONGOING);
@@ -127,10 +126,8 @@ public class PlayerMatchService {
     }
 
     private Long createMultiplayerSession(PendingSession pendingSession) {
-        Player player1 = playerRepository.findById(pendingSession.getRequestingPlayerId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Requesting player not found for " + pendingSession.getRequestingPlayerId()));
-        Player player2 = playerRepository.findById(pendingSession.getOpponentId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Opponent player not found for " + pendingSession.getOpponentId()));
+        Player player1 = playerService.getPlayerById(pendingSession.getRequestingPlayerId());
+        Player player2 = playerService.getPlayerById(pendingSession.getOpponentId());
 
         //Randomly choose who starts
 

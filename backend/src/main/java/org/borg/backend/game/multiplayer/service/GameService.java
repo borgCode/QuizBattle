@@ -17,7 +17,6 @@ import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.events.StatsEvents;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
@@ -38,7 +37,6 @@ import static java.util.Map.Entry;
 public class GameService {
 
     private final MultiplayerSessionRepository multiplayerSessionRepository;
-    private final PlayerRepository playerRepository;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RoundSessionService roundSessionService;
@@ -222,15 +220,12 @@ public class GameService {
                 .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE)));
 
         multiplayerSessionRepository.save(session);
-
+        
         Player loserPlayer = findPlayerInSession(session, session.getLoserId());
         Player winnerPlayer = findPlayerInSession(session, session.getWinnerId());
-
-        loserPlayer.getStats().incrementLosses();
-        winnerPlayer.getStats().incrementWins();
-
-        playerRepository.saveAll(List.of(loserPlayer, winnerPlayer));
-
+        
+        applicationEventPublisher.publishEvent(new StatsEvents.GameCompletedEvent(loserPlayer, winnerPlayer, GameResult.WIN_PLAYER1));
+        
         notificationService.sendGameWonNotification(winnerPlayer.getId(), loserPlayer.getDisplayName(), sessionId);
         notificationService.sendGameLostNotification(loserPlayer.getId(), winnerPlayer.getDisplayName(), sessionId);
 

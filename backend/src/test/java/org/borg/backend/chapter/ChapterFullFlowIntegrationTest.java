@@ -1,7 +1,6 @@
 package org.borg.backend.chapter;
 
 import Config.TestDataLoader;
-import jakarta.persistence.EntityNotFoundException;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.game.shared.dto.QuestionDTO;
@@ -25,9 +24,9 @@ import org.borg.backend.player.listener.AchievementListener;
 import org.borg.backend.player.listener.StatsListener;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
+import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.*;
@@ -137,7 +136,7 @@ public class ChapterFullFlowIntegrationTest {
 
         playerRepository.save(player);
 
-        story = storyRepository.findById(1L)
+        story = storyRepository.findById(chapter.getStory().getId())
                 .orElseThrow();
 
         playerProgress = storyService.getOrCreatePlayerProgress(player.getId(), story);

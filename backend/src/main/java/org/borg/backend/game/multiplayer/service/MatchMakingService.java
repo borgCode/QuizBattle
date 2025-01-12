@@ -9,6 +9,7 @@ import org.borg.backend.game.multiplayer.repository.MatchmakingSessionRepository
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -29,7 +30,7 @@ public class MatchMakingService {
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final MatchmakingSessionRepository matchmakingSessionRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final PlayerRepository playerRepository;
+    private final PlayerService playerService;
 
     public void findMatch(Long playerId) {
         synchronized (matchmakingQueue) {
@@ -49,11 +50,8 @@ public class MatchMakingService {
     }
 
     private void handleMatchMakingRequest(Long playerId, Long opponentId) {
-
-        Player requestingPlayer = playerRepository.findById(playerId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Requesting player not found for " + playerId));
-        Player opponent = playerRepository.findById(opponentId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Opponent player not found for " + opponentId));
+        Player requestingPlayer = playerService.getPlayerById(playerId);
+        Player opponent = playerService.getPlayerById(opponentId);
 
         MatchmakingSession matchmakingSession = new MatchmakingSession(playerId, opponentId);
         matchmakingSessionRepository.save(matchmakingSession);
@@ -101,10 +99,8 @@ public class MatchMakingService {
     }
 
     private void createMultiplayerSession(MatchmakingSession matchmakingSession) {
-        Player player1 = playerRepository.findById(matchmakingSession.getRequestingPlayerId())
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Requesting player not found for " + matchmakingSession.getRequestingPlayerId()));
-        Player player2 = playerRepository.findById(matchmakingSession.getOpponentId())
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Opponent player not found for " + matchmakingSession.getOpponentId()));
+        Player player1 = playerService.getPlayerById(matchmakingSession.getRequestingPlayerId());
+        Player player2 = playerService.getPlayerById(matchmakingSession.getOpponentId());
 
         //Randomly choose who starts
 

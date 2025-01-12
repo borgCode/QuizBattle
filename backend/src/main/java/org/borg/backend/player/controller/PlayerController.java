@@ -22,7 +22,7 @@ public class PlayerController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/{playerId}")
     public PlayerDTO getPlayerById(@PathVariable long playerId) {
-        return playerService.getPlayerById(playerId);
+        return playerService.getPlayerDTOById(playerId);
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.playerId)")

@@ -6,6 +6,7 @@ import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
 import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.player.model.ProgressStatus;
+import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.borg.backend.shared.util.ImageUtil;
@@ -34,12 +35,14 @@ public class StoryService {
     private final ChapterRepository chapterRepository;
     private final PlayerProgressRepository playerProgressRepository;
     private final PlayerRepository playerRepository;
+    private final PlayerService playerService;
 
-    public StoryService(StoryRepository storyRepository, ChapterRepository chapterRepository, PlayerProgressRepository playerProgressRepository, PlayerRepository playerRepository) {
+    public StoryService(StoryRepository storyRepository, ChapterRepository chapterRepository, PlayerProgressRepository playerProgressRepository, PlayerRepository playerRepository, PlayerService playerService) {
         this.storyRepository = storyRepository;
         this.chapterRepository = chapterRepository;
         this.playerProgressRepository = playerProgressRepository;
         this.playerRepository = playerRepository;
+        this.playerService = playerService;
     }
 
     @Transactional
@@ -72,8 +75,7 @@ public class StoryService {
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(playerId, story.getId());
 
         if (playerProgress == null) {
-            Player player = playerRepository.findById(playerId)
-                    .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
+            Player player = playerService.getPlayerById(playerId);;
 
             playerProgress = playerProgressRepository.save(PlayerProgress.builder()
                     .player(player)

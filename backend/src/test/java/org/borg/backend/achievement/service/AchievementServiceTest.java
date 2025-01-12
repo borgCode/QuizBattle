@@ -1,18 +1,13 @@
 package org.borg.backend.achievement.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.player.model.Achievement;
-import org.borg.backend.player.model.AchievementLevel;
 import org.borg.backend.player.dto.AchievementNotification;
-import org.borg.backend.player.model.UserUnlockedAchievement;
+import org.borg.backend.player.model.*;
 import org.borg.backend.player.repository.AchievementRepository;
 import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
 import org.borg.backend.player.service.AchievementService;
+import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.util.ImageUtil;
-import org.borg.backend.player.model.CategoryStats;
-import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.Stats;
-import org.borg.backend.player.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -20,7 +15,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +27,7 @@ class AchievementServiceTest {
     @Mock
     private AchievementRepository achievementRepository;
     @Mock
-    private PlayerRepository playerRepository;
+    private PlayerService playerService;
     @Mock
     private UserUnlockedAchievementRepository userUnlockedAchievementRepository;
     @Mock
@@ -74,7 +68,7 @@ class AchievementServiceTest {
 
 
             when(achievementRepository.findByName(storyName)).thenReturn(achievement);
-            when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
+            when(playerService.getPlayerById(playerId)).thenReturn(player);
             when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                     .thenReturn(false);
 
@@ -114,7 +108,7 @@ class AchievementServiceTest {
                 .build();
 
         when(achievementRepository.findByName(storyName)).thenReturn(achievement);
-        when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
+        when(playerService.getPlayerById(playerId)).thenReturn(player);
         when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                 .thenReturn(true);
 
@@ -175,7 +169,7 @@ class AchievementServiceTest {
                     .build();
             
             when(achievementRepository.findByName(category)).thenReturn(achievement);
-            when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
+            when(playerService.getPlayerById(playerId)).thenReturn(player);
             when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingUnlock);
             
             achievementService.handleCategoryAchievement(playerId, category);
@@ -232,7 +226,7 @@ class AchievementServiceTest {
 
 
             when(achievementRepository.findByName(category)).thenReturn(achievement);
-            when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
+            when(playerService.getPlayerById(playerId)).thenReturn(player);
             when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                     .thenReturn(false);
 

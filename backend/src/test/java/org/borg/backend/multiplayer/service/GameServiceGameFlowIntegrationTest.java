@@ -21,6 +21,7 @@ import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.game.shared.dto.PlayerQuestionResult;
 import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.repository.QuestionRepository;
+import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.notification.model.NotificationType;
@@ -57,14 +58,19 @@ public class GameServiceGameFlowIntegrationTest {
     private QuestionRepository questionRepository;
     @Autowired
     private RoundSessionService roundSessionService;
-    @MockitoBean
-    private AchievementService achievementService;
-    private Player player1;
-    private Player player2;
     @Autowired
     private MultiplayerQuestionService multiplayerQuestionService;
     @Autowired
     private GameValidationService gameValidationService;
+    
+    @MockitoBean
+    private AchievementService achievementService;
+    @MockitoBean
+    private StatsService statsService;
+    
+    private Player player1;
+    private Player player2;
+    
 
     @BeforeEach
     void setUp() {
@@ -415,18 +421,6 @@ public class GameServiceGameFlowIntegrationTest {
                 () -> assertEquals(GameStatus.COMPLETED, updatedSession.getStatus(), "Game status should be COMPLETED"),
                 () -> assertEquals(player1.getId(), updatedSession.getLoserId(), "Player1 should be the loser"),
                 () -> assertEquals(player2.getId(), updatedSession.getWinnerId(), "Player2 should be the winner")
-                );
-        
-        Player updatedPlayer1 = playerRepository.findById(player1.getId())
-                .orElseThrow();
-        Player updatedPlayer2 = playerRepository.findById(player2.getId())
-                .orElseThrow();
-        
-        assertAll("Post give up stats checks",
-                () -> assertEquals(1, updatedPlayer1.getStats().getNumOfLosses(), "Player1 should have 1 loss"),
-                () -> assertEquals(0, updatedPlayer1.getStats().getNumOfWins(), "Player2 should have 0 wins"),
-                () -> assertEquals(0, updatedPlayer2.getStats().getNumOfLosses(), "Player2 should have 0 losses"),
-                () -> assertEquals(1, updatedPlayer2.getStats().getNumOfWins(), "Player2 should have 1 win")
                 );
         
         verifyNotifications(NotificationType.GAME_LOST, NotificationType.GAME_WON);
