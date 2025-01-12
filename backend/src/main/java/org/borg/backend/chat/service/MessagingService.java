@@ -15,6 +15,8 @@ import org.borg.backend.chat.repository.ConversationRepository;
 import org.borg.backend.chat.repository.MessageRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,8 @@ public class MessagingService {
     public void sendMessage(SendMessageRequest request) {
 
         Conversation conversation = conversationRepository.findById(request.getConversationId())
-                .orElseThrow(() -> new EntityNotFoundException("Conversation not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Conversation not found for " + request.getConversationId()));
+
         Message message = messageRepository.save(Message.builder()
                 .conversation(conversation)
                 .senderId(request.getSenderId())
@@ -51,7 +54,6 @@ public class MessagingService {
         conversationRepository.save(conversation);
 
         simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/message", MessageMapper.toDTO(message));
-
     }
 
     public void markMessagesAsRead(List<Long> messageIds, long playerId) {
@@ -64,10 +66,8 @@ public class MessagingService {
             throw new AccessDeniedException("Not authorized to mark messages as read");
         }
 
-
         messageRepository.markMessagesAsRead(messageIds);
     }
-
 
     public FullConversationDTO getConversation(ConversationRequest conversationRequest) {
         Conversation conversation = conversationRepository.findByBothPlayerIds(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
@@ -75,15 +75,14 @@ public class MessagingService {
             return createConversation(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
         }
 
-
         return ConversationMapper.toFullConversationDTO(conversation, conversationRequest.getSenderId());
     }
 
     public FullConversationDTO createConversation(Long senderId, Long receiverId) {
         Player player1 = playerRepository.findById(senderId)
-                .orElseThrow(() -> new EntityNotFoundException("Sender not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Sender not found for " + senderId));
         Player player2 = playerRepository.findById(receiverId)
-                .orElseThrow(() -> new EntityNotFoundException("Receiver not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Receiver not found for " + receiverId));
 
         Conversation conversation = conversationRepository.save(Conversation.builder()
                 .player1(player1)
@@ -95,5 +94,4 @@ public class MessagingService {
     public List<ConversationPreviewDTO> getPlayerConversations(Long playerId) {
         return ConversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
     }
-
 }

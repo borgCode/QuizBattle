@@ -1,6 +1,5 @@
 package org.borg.backend.notification.service;
 
-
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +7,8 @@ import org.borg.backend.notification.model.Notification;
 import org.borg.backend.notification.model.NotificationType;
 import org.borg.backend.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +23,15 @@ import static org.borg.backend.notification.model.NotificationType.*;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    
+
     public List<Notification> getActivePlayerNotifications(Long playerId) {
         return notificationRepository.findByPlayerIdAndIsArchivedFalse(playerId);
     }
-    
+
     public List<Notification> getAllPlayerNotifications(Long playerId) {
         return notificationRepository.findByPlayerId(playerId);
     }
-    
+
     public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer) {
         String message = sendingPlayer.getDisplayName() + " sent you a friend request!";
         buildAndSaveNotification(receiverId, sendingPlayer.getId(), FRIEND_REQUEST, message, null, null);
@@ -50,14 +51,14 @@ public class NotificationService {
         String message = senderDisplayName + " requested a match against you!";
         buildAndSaveNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId);
     }
-    
+
     public void sendMatchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
         notificationRepository.deleteById(notificationId);
 
         String message = playerDisplayName + " accepted your match request!";
         buildAndSaveNotification(playerToNotify, null, MATCH_ACCEPTED, message, newSessionId, null);
     }
-    
+
     public void sendMatchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
         notificationRepository.deleteById(notificationId);
 
@@ -102,13 +103,12 @@ public class NotificationService {
     public void sendTieNotifications(List<Player> players, Long sessionId) {
         Player player1 = players.get(0);
         Player player2 = players.get(1);
-        
+
         String messagePlayer1 = "Your match against " + player1.getDisplayName() + " was tied!";
         buildAndSaveNotification(player1.getId(), null, GAME_TIED, messagePlayer1, sessionId, null);
 
         String messagePlayer2 = "Your match against " + player2.getDisplayName() + " was tied!";
         buildAndSaveNotification(player2.getId(), null, GAME_TIED, messagePlayer2, sessionId, null);
-
     }
 
     private void buildAndSaveNotification(Long receiverId, Long senderId, NotificationType notificationType, String message, Long startedSessionId, Long pendingSessionId) {
@@ -124,35 +124,36 @@ public class NotificationService {
                 .createdAt(Instant.now())
                 .build());
     }
-    
+
     public void markAsRead(long notificationId, long playerId) {
         Notification notification = notificationRepository.findById(notificationId)
-                        .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for: " + notificationId));
         if (!notification.getPlayerId().equals(playerId)) {
             throw new AccessDeniedException("Not authorized to mark notification as read");
         }
-        
+
         notification.setRead(true);
         notificationRepository.save(notification);
     }
+
     public void markAllAsRead(List<Long> notificationIds, long playerId) {
         long invalidIdCount = notificationRepository.countByIdInAndPlayerIdNot(notificationIds, playerId);
-        
+
         if (invalidIdCount > 0) {
             throw new AccessDeniedException("Not authorized to mark notifications as read");
         }
-        
+
         notificationRepository.markNotificationsAsRead(notificationIds);
     }
-    
+
     public void archiveNotification(long notificationId, long playerId) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for " + notificationId));
 
         if (!notification.getPlayerId().equals(playerId)) {
             throw new AccessDeniedException("Not authorized to mark notification as archived");
         }
-        
+
         notification.setArchived(true);
         notificationRepository.save(notification);
     }

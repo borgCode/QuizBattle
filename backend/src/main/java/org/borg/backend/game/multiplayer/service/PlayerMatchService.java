@@ -1,11 +1,7 @@
 package org.borg.backend.game.multiplayer.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.game.shared.enums.GameStatus;
-import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.game.multiplayer.dto.MatchRequest;
 import org.borg.backend.game.multiplayer.dto.MatchResponse;
 import org.borg.backend.game.multiplayer.dto.RematchRequest;
@@ -13,13 +9,17 @@ import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.model.PendingSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.repository.PendingSessionRepository;
+import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.shared.exceptions.GameException;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
+import static org.borg.backend.shared.enums.BusinessErrorCodes.*;
 
 @Slf4j
 @Service
@@ -31,25 +31,24 @@ public class PlayerMatchService {
     private final PlayerRepository playerRepository;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
 
-
     @Transactional
     public void requestMatch(MatchRequest matchRequest) {
         Player sendingPlayer = playerRepository.findById(matchRequest.getSenderId())
-                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Sender not found for " + matchRequest.getSenderId()));
         Player receivingPlayer = playerRepository.findById(matchRequest.getReceiverId())
-                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Receiver not found for " + matchRequest.getReceiverId()));
 
         handleMatchRequest(sendingPlayer, receivingPlayer, null);
-
     }
 
     @Transactional
     public void requestRematch(RematchRequest rematchRequest) {
         MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
-                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Session not found for " + rematchRequest.getSessionId()));
+        ;
 
         if (session.getStatus().equals(GameStatus.ACTIVE)) {
-            throw new GameException(BusinessErrorCodes.GAME_ALREADY_ONGOING);
+            throw new GameException(GAME_ALREADY_ONGOING);
         }
 
         Long playerId = rematchRequest.getPlayerId();
@@ -57,24 +56,23 @@ public class PlayerMatchService {
         Player sendingPlayer = session.getPlayers().stream()
                 .filter(player -> player.getId().equals(playerId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Player not found in session"));
+                .orElseThrow(() -> new GameException(INVALID_SESSION_STATE));
 
         Player opponentPlayer = session.getPlayers().stream()
                 .filter(player -> !player.equals(sendingPlayer))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Opponent not found in session"));
+                .orElseThrow(() -> new GameException(INVALID_SESSION_STATE));
 
         handleMatchRequest(sendingPlayer, opponentPlayer, session);
-
     }
 
     private void handleMatchRequest(Player sendingPlayer, Player receivingPlayer, MultiplayerSession originalSession) {
         if (multiplayerSessionRepository.checkIfOngoingSessionExists(sendingPlayer, receivingPlayer, GameStatus.ACTIVE)) {
-            throw new GameException(BusinessErrorCodes.GAME_ALREADY_ONGOING);
+            throw new GameException(GAME_ALREADY_ONGOING);
         }
 
         if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), receivingPlayer.getId())) {
-            throw new GameException(BusinessErrorCodes.REMATCH_REQUEST_ALREADY_SENT);
+            throw new GameException(REMATCH_REQUEST_ALREADY_SENT);
         }
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(receivingPlayer.getId(), sendingPlayer.getId());
 
@@ -97,10 +95,9 @@ public class PlayerMatchService {
                 notificationService.sendMatchStartedNotification(sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId);
                 notificationService.sendMatchStartedNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
             }
-
         } else {
             PendingSession newSession = pendingSessionRepository.save(new PendingSession(sendingPlayer.getId(), receivingPlayer.getId()));
-            
+
             if (originalSession != null) {
                 notificationService.sendRematchRequestNotification(receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
             } else {
@@ -109,11 +106,15 @@ public class PlayerMatchService {
         }
     }
 
-
     @Transactional
     public Long handleMatchAccept(MatchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
-                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Pending session not found for: " + response.getPendingSessionId()));
+
+        if (!pendingSession.getOpponentId().equals(response.getSenderId())) {
+            throw new AccessDeniedException("Not authorized to accept this request");
+        }
+
         Long newSessionId = createMultiplayerSession(pendingSession);
 
         if (response.isRematch()) {
@@ -125,12 +126,11 @@ public class PlayerMatchService {
         return newSessionId;
     }
 
-
     private Long createMultiplayerSession(PendingSession pendingSession) {
         Player player1 = playerRepository.findById(pendingSession.getRequestingPlayerId())
-                .orElseThrow(() -> new NoSuchElementException("Requesting player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Requesting player not found for " + pendingSession.getRequestingPlayerId()));
         Player player2 = playerRepository.findById(pendingSession.getOpponentId())
-                .orElseThrow(() -> new NoSuchElementException("Opponent not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Opponent player not found for " + pendingSession.getOpponentId()));
 
         //Randomly choose who starts
 
@@ -139,13 +139,12 @@ public class PlayerMatchService {
         MultiplayerSession session = multiplayerSessionRepository.save(
                 new MultiplayerSession(player1, player2, startingPlayer));
         return session.getId();
-
     }
 
     @Transactional
     public void handleMatchReject(MatchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
-                .orElseThrow(() -> new NoSuchElementException("Session not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND, "Pending session not found for: " + response.getPendingSessionId()));
 
         if (response.isRematch()) {
             notificationService.sendRematchRejectedNotification(response.getReceiverId(), response.getPlayerDisplayName(), response.getNotificationId());

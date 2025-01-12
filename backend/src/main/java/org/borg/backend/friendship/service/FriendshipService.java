@@ -82,7 +82,6 @@ public class FriendshipService {
                     }
                 }
             }
-
         }
     }
 
@@ -123,7 +122,7 @@ public class FriendshipService {
             notificationService.deleteFriendRequestByPlayerIds(response.getSenderId(), response.getReceiverId());
         }
     }
-    
+
     @Transactional
     public void blockPlayer(PlayerInteraction blockRequest) {
         Player sendingPlayer = playerRepository.findById(blockRequest.getSenderId())
@@ -170,18 +169,15 @@ public class FriendshipService {
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
                 friendshipRepository.delete(friendship);
             }
-
         } else {
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND);
         }
-
-
     }
 
     @Transactional
     public void removeAsFriend(PlayerInteraction removeFriendRequest) {
-        log.warn("Remove request sender: " + removeFriendRequest.getSenderId());
-        log.warn("Remove request receiver: " + removeFriendRequest.getReceiverId());
+        log.warn("Remove request sender: {}", removeFriendRequest.getSenderId());
+        log.warn("Remove request receiver: {}", removeFriendRequest.getReceiverId());
         Player sendingPlayer = playerRepository.findById(removeFriendRequest.getSenderId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -191,7 +187,7 @@ public class FriendshipService {
         List<Friendship> existingFriendships = friendshipRepository
                 .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
                         sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
-        
+
         if (!existingFriendships.isEmpty()) {
             Friendship friendship = existingFriendships.get(0);
             if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
@@ -234,7 +230,7 @@ public class FriendshipService {
         }
 
         Friendship friendship = friendships.get(0);
-        
+
         if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
             return friendship.getPlayer1().getId().equals(request.getPlayerId()) ?
                     FriendshipStatus.BLOCKED : FriendshipStatus.NONE;
@@ -246,6 +242,4 @@ public class FriendshipService {
         }
         return friendship.getStatus();
     }
-    
-    
 }

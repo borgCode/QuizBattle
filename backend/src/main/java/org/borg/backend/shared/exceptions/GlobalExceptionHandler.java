@@ -87,7 +87,19 @@ public class GlobalExceptionHandler {
                         .error(ex.getMessage())
                         .build());
     }
+    
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(ResourceNotFoundException exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .businessErrorCode(exception.getErrorCode().getCode())
+                .businessErrorDescription(exception.getErrorCode().getDescription())
+                .error(exception.getMessage())
+                .build();
 
+        return ResponseEntity
+                .status(exception.getErrorCode().getHttpStatus())
+                .body(response);
+    }
 
     @ExceptionHandler(GameException.class)
     public ResponseEntity<ExceptionResponse> handleException(GameException exception) {

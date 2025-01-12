@@ -28,6 +28,8 @@ import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.model.ProgressStatus;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -198,7 +200,7 @@ public class ChapterFullFlowIntegrationTest {
 
         ChapterProgress updatedChapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(playerProgress.getId(), player.getId());
         PlayerProgress playerProgress = playerProgressRepository.findById(chapterProgress.getPlayerProgress().getId())
-                .orElseThrow(() -> new EntityNotFoundException("PlayerProgress not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player progress not found for " + chapterProgress.getPlayerProgress().getId()));
 
         assertAll("Progress updates after chapter complete",
                 () -> assertEquals(ProgressStatus.COMPLETED, updatedChapterProgress.getProgressStatus(), "Chapter should be marked as complete"),

@@ -6,6 +6,8 @@ import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
 import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.player.model.ProgressStatus;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.dto.PlayerProgressDTO;
 import org.borg.backend.player.mapper.PlayerProgressMapper;
@@ -45,14 +47,13 @@ public class StoryService {
 
         List<Story> stories = storyRepository.findAll();
 
-
         List<StoryDTO> storyDTOS = new ArrayList<>();
         List<PlayerProgressDTO> playerProgressDTOS = new ArrayList<>();
 
         for (Story story : stories) {
             PlayerProgressDTO playerProgressDTO = PlayerProgressMapper.toDTO(getOrCreatePlayerProgress(playerId, story));
             playerProgressDTOS.add(playerProgressDTO);
-            
+
             StoryDTO storyDTO = StoryDTO.builder()
                     .id(story.getId())
                     .title(story.getTitle())
@@ -64,18 +65,16 @@ public class StoryService {
             storyDTOS.add(storyDTO);
         }
 
-
         return new AllStoriesDTO(storyDTOS, playerProgressDTOS);
-
     }
 
     public PlayerProgress getOrCreatePlayerProgress(Long playerId, Story story) {
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(playerId, story.getId());
-        
+
         if (playerProgress == null) {
             Player player = playerRepository.findById(playerId)
-                            .orElseThrow(() -> new EntityNotFoundException("User not found"));
-            
+                    .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
+
             playerProgress = playerProgressRepository.save(PlayerProgress.builder()
                     .player(player)
                     .story(story)
@@ -88,7 +87,7 @@ public class StoryService {
 
     public StoryOverviewDTO getStoryOverview(StoryOverviewRequest request) {
         Story story = storyRepository.findById(request.getStoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Story not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Story not found for " + request.getStoryId()));
 
         List<Chapter> chapters = chapterRepository.findByStoryId(story.getId());
 

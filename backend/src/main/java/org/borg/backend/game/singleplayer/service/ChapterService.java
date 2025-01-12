@@ -14,6 +14,8 @@ import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.model.ProgressStatus;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +34,7 @@ public class ChapterService {
 
     public ChapterDTO getChapter(Long chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId)
-                .orElseThrow(() -> new EntityNotFoundException("Chapter not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter not found for: " + chapterId));
         return ChapterMapper.toDTO(chapter);
     }
 
@@ -47,7 +49,7 @@ public class ChapterService {
         playerProgress = playerProgressRepository.save(playerProgress);
 
         Chapter chapter = chapterRepository.findById(request.getChapterId())
-                .orElseThrow(() -> new EntityNotFoundException("Chapter not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter not found for: " + request.getChapterId()));
 
         chapterSessionService.initializeChapterSession(request.getPlayerId(), chapter);
 
@@ -70,7 +72,7 @@ public class ChapterService {
     public void updateChapterProgress(Long chapterProgressId) {
         log.warn("Update chapter progress");
         ChapterProgress chapterProgress = chapterProgressRepository.findById(chapterProgressId)
-                .orElseThrow(() -> new EntityNotFoundException("ChapterProgress not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter progress not found for " + chapterProgressId));
 
         if (chapterProgress.getProgressStatus().equals(ProgressStatus.COMPLETED)) {
             return;
@@ -78,12 +80,13 @@ public class ChapterService {
 
         chapterProgress.setCompletedAt(LocalDate.now());
         chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
+        
+        Long playerProgressId = chapterProgress.getPlayerProgress().getId();
 
-        PlayerProgress playerProgress = playerProgressRepository.findById(chapterProgress.getPlayerProgress().getId())
-                .orElseThrow(() -> new EntityNotFoundException("PlayerProgress not found"));
-        log.warn(String.valueOf(playerProgress.getCompletedChapters()));
+        PlayerProgress playerProgress = playerProgressRepository.findById(playerProgressId)
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player progress not found for " + playerProgressId));
+        
         playerProgress.setCompletedChapters(playerProgress.getCompletedChapters() + 1);
-        log.warn(String.valueOf(playerProgress.getCompletedChapters()));
 
         if (playerProgress.getCompletedChapters() >= playerProgress.getStory().getNumOfChapters()) {
             playerProgress.setCompletedAt(LocalDate.now());

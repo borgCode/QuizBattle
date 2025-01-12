@@ -11,6 +11,8 @@ import org.borg.backend.player.dto.UserUnlockedAchievementDTO;
 import org.borg.backend.player.model.Achievement;
 import org.borg.backend.player.model.AchievementLevel;
 import org.borg.backend.player.model.UserUnlockedAchievement;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.borg.backend.shared.util.ImageUtil;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
@@ -41,7 +43,7 @@ public class AchievementService {
         Achievement achievement = achievementRepository.findByName(storyName);
 
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
 
         if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
             return;
@@ -61,7 +63,7 @@ public class AchievementService {
     public void handleCategoryAchievement(Long playerId, String category) {
         Achievement achievement = achievementRepository.findByName(category);
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
 
         int correctAnswers = player.getStats().getCategoryStats().get(category).getCorrect();
 
@@ -77,7 +79,7 @@ public class AchievementService {
         Achievement achievement = achievementRepository.findByName("Victories");
 
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
 
         int numOfWins = player.getStats().getNumOfWins();
 

@@ -13,6 +13,7 @@ import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.security.JwtService;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +36,7 @@ public class AuthService {
 
     public void register(RegistrationRequest request) {
         Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new EntityNotFoundException("ROLE USER was not initialized"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "USER role not initialized"));
         Player player = Player.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))

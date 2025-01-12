@@ -7,6 +7,8 @@ import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.dto.UpdatePlayerRequest;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.borg.backend.storage.FileStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,13 +27,13 @@ public class PlayerService {
 
     public PlayerDTO getPlayerById(Long playerId) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
         return PlayerMapper.toDTO(player);
     }
 
     public void updatePlayer(UpdatePlayerRequest request) {
         Player player = playerRepository.findById(request.getPlayerId())
-                .orElseThrow(() -> new NoSuchElementException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + request.getPlayerId()));
         log.warn("Updating player: " + player.getUsername());
 
         switch (request.getUpdateField()) {
@@ -49,7 +51,7 @@ public class PlayerService {
 
     public void uploadProfilePicture(Long playerId, MultipartFile file) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new NoSuchElementException("User not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
         log.warn("Saving profile pic");
         String profilePicturePath = fileStorageService.saveProfilePicture(file, playerId);
         log.warn("Saved + {}", profilePicturePath);
