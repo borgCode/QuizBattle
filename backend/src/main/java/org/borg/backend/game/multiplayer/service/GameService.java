@@ -11,7 +11,7 @@ import org.borg.backend.game.shared.enums.GameResult;
 import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.service.RoundSessionService;
-import org.borg.backend.notification.service.NotificationService;
+import org.borg.backend.social.notification.service.NotificationService;
 import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
