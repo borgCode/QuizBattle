@@ -2,12 +2,12 @@
   <div class="row mb-4">
     <div class="col-12">
       <div class="question-box p-3 bg-light rounded">
-        <h2>{{ questions[currentQuestionIndex].question }}</h2>
+        <h2>{{ question }}</h2>
       </div>
     </div>
   </div>
   <div class="row mb-3">
-    <ng-container *ngFor="let option of questions[currentQuestionIndex]?.options.slice(0,2); let i = index">
+    <ng-container *ngFor="let option of question?.options.slice(0,2); let i = index">
       <div class="col-6">
         <div class="answer-box p-3 border rounded text-center"
              [class.correct]="i === correctAnswerIndex && (hasClickedOption || timerHasRanOut)"
@@ -22,7 +22,7 @@
 
   </div>
   <div class="row">
-    <ng-container *ngFor="let option of questions[currentQuestionIndex]?.options.slice(2, 4); let i = index">
+    <ng-container *ngFor="let option of question?.options.slice(2, 4); let i = index">
       <div class="col-6">
         <div class="answer-box p-3 border rounded text-center"
              [class.correct]="(i + 2) === correctAnswerIndex && (hasClickedOption || timerHasRanOut)"

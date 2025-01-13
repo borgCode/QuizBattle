@@ -14,10 +14,9 @@ import {NgForOf} from '@angular/common';
 })
 export class QuestionPanelComponent implements OnChanges{
   @ViewChild(TimerComponent) timerComponent!: TimerComponent;
-  @Input() questions: QuestionDto[] = [];
+  @Input() question: QuestionDto;
   @Input() isCorrect: boolean | null = null;
   @Input() correctAnswerIndex: number | null = null;
-  @Input() currentQuestionIndex: number = 0;
   @Output() answerSelected = new EventEmitter<{ questionId: number, answer: string }>
   @Output() resetQuestionState = new EventEmitter<void>();
   @Output() navigateBackToScoreScreen? = new EventEmitter<void>();
@@ -49,7 +48,7 @@ ngOnChanges(changes: SimpleChanges) {
     this.selectedAnswerIndex = i;
     this.hasClickedOption = true
     this.answerSelected.emit({
-      questionId: this.questions[this.currentQuestionIndex].questionId,
+      questionId: this.question.questionId,
       answer: answer
     });
   }
@@ -60,25 +59,16 @@ ngOnChanges(changes: SimpleChanges) {
     this.timerHasRanOut = false;
     this.userClickedNext = true;
     this.resetQuestionState.emit();
-
-    if (this.currentQuestionIndex < this.questions.length - 1) {
-      this.nextQuestion.emit();
-      this.timerComponent.resetTimer();
-      this.timerComponent.startTimer();
-    } else {
-      //Multiplayer only
-      this.navigateBackToScoreScreen.emit();
-
-      //Singleplayer Only
-      this.handleChapterRound.emit();
-    }
+    this.nextQuestion.emit();
+    this.timerComponent.resetTimer();
+    this.timerComponent.startTimer();
   }
 
   onTimerRanOut() {
     if (!this.timerHasRanOut) {
       this.timerHasRanOut = true;
       console.log(this.timerHasRanOut)
-      this.timerRanOut.emit({questionId: this.questions[this.currentQuestionIndex].questionId});
+      this.timerRanOut.emit({questionId: this.question.questionId});
     }
   }
 

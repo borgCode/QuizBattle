@@ -271,6 +271,12 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
     }
   }
 
+  get currentQuestion(): QuestionDto | null {
+    return this.questions && this.currentQuestionIndex < this.questions.length
+      ? this.questions[this.currentQuestionIndex]
+      : null;
+  }
+
   ngOnDestroy() {
     this.chapterService.clearChapter({
       playerId: this.storedPlayerId

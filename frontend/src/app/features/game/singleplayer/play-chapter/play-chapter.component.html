@@ -29,10 +29,9 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <app-question-panel
-          [questions]="questions"
+          [question]="currentQuestion"
           [isCorrect]="answerIsCorrect"
           [correctAnswerIndex]="correctAnswerIndex"
-          [currentQuestionIndex]="currentQuestionIndex"
           *ngIf="hasQuestions"
           (answerSelected)="onAnswerSelected($event)"
           (timerRanOut)="onTimerRanOut($event)"
