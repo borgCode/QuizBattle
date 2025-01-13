@@ -3,6 +3,7 @@ import {PlayerDto} from '../../../../api/generated/models/player-dto';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {TokenService} from '../../../services/token/token.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-player-dropdown',
@@ -24,11 +25,13 @@ export class PlayerDropdownComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loginStateService.loggedInUser$.subscribe( {
-      next: loggedInUser => {
-        this.player = loggedInUser;
+    this.player = this.loginStateService.loggedInUser;
+
+    this.loginStateService.player$.subscribe(player => {
+      if (player) {
+        this.player = player;
       }
-    })
+    });
   }
 
   logout() {

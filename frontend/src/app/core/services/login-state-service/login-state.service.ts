@@ -1,5 +1,5 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import { Injectable } from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
 import {PlayerDto} from '../../../api/generated/models/player-dto';
 
 @Injectable({
@@ -8,18 +8,21 @@ import {PlayerDto} from '../../../api/generated/models/player-dto';
 export class LoginStateService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   isLoggedIn$ = this.isLoggedInSubject.asObservable();
-  private _loggedInUser: PlayerDto | null = null;
 
-  private _loggedInUserSubject: BehaviorSubject<PlayerDto | null> = new BehaviorSubject<PlayerDto | null>(this._loggedInUser);
-  public loggedInUser$: Observable<PlayerDto | null> = this._loggedInUserSubject.asObservable();
+  private playerSubject = new BehaviorSubject<PlayerDto | null>(null);
+  player$ = this.playerSubject.asObservable();
+
+  private _loggedInUser: PlayerDto;
 
   constructor() {
     const storedUser = localStorage.getItem('loggedInUser');
     if (storedUser) {
       this._loggedInUser = JSON.parse(storedUser);
+      this.playerSubject.next(this._loggedInUser);
       this.isLoggedInSubject.next(true);
     }
   }
+
 
   updateLoginState(hasToken: boolean): void {
     this.isLoggedInSubject.next(hasToken);
@@ -32,14 +35,13 @@ export class LoginStateService {
 
   set loggedInUser(value: PlayerDto) {
     this._loggedInUser = value;
-
+    this.playerSubject.next(value);
     localStorage.setItem('loggedInUser', JSON.stringify(value));
     this.isLoggedInSubject.next(true);
-    this._loggedInUserSubject.next(this._loggedInUser);
   }
-
   clearLoggedInUser() {
     this._loggedInUser = null;
+    this.playerSubject.next(null);
     localStorage.removeItem('loggedInUser');
     this.isLoggedInSubject.next(false);
   }
