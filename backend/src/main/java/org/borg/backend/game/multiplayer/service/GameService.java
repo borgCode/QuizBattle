@@ -3,7 +3,6 @@ package org.borg.backend.game.multiplayer.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
-import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
@@ -25,7 +24,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,15 +39,17 @@ public class GameService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RoundSessionService roundSessionService;
     private final StatsService statsService;
+    private final MultiplayerSessionService multiplayerSessionService;
 
     public GameStateResponse getGameState(long sessionId, long playerId) {
-        MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
+        log.debug("Fetching game state for sessionId: {}, playerId: {}", sessionId, playerId);
+        MultiplayerSession multiplayerSession = multiplayerSessionService.getSessionById(sessionId);
 
         boolean playerExistsInSession = multiplayerSession.getPlayers().stream()
                 .anyMatch(player -> player.getId().equals(playerId));
 
         if (!playerExistsInSession) {
+            log.warn("Access denied for playerId: {} in sessionId: {}", playerId, sessionId);
             throw new AccessDeniedException("Not authorized to access this game session");
         }
 
@@ -59,6 +59,7 @@ public class GameService {
                 .findFirst()
                 .orElse(null);
 
+        log.debug("Game state fetched successfully for sessionId: {}, playerId: {}", sessionId, playerId);
         return GameStateResponse.builder()
                 .playerTurn(multiplayerSession.getCurrentPlayerTurn().getId())
                 .playerDTOS(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
@@ -78,17 +79,21 @@ public class GameService {
 
     @Transactional
     public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
-        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
-
+        log.debug("Updating game state for sessionId: {}, playerId: {}, questionId: {}, isCorrect: {}",
+                sessionId, playerId, questionId, isCorrect);
+        MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
+        
         if (isCorrect) {
+            log.debug("Updating score for playerId: {}", playerId);
             Map<Long, Integer> scores = session.getScore();
             Integer playerScore = scores.getOrDefault(playerId, 0);
             scores.put(playerId, playerScore + 1);
+            log.debug("PlayerId: {} new score: {}", playerId, playerScore + 1);
         }
 
         Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
         questionsAnswered.put(playerId, questionsAnswered.get(playerId) + 1);
+        log.debug("PlayerId: {} questions answered updated to: {}", playerId, questionsAnswered.get(playerId));
 
         session.getQuestionResults().add(new PlayerQuestionResult(playerId, questionId, session.getQuestionsAnswered().get(playerId) - 1, isCorrect));
 
@@ -98,6 +103,7 @@ public class GameService {
                 .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session"));
 
         if (isGameComplete(questionsAnswered)) {
+            log.debug("Game is complete for sessionId: {}", sessionId);
             session.setStatus(GameStatus.COMPLETED);
             determineGameOutcome(session);
             sendGameOverNotifications(session);
@@ -108,6 +114,7 @@ public class GameService {
             if (session.getCurrentQuestionIndex() == 0) {
                 if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
                     session.setCurrentPlayerTurn(opponent);
+                    log.debug("Turn changed to opponent: {} for sessionId: {}", opponent.getId(), sessionId);
                 } else {
                     session.getQuestionIds().clear();
                     roundSessionService.finishSession(playerId);
@@ -115,6 +122,7 @@ public class GameService {
             }
         }
         multiplayerSessionRepository.save(session);
+        log.debug("Game state updated successfully for sessionId: {}", sessionId);
     }
 
     private boolean isGameComplete(Map<Long, Integer> questionsAnswered) {
@@ -123,6 +131,7 @@ public class GameService {
     }
 
     private void determineGameOutcome(MultiplayerSession session) {
+        log.debug("Determining game outcome for sessionId: {}", session.getId());
         List<Player> players = session.getPlayers();
 
         Long player1Id = players.get(0).getId();
@@ -148,9 +157,11 @@ public class GameService {
             result = GameResult.TIE;
         }
 
+        log.info("Game outcome determined for sessionId: {}, result: {}", session.getId(), result);
         statsService.updateGameStats(players.get(0), players.get(1), result);
 
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
+        log.debug("GameWonEvent published for sessionId: {}", session.getId());
     }
 
     private void sendGameOverNotifications(MultiplayerSession session) {
@@ -165,6 +176,7 @@ public class GameService {
     }
 
     private Player findPlayerInSession(MultiplayerSession session, Long playerId) {
+        log.debug("Finding playerId: {} in sessionId: {}", playerId, session.getId());
         return session.getPlayers().stream()
                 .filter(p -> p.getId().equals(playerId))
                 .findFirst()
@@ -172,7 +184,6 @@ public class GameService {
     }
 
     public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
-        log.warn("Session ids: " + session.getQuestionIds());
         session.getQuestionIds().clear();
         for (Question question : questions) {
             session.getQuestionIds().add(question.getId());
@@ -182,35 +193,17 @@ public class GameService {
         session.getRoundCategories().add(selectedCategory);
         multiplayerSessionRepository.save(session);
     }
-
-    public List<MultiplayerSessionDTO> getMultiplayerSessionsById(Long playerId) {
-        List<MultiplayerSession> multiplayerSessions = multiplayerSessionRepository.findByPlayerId(playerId);
-        List<MultiplayerSessionDTO> multiplayerSessionDTOS = new ArrayList<>();
-        for (MultiplayerSession multiplayerSession : multiplayerSessions) {
-            MultiplayerSessionDTO multiplayerSessionDTO = MultiplayerSessionDTO.builder()
-                    .id(multiplayerSession.getId())
-                    .playerDTOList(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
-                    .score(multiplayerSession.getScore())
-                    .status(multiplayerSession.getStatus())
-                    .currentPlayerTurn(PlayerMapper.toDTO(multiplayerSession.getCurrentPlayerTurn()))
-                    .build();
-            multiplayerSessionDTOS.add(multiplayerSessionDTO);
-        }
-        return multiplayerSessionDTOS;
-    }
-
+    
     public void acknowledgeGameOver(Long sessionId, Long playerId) {
-        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
-
+        MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
+        
         session.getPlayerAcknowledgment().put(playerId, true);
         multiplayerSessionRepository.save(session);
     }
 
     @Transactional
     public void handleGiveUp(Long sessionId, Long playerId) {
-        MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
+        MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
 
         session.getPlayerHasGivenUp().put(playerId, true);
         session.setStatus(GameStatus.COMPLETED);

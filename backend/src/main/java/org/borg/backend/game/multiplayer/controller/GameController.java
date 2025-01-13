@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
 import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.game.multiplayer.service.GameService;
+import org.borg.backend.game.multiplayer.service.MultiplayerSessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +20,12 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-    
+    private final MultiplayerSessionService multiplayerSessionService;
+
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("players/{playerId}/sessions")
     public List<MultiplayerSessionDTO> getPlayerSessions(@PathVariable long playerId) {
-        return gameService.getMultiplayerSessionsById(playerId);
+        return multiplayerSessionService.getMultiplayerSessionsById(playerId);
     }
     
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
