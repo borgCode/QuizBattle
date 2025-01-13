@@ -46,10 +46,10 @@ export class MultiplayerPlayRoundComponent implements OnInit {
 
 
     this.questionService.restoreSessionQuestions({playerId: this.storedPlayerId}).subscribe({
-      next: questions => {
-        console.log(questions)
-        if (questions && questions.length > 0) {
-          this.questions = questions;
+      next: progress => {
+        console.log(progress)
+        if (progress && progress.questions.length > 0) {
+          this.questions = progress.questions;
         } else {
 
           let questionIds = (history.state as any).questionIds;

@@ -32,11 +32,13 @@
           [questions]="questions"
           [isCorrect]="answerIsCorrect"
           [correctAnswerIndex]="correctAnswerIndex"
+          [currentQuestionIndex]="currentQuestionIndex"
           *ngIf="hasQuestions"
           (answerSelected)="onAnswerSelected($event)"
           (timerRanOut)="onTimerRanOut($event)"
           (resetQuestionState)="resetQuestionState()"
           (handleChapterRound)="handleRoundFinished()"
+          (nextQuestion)="onNextQuestion()"
         ></app-question-panel>
       </div>
     </div>

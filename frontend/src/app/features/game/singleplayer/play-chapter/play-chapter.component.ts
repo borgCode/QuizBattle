@@ -112,9 +112,11 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
 
   private fetchQuestions() {
     this.questionService.restoreSessionQuestions({playerId: this.storedPlayerId}).subscribe({
-      next: questions => {
-        if (questions && questions.length > 0) {
-          this.questions = questions;
+      next: progress => {
+        if (progress && progress.questions.length > 0) {
+          this.questions = progress.questions;
+          this.currentQuestionIndex = progress.currentIndex;
+          console.log("Restored index: " + this.currentQuestionIndex);
         } else {
           this.resetQuestionState()
           this.questionService.getSinglePlayerRoundQuestions({
@@ -163,11 +165,6 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
   private handleAnswerValidation(response: AnswerValidationResponse) {
     this.answerIsCorrect = response.correct;
     this.correctAnswerIndex = response.correctAnswerIndex;
-    this.currentQuestionIndex++;
-
-    if (this.currentQuestionIndex >= this.questions.length) {
-      this.handleRoundFinished();
-    }
   }
 
   resetQuestionState() {
@@ -263,6 +260,15 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
     refDialog.afterClosed().subscribe(() => {
       this.router.navigate(['singleplayer/story', this.storyId]);
     });
+  }
+
+  onNextQuestion() {
+    this.currentQuestionIndex++;
+    if (this.currentQuestionIndex >= this.questions.length) {
+      this.handleRoundFinished();
+    } else {
+      this.resetQuestionState();
+    }
   }
 
   ngOnDestroy() {

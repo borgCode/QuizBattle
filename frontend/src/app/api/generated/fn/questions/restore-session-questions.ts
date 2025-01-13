@@ -8,13 +8,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { QuestionDto } from '../../models/question-dto';
+import { RoundSessionProgress } from '../../models/round-session-progress';
 
 export interface RestoreSessionQuestions$Params {
   playerId: number;
 }
 
-export function restoreSessionQuestions(http: HttpClient, rootUrl: string, params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
+export function restoreSessionQuestions(http: HttpClient, rootUrl: string, params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<RoundSessionProgress>> {
   const rb = new RequestBuilder(rootUrl, restoreSessionQuestions.PATH, 'get');
   if (params) {
     rb.path('playerId', params.playerId, {});
@@ -25,7 +25,7 @@ export function restoreSessionQuestions(http: HttpClient, rootUrl: string, param
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<QuestionDto>>;
+      return r as StrictHttpResponse<RoundSessionProgress>;
     })
   );
 }

@@ -1,10 +1,10 @@
 package org.borg.backend.game.shared.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.game.shared.dto.QuestionDTO;
 import org.borg.backend.game.shared.mapper.QuestionMapper;
 import org.borg.backend.game.shared.model.RoundAnswer;
 import org.borg.backend.game.shared.model.RoundSession;
+import org.borg.backend.game.shared.model.RoundSessionProgress;
 import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.repository.QuestionRepository;
 import org.springframework.stereotype.Service;
@@ -47,8 +47,18 @@ public class RoundSessionService {
 
         RoundAnswer answer = new RoundAnswer(questionId, isCorrect, session.getCurrentIndex());
         session.getAnswers().put(session.getCurrentIndex(), answer);
+        log.debug("Saving answer {} for {}", questionId, playerId);
+        
+        
         session.setCurrentIndex(session.getCurrentIndex() + 1);
+        log.debug("Current session index {} for {}", session.getCurrentIndex(), playerId);
+        
         session.getAnsweredQuestionIds().add(questionId);
+        
+        log.debug("Added to answered ids {} for {}", questionId, playerId);
+        for (Long answeredQuestionId : session.getAnsweredQuestionIds()) {
+            log.debug("Answered id: {}", answeredQuestionId);
+        }
 
         return session.isComplete();
     }
@@ -100,14 +110,20 @@ public class RoundSessionService {
         return session;
     }
 
-    public List<QuestionDTO> restoreSessionQuestions(long playerId) {
-        log.debug("Restoring session questions for player:  {}", playerId);
+    public RoundSessionProgress restoreSessionQuestions(long playerId) {
+        log.debug("Restoring session questions for player: {}", playerId);
         List<Long> questionIds = getSessionQuestions(playerId);
         if (questionIds.isEmpty()) {
-            log.debug("Restored question ids is empty, returning empty list to player:  {}", playerId);
-            return List.of();
+            log.debug("Restored question ids is empty, returning empty response for player: {}", playerId);
+            return new RoundSessionProgress(List.of(), 0);
         }
-        
-        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
+
+        RoundSession session = roundSessions.get(playerId);
+        log.debug("Current index being sent after restore: {}", session.getCurrentIndex());
+        return new RoundSessionProgress(
+                QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds)),
+                session.getCurrentIndex()
+        );
     }
+    
 }

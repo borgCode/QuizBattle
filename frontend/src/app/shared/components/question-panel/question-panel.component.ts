@@ -17,13 +17,14 @@ export class QuestionPanelComponent implements OnChanges{
   @Input() questions: QuestionDto[] = [];
   @Input() isCorrect: boolean | null = null;
   @Input() correctAnswerIndex: number | null = null;
+  @Input() currentQuestionIndex: number = 0;
   @Output() answerSelected = new EventEmitter<{ questionId: number, answer: string }>
   @Output() resetQuestionState = new EventEmitter<void>();
   @Output() navigateBackToScoreScreen? = new EventEmitter<void>();
   @Output() handleChapterRound = new EventEmitter<void>();
   @Output() timerRanOut = new EventEmitter<{ questionId: number }>;
+  @Output() nextQuestion = new EventEmitter<void>();
 
-  currentQuestionIndex = 0;
   selectedAnswerIndex: number | null = null;
   hasClickedOption: boolean | null = null;
   timerHasRanOut: boolean = false;
@@ -36,6 +37,7 @@ ngOnChanges(changes: SimpleChanges) {
   if (changes['questions'] && !changes['questions'].firstChange) {
     this.resetQuestionPanel();
   }
+
   if (changes['isCorrect'] && changes['isCorrect'].currentValue === null) {
     this.selectedAnswerIndex = null;
     this.hasClickedOption = false;
@@ -60,8 +62,7 @@ ngOnChanges(changes: SimpleChanges) {
     this.resetQuestionState.emit();
 
     if (this.currentQuestionIndex < this.questions.length - 1) {
-      console.log("Current question index: " + this.currentQuestionIndex)
-      this.currentQuestionIndex++;
+      this.nextQuestion.emit();
       this.timerComponent.resetTimer();
       this.timerComponent.startTimer();
     } else {
@@ -84,7 +85,6 @@ ngOnChanges(changes: SimpleChanges) {
 
   private resetQuestionPanel() {
 
-    this.currentQuestionIndex = 0;
     this.selectedAnswerIndex = null;
     this.hasClickedOption = false;
     this.timerHasRanOut = false;

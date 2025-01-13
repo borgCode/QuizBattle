@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
 import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
+import org.borg.backend.game.shared.model.RoundSessionProgress;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
@@ -62,7 +63,7 @@ public class QuestionController {
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/{playerId}/restore")
-    public ResponseEntity<List<QuestionDTO>> restoreSessionQuestions(@PathVariable long playerId) {
+    public ResponseEntity<RoundSessionProgress> restoreSessionQuestions(@PathVariable long playerId) {
         return ResponseEntity.ok(roundSessionService.restoreSessionQuestions(playerId));
     }
 

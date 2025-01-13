@@ -28,6 +28,7 @@ import { GetThreeRandomCategories$Params } from '../fn/questions/get-three-rando
 import { QuestionDto } from '../models/question-dto';
 import { restoreSessionQuestions } from '../fn/questions/restore-session-questions';
 import { RestoreSessionQuestions$Params } from '../fn/questions/restore-session-questions';
+import { RoundSessionProgress } from '../models/round-session-progress';
 import { validateMultiplayerAnswer } from '../fn/questions/validate-multiplayer-answer';
 import { ValidateMultiplayerAnswer$Params } from '../fn/questions/validate-multiplayer-answer';
 import { validateSingleplayerAnswer } from '../fn/questions/validate-singleplayer-answer';
@@ -173,7 +174,7 @@ export class QuestionsService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  restoreSessionQuestions$Response(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
+  restoreSessionQuestions$Response(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<RoundSessionProgress>> {
     return restoreSessionQuestions(this.http, this.rootUrl, params, context);
   }
 
@@ -183,9 +184,9 @@ export class QuestionsService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  restoreSessionQuestions(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
+  restoreSessionQuestions(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<RoundSessionProgress> {
     return this.restoreSessionQuestions$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
+      map((r: StrictHttpResponse<RoundSessionProgress>): RoundSessionProgress => r.body)
     );
   }
 
