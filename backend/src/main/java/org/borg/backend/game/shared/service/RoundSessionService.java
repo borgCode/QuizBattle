@@ -47,19 +47,13 @@ public class RoundSessionService {
 
         RoundAnswer answer = new RoundAnswer(questionId, isCorrect, session.getCurrentIndex());
         session.getAnswers().put(session.getCurrentIndex(), answer);
-        log.debug("Saving answer {} for {}", questionId, playerId);
+        log.debug("Saving  {} answer to {}", questionId, session.getCurrentIndex());
         
         
         session.setCurrentIndex(session.getCurrentIndex() + 1);
         log.debug("Current session index {} for {}", session.getCurrentIndex(), playerId);
         
         session.getAnsweredQuestionIds().add(questionId);
-        
-        log.debug("Added to answered ids {} for {}", questionId, playerId);
-        for (Long answeredQuestionId : session.getAnsweredQuestionIds()) {
-            log.debug("Answered id: {}", answeredQuestionId);
-        }
-
         return session.isComplete();
     }
 
@@ -117,6 +111,8 @@ public class RoundSessionService {
             log.debug("Restored question ids is empty, returning empty response for player: {}", playerId);
             return new RoundSessionProgress(List.of(), 0);
         }
+        
+        log.warn("Restoring question ids {}", questionIds);
 
         RoundSession session = roundSessions.get(playerId);
         log.debug("Current index being sent after restore: {}", session.getCurrentIndex());
@@ -125,5 +121,4 @@ public class RoundSessionService {
                 session.getCurrentIndex()
         );
     }
-    
 }

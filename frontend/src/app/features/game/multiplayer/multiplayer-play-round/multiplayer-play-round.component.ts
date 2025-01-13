@@ -28,6 +28,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   storedPlayerId: number;
   answerIsCorrect: boolean = null;
   correctAnswerIndex: number;
+  currentQuestionIndex: number = 0;
 
   constructor(
     private questionService: QuestionsService,
@@ -50,6 +51,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
         console.log(progress)
         if (progress && progress.questions.length > 0) {
           this.questions = progress.questions;
+          this.currentQuestionIndex = progress.currentIndex;
         } else {
 
           let questionIds = (history.state as any).questionIds;
@@ -80,10 +82,19 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     })
   }
 
+  get currentQuestion(): QuestionDto | null {
+    return this.questions && this.currentQuestionIndex < this.questions.length
+      ? this.questions[this.currentQuestionIndex]
+      : null;
+  }
+
   private loadCategorySelection() {
     this.resetState();
 
-    this.questionService.getThreeRandomCategories({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
+    this.questionService.getThreeRandomCategories({
+      sessionId: this.sessionId,
+      playerId: this.storedPlayerId
+    }).subscribe({
       next: categories =>
         this.categories = categories
     })
@@ -122,7 +133,14 @@ export class MultiplayerPlayRoundComponent implements OnInit {
     });
   }
 
-
+  onNextQuestion() {
+    this.currentQuestionIndex++;
+    if (this.currentQuestionIndex >= this.questions.length) {
+      this.router.navigate(['multiplayer', this.sessionId]);
+    } else {
+      this.resetQuestionState();
+    }
+  }
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
 
     const validationRequest = {
@@ -165,11 +183,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
         this.correctAnswerIndex = response.correctAnswerIndex
       }
     })
-  }
-
-
-  onNavigateBack() {
-    this.router.navigate(['multiplayer', this.sessionId]);
   }
 
   get shouldShowCategories(): boolean {

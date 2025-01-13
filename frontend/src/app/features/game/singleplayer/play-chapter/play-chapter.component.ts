@@ -173,8 +173,11 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
   }
 
   handleRoundFinished() {
+    this.questions = [];
+
     this.questionService.getRoundResults({playerId: this.storedPlayerId}).subscribe({
       next: (roundResults) => {
+        console.log(roundResults)
         const dialogRef = this.resultsDialog.open(RoundResultsDialogComponent, {
           data: {
             roundResults: roundResults.questionResults,

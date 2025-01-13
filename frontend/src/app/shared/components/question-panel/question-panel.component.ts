@@ -33,7 +33,7 @@ export class QuestionPanelComponent implements OnChanges{
 
 
 ngOnChanges(changes: SimpleChanges) {
-  if (changes['questions'] && !changes['questions'].firstChange) {
+  if (changes['question'] && !changes['question'].firstChange) {
     this.resetQuestionPanel();
   }
 
@@ -45,6 +45,7 @@ ngOnChanges(changes: SimpleChanges) {
 }
 
   selectAnswer(answer: string, i: number) {
+    console.log('Selecting answer for question:', this.question?.questionId);
     this.selectedAnswerIndex = i;
     this.hasClickedOption = true
     this.answerSelected.emit({

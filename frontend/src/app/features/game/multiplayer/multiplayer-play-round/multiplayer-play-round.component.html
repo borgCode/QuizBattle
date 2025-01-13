@@ -4,12 +4,12 @@
   (categorySelected) = "onCategorySelected($event)"
   ></app-multiplayer-category>
 <app-question-panel
-  [questions]="questions"
+  [question]="currentQuestion"
   [isCorrect]="answerIsCorrect"
   [correctAnswerIndex]="correctAnswerIndex"
   *ngIf="shouldShowQuestions"
   (answerSelected)="onAnswerSelected($event)"
   (resetQuestionState)="resetQuestionState();"
   (timerRanOut)="onTimerRanOut($event)"
-  (navigateBackToScoreScreen)="onNavigateBack()"
+  (nextQuestion)="onNextQuestion()"
 ></app-question-panel>
