@@ -1,5 +1,6 @@
 package org.borg.backend.game.shared.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.shared.mapper.QuestionMapper;
 import org.borg.backend.game.shared.model.RoundAnswer;
@@ -14,14 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RoundSessionService {
     private final ConcurrentHashMap<Long, RoundSession> roundSessions = new ConcurrentHashMap<>();
     private final QuestionRepository questionRepository;
-
-    public RoundSessionService(QuestionRepository questionRepository) {
-        this.questionRepository = questionRepository;
-    }
-
+    
     public void initializeSession(Long playerId, List<Long> questionIds, String category, RoundType roundType) {
         RoundSession existingSession = roundSessions.get(playerId);
 
@@ -106,7 +104,7 @@ public class RoundSessionService {
 
     public RoundSessionProgress restoreSessionQuestions(long playerId) {
         log.debug("Restoring session questions for player: {}", playerId);
-        List<Long> questionIds = getSessionQuestions(playerId);
+        List<Long> questionIds = getSessionQuestions(playerId); 
         if (questionIds.isEmpty()) {
             log.debug("Restored question ids is empty, returning empty response for player: {}", playerId);
             return new RoundSessionProgress(List.of(), 0);

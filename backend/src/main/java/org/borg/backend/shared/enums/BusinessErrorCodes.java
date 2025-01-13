@@ -31,6 +31,7 @@ public enum BusinessErrorCodes {
     QUESTION_ALREADY_ANSWERED(306, HttpStatus.BAD_REQUEST, "Player has already answered this question"),
     NO_ACTIVE_SESSION(307 , HttpStatus.BAD_REQUEST, "No active sessions found for player"),
     INVALID_SESSION_STATE(308, HttpStatus.BAD_REQUEST, "Invalid session state"),
+    NULL_REQUEST(309, HttpStatus.BAD_REQUEST, "Null request"),
     
     PROFILE_PIC_TOO_LARGE(400, HttpStatus.PAYLOAD_TOO_LARGE, "File size exceeds the maximum allowed limit of 500KB"),
     

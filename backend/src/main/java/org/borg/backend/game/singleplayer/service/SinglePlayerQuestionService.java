@@ -17,6 +17,7 @@ import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class SinglePlayerQuestionService {
     public AnswerValidationResponse validateSingleplayerAnswer(SinglePlayerAnswerValidationRequest request) {
         log.debug("Validating singleplayer answer for request: {}", request);
         if (request == null) {
-            throw new IllegalArgumentException("Request cannot be null");
+            throw new GameException(BusinessErrorCodes.NULL_REQUEST, "Request cannot be null");
         }
 
         gameValidationService.validateSinglePlayerAnswer(request.getPlayerId(), request.getQuestionId());
