@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PlayerService} from "../../api/generated/services/player.service";
 import {NgIf} from "@angular/common";
 import {LoginStateService} from '../../core/services/login-state-service/login-state.service';

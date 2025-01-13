@@ -55,7 +55,9 @@ public class AchievementService {
         sendAchievementNotification(player, unlockedAchievement);
     }
 
+    @Transactional
     public void handleCategoryAchievement(Long playerId, String category) {
+        
         Achievement achievement = achievementRepository.findByName(category);
         Player player = playerService.getPlayerById(playerId);
 
@@ -67,13 +69,15 @@ public class AchievementService {
         handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void handleVictoryAchievement(Long playerId) {
+        log.debug("Processing victory achievement for player ID: {}", playerId);
+        
         Achievement achievement = achievementRepository.findByName("Victories");
-
         Player player = playerService.getPlayerById(playerId);
 
         int numOfWins = player.getStats().getNumOfWins();
+        log.debug("Player {} has {} total victories", player.getUsername(), numOfWins);
 
         UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
 
@@ -82,14 +86,17 @@ public class AchievementService {
     }
 
     private AchievementLevel determineNewAchievementLevel(UserUnlockedAchievement unlockedAchievement, Achievement achievement, int currentProgress) {
+        log.debug("Determining new achievement level - Current progress: {}", currentProgress);
         if (unlockedAchievement == null) {
             AchievementLevel firstLevel = achievement.getLevels().get(0);
+            log.debug("No current achievement, checking first level requirement: {}", firstLevel.getRequirementValue());
 
             return firstLevel.getRequirementValue() <= currentProgress ? firstLevel : null;
         }
 
         int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
         if (currentLevel >= achievement.getLevels().size()) {
+            log.debug("Already at maximum achievement level: {}", currentLevel);
             return null;
         }
         return achievement.getLevels().stream()
@@ -121,6 +128,9 @@ public class AchievementService {
     }
 
     private void sendAchievementNotification(Player player, UserUnlockedAchievement unlockedAchievement) {
+        log.debug("Sending achievement notification to player {} for achievement {}",
+                player.getUsername(), unlockedAchievement.getAchievement().getName());
+        
         AchievementNotification achievementNotification = AchievementNotification.builder()
                 .achievementName(unlockedAchievement.getAchievement().getName())
                 .achievementDescription(unlockedAchievement.getCurrentLevel().getDescription())
@@ -129,5 +139,6 @@ public class AchievementService {
                 .build();
 
         simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
+        log.debug("Achievement notification sent successfully");
     }
 }

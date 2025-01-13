@@ -21,12 +21,12 @@ import org.borg.backend.game.singleplayer.service.ChapterSessionService;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
 import org.borg.backend.game.singleplayer.service.StoryService;
 import org.borg.backend.player.listener.AchievementListener;
-import org.borg.backend.player.listener.StatsListener;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.*;
@@ -65,9 +65,8 @@ public class ChapterFullFlowIntegrationTest {
     private StoryService storyService;
     @MockitoBean
     private AchievementListener achievementListener;
-
     @MockitoBean
-    private StatsListener statsListener;
+    private StatsService statsService;
 
     Player player;
     Story story;

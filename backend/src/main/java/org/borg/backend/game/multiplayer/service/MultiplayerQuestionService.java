@@ -15,7 +15,7 @@ import org.borg.backend.game.shared.repository.QuestionRepository;
 import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.player.events.StatsEvents;
+import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
@@ -37,6 +37,7 @@ public class MultiplayerQuestionService {
     private final GameService gameService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GameValidationService gameValidationService;
+    private final StatsService statsService;
 
     public List<QuestionDTO> restoreSessionQuestions(Long playerId) {
         List<Long> questionIds = roundSessionService.getSessionQuestions(playerId);
@@ -93,12 +94,13 @@ public class MultiplayerQuestionService {
                 validationResponse.isCorrect()
         );
 
+        gameService.updateGameState(request.getSessionId(), request.getPlayerId(), request.getQuestionId(), validationResponse.isCorrect());
+
         if (isRoundComplete) {
             applicationEventPublisher.publishEvent(new AchievementEvents.CategoryCompletedEvent(request.getPlayerId(), question.getCategory())
             );
             roundSessionService.finishSession(request.getPlayerId());
         }
-        gameService.updateGameState(request.getSessionId(), request.getPlayerId(), request.getQuestionId(), validationResponse.isCorrect());
 
         return validationResponse;
     }
@@ -106,8 +108,8 @@ public class MultiplayerQuestionService {
     private AnswerValidationResponse validateAnswer(Long playerId, Question question, String answer) {
         boolean isCorrect = question.getCorrectAnswer().equals(answer);
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
-
-        applicationEventPublisher.publishEvent(new StatsEvents.QuestionAnsweredEvent(playerId, question.getCategory(), isCorrect));
+        
+        statsService.updateQuestionStats(playerId, question.getCategory(), isCorrect);
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }

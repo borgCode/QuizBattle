@@ -1,6 +1,7 @@
 package org.borg.backend.player.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.shared.enums.GameResult;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StatsService {
@@ -18,7 +20,9 @@ public class StatsService {
     private final PlayerService playerService;
 
     @Transactional
-    public void handleQuestionStats(Long playerId, String category, boolean isCorrect) {
+    public void updateQuestionStats(Long playerId, String category, boolean isCorrect) {
+        log.debug("Starting stats update for {} in category {}", playerId, category);
+        
         Player player = playerService.getPlayerById(playerId);
 
         player.getStats().incrementQuestionsAnswered(category);
@@ -26,11 +30,14 @@ public class StatsService {
         if (isCorrect) {
             player.getStats().incrementCorrectAnswer(category);
         }
+        
+        Player updatedPlayer = playerRepository.save(player);
 
-        playerRepository.save(player);
+        log.debug("After update, correct answers: {}", updatedPlayer.getStats().getCategoryStats().get(category).getCorrect());
     }
 
-    public void handleGameStats(Player player1, Player player2, GameResult result) {
+    @Transactional
+    public void updateGameStats(Player player1, Player player2, GameResult result) {
         Stats player1Stats = player1.getStats();
         Stats player2Stats = player2.getStats();
 

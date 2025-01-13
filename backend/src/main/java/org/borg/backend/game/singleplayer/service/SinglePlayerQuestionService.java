@@ -15,7 +15,7 @@ import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationReques
 import org.borg.backend.game.singleplayer.model.ChapterProgress;
 import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.player.events.StatsEvents;
+import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,6 +35,7 @@ public class SinglePlayerQuestionService {
     private final ChapterProgressRepository chapterProgressRepository;
     private final ChapterService chapterService;
     private final GameValidationService gameValidationService;
+    private final StatsService statsService;
 
     public List<QuestionDTO> getSinglePlayerRoundQuestions(long playerId) {
         ChapterSession session = chapterSessionService.getSession(playerId);
@@ -55,8 +56,7 @@ public class SinglePlayerQuestionService {
 
         return QuestionMapper.multipleToDTO(questions);
     }
-
-    @Transactional
+    
     public AnswerValidationResponse validateSingleplayerAnswer(SinglePlayerAnswerValidationRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
@@ -89,8 +89,8 @@ public class SinglePlayerQuestionService {
     private AnswerValidationResponse validateAnswer(Long playerId, Question question, String answer) {
         boolean isCorrect = question.getCorrectAnswer().equals(answer);
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
-
-        applicationEventPublisher.publishEvent(new StatsEvents.QuestionAnsweredEvent(playerId, question.getCategory(), isCorrect));
+        
+        statsService.updateQuestionStats(playerId, question.getCategory(), isCorrect);
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);
     }

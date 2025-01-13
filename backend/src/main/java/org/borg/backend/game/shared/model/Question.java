@@ -18,7 +18,7 @@ public class Question {
     private Long id;
     private String category;
     private String question;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> options;
     private String correctAnswer;
 }

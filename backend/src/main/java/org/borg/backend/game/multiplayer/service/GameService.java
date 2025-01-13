@@ -14,9 +14,9 @@ import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.notification.service.NotificationService;
 import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.player.events.StatsEvents;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
+import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
@@ -40,6 +40,7 @@ public class GameService {
     private final NotificationService notificationService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RoundSessionService roundSessionService;
+    private final StatsService statsService;
 
     public GameStateResponse getGameState(long sessionId, long playerId) {
         MultiplayerSession multiplayerSession = multiplayerSessionRepository.findById(sessionId)
@@ -147,7 +148,9 @@ public class GameService {
             result = GameResult.TIE;
         }
 
-        applicationEventPublisher.publishEvent(new StatsEvents.GameCompletedEvent(players.get(0), players.get(1), result));
+        statsService.updateGameStats(players.get(0), players.get(1), result);
+
+        applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
     }
 
     private void sendGameOverNotifications(MultiplayerSession session) {
@@ -224,7 +227,7 @@ public class GameService {
         Player loserPlayer = findPlayerInSession(session, session.getLoserId());
         Player winnerPlayer = findPlayerInSession(session, session.getWinnerId());
         
-        applicationEventPublisher.publishEvent(new StatsEvents.GameCompletedEvent(loserPlayer, winnerPlayer, GameResult.WIN_PLAYER1));
+        statsService.updateGameStats(loserPlayer, winnerPlayer, GameResult.WIN_PLAYER2);
         
         notificationService.sendGameWonNotification(winnerPlayer.getId(), loserPlayer.getDisplayName(), sessionId);
         notificationService.sendGameLostNotification(loserPlayer.getId(), winnerPlayer.getDisplayName(), sessionId);

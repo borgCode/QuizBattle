@@ -1,9 +1,7 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FullConversationDto} from '../../../api/generated/models/full-conversation-dto';
-import {BehaviorSubject, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {WebSocketService} from '../../websocket/web-socket.service';
-import {filter} from 'rxjs/operators';
-import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {LoginStateService} from "../login-state-service/login-state.service";
 
 export interface Message {

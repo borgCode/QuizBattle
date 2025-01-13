@@ -1,6 +1,7 @@
 package org.borg.backend.player.listener;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.service.AchievementService;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -12,6 +13,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import static org.borg.backend.player.events.AchievementEvents.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AchievementListener {
@@ -26,13 +28,16 @@ public class AchievementListener {
 
     @EventListener
     @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleCategoryCompleted(CategoryCompletedEvent event) {
+        log.debug("Starting async achievement handling for category {} and player {}",
+                event.category(), event.playerId());
         achievementService.handleCategoryAchievement(event.playerId(), event.category());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameWon(GameWonEvent event) {
         achievementService.handleVictoryAchievement(event.playerId());
     }

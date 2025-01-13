@@ -1,4 +1,4 @@
-package org.borg.backend.unit.multiplayer;
+package org.borg.backend.unit.game.multiplayer.service;
 
 import org.borg.backend.game.multiplayer.dto.MatchmakingResponse;
 import org.borg.backend.game.multiplayer.service.MatchMakingService;
@@ -13,7 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class MatchMakingTest {
+public class MatchMakingServiceTest {
     
     @Mock
     private SimpMessagingTemplate simpMessagingTemplate;
