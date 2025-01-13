@@ -26,6 +26,5 @@ public class Notification {
     private boolean isRead;
     private boolean isArchived;
     private Instant createdAt;
-    
 }
 

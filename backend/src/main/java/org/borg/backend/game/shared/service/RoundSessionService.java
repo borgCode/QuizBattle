@@ -8,6 +8,8 @@ import org.borg.backend.game.shared.model.RoundSession;
 import org.borg.backend.game.shared.model.RoundSessionProgress;
 import org.borg.backend.game.shared.model.RoundType;
 import org.borg.backend.game.shared.repository.QuestionRepository;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.GameException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -68,7 +70,8 @@ public class RoundSessionService {
     public List<Boolean> getSessionAnswers(Long playerId) {
         RoundSession session = roundSessions.get(playerId);
         if (session == null) {
-            throw new IllegalStateException("No active session found for player: " + playerId);
+            throw new GameException(BusinessErrorCodes.NO_ACTIVE_SESSION,
+                    String.format("No active round session found for player %d", playerId));
         }
         return session.getAnswers().values().stream()
                 .sorted(java.util.Comparator.comparingInt(RoundAnswer::index))
@@ -97,7 +100,8 @@ public class RoundSessionService {
     private RoundSession getActiveSession(Long playerId) {
         RoundSession session = roundSessions.get(playerId);
         if (session == null) {
-            throw new IllegalStateException("No active session found for player: " + playerId);
+            throw new GameException(BusinessErrorCodes.NO_ACTIVE_SESSION,
+                    String.format("No active round session found for player %d", playerId));
         }
         return session;
     }

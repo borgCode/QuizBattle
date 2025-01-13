@@ -21,8 +21,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     Notification findByPlayerIdAndPendingSessionId(Long playerId, Long pendingSessionId);
 
+    @Query("SELECT n FROM Notification n WHERE n.playerId = :playerId AND n.isArchived = false ORDER BY n.createdAt DESC")
     List<Notification> findByPlayerIdAndIsArchivedFalse(Long playerId);
-
+    
     List<Notification> findByPlayerId(Long playerId);
 
     @Modifying
