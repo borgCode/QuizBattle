@@ -24,7 +24,11 @@ export class PlayerDropdownComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.player = this.loginStateService.loggedInUser;
+    this.loginStateService.loggedInUser$.subscribe( {
+      next: loggedInUser => {
+        this.player = loggedInUser;
+      }
+    })
   }
 
   logout() {

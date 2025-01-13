@@ -56,7 +56,6 @@ public class ChapterService {
         ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapter.getId());
 
         if (chapterProgress == null) {
-            log.warn("Creating new chapter progress");
             chapterProgress = ChapterProgress.builder()
                     .playerProgress(playerProgress)
                     .chapter(chapter)
@@ -70,7 +69,6 @@ public class ChapterService {
 
     @Transactional
     public void updateChapterProgress(Long chapterProgressId) {
-        log.warn("Update chapter progress");
         ChapterProgress chapterProgress = chapterProgressRepository.findById(chapterProgressId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter progress not found for " + chapterProgressId));
 

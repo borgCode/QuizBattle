@@ -1,27 +1,27 @@
 package org.borg.backend.game.singleplayer.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
-import org.borg.backend.game.singleplayer.model.Chapter;
-import org.borg.backend.game.singleplayer.repository.ChapterRepository;
-import org.borg.backend.player.model.ProgressStatus;
-import org.borg.backend.player.service.PlayerService;
-import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.shared.exceptions.ResourceNotFoundException;
-import org.borg.backend.shared.util.ImageUtil;
-import org.borg.backend.player.dto.PlayerProgressDTO;
-import org.borg.backend.player.mapper.PlayerProgressMapper;
-import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.PlayerProgress;
-import org.borg.backend.player.repository.PlayerProgressRepository;
-import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.game.singleplayer.dto.AllStoriesDTO;
 import org.borg.backend.game.singleplayer.dto.StoryDTO;
 import org.borg.backend.game.singleplayer.dto.StoryOverviewDTO;
 import org.borg.backend.game.singleplayer.dto.StoryOverviewRequest;
+import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
+import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.model.Story;
+import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.game.singleplayer.repository.StoryRepository;
+import org.borg.backend.player.dto.PlayerProgressDTO;
+import org.borg.backend.player.mapper.PlayerProgressMapper;
+import org.borg.backend.player.model.Player;
+import org.borg.backend.player.model.PlayerProgress;
+import org.borg.backend.player.model.ProgressStatus;
+import org.borg.backend.player.repository.PlayerProgressRepository;
+import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.player.service.PlayerService;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
+import org.borg.backend.shared.util.ImageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,21 +30,13 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class StoryService {
     private final StoryRepository storyRepository;
     private final ChapterRepository chapterRepository;
     private final PlayerProgressRepository playerProgressRepository;
-    private final PlayerRepository playerRepository;
     private final PlayerService playerService;
-
-    public StoryService(StoryRepository storyRepository, ChapterRepository chapterRepository, PlayerProgressRepository playerProgressRepository, PlayerRepository playerRepository, PlayerService playerService) {
-        this.storyRepository = storyRepository;
-        this.chapterRepository = chapterRepository;
-        this.playerProgressRepository = playerProgressRepository;
-        this.playerRepository = playerRepository;
-        this.playerService = playerService;
-    }
-
+    
     @Transactional
     public AllStoriesDTO getAllStories(Long playerId) {
 

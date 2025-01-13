@@ -21,7 +21,6 @@ import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -80,8 +79,7 @@ public class SinglePlayerQuestionService {
         boolean isRoundComplete = roundSessionService.saveAnswer(
                 request.getPlayerId(),
                 question.getId(),
-                validationResponse.isCorrect()
-        );
+                validationResponse.isCorrect());
 
         if (isRoundComplete) {
             applicationEventPublisher.publishEvent(
