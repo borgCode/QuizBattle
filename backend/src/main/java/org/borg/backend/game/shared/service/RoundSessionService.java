@@ -1,9 +1,12 @@
 package org.borg.backend.game.shared.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.game.shared.dto.QuestionDTO;
+import org.borg.backend.game.shared.mapper.QuestionMapper;
 import org.borg.backend.game.shared.model.RoundAnswer;
 import org.borg.backend.game.shared.model.RoundSession;
 import org.borg.backend.game.shared.model.RoundType;
+import org.borg.backend.game.shared.repository.QuestionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class RoundSessionService {
     private final ConcurrentHashMap<Long, RoundSession> roundSessions = new ConcurrentHashMap<>();
+    private final QuestionRepository questionRepository;
+
+    public RoundSessionService(QuestionRepository questionRepository) {
+        this.questionRepository = questionRepository;
+    }
 
     public void initializeSession(Long playerId, List<Long> questionIds, String category, RoundType roundType) {
         RoundSession existingSession = roundSessions.get(playerId);
@@ -34,7 +42,6 @@ public class RoundSessionService {
         RoundSession session = getActiveSession(playerId);
 
         if (session.hasAnsweredQuestion(questionId)) {
-            log.warn("Attempted to answer same question twice: {}", questionId);
             throw new IllegalStateException("Question has already been answered");
         }
 
@@ -76,6 +83,7 @@ public class RoundSessionService {
             roundSessions.remove(playerId);
             return List.of();
         }
+        
         return session.getQuestionIds();
     }
 
@@ -90,5 +98,16 @@ public class RoundSessionService {
             throw new IllegalStateException("No active session found for player: " + playerId);
         }
         return session;
+    }
+
+    public List<QuestionDTO> restoreSessionQuestions(long playerId) {
+        log.debug("Restoring session questions for player:  {}", playerId);
+        List<Long> questionIds = getSessionQuestions(playerId);
+        if (questionIds.isEmpty()) {
+            log.debug("Restored question ids is empty, returning empty list to player:  {}", playerId);
+            return List.of();
+        }
+        
+        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
     }
 }

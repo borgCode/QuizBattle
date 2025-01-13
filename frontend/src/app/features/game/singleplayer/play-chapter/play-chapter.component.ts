@@ -38,6 +38,7 @@ import {ContentDialogComponent} from "../shared-components/content-dialog/conten
   ]
 })
 export class PlayChapterComponent implements OnInit, OnDestroy {
+
   playerProgressId: number;
   storyTitle: string;
   storyId: number;
@@ -105,21 +106,27 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
     });
   }
 
-
   get hasQuestions(): boolean {
     return this.questions.length > 0;
   }
 
   private fetchQuestions() {
-    this.resetQuestionState()
-    this.questionService.getSinglePlayerRoundQuestions({
-      playerId: this.storedPlayerId
-    }).subscribe({
+    this.questionService.restoreSessionQuestions({playerId: this.storedPlayerId}).subscribe({
       next: questions => {
-        this.questions = questions;
+        if (questions && questions.length > 0) {
+          this.questions = questions;
+        } else {
+          this.resetQuestionState()
+          this.questionService.getSinglePlayerRoundQuestions({
+            playerId: this.storedPlayerId
+          }).subscribe({
+            next: questions => {
+              this.questions = questions;
+            }
+          })
+        }
       }
     })
-
   }
 
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {

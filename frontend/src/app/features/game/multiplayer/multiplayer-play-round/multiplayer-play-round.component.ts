@@ -28,7 +28,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   storedPlayerId: number;
   answerIsCorrect: boolean = null;
   correctAnswerIndex: number;
-  isRestoredSession: boolean = false;
 
   constructor(
     private questionService: QuestionsService,
@@ -51,7 +50,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
         console.log(questions)
         if (questions && questions.length > 0) {
           this.questions = questions;
-          this.isRestoredSession = true;
         } else {
 
           let questionIds = (history.state as any).questionIds;
@@ -63,7 +61,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
             }).subscribe({
               next: questions => {
                 this.questions = questions;
-                this.isRestoredSession = true;
               },
               error: err => {
                 console.log('No active questions found, returning to score screen');
@@ -93,7 +90,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   }
 
   private resetState() {
-    this.isRestoredSession = false;
     this.selectedCategory = null;
     this.questions = [];
     this.answerIsCorrect = null;
@@ -114,8 +110,6 @@ export class MultiplayerPlayRoundComponent implements OnInit {
       next: data => {
         if (data && data.length > 0) {
           this.questions = data;
-          this.isRestoredSession = true;
-
         } else {
           console.log("This category has already been played, please choose another");
           this.selectedCategory = null;

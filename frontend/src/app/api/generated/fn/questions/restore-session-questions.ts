@@ -30,4 +30,4 @@ export function restoreSessionQuestions(http: HttpClient, rootUrl: string, param
   );
 }
 
-restoreSessionQuestions.PATH = '/questions/multiplayer/{playerId}/restore';
+restoreSessionQuestions.PATH = '/questions/{playerId}/restore';

@@ -38,15 +38,7 @@ public class MultiplayerQuestionService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GameValidationService gameValidationService;
     private final StatsService statsService;
-
-    public List<QuestionDTO> restoreSessionQuestions(Long playerId) {
-        List<Long> questionIds = roundSessionService.getSessionQuestions(playerId);
-        if (questionIds.isEmpty()) {
-            return List.of();
-        }
-        return QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds));
-    }
-
+    
     @Transactional
     public List<QuestionDTO> getNewQuestionsForCategory(MultiplayerQuestionsRequest request) {
         MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())

@@ -164,6 +164,31 @@ export class QuestionsService extends BaseService {
     );
   }
 
+  /** Path part for operation `restoreSessionQuestions()` */
+  static readonly RestoreSessionQuestionsPath = '/questions/{playerId}/restore';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `restoreSessionQuestions()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  restoreSessionQuestions$Response(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
+    return restoreSessionQuestions(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `restoreSessionQuestions$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  restoreSessionQuestions(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
+    return this.restoreSessionQuestions$Response(params, context).pipe(
+      map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
+    );
+  }
+
   /** Path part for operation `getActiveSessionQuestions()` */
   static readonly GetActiveSessionQuestionsPath = '/questions/multiplayer/{sessionId}/{playerId}';
 
@@ -211,31 +236,6 @@ export class QuestionsService extends BaseService {
   getThreeRandomCategories(params: GetThreeRandomCategories$Params, context?: HttpContext): Observable<Array<string>> {
     return this.getThreeRandomCategories$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<string>>): Array<string> => r.body)
-    );
-  }
-
-  /** Path part for operation `restoreSessionQuestions()` */
-  static readonly RestoreSessionQuestionsPath = '/questions/multiplayer/{playerId}/restore';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `restoreSessionQuestions()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  restoreSessionQuestions$Response(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<QuestionDto>>> {
-    return restoreSessionQuestions(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `restoreSessionQuestions$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  restoreSessionQuestions(params: RestoreSessionQuestions$Params, context?: HttpContext): Observable<Array<QuestionDto>> {
-    return this.restoreSessionQuestions$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<QuestionDto>>): Array<QuestionDto> => r.body)
     );
   }
 

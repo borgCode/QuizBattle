@@ -36,12 +36,6 @@ public class QuestionController {
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
-    @GetMapping("/multiplayer/{playerId}/restore")
-    public ResponseEntity<List<QuestionDTO>> restoreSessionQuestions(@PathVariable long playerId) {
-        return ResponseEntity.ok(multiplayerQuestionService.restoreSessionQuestions(playerId));
-    }
-
-    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/multiplayer/{playerId}/clear")
     public ResponseEntity<Void> clearPlayerSession(@PathVariable long playerId) {
         roundSessionService.finishSession(playerId);
@@ -67,6 +61,12 @@ public class QuestionController {
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
+    @GetMapping("/{playerId}/restore")
+    public ResponseEntity<List<QuestionDTO>> restoreSessionQuestions(@PathVariable long playerId) {
+        return ResponseEntity.ok(roundSessionService.restoreSessionQuestions(playerId));
+    }
+
+    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @PostMapping("/chapter/random-questions")
     public ResponseEntity<List<QuestionDTO>> getSinglePlayerRoundQuestions(@RequestParam long playerId) {
         return ResponseEntity.ok(singlePlayerQuestionService.getSinglePlayerRoundQuestions(playerId));
@@ -83,5 +83,5 @@ public class QuestionController {
     public ResponseEntity<ChapterRoundResults> getRoundResults(@PathVariable long playerId) {
         return ResponseEntity.ok(singlePlayerQuestionService.getRoundResults(playerId));
     }
-    
+
 }

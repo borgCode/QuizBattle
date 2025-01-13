@@ -38,14 +38,19 @@ public class SinglePlayerQuestionService {
     private final StatsService statsService;
 
     public List<QuestionDTO> getSinglePlayerRoundQuestions(long playerId) {
+        log.debug("Fetching single player round questions for player ID: {}", playerId);
+        
         ChapterSession session = chapterSessionService.getSession(playerId);
         String currentCategory = session.getCurrentCategory();
+        log.debug("Current category for player {}: {}", playerId, currentCategory);
 
         List<Question> questions = questionRepository.findFiveRandomQuestionsByCategory(currentCategory);
+        log.debug("Retrieved {} questions for category {}", questions.size(), currentCategory);
 
         List<Long> questionIds = questions.stream()
                 .map(Question::getId)
                 .toList();
+        log.debug("Question IDs for round: {}", questionIds);
 
         roundSessionService.initializeSession(
                 playerId,
@@ -53,11 +58,13 @@ public class SinglePlayerQuestionService {
                 currentCategory,
                 RoundType.SINGLE_PLAYER
         );
+        log.debug("Initialized round session for player {} with category {}", playerId, currentCategory);
 
         return QuestionMapper.multipleToDTO(questions);
     }
     
     public AnswerValidationResponse validateSingleplayerAnswer(SinglePlayerAnswerValidationRequest request) {
+        log.debug("Validating singleplayer answer for request: {}", request);
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
@@ -96,9 +103,14 @@ public class SinglePlayerQuestionService {
     }
 
     public ChapterRoundResults getRoundResults(Long playerId) {
+        log.debug("Retrieving round results for player {}", playerId);
+        
         List<Boolean> results = roundSessionService.getSessionAnswers(playerId);
+        log.debug("Retrieved session answers for player {}: {}", playerId, results);
+        
         roundSessionService.finishSession(playerId);
-
+        log.debug("Finished round session for player {}", playerId);
+        
         ChapterRoundResults roundResults = chapterSessionService.getRoundResults(playerId, results);
 
         if (roundResults.isChapterComplete() && !roundResults.isGameOver()) {
@@ -111,7 +123,9 @@ public class SinglePlayerQuestionService {
     }
 
     public void clearSession(long playerId) {
+        log.debug("Clearing all sessions for player {}", playerId);
         roundSessionService.finishSession(playerId);
         chapterSessionService.clearSession(playerId);
+        log.debug("Successfully cleared round and chapter sessions for player {}", playerId);
     }
 }
