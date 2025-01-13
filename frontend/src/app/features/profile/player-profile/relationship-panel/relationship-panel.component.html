@@ -1,13 +1,13 @@
 <ng-container *ngFor="let player of relationships">
   <div class="row align-items-center bg-light">
-    <div class="player-avatar col-4 p-2">
+    <div class="player-avatar col-4 col-md-3 col-lg-4 p-2">
       <img [src]="'data:image/jpeg;base64,' + player.base64Image" style="max-height: 40px; max-width: 40px"
            alt="player avatar" class="rounded-circle"/>
     </div>
-    <div class="player-name col-4 fw-bold">
+    <div class="player-name col-4 col-md-3 col-lg-4 fw-bold">
       {{ player.displayName }}
     </div>
-    <div class="btn-group col-4">
+    <div class="btn-group col-4 col-md-6 col-lg-4">
       <button class="btn btn-info btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
         Actions
       </button>
