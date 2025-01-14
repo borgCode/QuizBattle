@@ -2,6 +2,8 @@ package org.borg.backend.social.block.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.player.dto.PlayerDTO;
+import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 import static org.borg.backend.social.block.event.PlayerBlockEvent.PlayerBlockedEvent;
 
@@ -25,6 +28,7 @@ public class PlayerBlockService {
     private final PlayerService playerService;
     private final PlayerBlockRepository playerBlockRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final PlayerMapper playerMapper;
 
     @Transactional
     public void blockPlayer(Long blockerId, Long blockedId) {
@@ -92,5 +96,9 @@ public class PlayerBlockService {
             log.info("Player {} has blocked sender {} - silently preventing interaction", receiverId, senderId);
         }
         return isBlocked;
+    }
+
+    public List<PlayerDTO> getBlocked(long playerId) {
+        return playerMapper.multipleToDTO(playerBlockRepository.getBlockedPlayers(playerId));
     }
 }

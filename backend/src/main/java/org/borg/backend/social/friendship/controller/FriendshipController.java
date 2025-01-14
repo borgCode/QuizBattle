@@ -3,6 +3,7 @@ package org.borg.backend.social.friendship.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.model.FriendshipStatus;
 import org.borg.backend.social.friendship.dto.RelationshipsDTO;
 import org.borg.backend.social.friendship.service.FriendshipService;
@@ -24,6 +25,7 @@ import java.util.List;
 public class FriendshipController {
 
     private final FriendshipService friendshipService;
+    private final PlayerBlockService playerBlockService;
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/add")
@@ -62,7 +64,10 @@ public class FriendshipController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("/relationships/{playerId}")
     public ResponseEntity<RelationshipsDTO> getRelationships(@PathVariable long playerId) {
-        return ResponseEntity.ok(friendshipService.getRelationships(playerId));
+        return ResponseEntity.ok(RelationshipsDTO.builder()
+                .friends(friendshipService.getFriends(playerId))
+                .blocked(playerBlockService.getBlocked(playerId))
+                .build());
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#relationshipStatusRequest.playerId)")
