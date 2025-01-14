@@ -6,7 +6,6 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.BlockException;
-import org.borg.backend.social.block.dto.BlockRequest;
 import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.dto.PlayerInteraction;
@@ -14,7 +13,6 @@ import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.social.friendship.repository.FriendshipRepository;
 import org.borg.backend.social.friendship.service.FriendshipService;
 import org.borg.backend.social.notification.repository.NotificationRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,34 +65,34 @@ public class PlayerBlockIntegrationTest {
 
     @Test
     void shouldThrowError_WhenBlockingSelf() {
-        BlockRequest blockRequest = new BlockRequest(player1.getId(), player1.getId());
+        Long blockerId = player1.getId();
         
         BlockException exception = assertThrows(BlockException.class,
-                () -> playerBlockService.blockPlayer(blockRequest));
+                () -> playerBlockService.blockPlayer(blockerId, blockerId));
         assertAll("Post block self checks",
                 () -> assertEquals(BusinessErrorCodes.CANNOT_BLOCK_SELF, exception.getErrorCode()),
-                () -> assertEquals(String.format("Player %d attempted to block themselves", blockRequest.getSenderId()), exception.getMessage()));
+                () -> assertEquals(String.format("Player %d attempted to block themselves", blockerId), exception.getMessage()));
     }
 
     @Test
     void shouldThrowError_WhenBlockingAlreadyBlocked() {
-        BlockRequest blockRequest = new BlockRequest(player1.getId(), player2.getId());
+        Long blockerId = player1.getId();
+        Long blockedId = player2.getId();
 
-        playerBlockService.blockPlayer(blockRequest);
+        playerBlockService.blockPlayer(blockerId, blockedId);
 
         BlockException exception = assertThrows(BlockException.class,
-                () -> playerBlockService.blockPlayer(blockRequest));
+                () -> playerBlockService.blockPlayer(blockerId, blockedId));
         assertAll("Post block checks",
                 () -> assertEquals(BusinessErrorCodes.ALREADY_BLOCKED, exception.getErrorCode()),
                 () -> assertEquals(String.format("Player %d has already blocked player %d",
-                        blockRequest.getSenderId(), blockRequest.getReceiverId()), exception.getMessage()));
+                        blockerId, blockedId), exception.getMessage()));
     }
     @Test
     void shouldDeleteExistingFriendships() {
         createFriendship(player1, player2);
-
-        BlockRequest blockRequest = new BlockRequest(player1.getId(), player2.getId());
-        playerBlockService.blockPlayer(blockRequest);
+        
+        playerBlockService.blockPlayer(player1.getId(), player2.getId());
 
         await().atMost(Duration.ofSeconds(2))
                 .untilAsserted(() -> {
