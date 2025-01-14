@@ -31,11 +31,12 @@ public class ChapterService {
     private final ChapterProgressRepository chapterProgressRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChapterSessionService chapterSessionService;
+    private final ChapterMapper chapterMapper;
 
     public ChapterDTO getChapter(Long chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter not found for: " + chapterId));
-        return ChapterMapper.toDTO(chapter);
+        return chapterMapper.toDTO(chapter);
     }
 
     @Transactional

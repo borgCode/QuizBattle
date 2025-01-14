@@ -36,7 +36,8 @@ public class StoryService {
     private final ChapterRepository chapterRepository;
     private final PlayerProgressRepository playerProgressRepository;
     private final PlayerService playerService;
-    
+    private final ChapterMapper chapterMapper;
+
     @Transactional
     public AllStoriesDTO getAllStories(Long playerId) {
 
@@ -90,7 +91,7 @@ public class StoryService {
         return StoryOverviewDTO.builder()
                 .storyId(story.getId())
                 .title(story.getTitle())
-                .chapters(ChapterMapper.multipleToNoCategoriesDTO(chapters))
+                .chapters(chapterMapper.multipleToNoCategoriesDTO(chapters))
                 .playerProgress(PlayerProgressMapper.toDTO(playerProgress)).
                 build();
     }

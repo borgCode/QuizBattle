@@ -4,46 +4,20 @@ import org.borg.backend.game.singleplayer.dto.ChapterDTO;
 import org.borg.backend.game.singleplayer.dto.ChapterNoCategoriesDTO;
 import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.shared.util.ImageUtil;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class ChapterMapper {
+@Mapper(componentModel = "spring", imports = {ImageUtil.class})
+public interface ChapterMapper {
 
-    public static List<ChapterNoCategoriesDTO> multipleToNoCategoriesDTO(List<Chapter> chapters) {
-        List<ChapterNoCategoriesDTO> dtoList = new ArrayList<>();
-        for (Chapter chapter : chapters) {
-            ChapterNoCategoriesDTO chapterNoCategoriesDTO = ChapterNoCategoriesDTO.builder()
-                    .id(chapter.getId())
-                    .chapterNumber(chapter.getChapterNumber())
-                    .title(chapter.getTitle())
-                    .description(chapter.getDescription())
-                    .unlockCondition(chapter.getUnlockCondition())
-                    .base64Image(ImageUtil.encodeStoryImageToBase64(chapter.getImagePath()))
-                    .build();
-            dtoList.add(chapterNoCategoriesDTO);
-        }
+    @Mapping(target = "base64Image", expression = "java(ImageUtil.encodeStoryImageToBase64(chapter.getImagePath()))")
+    ChapterDTO toDTO(Chapter chapter);
 
-        return dtoList;
-    }
+    @Mapping(target = "base64Image", expression = "java(ImageUtil.encodeStoryImageToBase64(chapter.getImagePath()))")
+    ChapterNoCategoriesDTO chapterToChapterNoCategoriesDTO(Chapter chapter);  // Add this method
 
-    public static ChapterDTO toDTO(Chapter chapter) {
-        if (chapter == null) {
-            return null;
-        }
-
-        return ChapterDTO.builder()
-                .id(chapter.getId())
-                .chapterNumber(chapter.getChapterNumber())
-                .title(chapter.getTitle())
-                .rewardText(chapter.getRewardText())
-                .categories(chapter.getCategories())
-                .roundWinCondition(chapter.getRoundWinCondition())
-                .base64Image(ImageUtil.encodeStoryImageToBase64(chapter.getImagePath()))
-                .build();
-
-    }
-    
-    
+    @Mapping(target = "base64Image", expression = "java(ImageUtil.encodeStoryImageToBase64(chapter.getImagePath()))")
+    List<ChapterNoCategoriesDTO> multipleToNoCategoriesDTO(List<Chapter> chapters);
 }
