@@ -3,6 +3,7 @@ package org.borg.backend.integration.notification;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.notification.model.NotificationType;
 import org.borg.backend.social.notification.model.Notification;
@@ -10,10 +11,7 @@ import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.borg.backend.social.notification.service.NotificationCleanUpService;
 import org.borg.backend.social.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
@@ -45,6 +43,8 @@ public class NotificationIntegrationTest {
     private PlayerRepository playerRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private PlayerBlockRepository playerBlockRepository;
 
     @BeforeEach
     void setUp() {
@@ -175,6 +175,13 @@ public class NotificationIntegrationTest {
             return playerRepository.save(player);
         }
 
+        @AfterEach
+        void tearDown() {
+            playerBlockRepository.deleteAll();
+            playerRepository.deleteAll();
+            roleRepository.deleteAll();
+        }
+
         @Test
         void shouldHideNotifications_WhenPlayerBlocks() {
             Long receiverId = player1.getId();
@@ -196,6 +203,39 @@ public class NotificationIntegrationTest {
                         assertTrue(hiddenNotifications.stream().allMatch(Notification::isHiddenByBlock),
                                 "All notifications should be hidden after block");
                     });
+
+            Instant futureTime = Instant.now().plus(Duration.ofDays(15));
+            notificationCleanUpService.deleteHiddenNotifications(futureTime);
+        }
+
+        @Test
+        void shouldDeleteHiddenNotifications_WhenOlderThan14Days() {
+            Notification oldNotification = Notification.builder()
+                    .playerId(player1.getId())
+                    .senderId(player2.getId())
+                    .type(NotificationType.FRIEND_REQUEST)
+                    .message("Old notification")
+                    .hiddenByBlock(true)
+                    .createdAt(Instant.now().minus(Duration.ofDays(15)))
+                    .build();
+            notificationRepository.save(oldNotification);
+
+            Notification recentNotification = Notification.builder()
+                    .playerId(player1.getId())
+                    .senderId(player2.getId())
+                    .type(NotificationType.FRIEND_REQUEST)
+                    .message("Recent notification")
+                    .hiddenByBlock(true)
+                    .createdAt(Instant.now().minus(Duration.ofDays(13)))
+                    .build();
+            notificationRepository.save(recentNotification);
+
+            notificationCleanUpService.deleteHiddenNotifications();
+
+            List<Notification> remainingNotifications = notificationRepository.findAll();
+            assertEquals(1, remainingNotifications.size(), "Should only have recent notification");
+            assertEquals(recentNotification.getId(), remainingNotifications.get(0).getId(),
+                    "Recent notification should still exist");
         }
     }
 

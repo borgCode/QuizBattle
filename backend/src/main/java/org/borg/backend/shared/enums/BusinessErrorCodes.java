@@ -24,11 +24,6 @@ public enum BusinessErrorCodes {
     CANNOT_UNBLOCK_SELF(252, HttpStatus.BAD_REQUEST, "Player can't unblock themselves"),
     CANNOT_UNBLOCK_WHEN_NOT_BLOCKED(253, HttpStatus.BAD_REQUEST, "Can't unblock player that is not blocked"),
     CANNOT_SEND_FRIEND_REQUEST_TO_BLOCKED(254,HttpStatus.BAD_REQUEST, "Player can't friend someone that they have blocked"),
-    //TODO remove
-    CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP(204, HttpStatus.BAD_REQUEST, "Can't unblock friendship that isn't blocked"),
-    ALREADY_BLOCKED_FRIENDSHIP(205, HttpStatus.BAD_REQUEST, "The player is already blocked"),
-    CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER(200, HttpStatus.BAD_REQUEST, "Cannot send friend request to blocked user"),
-    
     
     REMATCH_REQUEST_ALREADY_SENT(300, HttpStatus.BAD_REQUEST, "Rematch request already sent"),
     GAME_ALREADY_ONGOING(301, HttpStatus.BAD_REQUEST, "Players already have a game against each other ongoing"),

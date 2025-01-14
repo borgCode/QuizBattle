@@ -166,14 +166,7 @@ public class FriendshipService {
 
         Long senderId = removeFriendRequest.getSenderId();
         Long receiverId = removeFriendRequest.getReceiverId();
-
-        if (playerBlockRepository.existsByBlockerIdAndBlockedId(senderId, receiverId)) {
-            log.warn("Cannot remove blocked friendship between players {} and {}", senderId, receiverId);
-            throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP,
-                    String.format("Cannot remove blocked friendship between players %d and %d",
-                            senderId, receiverId));
-        }
-
+        
         Player sendingPlayer = playerService.getPlayerById(senderId);
         Player receivingPlayer = playerService.getPlayerById(receiverId);
         log.debug("Player {} is removing player {} from their friends", senderId, receiverId);

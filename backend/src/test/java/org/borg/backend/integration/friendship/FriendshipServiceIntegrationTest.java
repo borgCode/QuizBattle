@@ -197,16 +197,6 @@ class FriendshipServiceIntegrationTest {
 
             assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
         }
-
-        //TODO IMPLEMENT AFTER ARCHIVE LOGIC
-//        @Test
-//        void shouldArchiveFriendRequest_WhenBlockedByReceiver() {
-//            playerBlockService.blockPlayer(player1.getId(), player2.getId());
-//
-//            friendshipService.sendFriendRequest(new PlayerInteraction(player2.getId(), player1.getId()));
-//            
-//            
-//        }
     }
 
     @Nested
