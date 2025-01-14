@@ -1,6 +1,5 @@
 package org.borg.backend.social.chat.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.borg.backend.player.model.Player;
@@ -26,7 +25,7 @@ public class Conversation {
     @ManyToOne
     @JoinColumn(name = "player2_id", nullable = false)
     private Player player2;
-    
+
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL)
     @OrderBy("sentAt ASC")
     private List<Message> messages = new ArrayList<>();
@@ -34,4 +33,12 @@ public class Conversation {
     @OneToOne
     @JoinColumn(name = "latest_message_id")
     private Message latestMessage;
+
+    public Player getOtherPlayer(Long currentPlayerId) {
+        return getPlayer1().getId().equals(currentPlayerId) ? getPlayer2() : getPlayer1();
+    }
+
+    public boolean isRead(Long currentPlayerId) {
+        return latestMessage.getSenderId().equals(currentPlayerId) || (latestMessage.getReceiverId().equals(currentPlayerId) && latestMessage.isRead());
+    }
 }

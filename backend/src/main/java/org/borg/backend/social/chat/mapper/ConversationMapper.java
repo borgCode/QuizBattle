@@ -16,9 +16,7 @@ public class ConversationMapper {
             return null;
         }
 
-        Player otherPlayer = conversation.getPlayer1().getId().equals(currentPlayerId)
-                ? conversation.getPlayer2()
-                : conversation.getPlayer1();
+        
 
         boolean isRead = isRead(conversation, currentPlayerId);
 
