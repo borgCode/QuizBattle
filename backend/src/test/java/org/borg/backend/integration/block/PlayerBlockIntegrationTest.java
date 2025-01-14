@@ -9,6 +9,10 @@ import org.borg.backend.shared.exceptions.BlockException;
 import org.borg.backend.social.block.dto.BlockRequest;
 import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.borg.backend.social.block.service.PlayerBlockService;
+import org.borg.backend.social.friendship.dto.PlayerInteraction;
+import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;
+import org.borg.backend.social.friendship.repository.FriendshipRepository;
+import org.borg.backend.social.friendship.service.FriendshipService;
 import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -38,6 +44,10 @@ public class PlayerBlockIntegrationTest {
     private Player player2;
     @Autowired
     private PlayerBlockService playerBlockService;
+    @Autowired
+    private FriendshipService friendshipService;
+    @Autowired
+    private FriendshipRepository friendshipRepository;
 
     @BeforeEach
     void setUp() {
@@ -79,6 +89,20 @@ public class PlayerBlockIntegrationTest {
                 () -> assertEquals(String.format("Player %d has already blocked player %d",
                         blockRequest.getSenderId(), blockRequest.getReceiverId()), exception.getMessage()));
     }
+    @Test
+    void shouldDeleteExistingFriendships() {
+        createFriendship(player1, player2);
+
+        BlockRequest blockRequest = new BlockRequest(player1.getId(), player2.getId());
+        playerBlockService.blockPlayer(blockRequest);
+
+        await().atMost(Duration.ofSeconds(2))
+                .untilAsserted(() -> {
+                    boolean existingFriendships = friendshipRepository
+                            .existsByPlayer1AndPlayer2OrPlayer1AndPlayer2(player1, player2, player2, player1);
+                    assertFalse(existingFriendships);
+                });
+    }
 
     private Player createAndSavePlayer(String playerName) {
         Role userRole = roleRepository.findByName("USER")
@@ -94,5 +118,12 @@ public class PlayerBlockIntegrationTest {
                 .build();
 
         return playerRepository.save(player);
+    }
+
+    private void createFriendship(Player player1, Player player2) {
+        PlayerInteraction playerInteraction = new PlayerInteraction(player1.getId(), player2.getId());
+        friendshipService.sendFriendRequest(playerInteraction);
+        
+        friendshipService.handleFriendshipResponse(new PlayerInteractionResponse(player2.getId(), player1.getId(), 1L), true);
     }
 }

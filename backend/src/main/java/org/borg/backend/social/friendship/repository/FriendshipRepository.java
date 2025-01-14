@@ -28,4 +28,8 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     List<Player> getBlockedPlayers(Long playerId);
 
     List<Friendship> findByPlayer1IdAndPlayer2IdOrPlayer1IdAndPlayer2Id(Long player1Id, Long player1Id1, Long player1Id2, Long player1Id3);
+
+    void deleteByPlayer1AndPlayer2OrPlayer1AndPlayer2(Player player1, Player player2, Player player11, Player player21);
+
+    boolean existsByPlayer1AndPlayer2OrPlayer1AndPlayer2(Player player1, Player player2, Player player11, Player player21);
 }
