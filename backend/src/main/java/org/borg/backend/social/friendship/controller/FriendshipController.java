@@ -47,20 +47,6 @@ public class FriendshipController {
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
-    @PostMapping("/block")
-    public ResponseEntity<Void> blockPlayer(@RequestBody PlayerInteraction request) {
-        friendshipService.blockPlayer(request);
-        return ResponseEntity.ok().build();
-    }
-
-    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
-    @PostMapping("/unblock")
-    public ResponseEntity<Void> unblockPlayer(@RequestBody PlayerInteraction request) {
-        friendshipService.unblockPlayer(request);
-        return ResponseEntity.ok().build();
-    }
-
-    @PreAuthorize("@customSecurityExpression.isPlayerOwner(#request.senderId)")
     @PostMapping("/remove")
     public ResponseEntity<Void> removeAsFriend(@RequestBody PlayerInteraction request) {
         friendshipService.removeAsFriend(request);

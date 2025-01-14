@@ -31,72 +31,72 @@ public class NotificationService {
         return notificationRepository.findByPlayerId(playerId);
     }
 
-    public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer) {
+    public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer, boolean isHidden) {
         String message = sendingPlayer.getDisplayName() + " sent you a friend request!";
-        buildAndSaveNotification(receiverId, sendingPlayer.getId(), FRIEND_REQUEST, message, null, null);
+        buildAndSaveNotification(receiverId, sendingPlayer.getId(), FRIEND_REQUEST, message, null, null, isHidden);
     }
 
     public void sendFriendAcceptedNotification(Long receiverId, Player sendingPlayer) {
         String message = sendingPlayer.getDisplayName() + " accepted your friend request!";
-        buildAndSaveNotification(receiverId, sendingPlayer.getId(), FRIEND_ACCEPTED, message, null, null);
+        buildAndSaveNotification(receiverId, sendingPlayer.getId(), FRIEND_ACCEPTED, message, null, null, false);
     }
 
     public void sendMatchStartedNotification(Long receivingId, String senderDisplayName, Long newSessionId) {
         String message = "Your match request against " + senderDisplayName + " was accepted!";
-        buildAndSaveNotification(receivingId, null, MATCH_ACCEPTED, message, newSessionId, null);
+        buildAndSaveNotification(receivingId, null, MATCH_ACCEPTED, message, newSessionId, null, false);
     }
 
     public void sendMatchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId) {
         String message = senderDisplayName + " requested a match against you!";
-        buildAndSaveNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId);
+        buildAndSaveNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId, false);
     }
 
     public void sendMatchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
         notificationRepository.deleteById(notificationId);
 
         String message = playerDisplayName + " accepted your match request!";
-        buildAndSaveNotification(playerToNotify, null, MATCH_ACCEPTED, message, newSessionId, null);
+        buildAndSaveNotification(playerToNotify, null, MATCH_ACCEPTED, message, newSessionId, null, false);
     }
 
     public void sendMatchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
         notificationRepository.deleteById(notificationId);
 
         String message = "Your match request against " + playerDisplayName + " was declined!";
-        buildAndSaveNotification(playerToNotify, null, MATCH_DECLINED, message, null, null);
+        buildAndSaveNotification(playerToNotify, null, MATCH_DECLINED, message, null, null, false);
     }
 
     public void sendRematchStartedNotification(Long receivingId, String senderDisplayName, Long newSessionId) {
         String message = "Your rematch request against " + senderDisplayName + " was accepted!";
-        buildAndSaveNotification(receivingId, null, REMATCH_ACCEPTED, message, newSessionId, null);
+        buildAndSaveNotification(receivingId, null, REMATCH_ACCEPTED, message, newSessionId, null, false);
     }
 
     public void sendRematchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId) {
         String message = senderDisplayName + " requested a rematch against you!";
-        buildAndSaveNotification(receivingId, senderId, REMATCH_REQUEST, message, null, pendingSessionId);
+        buildAndSaveNotification(receivingId, senderId, REMATCH_REQUEST, message, null, pendingSessionId, false);
     }
 
     public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
         notificationRepository.deleteById(notificationId);
 
         String message = playerDisplayName + " accepted your request for a rematch!";
-        buildAndSaveNotification(playerToNotify, null, REMATCH_ACCEPTED, message, newSessionId, null);
+        buildAndSaveNotification(playerToNotify, null, REMATCH_ACCEPTED, message, newSessionId, null, false);
     }
 
     public void sendRematchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
         notificationRepository.deleteById(notificationId);
 
         String message = "Your rematch request against " + playerDisplayName + " was declined!";
-        buildAndSaveNotification(playerToNotify, null, REMATCH_DECLINED, message, null, null);
+        buildAndSaveNotification(playerToNotify, null, REMATCH_DECLINED, message, null, null, false);
     }
 
     public void sendGameWonNotification(Long winnerId, String opponentDisplayName, Long sessionId) {
         String message = "You won your match against " + opponentDisplayName + "!";
-        buildAndSaveNotification(winnerId, null, GAME_WON, message, sessionId, null);
+        buildAndSaveNotification(winnerId, null, GAME_WON, message, sessionId, null, false);
     }
 
     public void sendGameLostNotification(Long loserId, String opponentDisplayName, Long sessionId) {
         String message = "You lost your match against " + opponentDisplayName + "!";
-        buildAndSaveNotification(loserId, null, GAME_LOST, message, sessionId, null);
+        buildAndSaveNotification(loserId, null, GAME_LOST, message, sessionId, null, false);
     }
 
     public void sendTieNotifications(List<Player> players, Long sessionId) {
@@ -104,13 +104,13 @@ public class NotificationService {
         Player player2 = players.get(1);
 
         String messagePlayer1 = "Your match against " + player1.getDisplayName() + " was tied!";
-        buildAndSaveNotification(player1.getId(), null, GAME_TIED, messagePlayer1, sessionId, null);
+        buildAndSaveNotification(player1.getId(), null, GAME_TIED, messagePlayer1, sessionId, null, false);
 
         String messagePlayer2 = "Your match against " + player2.getDisplayName() + " was tied!";
-        buildAndSaveNotification(player2.getId(), null, GAME_TIED, messagePlayer2, sessionId, null);
+        buildAndSaveNotification(player2.getId(), null, GAME_TIED, messagePlayer2, sessionId, null, false);
     }
 
-    private void buildAndSaveNotification(Long receiverId, Long senderId, NotificationType notificationType, String message, Long startedSessionId, Long pendingSessionId) {
+    private void buildAndSaveNotification(Long receiverId, Long senderId, NotificationType notificationType, String message, Long startedSessionId, Long pendingSessionId, boolean isHidden) {
         notificationRepository.save(Notification.builder()
                 .playerId(receiverId)
                 .senderId(senderId)
@@ -120,6 +120,7 @@ public class NotificationService {
                 .pendingSessionId(pendingSessionId)
                 .isRead(false)
                 .isArchived(false)
+                .hiddenByBlock(isHidden)
                 .createdAt(Instant.now())
                 .build());
     }

@@ -2,6 +2,7 @@ package org.borg.backend.social.friendship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
 import org.borg.backend.social.friendship.dto.RelationshipsDTO;
@@ -34,6 +35,7 @@ public class FriendshipService {
     private final PlayerService playerService;
     private final PlayerMapper playerMapper;
     private final PlayerBlockService playerBlockService;
+    private final PlayerBlockRepository playerBlockRepository;
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
@@ -46,14 +48,15 @@ public class FriendshipService {
         }
         Long senderId = request.getSenderId();
         Long receiverId = request.getReceiverId();
+
+        Player sendingPlayer = playerService.getPlayerById(request.getSenderId());
         
         if (playerBlockService.checkBlocksForFriendRequest(senderId, receiverId)) {
-            //TODO Archive notif for 14 days then delete
+            notificationService.sendFriendRequestNotification(receiverId, sendingPlayer, true);
             return;
         }
         log.info("No existing blocks between Player {} and Player {}", senderId, receiverId);
         
-        Player sendingPlayer = playerService.getPlayerById(request.getSenderId());
         Player receivingPlayer = playerService.getPlayerById(request.getReceiverId());
 
         List<Friendship> existingFriendships = friendshipRepository.
@@ -69,7 +72,7 @@ public class FriendshipService {
                     .status(FriendshipStatus.PENDING)
                     .build());
 
-            notificationService.sendFriendRequestNotification(receiverId, sendingPlayer);
+            notificationService.sendFriendRequestNotification(receiverId, sendingPlayer, true);
         } else {
             Friendship friendship = existingFriendships.get(0);
             log.debug("Existing friendship found with status: {}", friendship.getStatus());
@@ -113,28 +116,31 @@ public class FriendshipService {
         log.info("Entering handleFriendshipResponse: senderId = {}, receiverId = {}, wantsFriendship = {}",
                 response.getSenderId(), response.getReceiverId(), wantsFriendship);
         
-        Player sendingPlayer = playerService.getPlayerById(response.getSenderId());
-        Player receivingPlayer = playerService.getPlayerById(response.getReceiverId());
+        Long senderId = response.getSenderId();
+        Long receiverId = response.getReceiverId();
+        
+        Player sendingPlayer = playerService.getPlayerById(senderId);
+        Player receivingPlayer = playerService.getPlayerById(receiverId);
 
         List<Friendship> existingFriendships = friendshipRepository.
                 findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
                         sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
 
         if (existingFriendships.isEmpty()) {
-            log.warn("No friendship found between players {} and {}, deleting notification", sendingPlayer.getId(), receivingPlayer.getId());
+            log.warn("No friendship found between players {} and {}, deleting notification", senderId, receiverId);
             notificationRepository.deleteById(response.getNotificationId());
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND,
                     String.format("No friendship found between players %d and %d",
-                            sendingPlayer.getId(), receivingPlayer.getId()));
+                            senderId, receiverId));
         }
 
         Friendship friendship = existingFriendships.get(0);
 
         if (friendship.getStatus().equals(FriendshipStatus.ACTIVE)) {
-            log.warn("Friendship already exists between players {} and {}, cannot respond", sendingPlayer.getId(), receivingPlayer.getId());
+            log.warn("Friendship already exists between players {} and {}, cannot respond", senderId, receiverId);
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
                     String.format("Friendship already exists between players %d and %d",
-                            sendingPlayer.getId(), receivingPlayer.getId()));
+                            senderId, receiverId));
         }
         log.debug("Updating friendship status based on player response");
 
@@ -142,10 +148,10 @@ public class FriendshipService {
             friendship.setStatus(FriendshipStatus.ACTIVE);
             friendshipRepository.save(friendship);
             notificationService.sendFriendAcceptedNotification(response.getReceiverId(), sendingPlayer);
-            log.info("Friendship accepted between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
+            log.info("Friendship accepted between players {} and {}", senderId, receiverId);
         } else {
             friendshipRepository.delete(friendship);
-            log.info("Friendship request rejected between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
+            log.info("Friendship request rejected between players {} and {}", senderId, receiverId);
         }
 
         if (response.getNotificationId() != null) {
@@ -156,72 +162,22 @@ public class FriendshipService {
     }
 
     @Transactional
-    public void blockPlayer(PlayerInteraction blockRequest) {
-        log.info("Entering blockPlayer: senderId = {}, receiverId = {}", blockRequest.getSenderId(), blockRequest.getReceiverId());
-        
-        Player sendingPlayer = playerService.getPlayerById(blockRequest.getSenderId());
-        Player receivingPlayer = playerService.getPlayerById(blockRequest.getReceiverId());
-
-        List<Friendship> existingFriendships = friendshipRepository
-                .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
-                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
-
-        if (!existingFriendships.isEmpty()) {
-            Friendship existingFriendship = existingFriendships.get(0);
-            log.debug("Existing friendship found with status: {}", existingFriendship.getStatus());
-            
-            if (existingFriendship.getStatus() == FriendshipStatus.BLOCKED &&
-                    existingFriendship.getPlayer1().equals(sendingPlayer)) {
-                log.warn("Player {} has already blocked player {}", sendingPlayer.getId(), receivingPlayer.getId());
-                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP,
-                        String.format("Player %d has already blocked player %d",
-                                sendingPlayer.getId(), receivingPlayer.getId()));
-            }
-            log.info("Deleted existing friendship between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
-            friendshipRepository.delete(existingFriendship);
-        }
-        friendshipRepository.save(new Friendship(sendingPlayer, receivingPlayer, LocalDate.now(), FriendshipStatus.BLOCKED));
-        log.info("Friendship between players {} and {} is now blocked", sendingPlayer.getId(), receivingPlayer.getId());
-        
-        notificationService.deleteFriendRequestByPlayerIds(sendingPlayer.getId(), receivingPlayer.getId());
-        log.debug("Deleted pending friend request notification between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
-    }
-
-    public void unblockPlayer(PlayerInteraction unblockRequest) {
-        log.info("Entering unblockPlayer: senderId = {}, receiverId = {}", unblockRequest.getSenderId(), unblockRequest.getReceiverId());
-
-        Player sendingPlayer = playerService.getPlayerById(unblockRequest.getSenderId());
-        Player receivingPlayer = playerService.getPlayerById(unblockRequest.getReceiverId());
-        log.debug("Player {} is unblocking player {}", sendingPlayer.getId(), receivingPlayer.getId());
-
-        Optional<Friendship> existingFriendship = friendshipRepository.findByPlayer1AndPlayer2(sendingPlayer, receivingPlayer);
-        if (existingFriendship.isPresent()) {
-            Friendship friendship = existingFriendship.get();
-            if (friendship.getStatus() == FriendshipStatus.PENDING || friendship.getStatus() == FriendshipStatus.ACTIVE) {
-                log.warn("Cannot unblock active or pending friendship between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
-                throw new FriendshipException(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP,
-                        String.format("Cannot unblock active or pending friendship between players %d and %d",
-                                sendingPlayer.getId(), receivingPlayer.getId()));
-            }
-
-            if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
-                friendshipRepository.delete(friendship);
-                log.info("Friendship between players {} and {} has been unblocked", sendingPlayer.getId(), receivingPlayer.getId());
-            }
-        } else {
-            throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND,
-                    String.format("No friendship found between players %d and %d",
-                            sendingPlayer.getId(), receivingPlayer.getId()));
-        }
-    }
-
-    @Transactional
     public void removeAsFriend(PlayerInteraction removeFriendRequest) {
         log.info("Entering removeAsFriend: senderId = {}, receiverId = {}", removeFriendRequest.getSenderId(), removeFriendRequest.getReceiverId());
+
+        Long senderId = removeFriendRequest.getSenderId();
+        Long receiverId = removeFriendRequest.getReceiverId();
         
-        Player sendingPlayer = playerService.getPlayerById(removeFriendRequest.getSenderId());
-        Player receivingPlayer = playerService.getPlayerById(removeFriendRequest.getReceiverId());
-        log.debug("Player {} is removing player {} from their friends", sendingPlayer.getId(), receivingPlayer.getId());
+        if (playerBlockRepository.existsByBlockerIdAndBlockedId(senderId, receiverId)) {
+            log.warn("Cannot remove blocked friendship between players {} and {}", senderId, receiverId);
+            throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP,
+                    String.format("Cannot remove blocked friendship between players %d and %d",
+                            senderId, receiverId));
+        }
+        
+        Player sendingPlayer = playerService.getPlayerById(senderId);
+        Player receivingPlayer = playerService.getPlayerById(receiverId);
+        log.debug("Player {} is removing player {} from their friends", senderId, receiverId);
 
         List<Friendship> existingFriendships = friendshipRepository
                 .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
@@ -229,22 +185,15 @@ public class FriendshipService {
 
         if (!existingFriendships.isEmpty()) {
             Friendship friendship = existingFriendships.get(0);
-            log.debug("Existing friendship found with status: {}", friendship.getStatus());
-            if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
-                log.warn("Cannot remove blocked friendship between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
-                throw new FriendshipException(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP,
-                        String.format("Cannot remove blocked friendship between players %d and %d",
-                                sendingPlayer.getId(), receivingPlayer.getId()));
-            }
             if (friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 friendshipRepository.delete(friendship);
-                log.info("Removed friendship between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
+                log.info("Removed friendship between players {} and {}", senderId, receiverId);
 
             }
             if (friendship.getStatus() == FriendshipStatus.PENDING) {
                 friendshipRepository.delete(friendship);
-                notificationService.deleteFriendRequestByPlayerIds(receivingPlayer.getId(), sendingPlayer.getId());
-                log.debug("Deleted pending friend request notification between players {} and {}", receivingPlayer.getId(), sendingPlayer.getId());
+                notificationService.deleteFriendRequestByPlayerIds(receiverId, senderId);
+                log.debug("Deleted pending friend request notification between players {} and {}", receiverId, senderId);
             }
         }
     }
@@ -276,12 +225,7 @@ public class FriendshipService {
         }
 
         Friendship friendship = friendships.get(0);
-
-        if (friendship.getStatus() == FriendshipStatus.BLOCKED) {
-            return friendship.getPlayer1().getId().equals(request.getPlayerId()) ?
-                    FriendshipStatus.BLOCKED : FriendshipStatus.NONE;
-        }
-
+        
         if (friendship.getStatus() == FriendshipStatus.PENDING) {
             return friendship.getPlayer1().getId().equals(request.getPlayerId()) ?
                     FriendshipStatus.PENDING : FriendshipStatus.INCOMING_REQUEST;

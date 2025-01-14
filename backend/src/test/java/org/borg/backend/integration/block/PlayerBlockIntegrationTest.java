@@ -10,6 +10,7 @@ import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.dto.PlayerInteraction;
 import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;
+import org.borg.backend.social.friendship.dto.RelationshipsDTO;
 import org.borg.backend.social.friendship.repository.FriendshipRepository;
 import org.borg.backend.social.friendship.service.FriendshipService;
 import org.borg.backend.social.notification.repository.NotificationRepository;
@@ -151,6 +152,46 @@ public class PlayerBlockIntegrationTest {
         assertFalse(playerBlockRepository.existsByBlockerIdAndBlockedId(player2.getId(), player1.getId()),
                 "Second block should be removed");
     }
+    
+    //TODO getblockedPLayer
+
+//    @Test
+//    void getBlockedPlayersOnlyReturnsPlayersBlockedByRequestingPlayer() {
+//        Player thirdPlayer = createAndSavePlayer("thirdPlayer");
+//
+//        PlayerInteraction senderBlocksReceiver = new PlayerInteraction(player1.getId(), player2.getId());
+//        friendshipService.blockPlayer(senderBlocksReceiver);
+//
+//        PlayerInteraction thirdPlayerBlocksSender = new PlayerInteraction(thirdPlayer.getId(), player1.getId());
+//        friendshipService.blockPlayer(thirdPlayerBlocksSender);
+//
+//        RelationshipsDTO senderRelationships = friendshipService.getRelationships(player1.getId());
+//        RelationshipsDTO receiverRelationships = friendshipService.getRelationships(player2.getId());
+//        RelationshipsDTO thirdPlayerRelationships = friendshipService.getRelationships(thirdPlayer.getId());
+//
+//        assertAll("Blocked players visibility",
+//                () -> assertEquals(1, senderRelationships.getBlocked().size(),
+//                        "Player1 should see one blocked player"),
+//                () -> assertTrue(senderRelationships.getBlocked().stream()
+//                                .anyMatch(blocked -> blocked.getId().equals(player2.getId())),
+//                        "Player1 should see player2 as blocked"),
+//                () -> assertTrue(senderRelationships.getFriends().isEmpty(),
+//                        "Player1 should have no friends"),
+//
+//                () -> assertTrue(receiverRelationships.getBlocked().isEmpty(),
+//                        "Player2 should see no blocked players"),
+//                () -> assertTrue(receiverRelationships.getFriends().isEmpty(),
+//                        "Player2 should have no friends"),
+//
+//                () -> assertEquals(1, thirdPlayerRelationships.getBlocked().size(),
+//                        "ThirdPlayer should see one blocked player"),
+//                () -> assertTrue(thirdPlayerRelationships.getBlocked().stream()
+//                                .anyMatch(blocked -> blocked.getId().equals(player1.getId())),
+//                        "ThirdPlayer should see player1 as blocked"),
+//                () -> assertTrue(thirdPlayerRelationships.getFriends().isEmpty(),
+//                        "ThirdPlayer should have no friends")
+//        );
+//    }
 
     private Player createAndSavePlayer(String playerName) {
         Role userRole = roleRepository.findByName("USER")

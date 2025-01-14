@@ -39,6 +39,9 @@ public class Conversation {
     }
 
     public boolean isRead(Long currentPlayerId) {
+        if (latestMessage == null) {
+            return true;
+        }
         return latestMessage.getSenderId().equals(currentPlayerId) || (latestMessage.getReceiverId().equals(currentPlayerId) && latestMessage.isRead());
     }
 }

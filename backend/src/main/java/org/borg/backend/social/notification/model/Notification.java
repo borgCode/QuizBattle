@@ -25,6 +25,7 @@ public class Notification {
     private String message;
     private boolean isRead;
     private boolean isArchived;
+    private boolean hiddenByBlock;
     private Instant createdAt;
 }
 
