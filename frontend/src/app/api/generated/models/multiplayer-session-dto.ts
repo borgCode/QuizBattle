@@ -6,8 +6,8 @@ import { PlayerDto } from '../models/player-dto';
 export interface MultiplayerSessionDto {
   currentPlayerTurn?: PlayerDto;
   id?: number;
-  playerDTOList?: Array<PlayerDto>;
-  score?: {
+  playerDTOS?: Array<PlayerDto>;
+  scores?: {
 [key: string]: number;
 };
   status?: 'ACTIVE' | 'COMPLETED';

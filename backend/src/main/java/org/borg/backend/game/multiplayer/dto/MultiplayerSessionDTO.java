@@ -14,8 +14,8 @@ import java.util.Map;
 @Builder
 public class MultiplayerSessionDTO {
     private Long id;
-    private List<PlayerDTO> playerDTOList;
-    private Map<Long, Integer> score;
+    private List<PlayerDTO> playerDTOS;
+    private Map<Long, Integer> scores;
     private GameStatus status;
     private PlayerDTO currentPlayerTurn;
 }
