@@ -30,7 +30,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 class AuthServiceTest {
 
     @Mock
@@ -43,7 +42,8 @@ class AuthServiceTest {
     private AuthenticationManager authenticationManager;
     @Mock
     private JwtService jwtService;
-
+    @Mock
+    private PlayerMapper playerMapper;
 
     @InjectMocks
     private AuthService authService;
@@ -52,7 +52,6 @@ class AuthServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
 
     @Test
     void registerWithValidDataThenSucceed() {
@@ -96,7 +95,6 @@ class AuthServiceTest {
         assertFalse(capturedPlayer.isAccountLocked());
         assertTrue(capturedPlayer.isEnabled());
         assertEquals(List.of(userRole), capturedPlayer.getRoles());
-
     }
 
     @Test
@@ -130,7 +128,7 @@ class AuthServiceTest {
                     .username("testuser123")
                     .password("password123")
                     .build();
-            
+
             Authentication auth = Mockito.mock(Authentication.class);
 
             when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -164,7 +162,7 @@ class AuthServiceTest {
                     .base64Image("base64Image").
                     build();
 
-            mapperMock.when(() -> PlayerMapper.toDTO(mockPlayer))
+            mapperMock.when(() -> playerMapper.toDTO(mockPlayer))
                     .thenReturn(mockPlayerDTO);
 
             AuthResponse authResponse = authService.authenticate(authRequest);
@@ -173,21 +171,19 @@ class AuthServiceTest {
             assertEquals(mockPlayerDTO, authResponse.getPlayerDTO());
             assertEquals(accessToken, authResponse.getAccessToken());
             assertEquals(refreshToken, authResponse.getRefreshToken());
-
         }
     }
-    
     @Test
     void refreshTokenSuccess() {
 
         RefreshTokenRequest request = RefreshTokenRequest.builder()
                 .refreshToken("refreshToken").
                 build();
-        
+
         when(jwtService.createNewAccessToken(request.getRefreshToken())).thenReturn("newAccessToken");
 
         RefreshTokenResponse response = authService.refresh(request);
-        
+
         assertEquals("newAccessToken", response.getAccessToken());
         verify(jwtService).createNewAccessToken("refreshToken");
     }

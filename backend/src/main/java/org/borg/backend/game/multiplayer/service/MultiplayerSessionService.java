@@ -17,6 +17,7 @@ import java.util.List;
 public class MultiplayerSessionService {
 
     private final MultiplayerSessionRepository multiplayerSessionRepository;
+    private final PlayerMapper playerMapper;
 
     public MultiplayerSession getSessionById(Long sessionId) {
         return multiplayerSessionRepository.findById(sessionId)
@@ -29,10 +30,10 @@ public class MultiplayerSessionService {
         for (MultiplayerSession multiplayerSession : multiplayerSessions) {
             MultiplayerSessionDTO multiplayerSessionDTO = MultiplayerSessionDTO.builder()
                     .id(multiplayerSession.getId())
-                    .playerDTOList(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
+                    .playerDTOList(playerMapper.multipleToDTO(multiplayerSession.getPlayers()))
                     .score(multiplayerSession.getScore())
                     .status(multiplayerSession.getStatus())
-                    .currentPlayerTurn(PlayerMapper.toDTO(multiplayerSession.getCurrentPlayerTurn()))
+                    .currentPlayerTurn(playerMapper.toDTO(multiplayerSession.getCurrentPlayerTurn()))
                     .build();
             multiplayerSessionDTOS.add(multiplayerSessionDTO);
         }

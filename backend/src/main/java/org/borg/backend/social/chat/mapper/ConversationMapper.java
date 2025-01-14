@@ -1,69 +1,35 @@
 package org.borg.backend.social.chat.mapper;
 
+import lombok.RequiredArgsConstructor;
+import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.social.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.social.chat.dto.FullConversationDTO;
 import org.borg.backend.social.chat.model.Conversation;
-import org.borg.backend.player.mapper.PlayerMapper;
-import org.borg.backend.player.model.Player;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ConversationMapper {
+@Mapper(componentModel = "spring", uses = {PlayerMapper.class, MessageMapper.class})
+@RequiredArgsConstructor
+public abstract class ConversationMapper {
 
-    public static ConversationPreviewDTO toPreviewDTO(Conversation conversation, Long currentPlayerId) {
-        if (conversation == null) {
-            return null;
-        }
-
-        
-
-        boolean isRead = isRead(conversation, currentPlayerId);
-
-        return ConversationPreviewDTO.builder()
-                .id(conversation.getId())
-                .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
-                .latestMessageIsRead(isRead)
-                .latestMessage(conversation.getLatestMessage().getContent())
-                .build();
-    }
-
+    @Autowired
+    protected PlayerMapper playerMapper;
+    @Autowired
+    protected MessageMapper messageMapper;
     
-    public static List<ConversationPreviewDTO> multipleToDTO(List<Conversation> conversations, Long currentPlayerId) {
-        if (conversations == null || conversations.isEmpty()) {
-            return List.of();
-        }
+    @Mapping(target = "otherPlayer", expression = "java(playerMapper.toPlayerConversationDTO(conversation.getOtherPlayer(currentPlayerId)))")
+    @Mapping(target = "latestMessageIsRead", expression = "java(conversation.isRead(currentPlayerId))")
+    @Mapping(target = "latestMessage", source = "latestMessage.content")
+    public abstract ConversationPreviewDTO toPreviewDTO(Conversation conversation, @Context Long currentPlayerId);
 
-        return conversations.stream()
-                .map(conversation -> toPreviewDTO(conversation, currentPlayerId))
-                .collect(Collectors.toList());
-    }
+    public abstract List<ConversationPreviewDTO> multipleToDTO(List<Conversation> conversations, @Context Long currentPlayerId);
 
-    public static FullConversationDTO toFullConversationDTO(Conversation conversation, Long currentPlayerId) {
-        if (conversation == null) {
-            return null;
-        }
-
-        Player otherPlayer = conversation.getPlayer1().getId().equals(currentPlayerId)
-                ? conversation.getPlayer2()
-                : conversation.getPlayer1();
-        
-        boolean isRead = isRead(conversation, currentPlayerId);
-
-        return FullConversationDTO.builder()
-                .id(conversation.getId())
-                .otherPlayer(PlayerMapper.toPlayerConversationDTO(otherPlayer))
-                .messages(MessageMapper.multipleToDTO(conversation.getMessages()))
-                .latestMessageIsRead(isRead)
-                .build();
-    }
-
-    private static boolean isRead(Conversation conversation, Long currentPlayerId) {
-        if (conversation.getLatestMessage() == null) {
-            return true;
-        }
-        return conversation.getLatestMessage().getSenderId().equals(currentPlayerId) ||
-                (conversation.getLatestMessage().getReceiverId().equals(currentPlayerId) &&
-                        conversation.getLatestMessage().isRead());
-    }
+    @Mapping(target = "otherPlayer", expression = "java(playerMapper.toPlayerConversationDTO(conversation.getOtherPlayer(currentPlayerId)))")
+    @Mapping(target = "messages", expression = "java(messageMapper.multipleToDTO(conversation.getMessages()))")
+    @Mapping(target = "latestMessageIsRead", expression = "java(conversation.isRead(currentPlayerId))")
+    public abstract FullConversationDTO toFullConversationDTO(Conversation conversation, @Context Long currentPlayerId);
 }

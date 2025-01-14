@@ -40,6 +40,7 @@ public class GameService {
     private final RoundSessionService roundSessionService;
     private final StatsService statsService;
     private final MultiplayerSessionService multiplayerSessionService;
+    private final PlayerMapper playerMapper;
 
     public GameStateResponse getGameState(long sessionId, long playerId) {
         log.debug("Fetching game state for sessionId: {}, playerId: {}", sessionId, playerId);
@@ -62,7 +63,7 @@ public class GameService {
         log.debug("Game state fetched successfully for sessionId: {}, playerId: {}", sessionId, playerId);
         return GameStateResponse.builder()
                 .playerTurn(multiplayerSession.getCurrentPlayerTurn().getId())
-                .playerDTOS(PlayerMapper.multipleToDTO(multiplayerSession.getPlayers()))
+                .playerDTOS(playerMapper.multipleToDTO(multiplayerSession.getPlayers()))
                 .currentQuestionIndex(multiplayerSession.getCurrentQuestionIndex())
                 .scores(multiplayerSession.getScore())
                 .status(multiplayerSession.getStatus())

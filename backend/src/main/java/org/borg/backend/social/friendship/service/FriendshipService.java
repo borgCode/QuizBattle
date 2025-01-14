@@ -31,6 +31,7 @@ public class FriendshipService {
     private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
     private final PlayerService playerService;
+    private final PlayerMapper playerMapper;
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
@@ -248,7 +249,7 @@ public class FriendshipService {
     }
 
     public List<PlayerDTO> getFriends(Long playerId) {
-        return PlayerMapper.multipleToDTO(friendshipRepository.getActiveFriends(playerId));
+        return playerMapper.multipleToDTO(friendshipRepository.getActiveFriends(playerId));
     }
 
     public RelationshipsDTO getRelationships(Long playerId) {
@@ -256,8 +257,8 @@ public class FriendshipService {
         List<Player> blocked = friendshipRepository.getBlockedPlayers(playerId);
 
         return RelationshipsDTO.builder()
-                .friends(PlayerMapper.multipleToDTO(friends))
-                .blocked(PlayerMapper.multipleToDTO(blocked))
+                .friends(playerMapper.multipleToDTO(friends))
+                .blocked(playerMapper.multipleToDTO(blocked))
                 .build();
     }
 

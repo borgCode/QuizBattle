@@ -30,6 +30,8 @@ public class MessagingService {
     private final MessageRepository messageRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final PlayerService playerService;
+    private final ConversationMapper conversationMapper;
+    private final MessageMapper messageMapper;
 
     public FullConversationDTO createConversation(Long senderId, Long receiverId) {
         Player player1 = playerService.getPlayerById(senderId);
@@ -39,7 +41,7 @@ public class MessagingService {
                 .player1(player1)
                 .player2(player2)
                 .build());
-        return ConversationMapper.toFullConversationDTO(conversation, senderId);
+        return conversationMapper.toFullConversationDTO(conversation, senderId);
     }
 
     @Transactional
@@ -60,7 +62,7 @@ public class MessagingService {
         conversation.setLatestMessage(message);
         conversationRepository.save(conversation);
 
-        simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/message", MessageMapper.toDTO(message));
+        simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/message", messageMapper.toDTO(message));
 
         boolean isLastMessageRead = conversationRepository.isLatestMessageRead(conversation.getId());
 
@@ -100,7 +102,7 @@ public class MessagingService {
             return createConversation(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
         }
 
-        return ConversationMapper.toFullConversationDTO(conversation, conversationRequest.getSenderId());
+        return conversationMapper.toFullConversationDTO(conversation, conversationRequest.getSenderId());
     }
 
     public ConversationPreviewDTO getPreviewConversation(long conversationId, long playerId) {
@@ -110,13 +112,13 @@ public class MessagingService {
                                 String.format("Conversation not found for id: %s", conversationId)));
         
         if (conversation.getPlayer1().getId().equals(playerId) || conversation.getPlayer2().getId().equals(playerId)) {
-            return ConversationMapper.toPreviewDTO(conversation, playerId);
+            return conversationMapper.toPreviewDTO(conversation, playerId);
         } else {
             throw new AccessDeniedException("Not authorized to view this conversation");
         }
     }
 
     public List<ConversationPreviewDTO> getPlayerPreviewConversations(Long playerId) {
-        return ConversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
+        return conversationMapper.multipleToDTO(conversationRepository.findConversationsByPlayerId(playerId), playerId);
     }
 }

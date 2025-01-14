@@ -34,6 +34,7 @@ public class AuthService {
     private final PlayerRepository playerRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final PlayerMapper playerMapper;
 
     public void register(RegistrationRequest request) {
         Role userRole = roleRepository.findByName("USER")
@@ -66,7 +67,7 @@ public class AuthService {
         String accessToken = jwtService.generateToken(player);
         String refreshToken = jwtService.generateRefreshToken(player);
 
-        PlayerDTO playerDTO = PlayerMapper.toDTO(player);
+        PlayerDTO playerDTO = playerMapper.toDTO(player);
 
         return AuthResponse.builder()
                 .message("Login successful")

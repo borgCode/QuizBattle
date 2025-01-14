@@ -16,7 +16,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE Message m SET m.isRead = true " +
+    @Query("UPDATE Message m SET m.read = true " +
             "WHERE m.id IN :ids")
     void markMessagesAsRead(@Param("ids") List<Long> messageIds);
 

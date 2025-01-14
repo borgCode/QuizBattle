@@ -20,6 +20,6 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
             "WHERE c.player1.id = :player_id OR c.player2.id = :player_id")
     List<Conversation> findConversationsByPlayerId(@Param("player_id") Long playerId);
 
-    @Query("SELECT c.latestMessage.isRead FROM Conversation c WHERE c.id = :conversationId")
+    @Query("SELECT c.latestMessage.read FROM Conversation c WHERE c.id = :conversationId")
     boolean isLatestMessageRead(@Param("conversationId") Long conversationId);
 }

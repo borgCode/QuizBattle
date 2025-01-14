@@ -28,6 +28,8 @@ public class Message {
     private Long receiverId;
     
     private Instant sentAt;
+    
+    @Column(name = "is_read")
     private boolean read;
     private String content;
 }

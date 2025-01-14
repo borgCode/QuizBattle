@@ -25,6 +25,7 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final FileStorageService fileStorageService;
     private final PasswordEncoder passwordEncoder;
+    private final PlayerMapper playerMapper;
 
     public Player getPlayerById(Long playerId) {
         return playerRepository.findById(playerId)
@@ -32,7 +33,7 @@ public class PlayerService {
     }
 
     public PlayerDTO getPlayerDTOById(Long playerId) {
-        return PlayerMapper.toDTO(getPlayerById(playerId));
+        return playerMapper.toDTO(getPlayerById(playerId));
     }
 
     public void updatePlayer(UpdatePlayerRequest request) {
