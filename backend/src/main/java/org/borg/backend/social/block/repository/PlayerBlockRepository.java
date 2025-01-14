@@ -11,9 +11,7 @@ import java.util.List;
 @Repository
 public interface PlayerBlockRepository extends JpaRepository<PlayerBlock, Long> {
 
-    @Query("SELECT DISTINCT p FROM Player p " +
-            "JOIN Friendship f ON (f.player1.id = :playerId AND p = f.player2) " +
-            "WHERE f.status = 'BLOCKED'")
+    @Query("SELECT DISTINCT p.blocked FROM PlayerBlock p WHERE p.blocker.id = :playerId")
     List<Player> getBlockedPlayers(Long playerId);
     
     boolean existsByBlockerIdAndBlockedId(Long blockerId, Long blockedId);
