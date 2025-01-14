@@ -2,6 +2,7 @@ package org.borg.backend.integration.friendship;
 
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
+import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.service.FriendshipService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.social.friendship.model.FriendshipStatus;
@@ -51,6 +52,8 @@ class FriendshipServiceIntegrationTest {
 
     private Player player1;
     private Player player2;
+    @Autowired
+    private PlayerBlockService playerBlockService;
 
     @BeforeEach
     void setUp() {
@@ -195,19 +198,15 @@ class FriendshipServiceIntegrationTest {
             assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
         }
 
-        @Test
-        void throwErrorWhenSendingToBlockedFriendship() {
-            PlayerInteraction playerInteraction = new PlayerInteraction(player1.getId(), player2.getId());
-
-            friendshipService.blockPlayer(playerInteraction);
-
-            PlayerInteraction otherPlayerInteraction = new PlayerInteraction(player2.getId(), player1.getId());
-
-            FriendshipException exception = assertThrows(FriendshipException.class,
-                    () -> friendshipService.sendFriendRequest(otherPlayerInteraction));
-
-            assertEquals(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER, exception.getErrorCode());
-        }
+        //TODO IMPLEMENT AFTER ARCHIVE LOGIC
+//        @Test
+//        void shouldArchiveFriendRequest_WhenBlockedByReceiver() {
+//            playerBlockService.blockPlayer(player1.getId(), player2.getId());
+//
+//            friendshipService.sendFriendRequest(new PlayerInteraction(player2.getId(), player1.getId()));
+//            
+//            
+//        }
     }
 
     @Nested
@@ -237,80 +236,7 @@ class FriendshipServiceIntegrationTest {
             assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
         }
     }
-
-    @Nested
-    class BlockPlayerTests {
-
-        @Test
-        void successfullyBlockPlayer() {
-            PlayerInteraction playerInteraction = new PlayerInteraction(player1.getId(), player2.getId());
-
-            friendshipService.blockPlayer(playerInteraction);
-
-            Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
-
-            assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
-
-            Friendship actualFriendship = friendship.get();
-            assertAll("Post-block friendship",
-                    () -> assertEquals(player1, actualFriendship.getPlayer1(), "The player who blocked was not the expected player"),
-                    () -> assertEquals(player2, actualFriendship.getPlayer2(), "The blocked player was not the expected player"),
-                    () -> assertEquals(FriendshipStatus.BLOCKED, actualFriendship.getStatus(), "Friendship should be BLOCKED")
-            );
-        }
-
-        @Test
-        void blockingShouldRemoveFriendRequest() {
-            PlayerInteraction friendRequest = new PlayerInteraction(player1.getId(), player2.getId());
-            friendshipService.sendFriendRequest(friendRequest);
-
-            PlayerInteraction blockInteraction = new PlayerInteraction(player2.getId(), player1.getId());
-            friendshipService.blockPlayer(blockInteraction);
-
-            assertEquals(0, notificationRepository.findByPlayerId(player2.getId()).size(),
-                    "Player 1 should have no notifications after blocking player2");
-        }
-
-        @Test
-        void throwErrorWhenAlreadyBlocked() {
-            PlayerInteraction firstPlayerInteraction = new PlayerInteraction(player1.getId(), player2.getId());
-
-            friendshipService.blockPlayer(firstPlayerInteraction);
-
-            PlayerInteraction secondPlayerInteraction = new PlayerInteraction(player1.getId(), player2.getId());
-
-            FriendshipException exception = assertThrows(FriendshipException.class,
-                    () -> friendshipService.blockPlayer(secondPlayerInteraction));
-
-            assertEquals(BusinessErrorCodes.ALREADY_BLOCKED_FRIENDSHIP, exception.getErrorCode());
-        }
-
-        @Test
-        void successfullyUnblockPlayer() {
-            PlayerInteraction blockInteraction = new PlayerInteraction(player1.getId(), player2.getId());
-            friendshipService.blockPlayer(blockInteraction);
-
-            PlayerInteraction unblockInteraction = new PlayerInteraction(player1.getId(), player2.getId());
-            friendshipService.unblockPlayer(unblockInteraction);
-
-            Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
-            assertFalse(friendship.isPresent(), "Relationship was not deleted from repo after unblock");
-        }
-
-        @Test
-        void throwErrorWhenUnblockingNonBlockedPlayer() {
-            PlayerInteraction friendRequest = new PlayerInteraction(player1.getId(), player2.getId());
-            friendshipService.sendFriendRequest(friendRequest);
-
-            PlayerInteraction unblockInteraction = new PlayerInteraction(player1.getId(), player2.getId());
-
-            FriendshipException exception = assertThrows(FriendshipException.class,
-                    () -> friendshipService.unblockPlayer(unblockInteraction));
-
-            assertEquals(BusinessErrorCodes.CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP, exception.getErrorCode());
-        }
-    }
-
+    
     @Nested
     class RelationshipQueryTests {
         @Test

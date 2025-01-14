@@ -2,6 +2,7 @@ package org.borg.backend.social.friendship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
 import org.borg.backend.social.friendship.dto.RelationshipsDTO;
 import org.borg.backend.social.friendship.model.Friendship;
@@ -32,6 +33,7 @@ public class FriendshipService {
     private final NotificationRepository notificationRepository;
     private final PlayerService playerService;
     private final PlayerMapper playerMapper;
+    private final PlayerBlockService playerBlockService;
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {
@@ -42,7 +44,15 @@ public class FriendshipService {
             throw new FriendshipException(BusinessErrorCodes.CANNOT_FRIEND_SELF,
                     String.format("Player %d attempted to send friend request to themselves", request.getSenderId()));
         }
-
+        Long senderId = request.getSenderId();
+        Long receiverId = request.getReceiverId();
+        
+        if (playerBlockService.checkBlocksForFriendRequest(senderId, receiverId)) {
+            //TODO Archive notif for 14 days then delete
+            return;
+        }
+        log.info("No existing blocks between Player {} and Player {}", senderId, receiverId);
+        
         Player sendingPlayer = playerService.getPlayerById(request.getSenderId());
         Player receivingPlayer = playerService.getPlayerById(request.getReceiverId());
 
@@ -59,52 +69,43 @@ public class FriendshipService {
                     .status(FriendshipStatus.PENDING)
                     .build());
 
-            notificationService.sendFriendRequestNotification(receivingPlayer.getId(), sendingPlayer);
+            notificationService.sendFriendRequestNotification(receiverId, sendingPlayer);
         } else {
             Friendship friendship = existingFriendships.get(0);
             log.debug("Existing friendship found with status: {}", friendship.getStatus());
             if (friendship.getPlayer1().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
-                    case BLOCKED:
-                        log.warn("Player {} attempted to send friend request to blocked player {}", sendingPlayer.getId(), receivingPlayer.getId());
-                        throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER,
-                                String.format("Player %d attempted to send friend request to blocked player %d",
-                                        sendingPlayer.getId(), receivingPlayer.getId()));
                     case PENDING:
-                        log.warn("Friend request already pending from player {} to player {}", sendingPlayer.getId(), receivingPlayer.getId());
+                        log.warn("Friend request already pending from player {} to player {}", senderId, receiverId);
                         throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING,
                                 String.format("Friend request from player %d to player %d is already pending",
-                                        sendingPlayer.getId(), receivingPlayer.getId()));
+                                        senderId, receiverId));
                     case ACTIVE:
-                        log.warn("Friendship already exists between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
-                        throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
-                                String.format("Friendship already exists between players %d and %d",
-                                        sendingPlayer.getId(), receivingPlayer.getId()));
+                        throwAlreadyExistsException(senderId, receiverId);
                 }
             } else if (friendship.getPlayer2().equals(sendingPlayer)) {
                 switch (friendship.getStatus()) {
                     case ACTIVE:
-                        log.warn("Friendship already exists between players {} and {}", sendingPlayer.getId(), receivingPlayer.getId());
-                        throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
-                                String.format("Friendship already exists between players %d and %d",
-                                        sendingPlayer.getId(), receivingPlayer.getId()));
-                    case BLOCKED:
-                        log.warn("Player {} attempted to send friend request to blocked player {}", sendingPlayer.getId(), receivingPlayer.getId());
-                        throw new FriendshipException(BusinessErrorCodes.CANNOT_SENT_REQUEST_TO_BLOCKED_PLAYER,
-                                String.format("Player %d attempted to send friend request to blocked player %d",
-                                        sendingPlayer.getId(), receivingPlayer.getId()));
+                        throwAlreadyExistsException(senderId, receiverId);
                     case PENDING:
-                        log.info("Friend request accepted by player {}, updating status to ACTIVE", sendingPlayer.getId());
+                        log.info("Friend request accepted by player {}, updating status to ACTIVE", senderId);
                         friendship.setStatus(FriendshipStatus.ACTIVE);
                         friendshipRepository.save(friendship);
                         notificationService.sendFriendAcceptedNotification(friendship.getPlayer1().getId(), sendingPlayer);
                         notificationService.sendFriendAcceptedNotification(friendship.getPlayer2().getId(), receivingPlayer);
 
                         //Clean up the friend request notif in the case of both sending a request
-                        notificationService.deleteFriendRequestByPlayerIds(sendingPlayer.getId(), receivingPlayer.getId());
+                        notificationService.deleteFriendRequestByPlayerIds(senderId, receiverId);
                 }
             }
         }
+    }
+
+    private void throwAlreadyExistsException(Long senderId, Long receiverId) {
+        log.warn("Friendship already exists between players {} and {}", senderId, receiverId);
+        throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
+                String.format("Friendship already exists between players %d and %d",
+                        senderId, receiverId));
     }
 
     @Transactional
