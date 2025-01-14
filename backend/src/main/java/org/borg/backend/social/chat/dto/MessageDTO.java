@@ -14,6 +14,6 @@ public class MessageDTO {
     private Long id;
     private Long senderId;
     private Instant sentAt;
-    private boolean isRead;
+    private boolean read;
     private String content;
 }

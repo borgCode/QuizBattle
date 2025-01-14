@@ -54,7 +54,7 @@ public class MessagingService {
                 .receiverId(request.getReceiverId())
                 .content(request.getMessage())
                 .sentAt(Instant.now())
-                .isRead(false)
+                .read(false)
                 .build());
 
         conversation.setLatestMessage(message);
