@@ -42,7 +42,7 @@
       </ng-template>
     </ng-container>
   </div>
-  <div class="d-flex message-input-box" (keydown.enter)="sendMessage(conversation.id, conversation.otherPlayer.id, conversation.otherPlayer.userName); messageToSend=''">
+  <div class="d-flex message-input-box" (keydown.enter)="sendMessage(conversation.id, conversation.otherPlayer.id, conversation.otherPlayer.username); messageToSend=''">
     <input id="message-input" class="flex-grow-1" placeholder="Send message" autocomplete="off" [(ngModel)]="messageToSend">
   </div>
 </div>

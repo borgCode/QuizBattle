@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {PlayerMapper.class, MessageMapper.class})
-@RequiredArgsConstructor
 public abstract class ConversationMapper {
 
     @Autowired

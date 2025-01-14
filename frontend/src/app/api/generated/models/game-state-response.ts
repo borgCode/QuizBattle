@@ -15,7 +15,7 @@ export interface GameStateResponse {
   playerTurn?: number;
   playerWhoGaveUp?: number;
   questionIds?: Array<number>;
-  results?: Array<PlayerQuestionResult>;
+  questionResults?: Array<PlayerQuestionResult>;
   roundCategories?: Array<string>;
   scores?: {
 [key: string]: number;

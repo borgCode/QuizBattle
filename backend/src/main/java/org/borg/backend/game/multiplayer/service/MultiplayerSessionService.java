@@ -31,7 +31,7 @@ public class MultiplayerSessionService {
             MultiplayerSessionDTO multiplayerSessionDTO = MultiplayerSessionDTO.builder()
                     .id(multiplayerSession.getId())
                     .playerDTOList(playerMapper.multipleToDTO(multiplayerSession.getPlayers()))
-                    .score(multiplayerSession.getScore())
+                    .score(multiplayerSession.getScores())
                     .status(multiplayerSession.getStatus())
                     .currentPlayerTurn(playerMapper.toDTO(multiplayerSession.getCurrentPlayerTurn()))
                     .build();

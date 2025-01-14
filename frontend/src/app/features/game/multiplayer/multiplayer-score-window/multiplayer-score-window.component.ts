@@ -111,7 +111,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
         this.opponentDisplayName = gameState.playerDTOS[this.opponentIndex].displayName;
         this.opponentAvatar = 'data:image/jpeg;base64,' + gameState.playerDTOS[this.opponentIndex].base64Image;
 
-        this.results = this.gameState.results
+        this.results = this.gameState.questionResults
 
         this.results.forEach((result) => {
             if (result.playerId == this.storedPlayerId) {

@@ -22,7 +22,7 @@ public class GameStateResponse {
     private Integer currentQuestionIndex;
     private Map<Long, Integer> scores;
     private GameStatus status;
-    private Set<PlayerQuestionResult> results;
+    private Set<PlayerQuestionResult> questionResults;
     private List<Long> questionIds;
     private List<String> roundCategories;
     private Map<Long, Boolean> playerAcknowledgment;

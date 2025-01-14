@@ -3,6 +3,7 @@ package org.borg.backend.game.multiplayer.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
+import org.borg.backend.game.multiplayer.mapper.GameSessionMapper;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
@@ -27,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Map.Entry;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,6 +40,7 @@ public class GameService {
     private final StatsService statsService;
     private final MultiplayerSessionService multiplayerSessionService;
     private final PlayerMapper playerMapper;
+    private final GameSessionMapper gameSessionMapper;
 
     public GameStateResponse getGameState(long sessionId, long playerId) {
         log.debug("Fetching game state for sessionId: {}, playerId: {}", sessionId, playerId);
@@ -53,29 +53,9 @@ public class GameService {
             log.warn("Access denied for playerId: {} in sessionId: {}", playerId, sessionId);
             throw new AccessDeniedException("Not authorized to access this game session");
         }
-
-        Long playerWhoGaveUp = multiplayerSession.getPlayerHasGivenUp().entrySet().stream()
-                .filter(Entry::getValue)
-                .map(Entry::getKey)
-                .findFirst()
-                .orElse(null);
-
+        
         log.debug("Game state fetched successfully for sessionId: {}, playerId: {}", sessionId, playerId);
-        return GameStateResponse.builder()
-                .playerTurn(multiplayerSession.getCurrentPlayerTurn().getId())
-                .playerDTOS(playerMapper.multipleToDTO(multiplayerSession.getPlayers()))
-                .currentQuestionIndex(multiplayerSession.getCurrentQuestionIndex())
-                .scores(multiplayerSession.getScore())
-                .status(multiplayerSession.getStatus())
-                .results(multiplayerSession.getQuestionResults())
-                .questionIds(multiplayerSession.getQuestionIds())
-                .roundCategories(multiplayerSession.getRoundCategories())
-                .playerAcknowledgment(multiplayerSession.getPlayerAcknowledgment())
-                .playerWhoGaveUp(playerWhoGaveUp)
-                .winnerId(multiplayerSession.getWinnerId())
-                .loserId(multiplayerSession.getLoserId())
-                .isTie(multiplayerSession.getIsTie())
-                .build();
+        return gameSessionMapper.toGameStateResponse(multiplayerSession);
     }
 
     @Transactional
@@ -86,7 +66,7 @@ public class GameService {
         
         if (isCorrect) {
             log.debug("Updating score for playerId: {}", playerId);
-            Map<Long, Integer> scores = session.getScore();
+            Map<Long, Integer> scores = session.getScores();
             Integer playerScore = scores.getOrDefault(playerId, 0);
             scores.put(playerId, playerScore + 1);
             log.debug("PlayerId: {} new score: {}", playerId, playerScore + 1);
@@ -138,7 +118,7 @@ public class GameService {
         Long player1Id = players.get(0).getId();
         Long player2Id = players.get(1).getId();
 
-        Map<Long, Integer> scores = session.getScore();
+        Map<Long, Integer> scores = session.getScores();
         int score1 = scores.get(player1Id);
         int score2 = scores.get(player2Id);
 

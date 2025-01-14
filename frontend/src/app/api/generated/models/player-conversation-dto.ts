@@ -6,5 +6,5 @@ export interface PlayerConversationDto {
   base64Image?: string;
   displayName?: string;
   id?: number;
-  userName?: string;
+  username?: string;
 }

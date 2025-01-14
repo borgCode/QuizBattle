@@ -30,8 +30,8 @@ public class MultiplayerSession {
     @ElementCollection
     @CollectionTable(name = "player_scores")
     @MapKeyColumn(name = "player_id")
-    @Column(name = "score")
-    private Map<Long, Integer> score;
+    @Column(name = "scores")
+    private Map<Long, Integer> scores;
     
     @Enumerated(EnumType.STRING)
     private GameStatus status;
@@ -85,7 +85,7 @@ public class MultiplayerSession {
 
     public MultiplayerSession(Player player1, Player player2, Player currentPlayerTurn) {
         players = new ArrayList<>(List.of(player1, player2));
-        score = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
+        scores = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
         playerAcknowledgment = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
         playerWantsRematch = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
         playerHasGivenUp = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
@@ -93,5 +93,13 @@ public class MultiplayerSession {
         this.currentQuestionIndex = 0;
         this.currentPlayerTurn = currentPlayerTurn;
         questionsAnswered = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
+    }
+    
+    public Long getPlayerWhoGaveUpId() {
+        return getPlayerHasGivenUp().entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 }

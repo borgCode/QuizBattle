@@ -1,4 +1,20 @@
 package org.borg.backend.game.multiplayer.mapper;
 
-public interface GameSessionMapper {
+import org.borg.backend.game.multiplayer.dto.GameStateResponse;
+import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.player.mapper.PlayerMapper;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Mapper(componentModel = "spring", uses = PlayerMapper.class)
+public abstract class GameSessionMapper {
+    
+    @Autowired
+    protected PlayerMapper playerMapper;
+
+    @Mapping(target = "playerTurn", source = "currentPlayerTurn.id")
+    @Mapping(target = "playerDTOS", expression = "java(playerMapper.multipleToDTO(multiplayerSession.getPlayers()))")
+    @Mapping(target = "playerWhoGaveUp", expression = "java(multiplayerSession.getPlayerWhoGaveUpId())")
+    public abstract GameStateResponse toGameStateResponse(MultiplayerSession multiplayerSession);
 }

@@ -132,7 +132,7 @@ public class GameServiceGameFlowIntegrationTest {
                 .map(PlayerDTO::getId)
                 .toList();
 
-        List<Long> actualQuestionIds = gameStateResponse.getResults().stream()
+        List<Long> actualQuestionIds = gameStateResponse.getQuestionResults().stream()
                 .map(PlayerQuestionResult::getQuestionId)
                 .toList();
 
@@ -391,7 +391,7 @@ public class GameServiceGameFlowIntegrationTest {
             Map<Long, Integer> scores = new HashMap<>(Map.of(player1.getId(), player1Score, player2.getId(), player2Score));
             session.setCurrentPlayerTurn(player1);
             session.setQuestionsAnswered(questionAnswered);
-            session.setScore(scores);
+            session.setScores(scores);
             session.setStatus(GameStatus.ACTIVE);
 
             return session;
