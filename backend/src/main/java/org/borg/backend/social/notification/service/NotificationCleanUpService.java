@@ -44,4 +44,9 @@ public class NotificationCleanUpService {
                 instant.minus(Duration.ofHours(48))
         );
     }
+
+    @Scheduled(fixedRate = 10000)
+    public void deleteHiddenNotifications() {
+        notificationRepository.deleteHiddenByOlderThan(Instant.now().minus(Duration.ofDays(14)));
+    }
 }

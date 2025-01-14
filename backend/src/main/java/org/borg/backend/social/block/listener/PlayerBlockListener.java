@@ -21,7 +21,7 @@ public class PlayerBlockListener {
     private final NotificationRepository notificationRepository;
 
     @EventListener
-    @Transactional 
+    @Transactional
     public void handleFriendshipDeletion(PlayerBlockedEvent event) {
         PlayerBlock block = event.block();
         friendshipRepository.deleteByPlayer1AndPlayer2OrPlayer1AndPlayer2(
@@ -34,13 +34,12 @@ public class PlayerBlockListener {
 
     @EventListener
     @Async
-    public void handleNotificationDeletion(PlayerBlockedEvent event) {
-//        PlayerBlock block = event.block();
-//        notificationRepository.deleteByFromPlayerAndToPlayerOrFromPlayerAndToPlayer(
-//                block.getBlocker(), block.getBlocked(),
-//                block.getBlocked(), block.getBlocker()
-//        );
-//        log.info("Deleted notifications between players {} and {}",
-//                block.getBlocker().getId(), block.getBlocked().getId());
+    public void handleNotificationHiding(PlayerBlockedEvent event) {
+        Long blockerId = event.block().getBlocker().getId();
+        Long blockedId = event.block().getBlocked().getId();
+        notificationRepository.setNotificationsToHidden(blockerId, blockedId);
+
+        log.info("Hidden notifications from Player {} to Player {}",
+                blockerId, blockedId);
     }
 }
