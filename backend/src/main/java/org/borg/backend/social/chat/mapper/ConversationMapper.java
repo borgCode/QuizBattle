@@ -1,6 +1,5 @@
 package org.borg.backend.social.chat.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.social.chat.dto.ConversationPreviewDTO;
 import org.borg.backend.social.chat.dto.FullConversationDTO;

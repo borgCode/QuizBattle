@@ -1,19 +1,18 @@
 package org.borg.backend.auth.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.auth.dto.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.player.model.Stats;
-import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.shared.exceptions.DuplicateException;
 import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
+import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.security.JwtService;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.DuplicateException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;

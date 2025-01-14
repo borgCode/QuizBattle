@@ -12,7 +12,6 @@ import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.PasswordException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.borg.backend.storage.FileStorageService;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

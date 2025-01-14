@@ -13,7 +13,6 @@ import java.util.Base64;
 @Slf4j
 public class ImageUtil {
 
-
     public static String encodeAvatarImageFileToBase64(String subFilePath) {
         String basePath = "backend/src/main/java/org/borg/backend/storage/profile-pics/";
 
@@ -21,7 +20,7 @@ public class ImageUtil {
             try {
                 return loadAndEncodeResource("placeholder_profile_pic/placeholder.jpg");
             } catch (IOException e) {
-                //TODO error handling
+                log.warn("Error loading and encoding placeholder image, ", e);
             }
         }
 
@@ -30,22 +29,16 @@ public class ImageUtil {
             byte[] imageBytes = Files.readAllBytes(path);
             return Base64.getEncoder().encodeToString(imageBytes);
         } catch (IOException e) {
-            
-            //TODO error handling
-            System.err.println("Error encoding image file: " + subFilePath);
-            e.printStackTrace();
+            log.warn("Error encoding avatar image file: {}", subFilePath, e);
         }
         return null;
     }
-    
+
     public static String encodeStoryImageToBase64(String subFilePath) {
         try {
             return loadAndEncodeResource("story/" + subFilePath);
         } catch (IOException e) {
-
-            //TODO error handling
-            System.err.println("Error encoding image file: " + subFilePath);
-            e.printStackTrace();
+            log.warn("Error encoding story image file: {}", subFilePath, e);
         }
         return null;
     }
@@ -54,10 +47,7 @@ public class ImageUtil {
         try {
             return loadAndEncodeResource("achievement/" + subFilePath);
         } catch (IOException e) {
-
-            //TODO error handling
-            System.err.println("Error encoding image file: " + subFilePath);
-            e.printStackTrace();
+            log.warn("Error encoding achievement image file: {}", subFilePath, e);
         }
         return null;
     }

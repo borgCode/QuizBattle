@@ -178,7 +178,6 @@ class ChapterServiceIntegrationTest {
                         startLatch.await();
 
                         Long storyId = random.nextLong(3) + 1;
-                        log.warn("StoryId: " + storyId);
 
                         playerStoryIds.put(player.getId(), storyId);
 

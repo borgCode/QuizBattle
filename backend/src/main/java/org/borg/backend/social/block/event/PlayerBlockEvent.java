@@ -4,4 +4,5 @@ import org.borg.backend.social.block.model.PlayerBlock;
 
 public class PlayerBlockEvent {
     public record PlayerBlockedEvent(PlayerBlock block) {}
+    public record PlayedUnblockedEvent(Long blockerId, Long blockedId) {}
 }

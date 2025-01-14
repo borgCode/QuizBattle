@@ -17,11 +17,14 @@ public enum BusinessErrorCodes {
     FRIENDSHIP_REQUEST_PENDING(201, HttpStatus.BAD_REQUEST, "Friend request is already pending"),
     FRIENDSHIP_ALREADY_EXISTS(202, HttpStatus.BAD_REQUEST, "Friendship already exists"),
     FRIENDSHIP_NOT_FOUND(203, HttpStatus.BAD_REQUEST, "The friendship was not found"),
-    CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP(204, HttpStatus.BAD_REQUEST, "Can't unblock friendship that isn't blocked"),
     ALREADY_BLOCKED_FRIENDSHIP(205, HttpStatus.BAD_REQUEST, "The player is already blocked"),
     CANNOT_FRIEND_SELF(206, HttpStatus.BAD_REQUEST, "Player cannot friend themselves"),
     ALREADY_BLOCKED(250, HttpStatus.BAD_REQUEST, "The player is already blocked"),
     CANNOT_BLOCK_SELF(251, HttpStatus.BAD_REQUEST, "Player can't block themselves"),
+    CANNOT_UNBLOCK_SELF(252, HttpStatus.BAD_REQUEST, "Player can't unblock themselves"),
+    CANNOT_UNBLOCK_WHEN_NOT_BLOCKED(253, HttpStatus.BAD_REQUEST, "Can't unblock player that is not blocked"),
+    //TODO remove
+    CANNOT_UNBLOCK_ACTIVE_FRIENDSHIP(204, HttpStatus.BAD_REQUEST, "Can't unblock friendship that isn't blocked"),
     
     
     REMATCH_REQUEST_ALREADY_SENT(300, HttpStatus.BAD_REQUEST, "Rematch request already sent"),

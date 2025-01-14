@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toSet());
-        log.warn("Validation errors: " + validationErrors);
+        log.warn("Validation errors: {}", validationErrors);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

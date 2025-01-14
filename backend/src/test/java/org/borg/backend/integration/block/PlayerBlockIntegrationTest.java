@@ -66,7 +66,7 @@ public class PlayerBlockIntegrationTest {
     @Test
     void shouldThrowError_WhenBlockingSelf() {
         Long blockerId = player1.getId();
-        
+
         BlockException exception = assertThrows(BlockException.class,
                 () -> playerBlockService.blockPlayer(blockerId, blockerId));
         assertAll("Post block self checks",
@@ -88,10 +88,11 @@ public class PlayerBlockIntegrationTest {
                 () -> assertEquals(String.format("Player %d has already blocked player %d",
                         blockerId, blockedId), exception.getMessage()));
     }
+
     @Test
     void shouldDeleteExistingFriendships() {
         createFriendship(player1, player2);
-        
+
         playerBlockService.blockPlayer(player1.getId(), player2.getId());
 
         await().atMost(Duration.ofSeconds(2))
@@ -100,6 +101,55 @@ public class PlayerBlockIntegrationTest {
                             .existsByPlayer1AndPlayer2OrPlayer1AndPlayer2(player1, player2, player2, player1);
                     assertFalse(existingFriendships);
                 });
+    }
+
+    @Test
+    void shouldThrowError_WhenUnblockingSelf() {
+        Long blockerId = player1.getId();
+
+        BlockException exception = assertThrows(BlockException.class,
+                () -> playerBlockService.unblockPlayer(blockerId, blockerId));
+        assertAll("Post block self checks",
+                () -> assertEquals(BusinessErrorCodes.CANNOT_UNBLOCK_SELF, exception.getErrorCode()),
+                () -> assertEquals(String.format("Player %d attempted to unblock themselves", blockerId), exception.getMessage()));
+    }
+
+    @Test
+    void shouldThrowError_WhenUnblockingNonBlocked() {
+        Long blockerId = player1.getId();
+        Long blockedId = player2.getId();
+
+        BlockException exception = assertThrows(BlockException.class,
+                () -> playerBlockService.unblockPlayer(blockerId, blockedId));
+        assertAll("Post block checks",
+                () -> assertEquals(BusinessErrorCodes.CANNOT_UNBLOCK_WHEN_NOT_BLOCKED, exception.getErrorCode()),
+                () -> assertEquals(String.format("Player %d tried to unblock %d with no block active",
+                        blockerId, blockedId), exception.getMessage()));
+    }
+
+    @Test
+    void shouldNotPublishEvent_WhenOnlyOnePlayerUnblocks() {
+        playerBlockService.blockPlayer(player1.getId(), player2.getId());
+        playerBlockService.blockPlayer(player2.getId(), player1.getId());
+
+        playerBlockService.unblockPlayer(player1.getId(), player2.getId());
+
+        assertTrue(playerBlockRepository.existsByBlockerIdAndBlockedId(player2.getId(), player1.getId()),
+                "Reverse block should still exist");
+    }
+
+    @Test
+    void shouldPublishEvent_WhenBothPlayersUnblock() {
+        playerBlockService.blockPlayer(player1.getId(), player2.getId());
+        playerBlockService.blockPlayer(player2.getId(), player1.getId());
+
+        playerBlockService.unblockPlayer(player1.getId(), player2.getId());
+        playerBlockService.unblockPlayer(player2.getId(), player1.getId());
+
+        assertFalse(playerBlockRepository.existsByBlockerIdAndBlockedId(player1.getId(), player2.getId()),
+                "First block should be removed");
+        assertFalse(playerBlockRepository.existsByBlockerIdAndBlockedId(player2.getId(), player1.getId()),
+                "Second block should be removed");
     }
 
     private Player createAndSavePlayer(String playerName) {
@@ -121,7 +171,7 @@ public class PlayerBlockIntegrationTest {
     private void createFriendship(Player player1, Player player2) {
         PlayerInteraction playerInteraction = new PlayerInteraction(player1.getId(), player2.getId());
         friendshipService.sendFriendRequest(playerInteraction);
-        
+
         friendshipService.handleFriendshipResponse(new PlayerInteractionResponse(player2.getId(), player1.getId(), 1L), true);
     }
 }

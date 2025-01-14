@@ -12,14 +12,13 @@ import org.borg.backend.game.shared.enums.GameResult;
 import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.service.RoundSessionService;
-import org.borg.backend.social.notification.service.NotificationService;
 import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.player.mapper.PlayerMapper;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
+import org.borg.backend.social.notification.service.NotificationService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,6 @@ public class GameService {
     private final RoundSessionService roundSessionService;
     private final StatsService statsService;
     private final MultiplayerSessionService multiplayerSessionService;
-    private final PlayerMapper playerMapper;
     private final GameSessionMapper gameSessionMapper;
 
     public GameStateResponse getGameState(long sessionId, long playerId) {

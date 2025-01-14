@@ -6,6 +6,7 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.BlockException;
+import org.borg.backend.social.block.event.PlayerBlockEvent;
 import org.borg.backend.social.block.model.PlayerBlock;
 import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -52,5 +53,31 @@ public class PlayerBlockService {
         
         applicationEventPublisher.publishEvent(new PlayerBlockedEvent(block));
         log.info("Published player blocked event for {} and {}", blockerId, blockedId);
+    }
+    
+    @Transactional
+    public void unblockPlayer(Long blockerId, Long blockedId) {
+        log.info("Entering unblockPlayer: blockerId = {}, blockedId = {}", blockerId, blockedId);
+
+        if (blockerId.equals(blockedId)) {
+            log.warn("Player {} attempted to unblock themselves", blockerId);
+            throw new BlockException(BusinessErrorCodes.CANNOT_UNBLOCK_SELF, String.format("Player %d attempted to unblock themselves", blockerId));
+        }
+
+        if (!playerBlockRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId)) {
+            log.warn("Player {} tried to unblock {} with no block active", blockerId, blockedId);
+            throw new BlockException(BusinessErrorCodes.CANNOT_UNBLOCK_WHEN_NOT_BLOCKED, String.format("Player %d tried to unblock %d with no block active",
+                    blockerId, blockedId));
+        }
+        
+        playerBlockRepository.deleteByBlockerIdAndBlockedId(blockerId, blockedId);
+        log.info("Block from {} to {} removed", blockerId, blockedId);
+
+        if (playerBlockRepository.existsByBlockerIdAndBlockedId(blockedId, blockerId)) {
+            log.info("Block still exists from {} to {}", blockedId, blockerId);
+        } else {
+            applicationEventPublisher.publishEvent(new PlayerBlockEvent.PlayedUnblockedEvent(blockerId, blockedId));
+            log.info("Published player unblocked event for {} and {}", blockerId, blockedId);
+        }
     }
 }

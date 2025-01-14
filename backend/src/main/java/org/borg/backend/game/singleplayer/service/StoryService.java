@@ -68,7 +68,7 @@ public class StoryService {
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(playerId, story.getId());
 
         if (playerProgress == null) {
-            Player player = playerService.getPlayerById(playerId);;
+            Player player = playerService.getPlayerById(playerId);
 
             playerProgress = playerProgressRepository.save(PlayerProgress.builder()
                     .player(player)

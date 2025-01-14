@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlayerBlockRepository extends JpaRepository<PlayerBlock, Long> {
     boolean existsByBlockerIdAndBlockedId(Long blockerId, Long blockedId);
+
+    void deleteByBlockerIdAndBlockedId(Long blockerId, Long blockedId);
 }
