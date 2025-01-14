@@ -14,7 +14,6 @@ import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
 import org.borg.backend.shared.util.ImageUtil;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -30,9 +29,10 @@ public class AchievementService {
     private final UserUnlockedAchievementRepository userUnlockedAchievementRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final PlayerService playerService;
+    private final AchievementMapper achievementMapper;
 
     public List<UserUnlockedAchievementDTO> getUnlockedAchievements(long playerId) {
-        return AchievementMapper.multipleToUnlockedAchievementDTO(userUnlockedAchievementRepository.findAllByPlayerId(playerId));
+        return achievementMapper.multipleToUnlockedAchievementDTO(userUnlockedAchievementRepository.findAllByPlayerId(playerId));
     }
 
     public void handleStoryAchievement(Long playerId, String storyName) {

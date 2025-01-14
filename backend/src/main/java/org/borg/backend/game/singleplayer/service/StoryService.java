@@ -17,7 +17,6 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.player.repository.PlayerProgressRepository;
-import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
@@ -37,6 +36,7 @@ public class StoryService {
     private final PlayerProgressRepository playerProgressRepository;
     private final PlayerService playerService;
     private final ChapterMapper chapterMapper;
+    private final PlayerProgressMapper playerProgressMapper;
 
     @Transactional
     public AllStoriesDTO getAllStories(Long playerId) {
@@ -47,7 +47,7 @@ public class StoryService {
         List<PlayerProgressDTO> playerProgressDTOS = new ArrayList<>();
 
         for (Story story : stories) {
-            PlayerProgressDTO playerProgressDTO = PlayerProgressMapper.toDTO(getOrCreatePlayerProgress(playerId, story));
+            PlayerProgressDTO playerProgressDTO = playerProgressMapper.toDTO(getOrCreatePlayerProgress(playerId, story));
             playerProgressDTOS.add(playerProgressDTO);
 
             StoryDTO storyDTO = StoryDTO.builder()
@@ -92,7 +92,7 @@ public class StoryService {
                 .storyId(story.getId())
                 .title(story.getTitle())
                 .chapters(chapterMapper.multipleToNoCategoriesDTO(chapters))
-                .playerProgress(PlayerProgressMapper.toDTO(playerProgress)).
+                .playerProgress(playerProgressMapper.toDTO(playerProgress)).
                 build();
     }
 }
