@@ -11,7 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "questions")
+@Table(
+        name = "questions",
+        indexes = {
+                @Index(name = "IX_category", columnList = "category")
+        })
 public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
