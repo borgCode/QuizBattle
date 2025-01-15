@@ -11,11 +11,11 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { ChapterDto } from '../models/chapter-dto';
 import { clearChapter } from '../fn/chapter/clear-chapter';
 import { ClearChapter$Params } from '../fn/chapter/clear-chapter';
 import { getChapter } from '../fn/chapter/get-chapter';
 import { GetChapter$Params } from '../fn/chapter/get-chapter';
+import { PlayChapterDto } from '../models/play-chapter-dto';
 import { startChapter } from '../fn/chapter/start-chapter';
 import { StartChapter$Params } from '../fn/chapter/start-chapter';
 
@@ -84,7 +84,7 @@ export class ChapterService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getChapter$Response(params: GetChapter$Params, context?: HttpContext): Observable<StrictHttpResponse<ChapterDto>> {
+  getChapter$Response(params: GetChapter$Params, context?: HttpContext): Observable<StrictHttpResponse<PlayChapterDto>> {
     return getChapter(this.http, this.rootUrl, params, context);
   }
 
@@ -94,9 +94,9 @@ export class ChapterService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getChapter(params: GetChapter$Params, context?: HttpContext): Observable<ChapterDto> {
+  getChapter(params: GetChapter$Params, context?: HttpContext): Observable<PlayChapterDto> {
     return this.getChapter$Response(params, context).pipe(
-      map((r: StrictHttpResponse<ChapterDto>): ChapterDto => r.body)
+      map((r: StrictHttpResponse<PlayChapterDto>): PlayChapterDto => r.body)
     );
   }
 

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ChapterNoCategoriesDTO {
+public class ChapterOverviewDTO {
     private Long id;
     private Integer chapterNumber;
     private String title;

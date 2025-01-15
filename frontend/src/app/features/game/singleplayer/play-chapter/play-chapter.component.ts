@@ -11,6 +11,7 @@ import {animate, keyframes, style, transition, trigger} from '@angular/animation
 import {MatDialog} from '@angular/material/dialog';
 import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
 import {ContentDialogComponent} from "../shared-components/content-dialog/content-dialog.component";
+import {PlayChapterFacadeService} from './service/play-chapter-facade.service';
 
 @Component({
   selector: 'app-play-chapter',
@@ -39,8 +40,6 @@ import {ContentDialogComponent} from "../shared-components/content-dialog/conten
 })
 export class PlayChapterComponent implements OnInit, OnDestroy {
 
-  playerProgressId: number;
-  storyTitle: string;
   storyId: number;
   chapterId: number;
   categories: string[];
@@ -62,16 +61,14 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
     private chapterService: ChapterService,
     private questionService: QuestionsService,
     private loginStateService: LoginStateService,
     private resultsDialog: MatDialog,
     private endGameDialog: MatDialog
   ) {
-    this.playerProgressId = this.router.getCurrentNavigation().extras.state?.['playerProgressId'];
-    this.storyTitle = this.router.getCurrentNavigation().extras.state?.['storyTitle'];
     this.storyId = this.router.getCurrentNavigation().extras.state?.['storyId'];
-    console.log(this.storyTitle)
   }
 
   ngOnInit() {
@@ -92,7 +89,6 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
       next: () => {
         this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
           next: chapter => {
-            this.categories = chapter.categories;
             this.rewardText = chapter.rewardText;
             this.chapterTitle = chapter.title;
             this.chapterWinCondition = chapter.roundWinCondition;

@@ -2,7 +2,7 @@ package org.borg.backend.game.singleplayer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.game.singleplayer.dto.ChapterDTO;
+import org.borg.backend.game.singleplayer.dto.PlayChapterDTO;
 import org.borg.backend.game.singleplayer.dto.StartChapterRequest;
 import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
 import org.borg.backend.game.singleplayer.model.Chapter;
@@ -32,10 +32,10 @@ public class ChapterService {
     private final ChapterSessionService chapterSessionService;
     private final ChapterMapper chapterMapper;
 
-    public ChapterDTO getChapter(Long chapterId) {
+    public PlayChapterDTO getChapter(Long chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter not found for: " + chapterId));
-        return chapterMapper.toDTO(chapter);
+        return chapterMapper.toPlayChapterDTO(chapter);
     }
 
     @Transactional

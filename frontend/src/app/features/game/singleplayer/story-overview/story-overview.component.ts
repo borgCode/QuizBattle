@@ -7,7 +7,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
 import {MatDialog} from '@angular/material/dialog';
 import {ContentDialogComponent} from '../shared-components/content-dialog/content-dialog.component';
-import {ChapterNoCategoriesDto} from '../../../../api/generated/models/chapter-no-categories-dto';
+import {ChapterOverviewDto} from '../../../../api/generated/models/chapter-overview-dto';
 
 @Component({
     selector: 'app-story-overview',
@@ -20,7 +20,7 @@ import {ChapterNoCategoriesDto} from '../../../../api/generated/models/chapter-n
     styleUrl: './story-overview.component.css'
 })
 export class StoryOverviewComponent implements OnInit {
-    chapters: ChapterNoCategoriesDto[]
+    chapters: ChapterOverviewDto[]
     playerProgress: PlayerProgressDto;
     storyTitle: string;
     storyId: number
@@ -85,8 +85,6 @@ export class StoryOverviewComponent implements OnInit {
             if (result === "yes") {
                 this.router.navigate(['singleplayer/story/chapter', id], {
                     state: {
-                        playerProgressId: this.playerProgress.id,
-                        storyTitle: this.storyTitle,
                         storyId: this.storyId
                     }
                 })

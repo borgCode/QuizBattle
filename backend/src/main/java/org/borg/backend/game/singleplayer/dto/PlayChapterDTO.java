@@ -4,17 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Getter
 @Setter
 @Builder
-public class ChapterDTO {
-    private Long id;
-    private Integer chapterNumber;
+public class PlayChapterDTO {
     private Integer roundWinCondition;
     private String title;
     private String rewardText;
-    private String base64Image;
-    private Set<String> categories;
 }

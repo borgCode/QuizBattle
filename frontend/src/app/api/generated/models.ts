@@ -8,8 +8,7 @@ export type { AuthRequest } from './models/auth-request';
 export type { AuthResponse } from './models/auth-response';
 export type { CategoryStats } from './models/category-stats';
 export type { ChangePasswordRequest } from './models/change-password-request';
-export type { ChapterDto } from './models/chapter-dto';
-export type { ChapterNoCategoriesDto } from './models/chapter-no-categories-dto';
+export type { ChapterOverviewDto } from './models/chapter-overview-dto';
 export type { ChapterRoundResults } from './models/chapter-round-results';
 export type { ConversationPreviewDto } from './models/conversation-preview-dto';
 export type { ConversationRequest } from './models/conversation-request';
@@ -23,6 +22,7 @@ export type { MultiplayerAnswerValidationRequest } from './models/multiplayer-an
 export type { MultiplayerQuestionsRequest } from './models/multiplayer-questions-request';
 export type { MultiplayerSessionDto } from './models/multiplayer-session-dto';
 export type { Notification } from './models/notification';
+export type { PlayChapterDto } from './models/play-chapter-dto';
 export type { PlayerConversationDto } from './models/player-conversation-dto';
 export type { PlayerDto } from './models/player-dto';
 export type { PlayerInteraction } from './models/player-interaction';

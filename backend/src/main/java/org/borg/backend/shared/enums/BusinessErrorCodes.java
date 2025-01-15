@@ -13,7 +13,6 @@ public enum BusinessErrorCodes {
     BAD_CREDENTIALS(104, HttpStatus.FORBIDDEN, "Username and/or password is incorrect"),
     USERNAME_TAKEN(105, HttpStatus.BAD_REQUEST, "Username is taken"),
     
-    
     FRIENDSHIP_REQUEST_PENDING(201, HttpStatus.BAD_REQUEST, "Friend request is already pending"),
     FRIENDSHIP_ALREADY_EXISTS(202, HttpStatus.BAD_REQUEST, "Friendship already exists"),
     FRIENDSHIP_NOT_FOUND(203, HttpStatus.BAD_REQUEST, "The friendship was not found"),

@@ -8,13 +8,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ChapterDto } from '../../models/chapter-dto';
+import { PlayChapterDto } from '../../models/play-chapter-dto';
 
 export interface GetChapter$Params {
   chapterId: number;
 }
 
-export function getChapter(http: HttpClient, rootUrl: string, params: GetChapter$Params, context?: HttpContext): Observable<StrictHttpResponse<ChapterDto>> {
+export function getChapter(http: HttpClient, rootUrl: string, params: GetChapter$Params, context?: HttpContext): Observable<StrictHttpResponse<PlayChapterDto>> {
   const rb = new RequestBuilder(rootUrl, getChapter.PATH, 'get');
   if (params) {
     rb.path('chapterId', params.chapterId, {});
@@ -25,7 +25,7 @@ export function getChapter(http: HttpClient, rootUrl: string, params: GetChapter
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<ChapterDto>;
+      return r as StrictHttpResponse<PlayChapterDto>;
     })
   );
 }

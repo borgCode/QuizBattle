@@ -14,7 +14,7 @@ import java.util.List;
 public class StoryOverviewDTO {
     private Long storyId;
     private String title;
-    private List<ChapterNoCategoriesDTO> chapters;
+    private List<ChapterOverviewDTO> chapters;
     private PlayerProgressDTO playerProgress;
     
 }

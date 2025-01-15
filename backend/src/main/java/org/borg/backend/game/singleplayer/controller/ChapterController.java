@@ -2,7 +2,7 @@ package org.borg.backend.game.singleplayer.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.borg.backend.game.singleplayer.dto.ChapterDTO;
+import org.borg.backend.game.singleplayer.dto.PlayChapterDTO;
 import org.borg.backend.game.singleplayer.dto.StartChapterRequest;
 import org.borg.backend.game.singleplayer.service.ChapterService;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
@@ -20,7 +20,7 @@ public class ChapterController {
     private final SinglePlayerQuestionService singlePlayerQuestionService;
 
     @GetMapping("/{chapterId}")
-    public ResponseEntity<ChapterDTO> getChapter(@PathVariable long chapterId) {
+    public ResponseEntity<PlayChapterDTO> getChapter(@PathVariable long chapterId) {
         return ResponseEntity.ok().body(chapterService.getChapter(chapterId));
     }
 

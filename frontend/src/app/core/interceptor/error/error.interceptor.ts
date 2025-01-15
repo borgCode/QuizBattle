@@ -135,6 +135,12 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 400:
               errorMessage = 'Bad request';
               break;
+            case 401:
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('loggedInUser');
+              localStorage.removeItem('refreshToken');
+              this.router.navigate(['/login']);
+              break;
             case 403:
               errorMessage = 'You are not authorized to perform this action';
               break;

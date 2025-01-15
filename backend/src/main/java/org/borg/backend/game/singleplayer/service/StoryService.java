@@ -3,7 +3,6 @@ package org.borg.backend.game.singleplayer.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.singleplayer.dto.AllStoriesDTO;
-import org.borg.backend.game.singleplayer.dto.StoryDTO;
 import org.borg.backend.game.singleplayer.dto.StoryOverviewDTO;
 import org.borg.backend.game.singleplayer.dto.StoryOverviewRequest;
 import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
@@ -21,11 +20,9 @@ import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
-import org.borg.backend.shared.util.ImageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -102,7 +99,7 @@ public class StoryService {
         return StoryOverviewDTO.builder()
                 .storyId(story.getId())
                 .title(story.getTitle())
-                .chapters(chapterMapper.multipleToNoCategoriesDTO(chapters))
+                .chapters(chapterMapper.multipleToChapterOverviewDTO(chapters))
                 .playerProgress(playerProgressMapper.toDTO(playerProgress)).
                 build();
     }

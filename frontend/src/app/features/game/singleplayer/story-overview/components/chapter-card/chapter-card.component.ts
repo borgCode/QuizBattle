@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {ChapterNoCategoriesDto} from '../../../../../../api/generated/models/chapter-no-categories-dto';
+import {ChapterOverviewDto} from '../../../../../../api/generated/models/chapter-overview-dto';
 
 
 
@@ -11,6 +11,6 @@ import {ChapterNoCategoriesDto} from '../../../../../../api/generated/models/cha
   styleUrl: './chapter-card.component.css'
 })
 export class ChapterCardComponent{
-  @Input() chapter!: ChapterNoCategoriesDto;
+  @Input() chapter!: ChapterOverviewDto;
 
 }
