@@ -23,6 +23,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     long countByIdInAndPlayerIdNot(Collection<Long> ids, Long playerId);
 
+    void deleteByPlayerIdAndSenderId(Long playerId, Long senderId);
+
     void deleteByPlayerIdAndSenderIdAndType(Long playerId, Long senderId, NotificationType notificationType);
 
     @Modifying

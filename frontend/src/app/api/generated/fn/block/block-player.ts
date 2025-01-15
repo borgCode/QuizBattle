@@ -8,16 +8,17 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { PlayerInteraction } from '../../models/player-interaction';
 
-export interface UnblockPlayer$Params {
-      body: PlayerInteraction
+export interface BlockPlayer$Params {
+  blockerId: number;
+  blockedId: number;
 }
 
-export function unblockPlayer(http: HttpClient, rootUrl: string, params: UnblockPlayer$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, unblockPlayer.PATH, 'post');
+export function blockPlayer(http: HttpClient, rootUrl: string, params: BlockPlayer$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, blockPlayer.PATH, 'post');
   if (params) {
-    rb.body(params.body, 'application/json');
+    rb.query('blockerId', params.blockerId, {});
+    rb.query('blockedId', params.blockedId, {});
   }
 
   return http.request(
@@ -30,4 +31,4 @@ export function unblockPlayer(http: HttpClient, rootUrl: string, params: Unblock
   );
 }
 
-unblockPlayer.PATH = '/friendship/unblock';
+blockPlayer.PATH = '/block/block';

@@ -34,6 +34,7 @@ export type { RefreshTokenRequest } from './models/refresh-token-request';
 export type { RefreshTokenResponse } from './models/refresh-token-response';
 export type { RegistrationRequest } from './models/registration-request';
 export type { RelationshipsDto } from './models/relationships-dto';
+export type { RelationshipStatus } from './models/relationship-status';
 export type { RelationshipStatusRequest } from './models/relationship-status-request';
 export type { RematchRequest } from './models/rematch-request';
 export type { RoundSessionProgress } from './models/round-session-progress';

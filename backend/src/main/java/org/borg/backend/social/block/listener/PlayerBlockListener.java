@@ -34,12 +34,25 @@ public class PlayerBlockListener {
 
     @EventListener
     @Async
-    public void handleNotificationHiding(PlayerBlockedEvent event) {
+    @Transactional
+    public void handleReceivedNotificationsHiding(PlayerBlockedEvent event) {
         Long blockerId = event.block().getBlocker().getId();
         Long blockedId = event.block().getBlocked().getId();
         notificationRepository.setNotificationsToHidden(blockerId, blockedId);
 
         log.info("Hidden notifications from Player {} to Player {}",
+                blockedId, blockerId);
+    }
+
+    @EventListener
+    @Async
+    @Transactional
+    public void handleSentNotificationsDeletion(PlayerBlockedEvent event) {
+        Long blockerId = event.block().getBlocker().getId();
+        Long blockedId = event.block().getBlocked().getId();
+        notificationRepository.deleteByPlayerIdAndSenderId(blockedId, blockerId);
+
+        log.info("Deleting notifications from Player {} to Player {}",
                 blockerId, blockedId);
     }
 }

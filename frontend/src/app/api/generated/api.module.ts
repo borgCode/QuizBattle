@@ -15,6 +15,7 @@ import { MultiplayerGameService } from './services/multiplayer-game.service';
 import { MessageService } from './services/message.service';
 import { FriendshipService } from './services/friendship.service';
 import { ChapterService } from './services/chapter.service';
+import { BlockService } from './services/block.service';
 import { AuthenticationService } from './services/authentication.service';
 import { AchievementService } from './services/achievement.service';
 import { MultiplayerMatchmakingService } from './services/multiplayer-matchmaking.service';
@@ -36,6 +37,7 @@ import { MultiplayerMatchmakingService } from './services/multiplayer-matchmakin
     MessageService,
     FriendshipService,
     ChapterService,
+    BlockService,
     AuthenticationService,
     AchievementService,
     MultiplayerMatchmakingService,

@@ -5,6 +5,7 @@
 export interface Notification {
   archived?: boolean;
   createdAt?: string;
+  hiddenByBlock?: boolean;
   id?: number;
   message?: string;
   pendingSessionId?: number;

@@ -14,6 +14,7 @@ import {MultiplayerMatchService} from '../../../../api/generated/services/multip
 import {
   ConfirmationDialogComponent
 } from '../../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
+import {BlockService} from '../../../../api/generated/services/block.service';
 
 interface Box {
   color: string;
@@ -52,6 +53,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   hasAcknowledgedGameOver: boolean;
 
   friendshipStatus: string;
+  blockedStatus: boolean;
 
   constructor(
     private multiplayerGameService: MultiplayerGameService,
@@ -61,7 +63,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private gameOverDialog: MatDialog,
-    private confirmationDialog: MatDialog
+    private confirmationDialog: MatDialog,
+    private blockService: BlockService
   ) {
   }
 
@@ -163,7 +166,11 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     }).subscribe({
       next: value => {
         if (value) {
-          this.friendshipStatus = value;
+          if (value.blocked) {
+            this.friendshipStatus = "BLOCKED"
+          } else {
+            this.friendshipStatus = value.friendshipStatus
+          }
         }
 
       },
@@ -268,12 +275,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
         if (result === true) {
-          this.friendshipService.blockPlayer({
-            body: {
-              senderId: this.storedPlayerId,
-              receiverId: this.opponentId
-            }
-          }).subscribe({
+          this.blockService.blockPlayer({blockerId: this.storedPlayerId, blockedId: this.opponentId}).subscribe({
             next: () => {
               this.alertMessageService.show('Blocked player', 'success')
               this.getFriendshipStatus();
@@ -292,12 +294,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        this.friendshipService.unblockPlayer({
-          body: {
-            senderId: this.storedPlayerId,
-            receiverId: this.opponentId
-          }
-        }).subscribe({
+        this.blockService.unblockPlayer({blockerId: this.storedPlayerId, blockedId: this.opponentId}).subscribe({
           next: () => {
             this.alertMessageService.show('Unblocked player', 'success')
             this.getFriendshipStatus();

@@ -15,6 +15,7 @@ import {AsyncPipe, NgIf} from '@angular/common';
 import {UserUnlockedAchievementDto} from '../../../api/generated/models/user-unlocked-achievement-dto';
 import {AchievementService} from '../../../api/generated/services/achievement.service';
 import {AchievementsPanelComponent} from './achievements-panel/achievements-panel.component';
+import {BlockService} from '../../../api/generated/services/block.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -47,7 +48,8 @@ export class PlayerProfileComponent implements OnInit {
     private multiplayerMatchService: MultiplayerMatchService,
     private messageService: MessageService,
     private whisperWindowService: WhisperWindowService,
-    private achievementService: AchievementService
+    private achievementService: AchievementService,
+    private blockService: BlockService
   ) {
   }
 
@@ -112,12 +114,7 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "BLOCK":
-        this.friendshipService.blockPlayer({
-          body: {
-            senderId: this.player.id,
-            receiverId: $event.playerId
-          }
-        }).subscribe({
+        this.blockService.blockPlayer({blockerId: this.player.id, blockedId: $event.playerId}).subscribe({
           next: () => {
             this.alertMessageService.show("Blocked player", "success")
             this.getFriends()
@@ -128,12 +125,7 @@ export class PlayerProfileComponent implements OnInit {
         })
         break;
       case "UNBLOCK":
-        this.friendshipService.unblockPlayer({
-          body: {
-            senderId: this.player.id,
-            receiverId: $event.playerId
-          }
-        }).subscribe({
+        this.blockService.unblockPlayer({blockerId: this.player.id, blockedId: $event.playerId}).subscribe({
           next: () => {
             this.alertMessageService.show("Unblocked player", "success")
             this.getFriends()

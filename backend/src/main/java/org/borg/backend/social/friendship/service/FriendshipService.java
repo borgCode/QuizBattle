@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
-import org.borg.backend.social.friendship.dto.RelationshipsDTO;
 import org.borg.backend.social.friendship.model.Friendship;
 import org.borg.backend.social.friendship.model.FriendshipStatus;
 import org.borg.backend.social.friendship.dto.PlayerInteraction;
@@ -193,7 +192,7 @@ public class FriendshipService {
         return playerMapper.multipleToDTO(friendshipRepository.getActiveFriends(playerId));
     }
 
-    public FriendshipStatus getRelationshipStatus(RelationshipStatusRequest request) {
+    public FriendshipStatus getFriendshipStatus(RelationshipStatusRequest request) {
         List<Friendship> friendships = friendshipRepository
                 .findByPlayer1IdAndPlayer2IdOrPlayer1IdAndPlayer2Id(
                         request.getPlayerId(),

@@ -11,7 +11,6 @@ import org.borg.backend.shared.exceptions.FriendshipException;
 import org.borg.backend.social.friendship.dto.PlayerInteraction;
 import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
-import org.borg.backend.social.friendship.dto.RelationshipsDTO;
 import org.borg.backend.social.friendship.model.Friendship;
 import org.borg.backend.social.friendship.repository.FriendshipRepository;
 import org.borg.backend.social.notification.model.Notification;
@@ -234,22 +233,22 @@ class FriendshipServiceIntegrationTest {
             RelationshipStatusRequest request = new RelationshipStatusRequest(player1.getId(), player2.getId());
             RelationshipStatusRequest receiverRequest = new RelationshipStatusRequest(player2.getId(), player1.getId());
 
-            FriendshipStatus noneStatus = friendshipService.getRelationshipStatus(request);
+            FriendshipStatus noneStatus = friendshipService.getFriendshipStatus(request);
             assertEquals(FriendshipStatus.NONE, noneStatus, "Status should be NONE");
 
             PlayerInteraction friendRequestFromPlayer1 = new PlayerInteraction(player1.getId(), player2.getId());
             friendshipService.sendFriendRequest(friendRequestFromPlayer1);
 
-            FriendshipStatus pendingStatus = friendshipService.getRelationshipStatus(request);
+            FriendshipStatus pendingStatus = friendshipService.getFriendshipStatus(request);
             assertEquals(FriendshipStatus.PENDING, pendingStatus, "Sender should see PENDING status");
 
-            FriendshipStatus incomingStatus = friendshipService.getRelationshipStatus(receiverRequest);
+            FriendshipStatus incomingStatus = friendshipService.getFriendshipStatus(receiverRequest);
             assertEquals(FriendshipStatus.INCOMING_REQUEST, incomingStatus, "Receiver should see INCOMING_REQUEST status");
 
             PlayerInteraction friendRequestFromPlayer2 = new PlayerInteraction(player2.getId(), player1.getId());
             friendshipService.sendFriendRequest(friendRequestFromPlayer2);
 
-            FriendshipStatus activeStatus = friendshipService.getRelationshipStatus(request);
+            FriendshipStatus activeStatus = friendshipService.getFriendshipStatus(request);
             assertEquals(FriendshipStatus.ACTIVE, activeStatus, "Status should be ACTIVE");
         }
     }

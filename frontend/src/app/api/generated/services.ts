@@ -11,6 +11,7 @@ export { MultiplayerGameService } from './services/multiplayer-game.service';
 export { MessageService } from './services/message.service';
 export { FriendshipService } from './services/friendship.service';
 export { ChapterService } from './services/chapter.service';
+export { BlockService } from './services/block.service';
 export { AuthenticationService } from './services/authentication.service';
 export { AchievementService } from './services/achievement.service';
 export { MultiplayerMatchmakingService } from './services/multiplayer-matchmaking.service';

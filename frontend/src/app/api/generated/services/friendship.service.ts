@@ -15,8 +15,6 @@ import { acceptFriend } from '../fn/friendship/accept-friend';
 import { AcceptFriend$Params } from '../fn/friendship/accept-friend';
 import { addFriend } from '../fn/friendship/add-friend';
 import { AddFriend$Params } from '../fn/friendship/add-friend';
-import { blockPlayer } from '../fn/friendship/block-player';
-import { BlockPlayer$Params } from '../fn/friendship/block-player';
 import { getFriends } from '../fn/friendship/get-friends';
 import { GetFriends$Params } from '../fn/friendship/get-friends';
 import { getRelationships } from '../fn/friendship/get-relationships';
@@ -27,40 +25,14 @@ import { PlayerDto } from '../models/player-dto';
 import { rejectFriendship } from '../fn/friendship/reject-friendship';
 import { RejectFriendship$Params } from '../fn/friendship/reject-friendship';
 import { RelationshipsDto } from '../models/relationships-dto';
+import { RelationshipStatus } from '../models/relationship-status';
 import { removeAsFriend } from '../fn/friendship/remove-as-friend';
 import { RemoveAsFriend$Params } from '../fn/friendship/remove-as-friend';
-import { unblockPlayer } from '../fn/friendship/unblock-player';
-import { UnblockPlayer$Params } from '../fn/friendship/unblock-player';
 
 @Injectable({ providedIn: 'root' })
 export class FriendshipService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
-  }
-
-  /** Path part for operation `unblockPlayer()` */
-  static readonly UnblockPlayerPath = '/friendship/unblock';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `unblockPlayer()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  unblockPlayer$Response(params: UnblockPlayer$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return unblockPlayer(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `unblockPlayer$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  unblockPlayer(params: UnblockPlayer$Params, context?: HttpContext): Observable<void> {
-    return this.unblockPlayer$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
   }
 
   /** Path part for operation `removeAsFriend()` */
@@ -109,31 +81,6 @@ export class FriendshipService extends BaseService {
    */
   rejectFriendship(params: RejectFriendship$Params, context?: HttpContext): Observable<void> {
     return this.rejectFriendship$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
-  }
-
-  /** Path part for operation `blockPlayer()` */
-  static readonly BlockPlayerPath = '/friendship/block';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `blockPlayer()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  blockPlayer$Response(params: BlockPlayer$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return blockPlayer(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `blockPlayer$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  blockPlayer(params: BlockPlayer$Params, context?: HttpContext): Observable<void> {
-    return this.blockPlayer$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
@@ -222,7 +169,7 @@ export class FriendshipService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getRelationshipStatus$Response(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'>> {
+  getRelationshipStatus$Response(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<RelationshipStatus>> {
     return getRelationshipStatus(this.http, this.rootUrl, params, context);
   }
 
@@ -232,9 +179,9 @@ export class FriendshipService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getRelationshipStatus(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'> {
+  getRelationshipStatus(params: GetRelationshipStatus$Params, context?: HttpContext): Observable<RelationshipStatus> {
     return this.getRelationshipStatus$Response(params, context).pipe(
-      map((r: StrictHttpResponse<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'>): 'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE' => r.body)
+      map((r: StrictHttpResponse<RelationshipStatus>): RelationshipStatus => r.body)
     );
   }
 

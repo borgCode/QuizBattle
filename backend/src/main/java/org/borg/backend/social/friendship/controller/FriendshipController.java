@@ -4,13 +4,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.social.block.service.PlayerBlockService;
+import org.borg.backend.social.friendship.dto.*;
 import org.borg.backend.social.friendship.model.FriendshipStatus;
-import org.borg.backend.social.friendship.dto.RelationshipsDTO;
 import org.borg.backend.social.friendship.service.FriendshipService;
-import org.borg.backend.social.friendship.dto.PlayerInteraction;
-import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;
 import org.borg.backend.player.dto.PlayerDTO;
-import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -72,7 +69,12 @@ public class FriendshipController {
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#relationshipStatusRequest.playerId)")
     @GetMapping("/relationship/status")
-    public ResponseEntity<FriendshipStatus> getRelationshipStatus(RelationshipStatusRequest relationshipStatusRequest) {
-        return ResponseEntity.ok(friendshipService.getRelationshipStatus(relationshipStatusRequest));
+    public ResponseEntity<RelationshipStatus> getRelationshipStatus(RelationshipStatusRequest relationshipStatusRequest) {
+        if (playerBlockService.checkBlockForRelationshipStatus(relationshipStatusRequest)) {
+            return ResponseEntity.ok(new RelationshipStatus(null, true));
+        }
+        
+        FriendshipStatus friendshipStatus = friendshipService.getFriendshipStatus(relationshipStatusRequest);
+        return ResponseEntity.ok(new RelationshipStatus(friendshipStatus, false));
     }
 }

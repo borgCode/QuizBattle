@@ -8,13 +8,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { RelationshipStatus } from '../../models/relationship-status';
 import { RelationshipStatusRequest } from '../../models/relationship-status-request';
 
 export interface GetRelationshipStatus$Params {
   relationshipStatusRequest: RelationshipStatusRequest;
 }
 
-export function getRelationshipStatus(http: HttpClient, rootUrl: string, params: GetRelationshipStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'>> {
+export function getRelationshipStatus(http: HttpClient, rootUrl: string, params: GetRelationshipStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<RelationshipStatus>> {
   const rb = new RequestBuilder(rootUrl, getRelationshipStatus.PATH, 'get');
   if (params) {
     rb.query('relationshipStatusRequest', params.relationshipStatusRequest, {});
@@ -25,7 +26,7 @@ export function getRelationshipStatus(http: HttpClient, rootUrl: string, params:
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<'PENDING' | 'INCOMING_REQUEST' | 'ACTIVE' | 'BLOCKED' | 'NONE'>;
+      return r as StrictHttpResponse<RelationshipStatus>;
     })
   );
 }
