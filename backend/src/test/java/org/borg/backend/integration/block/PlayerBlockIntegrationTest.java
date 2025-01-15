@@ -175,7 +175,7 @@ public class PlayerBlockIntegrationTest {
                 () -> assertEquals(NotificationType.FRIEND_REQUEST, hiddenNotification.getType()),
                 () -> assertTrue(hiddenNotification.isHiddenByBlock()),
                 () -> assertEquals(player2.getId(), hiddenNotification.getSenderId()),
-                () -> assertEquals(player1.getId(), hiddenNotification.getPlayerId())
+                () -> assertEquals(player1.getId(), hiddenNotification.getRecipientId())
         );
     }
     

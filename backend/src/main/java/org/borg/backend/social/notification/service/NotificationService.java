@@ -124,7 +124,7 @@ public class NotificationService {
 
     private void buildAndSaveNotification(Long receiverId, Long senderId, NotificationType notificationType, String message, Long startedSessionId, Long pendingSessionId) {
         notificationRepository.save(Notification.builder()
-                .playerId(receiverId)
+                .recipientId(receiverId)
                 .senderId(senderId)
                 .type(notificationType)
                 .message(message)
@@ -139,7 +139,7 @@ public class NotificationService {
 
     private void buildAndSaveHiddenNotification(Long receiverId, Long senderId, NotificationType notificationType, String message, Long startedSessionId, Long pendingSessionId) {
         notificationRepository.save(Notification.builder()
-                .playerId(receiverId)
+                .recipientId(receiverId)
                 .senderId(senderId)
                 .type(notificationType)
                 .message(message)
@@ -155,7 +155,7 @@ public class NotificationService {
     public void markAsRead(long notificationId, long playerId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for: " + notificationId));
-        if (!notification.getPlayerId().equals(playerId)) {
+        if (!notification.getRecipientId().equals(playerId)) {
             throw new AccessDeniedException("Not authorized to mark notification as read");
         }
 
@@ -164,7 +164,7 @@ public class NotificationService {
     }
 
     public void markAllAsRead(List<Long> notificationIds, long playerId) {
-        long invalidIdCount = notificationRepository.countByIdInAndPlayerIdNot(notificationIds, playerId);
+        long invalidIdCount = notificationRepository.countByIdInAndRecipientIdNot(notificationIds, playerId);
 
         if (invalidIdCount > 0) {
             throw new AccessDeniedException("Not authorized to mark notifications as read");
@@ -177,7 +177,7 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for " + notificationId));
 
-        if (!notification.getPlayerId().equals(playerId)) {
+        if (!notification.getRecipientId().equals(playerId)) {
             throw new AccessDeniedException("Not authorized to mark notification as archived");
         }
 
@@ -186,11 +186,11 @@ public class NotificationService {
     }
 
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {
-        notificationRepository.deleteByPlayerIdAndSenderIdAndType(id, id1, FRIEND_REQUEST);
+        notificationRepository.deleteByRecipientIdAndSenderIdAndType(id, id1, FRIEND_REQUEST);
     }
 
     public void deleteMatchRequestNotification(Long playerId, Long pendingSessionId) {
-        Notification notification = notificationRepository.findByPlayerIdAndPendingSessionId(playerId, pendingSessionId);
+        Notification notification = notificationRepository.findByRecipientIdAndPendingSessionId(playerId, pendingSessionId);
         if (notification != null) {
             notificationRepository.delete(notification);
         }

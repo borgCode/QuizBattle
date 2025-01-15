@@ -211,7 +211,7 @@ public class NotificationIntegrationTest {
         @Test
         void shouldDeleteHiddenNotifications_WhenOlderThan14Days() {
             Notification oldNotification = Notification.builder()
-                    .playerId(player1.getId())
+                    .recipientId(player1.getId())
                     .senderId(player2.getId())
                     .type(NotificationType.FRIEND_REQUEST)
                     .message("Old notification")
@@ -221,7 +221,7 @@ public class NotificationIntegrationTest {
             notificationRepository.save(oldNotification);
 
             Notification recentNotification = Notification.builder()
-                    .playerId(player1.getId())
+                    .recipientId(player1.getId())
                     .senderId(player2.getId())
                     .type(NotificationType.FRIEND_REQUEST)
                     .message("Recent notification")

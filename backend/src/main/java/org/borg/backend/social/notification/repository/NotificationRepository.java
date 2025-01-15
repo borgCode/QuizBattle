@@ -17,20 +17,20 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     
 
-    Notification findByPlayerIdAndPendingSessionId(Long playerId, Long pendingSessionId);
+    Notification findByRecipientIdAndPendingSessionId(Long playerId, Long pendingSessionId);
 
-    long countByIdInAndPlayerIdNot(Collection<Long> ids, Long playerId);
+    long countByIdInAndRecipientIdNot(Collection<Long> ids, Long playerId);
 
-    void deleteByPlayerIdAndSenderId(Long playerId, Long senderId);
+    void deleteByRecipientIdAndSenderId(Long playerId, Long senderId);
 
-    void deleteByPlayerIdAndSenderIdAndType(Long playerId, Long senderId, NotificationType notificationType);
+    void deleteByRecipientIdAndSenderIdAndType(Long playerId, Long senderId, NotificationType notificationType);
 
-    @Query("SELECT n FROM Notification n WHERE n.playerId = :playerId " +
+    @Query("SELECT n FROM Notification n WHERE n.recipientId = :playerId " +
             "AND n.hiddenByBlock = false " +
             "ORDER BY n.createdAt DESC")
     List<Notification> findByPlayerIdAndIsHiddenFalse(Long playerId);
 
-    @Query("SELECT n FROM Notification n WHERE n.playerId = :playerId " +
+    @Query("SELECT n FROM Notification n WHERE n.recipientId = :playerId " +
             "AND n.isArchived = false " +
             "AND n.hiddenByBlock = false " +
             "ORDER BY n.createdAt DESC")
@@ -53,11 +53,11 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     @Modifying
     @Transactional
-    @Query("UPDATE Notification n SET n.hiddenByBlock = true WHERE n.playerId = :blockerId AND n.senderId = :blockedId")
+    @Query("UPDATE Notification n SET n.hiddenByBlock = true WHERE n.recipientId = :blockerId AND n.senderId = :blockedId")
     void setNotificationsToHidden(@Param("blockerId") Long blocker, @Param("blockedId") Long blocked);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Notification n SET n.hiddenByBlock = false WHERE n.playerId = :blockerId AND n.senderId = :blockedId")
+    @Query("UPDATE Notification n SET n.hiddenByBlock = false WHERE n.recipientId = :blockerId AND n.senderId = :blockedId")
     void restoreHiddenNotifications(@Param("blockerId") Long blocker, @Param("blockedId") Long blocked);
 }

@@ -2,7 +2,6 @@ package org.borg.backend.social.block.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.social.block.event.PlayerBlockEvent;
 import org.borg.backend.social.block.model.PlayerBlock;
 import org.borg.backend.social.friendship.repository.FriendshipRepository;
 import org.borg.backend.social.notification.repository.NotificationRepository;
@@ -52,7 +51,7 @@ public class PlayerBlockListener {
     public void handleSentNotificationsDeletion(PlayerBlockedEvent event) {
         Long blockerId = event.block().getBlocker().getId();
         Long blockedId = event.block().getBlocked().getId();
-        notificationRepository.deleteByPlayerIdAndSenderId(blockedId, blockerId);
+        notificationRepository.deleteByRecipientIdAndSenderId(blockedId, blockerId);
 
         log.info("Deleting notifications from Player {} to Player {}",
                 blockerId, blockedId);

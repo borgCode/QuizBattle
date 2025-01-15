@@ -177,7 +177,7 @@ class FriendshipServiceIntegrationTest {
         void throwErrorWhenRespondingToNoExistingFriendRequest() {
 
             Notification friendRequest = Notification.builder()
-                    .playerId(player2.getId())
+                    .recipientId(player2.getId())
                     .senderId(player1.getId())
                     .type(NotificationType.FRIEND_REQUEST)
                     .message(player1.getDisplayName() + " sent you a friend request!")

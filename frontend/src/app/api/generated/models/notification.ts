@@ -9,8 +9,8 @@ export interface Notification {
   id?: number;
   message?: string;
   pendingSessionId?: number;
-  playerId?: number;
   read?: boolean;
+  recipientId?: number;
   senderId?: number;
   startedSessionId?: number;
   type?: 'FRIEND_REQUEST' | 'FRIEND_ACCEPTED' | 'REMATCH_REQUEST' | 'REMATCH_ACCEPTED' | 'REMATCH_DECLINED' | 'GAME_WON' | 'GAME_LOST' | 'GAME_TIED' | 'MATCH_REQUEST' | 'MATCH_ACCEPTED' | 'MATCH_DECLINED';
