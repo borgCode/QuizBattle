@@ -1,6 +1,7 @@
 package org.borg.backend.integration.chapter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
@@ -121,9 +122,11 @@ class ChapterServiceIntegrationTest {
             story = storyRepository.findById(1L)
                     .orElseThrow();
 
-            playerProgress = storyService.getOrCreatePlayerProgress(player.getId(), story);
+            playerProgress = createPlayerProgress(player, story);
+            
             chapters = chapterRepository.findByStoryId(story.getId());
         }
+        
 
         @Test
         void shouldNotIncrementCompleteChaptersOnDuplicateCompletion() {
@@ -152,6 +155,14 @@ class ChapterServiceIntegrationTest {
             assertEquals(1, progressAfterDuplicate.getCompletedChapters(),
                     "Completing same chapter twice should not increment counter");
         }
+    }
+
+    private PlayerProgress createPlayerProgress(Player player, Story story) {
+        return playerProgressRepository.save(PlayerProgress.builder()
+                .player(player)
+                .story(story)
+                .completedChapters(0)
+                .progressStatus(ProgressStatus.NOT_STARTED).build());
     }
 
     @RepeatedTest(5)
@@ -183,8 +194,7 @@ class ChapterServiceIntegrationTest {
 
                         Story story = storyRepository.findById(storyId)
                                 .orElseThrow();
-                        PlayerProgress playerProgress = storyService
-                                .getOrCreatePlayerProgress(player.getId(), story);
+                        PlayerProgress playerProgress = createPlayerProgress(player, story);
 
                         List<Chapter> chapters = chapterRepository.findByStoryId(storyId);
 

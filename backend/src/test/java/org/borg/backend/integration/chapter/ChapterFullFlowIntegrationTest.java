@@ -138,7 +138,12 @@ public class ChapterFullFlowIntegrationTest {
         story = storyRepository.findById(chapter.getStory().getId())
                 .orElseThrow();
 
-        playerProgress = storyService.getOrCreatePlayerProgress(player.getId(), story);
+        playerProgress = playerProgressRepository.save(PlayerProgress.builder()
+                .player(player)
+                .story(story)
+                .completedChapters(0)
+                .progressStatus(ProgressStatus.NOT_STARTED)
+                .build());
 
         chapterService.startChapter(new StartChapterRequest(player.getId(), story.getId(), chapter.getId()));
     }
