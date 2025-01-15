@@ -7,6 +7,7 @@ import org.borg.backend.game.singleplayer.dto.StoryDTO;
 import org.borg.backend.game.singleplayer.dto.StoryOverviewDTO;
 import org.borg.backend.game.singleplayer.dto.StoryOverviewRequest;
 import org.borg.backend.game.singleplayer.mapper.ChapterMapper;
+import org.borg.backend.game.singleplayer.mapper.StoryMapper;
 import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.model.Story;
 import org.borg.backend.game.singleplayer.repository.ChapterRepository;
@@ -26,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,47 +40,55 @@ public class StoryService {
     private final PlayerService playerService;
     private final ChapterMapper chapterMapper;
     private final PlayerProgressMapper playerProgressMapper;
+    private final StoryMapper storyMapper;
 
     @Transactional
     public AllStoriesDTO getAllStories(Long playerId) {
-
+        log.debug("Fetching all stories and progress for player {}", playerId);
+        
         List<Story> stories = storyRepository.findAll();
+        log.debug("Found {} stories in total", stories.size());
+                
+        List<PlayerProgress> existingProgress = playerProgressRepository.findAllByPlayerId(playerId);
+        log.debug("Found {} existing progress entries for player {}", existingProgress.size(), playerId);
 
-        List<StoryDTO> storyDTOS = new ArrayList<>();
-        List<PlayerProgressDTO> playerProgressDTOS = new ArrayList<>();
+        Map<Long, PlayerProgress> progressByStoryId = existingProgress.stream()
+                .collect(Collectors.toMap(
+                        playerProgress -> playerProgress.getStory().getId(),
+                        playerProgress -> playerProgress
+                ));
 
-        for (Story story : stories) {
-            PlayerProgressDTO playerProgressDTO = playerProgressMapper.toDTO(getOrCreatePlayerProgress(playerId, story));
-            playerProgressDTOS.add(playerProgressDTO);
+        List<PlayerProgress> newProgress = stories.stream()
+                .filter(story -> !progressByStoryId.containsKey(story.getId()))
+                .map(story -> createInitialProgress(playerId, story))
+                .toList();
 
-            StoryDTO storyDTO = StoryDTO.builder()
-                    .id(story.getId())
-                    .title(story.getTitle())
-                    .description(story.getDescription())
-                    .introText(story.getIntroText())
-                    .numOfChapters(story.getNumOfChapters())
-                    .base64Image(ImageUtil.encodeStoryImageToBase64(story.getImagePath()))
-                    .build();
-            storyDTOS.add(storyDTO);
+        if (!newProgress.isEmpty()) {
+            log.info("Creating initial progress for {} new stories for player {}",
+                    newProgress.size(), playerId);
+            playerProgressRepository.saveAll(newProgress);
+            newProgress.forEach(progress -> progressByStoryId.put(progress.getStory().getId(), progress));
+        } else {
+            log.debug("No new progress entries needed for player {}", playerId);
         }
 
-        return new AllStoriesDTO(storyDTOS, playerProgressDTOS);
+        List<PlayerProgressDTO> playerProgressDTOS = stories.stream()
+                .map(story -> playerProgressMapper.toDTO(progressByStoryId.get(story.getId())))
+                .collect(Collectors.toList());
+
+        return new AllStoriesDTO(storyMapper.multipleToDto(stories), playerProgressDTOS);
     }
 
-    public PlayerProgress getOrCreatePlayerProgress(Long playerId, Story story) {
-        PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(playerId, story.getId());
-
-        if (playerProgress == null) {
-            Player player = playerService.getPlayerById(playerId);
-
-            playerProgress = playerProgressRepository.save(PlayerProgress.builder()
-                    .player(player)
-                    .story(story)
-                    .completedChapters(0)
-                    .progressStatus(ProgressStatus.NOT_STARTED)
-                    .build());
-        }
-        return playerProgress;
+    private PlayerProgress createInitialProgress(Long playerId, Story story) {
+        log.debug("Creating initial progress for story {} and player {}", story.getId(), playerId);
+        
+        Player player = playerService.getPlayerById(playerId);
+        return PlayerProgress.builder()
+                .player(player)
+                .story(story)
+                .completedChapters(0)
+                .progressStatus(ProgressStatus.NOT_STARTED)
+                .build();
     }
 
     public StoryOverviewDTO getStoryOverview(StoryOverviewRequest request) {
