@@ -55,5 +55,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Transactional
     @Query("UPDATE Notification n SET n.hiddenByBlock = true WHERE n.playerId = :blockerId AND n.senderId = :blockedId")
     void setNotificationsToHidden(@Param("blockerId") Long blocker, @Param("blockedId") Long blocked);
-    
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Notification n SET n.hiddenByBlock = false WHERE n.playerId = :blockerId AND n.senderId = :blockedId")
+    void restoreHiddenNotifications(@Param("blockerId") Long blocker, @Param("blockedId") Long blocked);
 }

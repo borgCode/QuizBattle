@@ -2,6 +2,7 @@ package org.borg.backend.social.block.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.social.block.event.PlayerBlockEvent;
 import org.borg.backend.social.block.model.PlayerBlock;
 import org.borg.backend.social.friendship.repository.FriendshipRepository;
 import org.borg.backend.social.notification.repository.NotificationRepository;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.borg.backend.social.block.event.PlayerBlockEvent.*;
 import static org.borg.backend.social.block.event.PlayerBlockEvent.PlayerBlockedEvent;
 
 @Slf4j
@@ -55,4 +57,17 @@ public class PlayerBlockListener {
         log.info("Deleting notifications from Player {} to Player {}",
                 blockerId, blockedId);
     }
+    
+    @EventListener
+    @Async
+    @Transactional
+    public void handleSentNotificationsRestoration(PlayedUnblockedEvent event) {
+        Long blockerId = event.blockerId();
+        Long blockedId = event.blockedId();
+        notificationRepository.restoreHiddenNotifications(blockerId, blockedId);
+
+        log.info("Restoring notifications from Player {} to Player {}",
+                blockedId, blockerId);
+    }
+    
 }
