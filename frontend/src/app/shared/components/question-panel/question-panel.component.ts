@@ -48,6 +48,7 @@ ngOnChanges(changes: SimpleChanges) {
     console.log('Selecting answer for question:', this.question?.questionId);
     this.selectedAnswerIndex = i;
     this.hasClickedOption = true
+
     this.answerSelected.emit({
       questionId: this.question.questionId,
       answer: answer
@@ -61,8 +62,6 @@ ngOnChanges(changes: SimpleChanges) {
     this.userClickedNext = true;
     this.resetQuestionState.emit();
     this.nextQuestion.emit();
-    this.timerComponent.resetTimer();
-    this.timerComponent.startTimer();
   }
 
   onTimerRanOut() {

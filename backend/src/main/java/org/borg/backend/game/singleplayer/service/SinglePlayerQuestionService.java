@@ -70,11 +70,14 @@ public class SinglePlayerQuestionService {
         }
 
         gameValidationService.validateSinglePlayerAnswer(request.getPlayerId(), request.getQuestionId());
+        log.debug("Game validation passed for player {} and question {}",
+                request.getPlayerId(), request.getQuestionId());
 
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Question not found for " + request.getQuestionId()));
 
         AnswerValidationResponse validationResponse = validateAnswer(request.getPlayerId(), question, request.getAnswer());
+        log.debug("Answer validation result for player {}: correct={}", request.getPlayerId(), validationResponse.isCorrect());
 
         boolean isRoundComplete = roundSessionService.saveAnswer(
                 request.getPlayerId(),
@@ -89,6 +92,8 @@ public class SinglePlayerQuestionService {
                     )
             );
         }
+        log.info("Answer validation completed for player {}: correct={}, roundComplete={}",
+                request.getPlayerId(), validationResponse.isCorrect(), isRoundComplete);
         return validationResponse;
     }
 

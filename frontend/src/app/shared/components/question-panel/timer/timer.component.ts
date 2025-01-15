@@ -50,6 +50,4 @@ export class TimerComponent implements OnInit, OnChanges {
     this.timeLeft = this.duration;
     this.progressPercentage = 100;
   }
-
-
 }
