@@ -44,7 +44,12 @@ public class MatchMakingService {
                     return;
                 }
                 if (playerBlockService.checkIfAnyBlockExists(playerId, actualOpponentId)) {
-                    log.debug("Player {} attempted to match with self, ignoring", playerId);
+                    log.debug("Player {} attempted to match with {} while block is in place, ignoring", playerId, actualOpponentId);
+
+                    matchmakingQueue.add(playerId);
+                    log.debug("Player {} added to matchmaking queue. Queue size: {}", playerId, matchmakingQueue.size());
+                    messagingTemplate.convertAndSend("/topic/match" + playerId,
+                            MatchmakingResponse.waiting());
                     return;
                 }
                 

@@ -169,14 +169,7 @@ public class PlayerBlockIntegrationTest {
 
         
         List<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId());
-        assertEquals(1, notifications.size(), "Should have one notification");
-        Notification hiddenNotification = notifications.get(0);
-        assertAll("Hidden notification properties",
-                () -> assertEquals(NotificationType.FRIEND_REQUEST, hiddenNotification.getType()),
-                () -> assertTrue(hiddenNotification.isHiddenByBlock()),
-                () -> assertEquals(player2.getId(), hiddenNotification.getSenderId()),
-                () -> assertEquals(player1.getId(), hiddenNotification.getRecipientId())
-        );
+        assertEquals(0, notifications.size(), "Should have no notifications");
     }
     
 

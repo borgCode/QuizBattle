@@ -12,6 +12,7 @@ import org.borg.backend.game.multiplayer.service.MatchMakingService;
 import org.borg.backend.game.multiplayer.service.SessionCleanUpService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.social.block.service.PlayerBlockService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -52,6 +53,8 @@ class MatchMakingServiceIntegrationTest {
     private SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
     private SessionCleanUpService sessionCleanUpService;
+    @Autowired
+    private PlayerBlockService playerBlockService;
 
     @BeforeEach
     void setUp() {
@@ -61,8 +64,6 @@ class MatchMakingServiceIntegrationTest {
             userRole.setName("USER");
             roleRepository.save(userRole);
         }
-
-
     }
 
     @AfterEach
@@ -72,8 +73,6 @@ class MatchMakingServiceIntegrationTest {
         playerRepository.deleteAll();
         matchmakingSessionRepository.deleteAll();
     }
-    
-    
 
     @Nested
     class MatchingMakingFullFLowTests {
@@ -85,7 +84,6 @@ class MatchMakingServiceIntegrationTest {
             player1 = createAndSavePlayer("Player1");
             player2 = createAndSavePlayer("Player2");
         }
-        
 
         @Test
         void fullFlowMatchTwoPlayers_bothAcceptAndCreateMultiplayerSession() {
@@ -97,7 +95,7 @@ class MatchMakingServiceIntegrationTest {
             verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.waitingForOtherPlayer());
 
             matchMakingService.handleMatchResponse(matchmakingSession.getId(), player2.getId(), true);
-            
+
             List<MultiplayerSession> player1Sessions = multiplayerSessionRepository.findByPlayerId(player1.getId());
             List<MultiplayerSession> player2Sessions = multiplayerSessionRepository.findByPlayerId(player2.getId());
             assertAll("Post both accept match checks",
@@ -105,25 +103,62 @@ class MatchMakingServiceIntegrationTest {
                     () -> assertEquals(1, player2Sessions.size(), "Player2 should have one active game"),
                     () -> assertEquals(player1Sessions.get(0).getId(), player2Sessions.get(0).getId(), "Both players should have the same session ID")
             );
-            
+
             verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.accepted(player1Sessions.get(0).getId(), player2.getDisplayName()));
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.accepted(player1Sessions.get(0).getId(), player1.getDisplayName()));
-            
+
             MatchmakingSession postAcceptSession = matchmakingSessionRepository
                     .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
                             player1.getId(), player2.getId(),
                             player2.getId(), player1.getId()
                     );
             assertNull(postAcceptSession, "Matchmaking session should be cleaned up after both players accepted");
-            
         }
-        
+
+        @Test
+        void blockedPlayersShouldNotBeMatchedTogether() {
+            Player player3 = createAndSavePlayer("Player3");
+
+            playerBlockService.blockPlayer(player1.getId(), player2.getId());
+
+            matchMakingService.findMatch(player1.getId());
+            assertEquals(1, matchMakingService.getQueueSize(), "Player1 should be in queue");
+
+            matchMakingService.findMatch(player2.getId());
+            assertEquals(2, matchMakingService.getQueueSize(), "Players should not be matched due to block");
+
+            matchMakingService.findMatch(player3.getId());
+
+            assertNull(matchmakingSessionRepository
+                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
+                            player1.getId(), player2.getId(),
+                            player2.getId(), player1.getId()
+                    ));
+
+            MatchmakingSession player3WithPlayer1 = matchmakingSessionRepository
+                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
+                            player1.getId(), player3.getId(),
+                            player3.getId(), player1.getId()
+                    );
+
+            MatchmakingSession player3WithPlayer2 = matchmakingSessionRepository
+                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
+                            player2.getId(), player3.getId(),
+                            player3.getId(), player2.getId()
+                    );
+
+            assertTrue(player3WithPlayer1 != null || player3WithPlayer2 != null,
+                    "Player3 should be matched with either player1 or player2");
+
+            assertEquals(1, matchMakingService.getQueueSize(), "There should only be one player left in the queue");
+        }
+
         @Test
         void twoPlayersMatched_oneDeclineAndCleanUp() {
             MatchmakingSession savedMatchmakingSession = setupMatchmakingSession();
 
             matchMakingService.handleMatchResponse(savedMatchmakingSession.getId(), player1.getId(), false);
-            
+
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.declined());
 
             MatchmakingSession postDeclinedSession = matchmakingSessionRepository
@@ -132,20 +167,19 @@ class MatchMakingServiceIntegrationTest {
                             player2.getId(), player1.getId()
                     );
             assertNull(postDeclinedSession, "Matchmaking session should be cleaned up after both players after someone declined");
-            
         }
-        
+
         @Test
         void TwoPlayersMatched_oneTimedOutAndCleanUp() {
             MatchmakingSession savedMatchmakingSession = setupMatchmakingSession();
             matchMakingService.handleMatchResponse(savedMatchmakingSession.getId(), player1.getId(), true);
-            
+
             Instant futureTime = savedMatchmakingSession.getCreatedAt().plusSeconds(16);
             sessionCleanUpService.cleanUpMatchmakingSessions(futureTime);
-            
+
             assertFalse(matchmakingSessionRepository.existsById(savedMatchmakingSession.getId()));
-            
         }
+
         private MatchmakingSession setupMatchmakingSession() {
             matchMakingService.findMatch(player1.getId());
             assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
@@ -163,10 +197,9 @@ class MatchMakingServiceIntegrationTest {
 
             verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.matched(savedMatchmakingSession.getId(), player2.getDisplayName()));
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.matched(savedMatchmakingSession.getId(), player1.getDisplayName()));
-            
+
             return savedMatchmakingSession;
         }
-
 
         private void verifyMatchmakingResponse(Long playerId, MatchmakingResponse expectedResponse) {
             verify(simpMessagingTemplate).convertAndSend(
@@ -175,18 +208,18 @@ class MatchMakingServiceIntegrationTest {
                             response.equals(expectedResponse))
             );
         }
-        
+
         @Test
         void testPlayerCancelMatchmaking() {
             matchMakingService.findMatch(player1.getId());
             assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
-            
+
             matchMakingService.cancelMatchmaking(player1.getId());
             assertEquals(0, matchMakingService.getQueueSize(), "There should be no players in the queue");
-            
         }
+
         @Test
-        void playersShouldNotMatchWithThemselves () {
+        void playersShouldNotMatchWithThemselves() {
             matchMakingService.findMatch(player1.getId());
             assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
 
@@ -194,7 +227,7 @@ class MatchMakingServiceIntegrationTest {
             assertEquals(1, matchMakingService.getQueueSize(), "There should be one person in the queue");
         }
     }
-    
+
     @Test
     void concurrentMatchmakingTest() throws InterruptedException {
         int numOfPlayers = 100;
@@ -217,7 +250,7 @@ class MatchMakingServiceIntegrationTest {
         }
         boolean completed = latch.await(5, TimeUnit.SECONDS);
         assertTrue(completed, "Not all matchmaking operations finished on time");
-        
+
         executorService.shutdown();
 
         List<MatchmakingSession> matchmakingSessions = matchmakingSessionRepository.findAll();
@@ -229,6 +262,7 @@ class MatchMakingServiceIntegrationTest {
                         "Mismatch in players in the queue")
         );
     }
+
     private Player createAndSavePlayer(String name) {
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
