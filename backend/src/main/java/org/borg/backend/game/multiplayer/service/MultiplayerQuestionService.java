@@ -38,6 +38,7 @@ public class MultiplayerQuestionService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GameValidationService gameValidationService;
     private final StatsService statsService;
+    private final QuestionMapper questionMapper;
 
     @Transactional
     public List<QuestionDTO> getNewQuestionsForCategory(MultiplayerQuestionsRequest request) {
@@ -61,7 +62,7 @@ public class MultiplayerQuestionService {
 
         gameService.updateSessionQuestionsAndCategory(session, questions, request.getCategory());
 
-        return QuestionMapper.multipleToDTO(questions);
+        return questionMapper.multipleToDTO(questions);
     }
 
     @Transactional
@@ -134,7 +135,7 @@ public class MultiplayerQuestionService {
         List<Long> sessionQuestions = roundSessionService.getSessionQuestions(playerId);
         if (!sessionQuestions.isEmpty()) {
             log.info("Player {} has ongoing session, returning those questions", playerId);
-            return QuestionMapper.multipleToDTO(questionRepository.findAllById(sessionQuestions));
+            return questionMapper.multipleToDTO(questionRepository.findAllById(sessionQuestions));
         }
 
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
@@ -158,6 +159,6 @@ public class MultiplayerQuestionService {
                 RoundType.MULTIPLAYER
         );
 
-        return QuestionMapper.multipleToDTO(questions);
+        return questionMapper.multipleToDTO(questions);
     }
 }

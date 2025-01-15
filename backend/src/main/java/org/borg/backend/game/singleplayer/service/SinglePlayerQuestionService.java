@@ -36,6 +36,7 @@ public class SinglePlayerQuestionService {
     private final ChapterService chapterService;
     private final GameValidationService gameValidationService;
     private final StatsService statsService;
+    private final QuestionMapper questionMapper;
 
     public List<QuestionDTO> getSinglePlayerRoundQuestions(long playerId) {
         log.debug("Fetching single player round questions for player ID: {}", playerId);
@@ -60,7 +61,7 @@ public class SinglePlayerQuestionService {
         );
         log.debug("Initialized round session for player {} with category {}", playerId, currentCategory);
 
-        return QuestionMapper.multipleToDTO(questions);
+        return questionMapper.multipleToDTO(questions);
     }
     
     public AnswerValidationResponse validateSingleplayerAnswer(SinglePlayerAnswerValidationRequest request) {

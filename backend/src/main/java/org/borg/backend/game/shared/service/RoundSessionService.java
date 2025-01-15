@@ -21,7 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RoundSessionService {
     private final ConcurrentHashMap<Long, RoundSession> roundSessions = new ConcurrentHashMap<>();
     private final QuestionRepository questionRepository;
-    
+    private final QuestionMapper questionMapper;
+
     public void initializeSession(Long playerId, List<Long> questionIds, String category, RoundType roundType) {
         RoundSession existingSession = roundSessions.get(playerId);
 
@@ -119,7 +120,7 @@ public class RoundSessionService {
         RoundSession session = roundSessions.get(playerId);
         log.debug("Current index being sent after restore: {}", session.getCurrentIndex());
         return new RoundSessionProgress(
-                QuestionMapper.multipleToDTO(questionRepository.findQuestionsOrdered(questionIds)),
+                questionMapper.multipleToDTO(questionRepository.findQuestionsOrdered(questionIds)),
                 session.getCurrentIndex()
         );
     }
