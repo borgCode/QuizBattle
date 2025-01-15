@@ -17,4 +17,6 @@ public interface PlayerBlockRepository extends JpaRepository<PlayerBlock, Long> 
     boolean existsByBlockerIdAndBlockedId(Long blockerId, Long blockedId);
 
     void deleteByBlockerIdAndBlockedId(Long blockerId, Long blockedId);
+
+    boolean existsByBlockerIdAndBlockedIdOrBlockerIdAndBlockedId(Long blockerId, Long blockedId, Long blockerId1, Long blockedId1);
 }

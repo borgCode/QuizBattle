@@ -103,7 +103,11 @@ public class PlayerBlockService {
         return playerMapper.multipleToDTO(playerBlockRepository.getBlockedPlayers(playerId));
     }
 
-    public boolean checkBlockForRelationshipStatus(RelationshipStatusRequest relationshipStatusRequest) {
-        return playerBlockRepository.existsByBlockerIdAndBlockedId(relationshipStatusRequest.getPlayerId(), relationshipStatusRequest.getTargetPlayerId());
+    public boolean checkIfBlockIsActive(Long blockerId, Long blockedId) {
+        return playerBlockRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId);
+    }
+
+    public boolean checkIfAnyBlockExists(Long player1, Long player2) {
+        return playerBlockRepository.existsByBlockerIdAndBlockedIdOrBlockerIdAndBlockedId(player1, player2, player2, player1);
     }
 }

@@ -70,7 +70,7 @@ public class FriendshipController {
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#relationshipStatusRequest.playerId)")
     @GetMapping("/relationship/status")
     public ResponseEntity<RelationshipStatus> getRelationshipStatus(RelationshipStatusRequest relationshipStatusRequest) {
-        if (playerBlockService.checkBlockForRelationshipStatus(relationshipStatusRequest)) {
+        if (playerBlockService.checkIfBlockIsActive(relationshipStatusRequest.getPlayerId(), relationshipStatusRequest.getTargetPlayerId())) {
             return ResponseEntity.ok(new RelationshipStatus(null, true));
         }
         

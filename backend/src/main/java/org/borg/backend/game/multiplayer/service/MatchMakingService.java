@@ -11,6 +11,7 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
+import org.borg.backend.social.block.service.PlayerBlockService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -30,18 +31,29 @@ public class MatchMakingService {
     private final MatchmakingSessionRepository matchmakingSessionRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final PlayerService playerService;
+    private final PlayerBlockService playerBlockService;
 
     public void findMatch(Long playerId) {
+        log.debug("Player {} looking for match", playerId);
         synchronized (matchmakingQueue) {
             Optional<Long> opponentId = matchmakingQueue.stream().findFirst();
             if (opponentId.isPresent()) {
-                if (opponentId.get().equals(playerId)) {
+                Long actualOpponentId = opponentId.get();
+                if (actualOpponentId.equals(playerId)) {
+                    log.debug("Player {} attempted to match with self, ignoring", playerId);
                     return;
                 }
-                matchmakingQueue.remove(opponentId.get());
-                handleMatchMakingRequest(playerId, opponentId.get());
+                if (playerBlockService.checkIfAnyBlockExists(playerId, actualOpponentId)) {
+                    log.debug("Player {} attempted to match with self, ignoring", playerId);
+                    return;
+                }
+                
+                matchmakingQueue.remove(actualOpponentId);
+                log.info("Match found: Player {} matched with Player {}", playerId, actualOpponentId);
+                handleMatchMakingRequest(playerId, actualOpponentId);
             } else {
                 matchmakingQueue.add(playerId);
+                log.debug("Player {} added to matchmaking queue. Queue size: {}", playerId, matchmakingQueue.size());
                 messagingTemplate.convertAndSend("/topic/match" + playerId,
                         MatchmakingResponse.waiting());
             }
@@ -49,11 +61,15 @@ public class MatchMakingService {
     }
 
     private void handleMatchMakingRequest(Long playerId, Long opponentId) {
+        log.debug("Creating matchmaking session for players {} and {}", playerId, opponentId);
         Player requestingPlayer = playerService.getPlayerById(playerId);
         Player opponent = playerService.getPlayerById(opponentId);
 
         MatchmakingSession matchmakingSession = new MatchmakingSession(playerId, opponentId);
         matchmakingSessionRepository.save(matchmakingSession);
+        log.info("Created matchmaking session {} for players {} and {}",
+                matchmakingSession.getId(), requestingPlayer.getDisplayName(), opponent.getDisplayName());
+
 
         messagingTemplate.convertAndSend("/topic/match" + requestingPlayer.getId(),
                 MatchmakingResponse.matched(matchmakingSession.getId(), opponent.getDisplayName()));
@@ -62,6 +78,9 @@ public class MatchMakingService {
     }
 
     public void handleMatchResponse(long matchmakingSessionId, long playerId, boolean hasAccepted) {
+        log.debug("Received match response from player {}: {} for session {}",
+                playerId, hasAccepted ? "accepted" : "declined", matchmakingSessionId);
+
         MatchmakingSession matchmakingSession = matchmakingSessionRepository.findById(matchmakingSessionId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Matchmaking session not found for " + matchmakingSessionId));
 
@@ -72,6 +91,7 @@ public class MatchMakingService {
         
         if (!hasAccepted) {
             try {
+                log.info("Player {} declined match in session {}", playerId, matchmakingSessionId);
                 cancelMatch(matchmakingSession, playerId);
             } catch (ObjectOptimisticLockingFailureException e) {
                 log.info("Session {} was already cancelled by another player", matchmakingSession);
@@ -81,14 +101,18 @@ public class MatchMakingService {
 
         if (playerId == matchmakingSession.getRequestingPlayerId()) {
             matchmakingSession.setRequestingPlayerAccepted(true);
+            log.debug("Requesting player {} accepted match", playerId);
         } else if (playerId == matchmakingSession.getOpponentId()) {
+            log.debug("Opponent {} accepted match", playerId);
             matchmakingSession.setOpponentAccepted(true);
         }
         matchmakingSessionRepository.save(matchmakingSession);
 
         if (matchmakingSession.isOpponentAccepted() && matchmakingSession.isRequestingPlayerAccepted()) {
+            log.info("Both players accepted match in session {}", matchmakingSessionId);
             createMultiplayerSession(matchmakingSession);
         } else {
+            log.debug("Waiting for other player's response in session {}", matchmakingSessionId);
             messagingTemplate.convertAndSend("/topic/match" + playerId,
                     MatchmakingResponse.waitingForOtherPlayer());
         }
@@ -97,6 +121,8 @@ public class MatchMakingService {
     private void cancelMatch(MatchmakingSession matchmakingSession, long playerId) {
         Long opponentId = matchmakingSession.getOpponentId().equals(playerId) ? matchmakingSession.getRequestingPlayerId() : matchmakingSession.getOpponentId();
 
+        log.info("Cancelling match session {} between players {} and {}",
+                matchmakingSession.getId(), playerId, opponentId);
         messagingTemplate.convertAndSend("/topic/match" + opponentId,
                 MatchmakingResponse.declined());
         matchmakingSessionRepository.delete(matchmakingSession);
