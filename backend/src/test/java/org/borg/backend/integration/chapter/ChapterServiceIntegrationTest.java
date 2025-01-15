@@ -1,5 +1,6 @@
 package org.borg.backend.integration.chapter;
 
+import Config.TestDataLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.player.service.AchievementService;
@@ -18,10 +19,12 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
 import org.borg.backend.player.repository.PlayerProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.seed.DataLoader;
 import org.borg.backend.seed.InitDataService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(TestDataLoader.class)
 class ChapterServiceIntegrationTest {
 
     @Autowired
@@ -58,9 +62,10 @@ class ChapterServiceIntegrationTest {
     @Autowired
     private StoryRepository storyRepository;
     @Autowired
-    private StoryService storyService;
-    @Autowired
     private ChapterService chapterService;
+    @Autowired
+    private TestDataLoader testDataLoader;
+    
     @MockitoBean
     private AchievementService achievementService;
 
@@ -105,17 +110,7 @@ class ChapterServiceIntegrationTest {
 
         @BeforeEach
         void setUp() {
-            Role userRole = roleRepository.findByName("USER")
-                    .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
-
-            player = Player.builder()
-                    .username("testPlayer")
-                    .password("password")
-                    .displayName("Test Player ")
-                    .accountLocked(false)
-                    .enabled(true)
-                    .roles(new ArrayList<>(List.of(userRole)))
-                    .build();
+            player = testDataLoader.createTestPlayer();
 
             playerRepository.save(player);
 

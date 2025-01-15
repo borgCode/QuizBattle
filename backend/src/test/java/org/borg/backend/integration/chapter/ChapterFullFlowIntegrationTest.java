@@ -1,8 +1,6 @@
 package org.borg.backend.integration.chapter;
 
 import Config.TestDataLoader;
-import org.borg.backend.auth.model.Role;
-import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.game.shared.dto.QuestionDTO;
 import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.repository.QuestionRepository;
@@ -19,7 +17,6 @@ import org.borg.backend.game.singleplayer.repository.StoryRepository;
 import org.borg.backend.game.singleplayer.service.ChapterService;
 import org.borg.backend.game.singleplayer.service.ChapterSessionService;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
-import org.borg.backend.game.singleplayer.service.StoryService;
 import org.borg.backend.player.listener.AchievementListener;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.PlayerProgress;
@@ -38,7 +35,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,19 +56,6 @@ public class ChapterFullFlowIntegrationTest {
     @Autowired
     private StoryRepository storyRepository;
     @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private StoryService storyService;
-    @MockitoBean
-    private AchievementListener achievementListener;
-    @MockitoBean
-    private StatsService statsService;
-
-    Player player;
-    Story story;
-    PlayerProgress playerProgress;
-    Chapter chapter;
-    @Autowired
     private ChapterService chapterService;
     @Autowired
     private TestDataLoader testDataLoader;
@@ -84,6 +67,16 @@ public class ChapterFullFlowIntegrationTest {
     private RoundSessionService roundSessionService;
     @Autowired
     private QuestionRepository questionRepository;
+    
+    @MockitoBean
+    private AchievementListener achievementListener;
+    @MockitoBean
+    private StatsService statsService;
+    
+    Player player;
+    Story story;
+    PlayerProgress playerProgress;
+    Chapter chapter;
 
     @BeforeAll
     void setUpOnce() {
@@ -93,11 +86,7 @@ public class ChapterFullFlowIntegrationTest {
         playerRepository.deleteAll();
         storyRepository.deleteAll();
 
-        if (roleRepository.findByName("USER").isEmpty()) {
-            Role userRole = new Role();
-            userRole.setName("USER");
-            roleRepository.save(userRole);
-        }
+        player = testDataLoader.createTestPlayer();
     }
 
     @AfterAll
@@ -113,28 +102,13 @@ public class ChapterFullFlowIntegrationTest {
     void tearDown() {
         chapterProgressRepository.deleteAll();
         playerProgressRepository.deleteAll();
-        playerRepository.deleteAll();
         testDataLoader.cleanup();
     }
 
     @BeforeEach
     void setUp() {
-        Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
-
         chapter = testDataLoader.createTestChapter(new String[]{"Science & Nature", "Sports", "Geography"});
-
-        player = Player.builder()
-                .username("testPlayer")
-                .password("password")
-                .displayName("Test Player ")
-                .accountLocked(false)
-                .enabled(true)
-                .roles(new ArrayList<>(List.of(userRole)))
-                .build();
-
-        playerRepository.save(player);
-
+        
         story = storyRepository.findById(chapter.getStory().getId())
                 .orElseThrow();
 
