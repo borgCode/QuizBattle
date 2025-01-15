@@ -119,7 +119,7 @@ public class RoundSessionService {
         RoundSession session = roundSessions.get(playerId);
         log.debug("Current index being sent after restore: {}", session.getCurrentIndex());
         return new RoundSessionProgress(
-                QuestionMapper.multipleToDTO(questionRepository.findAllById(questionIds)),
+                QuestionMapper.multipleToDTO(questionRepository.findQuestionsOrdered(questionIds)),
                 session.getCurrentIndex()
         );
     }
