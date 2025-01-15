@@ -15,9 +15,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-
-
-    List<Notification> findByPlayerId(Long playerId);
+    
 
     Notification findByPlayerIdAndPendingSessionId(Long playerId, Long pendingSessionId);
 
@@ -27,13 +25,21 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     void deleteByPlayerIdAndSenderIdAndType(Long playerId, Long senderId, NotificationType notificationType);
 
+    @Query("SELECT n FROM Notification n WHERE n.playerId = :playerId " +
+            "AND n.hiddenByBlock = false " +
+            "ORDER BY n.createdAt DESC")
+    List<Notification> findByPlayerIdAndIsHiddenFalse(Long playerId);
+
+    @Query("SELECT n FROM Notification n WHERE n.playerId = :playerId " +
+            "AND n.isArchived = false " +
+            "AND n.hiddenByBlock = false " +
+            "ORDER BY n.createdAt DESC")
+    List<Notification> findByPlayerIdAndIsArchivedFalse(@Param("playerId") Long playerId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM Notification WHERE hiddenByBlock AND createdAt < :threshold")
     void deleteHiddenByOlderThan(@Param("threshold") Instant threshold);
-    
-    @Query("SELECT n FROM Notification n WHERE n.playerId = :playerId AND n.isArchived = false ORDER BY n.createdAt DESC")
-    List<Notification> findByPlayerIdAndIsArchivedFalse(@Param("playerId") Long playerId);
     
     @Modifying
     @Transactional
@@ -49,4 +55,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Transactional
     @Query("UPDATE Notification n SET n.hiddenByBlock = true WHERE n.playerId = :blockerId AND n.senderId = :blockedId")
     void setNotificationsToHidden(@Param("blockerId") Long blocker, @Param("blockedId") Long blocked);
+    
 }

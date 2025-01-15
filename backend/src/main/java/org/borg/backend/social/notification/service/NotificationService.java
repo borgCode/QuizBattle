@@ -28,7 +28,7 @@ public class NotificationService {
     }
 
     public List<Notification> getAllPlayerNotifications(Long playerId) {
-        return notificationRepository.findByPlayerId(playerId);
+        return notificationRepository.findByPlayerIdAndIsHiddenFalse(playerId);
     }
 
     public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer, boolean isHidden) {
@@ -53,7 +53,7 @@ public class NotificationService {
     public void sendMatchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId, boolean isHidden) {
         String message = senderDisplayName + " requested a match against you!";
         if (isHidden) {
-            buildAndSaveHiddenNotification(receivingId, senderId, MATCH_REQUEST, message, null, null);
+            buildAndSaveHiddenNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId);
         } else {
             buildAndSaveNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId);
         }
@@ -81,7 +81,7 @@ public class NotificationService {
     public void sendRematchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId, boolean isHidden) {
         String message = senderDisplayName + " requested a rematch against you!";
         if (isHidden) {
-            buildAndSaveHiddenNotification(receivingId, senderId, REMATCH_REQUEST, message, null, null);
+            buildAndSaveHiddenNotification(receivingId, senderId, REMATCH_REQUEST, message, null, pendingSessionId);
         } else {
             buildAndSaveNotification(receivingId, senderId, REMATCH_REQUEST, message, null, pendingSessionId);
         }
