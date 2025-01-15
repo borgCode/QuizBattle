@@ -26,6 +26,7 @@ public enum BusinessErrorCodes {
     CANNOT_SEND_FRIEND_REQUEST_TO_BLOCKED(254,HttpStatus.BAD_REQUEST, "Player can't friend someone that they have blocked"),
     CANNOT_SEND_MATCH_REQUEST_TO_BLOCKED(255, HttpStatus.BAD_REQUEST, "Player can't send a match request to someone they blocked"),
     
+    
     REMATCH_REQUEST_ALREADY_SENT(300, HttpStatus.BAD_REQUEST, "Rematch request already sent"),
     GAME_ALREADY_ONGOING(301, HttpStatus.BAD_REQUEST, "Players already have a game against each other ongoing"),
     NOT_PLAYER_TURN(302, HttpStatus.BAD_REQUEST, "It's not player's turn"),

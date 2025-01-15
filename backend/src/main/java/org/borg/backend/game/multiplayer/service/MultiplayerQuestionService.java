@@ -38,7 +38,7 @@ public class MultiplayerQuestionService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GameValidationService gameValidationService;
     private final StatsService statsService;
-    
+
     @Transactional
     public List<QuestionDTO> getNewQuestionsForCategory(MultiplayerQuestionsRequest request) {
         MultiplayerSession session = multiplayerSessionRepository.findById(request.getSessionId())
@@ -100,7 +100,7 @@ public class MultiplayerQuestionService {
     private AnswerValidationResponse validateAnswer(Long playerId, Question question, String answer) {
         boolean isCorrect = question.getCorrectAnswer().equals(answer);
         int indexOfCorrectAnswer = question.getOptions().indexOf(question.getCorrectAnswer());
-        
+
         statsService.updateQuestionStats(playerId, question.getCategory(), isCorrect);
 
         return new AnswerValidationResponse(isCorrect, indexOfCorrectAnswer);

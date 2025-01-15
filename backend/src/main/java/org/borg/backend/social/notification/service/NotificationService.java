@@ -114,6 +114,8 @@ public class NotificationService {
     public void sendTieNotifications(List<Player> players, Long sessionId) {
         Player player1 = players.get(0);
         Player player2 = players.get(1);
+        
+        log.debug("Sending tie notifications to Player {} and {}", player1.getId(), player2.getId());
 
         String messagePlayer1 = "Your match against " + player1.getDisplayName() + " was tied!";
         buildAndSaveNotification(player1.getId(), null, GAME_TIED, messagePlayer1, sessionId, null);

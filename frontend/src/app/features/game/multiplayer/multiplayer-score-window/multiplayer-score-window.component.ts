@@ -53,7 +53,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   hasAcknowledgedGameOver: boolean;
 
   friendshipStatus: string;
-  blockedStatus: boolean;
+
 
   constructor(
     private multiplayerGameService: MultiplayerGameService,

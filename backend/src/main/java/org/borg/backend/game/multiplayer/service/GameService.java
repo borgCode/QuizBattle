@@ -144,13 +144,16 @@ public class GameService {
     }
 
     private void sendGameOverNotifications(MultiplayerSession session) {
+        log.debug("Sending game over notifications for sessionId: {}", session.getId());
         if (session.getIsTie()) {
             notificationService.sendTieNotifications(session.getPlayers(), session.getId());
         } else {
             Player loserPlayer = findPlayerInSession(session, session.getLoserId());
             Player winnerPlayer = findPlayerInSession(session, session.getWinnerId());
+            
             notificationService.sendGameWonNotification(session.getWinnerId(), loserPlayer.getDisplayName(), session.getId());
             notificationService.sendGameLostNotification(session.getLoserId(), winnerPlayer.getDisplayName(), session.getId());
+            log.debug("Sent game won notification to {} and game lost notification to {}", session.getWinnerId(), session.getLoserId());
         }
     }
 
@@ -163,36 +166,50 @@ public class GameService {
     }
 
     public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
+        log.info("Updating session questions and category for sessionId: {}", session.getId());
+        
         session.getQuestionIds().clear();
         for (Question question : questions) {
             session.getQuestionIds().add(question.getId());
+            log.debug("Added question id: {}", question.getId());
         }
         session.getPlayedCategories().add(selectedCategory);
+        log.debug("Added category: {} to played session categories", selectedCategory);
 
         session.getRoundCategories().add(selectedCategory);
+        log.debug("Added to round categories: {}", selectedCategory);
         multiplayerSessionRepository.save(session);
+        log.debug("Saved session {}", session.getId());
     }
     
     public void acknowledgeGameOver(Long sessionId, Long playerId) {
+        log.info("Acknowledging game over for playerId: {} in sessionId: {}", playerId, sessionId);
         MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
         
         session.getPlayerAcknowledgment().put(playerId, true);
         multiplayerSessionRepository.save(session);
+        log.debug("Marked acknowledgement as true for playerId: {} and saved", playerId);
     }
 
     @Transactional
     public void handleGiveUp(Long sessionId, Long playerId) {
+        log.info("Handling give-up for sessionId: {} and playerId: {}", sessionId, playerId);
         MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
 
         session.getPlayerHasGivenUp().put(playerId, true);
         session.setStatus(GameStatus.COMPLETED);
+        log.debug("Session status set to COMPLETED for sessionId: {}", sessionId);
 
         session.setLoserId(playerId);
+        log.debug("Player with ID {} marked as loser for sessionId: {}", playerId, sessionId);
         session.setWinnerId(session.getPlayers().stream()
                 .filter(player -> !player.getId().equals(playerId))
                 .findFirst()
                 .map(Player::getId)
-                .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session")));
+                .orElseThrow(() -> {
+                    log.error("Opponent not found for sessionId: {}", sessionId);
+                    return new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session");
+                }));
 
         multiplayerSessionRepository.save(session);
         
