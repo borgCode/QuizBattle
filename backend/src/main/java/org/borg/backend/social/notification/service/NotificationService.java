@@ -50,9 +50,13 @@ public class NotificationService {
         buildAndSaveNotification(receivingId, null, MATCH_ACCEPTED, message, newSessionId, null);
     }
 
-    public void sendMatchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId) {
+    public void sendMatchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId, boolean isHidden) {
         String message = senderDisplayName + " requested a match against you!";
-        buildAndSaveNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId);
+        if (isHidden) {
+            buildAndSaveHiddenNotification(receivingId, senderId, MATCH_REQUEST, message, null, null);
+        } else {
+            buildAndSaveNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId);
+        }
     }
 
     public void sendMatchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
@@ -74,9 +78,13 @@ public class NotificationService {
         buildAndSaveNotification(receivingId, null, REMATCH_ACCEPTED, message, newSessionId, null);
     }
 
-    public void sendRematchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId) {
+    public void sendRematchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId, boolean isHidden) {
         String message = senderDisplayName + " requested a rematch against you!";
-        buildAndSaveNotification(receivingId, senderId, REMATCH_REQUEST, message, null, pendingSessionId);
+        if (isHidden) {
+            buildAndSaveHiddenNotification(receivingId, senderId, REMATCH_REQUEST, message, null, null);
+        } else {
+            buildAndSaveNotification(receivingId, senderId, REMATCH_REQUEST, message, null, pendingSessionId);
+        }
     }
 
     public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {

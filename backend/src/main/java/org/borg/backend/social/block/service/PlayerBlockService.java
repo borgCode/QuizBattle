@@ -103,7 +103,9 @@ public class PlayerBlockService {
     }
 
     public boolean checkIfBlockIsActive(Long blockerId, Long blockedId) {
-        return playerBlockRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId);
+        boolean isBlocked = playerBlockRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId);
+        log.debug("Block check - blockerId: {}, blockedId: {}, isBlocked: {}", blockerId, blockedId, isBlocked);
+        return isBlocked;
     }
 
     public boolean checkIfAnyBlockExists(Long player1, Long player2) {
