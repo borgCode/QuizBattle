@@ -33,29 +33,50 @@ public class ChapterService {
     private final ChapterMapper chapterMapper;
 
     public PlayChapterDTO getChapter(Long chapterId) {
+        log.debug("Fetching chapter with ID: {}", chapterId);
+
         Chapter chapter = chapterRepository.findById(chapterId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter not found for: " + chapterId));
+                .orElseThrow(() -> {
+                    log.error("Chapter not found with ID: {}", chapterId);
+                    return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter not found for: " + chapterId);
+                });
+
+        log.debug("Successfully retrieved chapter: {}", chapter.getId());
         return chapterMapper.toPlayChapterDTO(chapter);
     }
 
     @Transactional
     public void startChapter(StartChapterRequest request) {
+        log.info("Starting chapter for player: {}, story: {}, chapter: {}",
+                request.getPlayerId(), request.getStoryId(), request.getChapterId());
+
         PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(request.getPlayerId(), request.getStoryId());
+        log.debug("Found player progress for player: {}, current status: {}",
+                request.getPlayerId(), playerProgress.getProgressStatus());
 
         playerProgress.setStartedAt(LocalDate.now());
         playerProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);
         playerProgress.setCurrentChapterId(request.getChapterId());
 
         playerProgress = playerProgressRepository.save(playerProgress);
+        log.debug("Updated player progress status to IN_PROGRESS");
 
         Chapter chapter = chapterRepository.findById(request.getChapterId())
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter not found for: " + request.getChapterId()));
+                .orElseThrow(() -> {
+                    log.error("Chapter not found with ID: {}", request.getChapterId());
+                    return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND,
+                            "Chapter not found for: " + request.getChapterId());
+                });
 
+        log.debug("Initializing chapter session for player: {}", request.getPlayerId());
         chapterSessionService.initializeChapterSession(request.getPlayerId(), chapter);
 
         ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapter.getId());
 
         if (chapterProgress == null) {
+            log.debug("Creating new chapter progress for player: {} and chapter: {}",
+                    request.getPlayerId(), chapter.getId());
+
             chapterProgress = ChapterProgress.builder()
                     .playerProgress(playerProgress)
                     .chapter(chapter)
@@ -64,29 +85,49 @@ public class ChapterService {
                     .build();
 
             chapterProgressRepository.save(chapterProgress);
+            log.info("Successfully initiated chapter progress for player: {}, chapter: {}",
+                    request.getPlayerId(), chapter.getId());
+        } else {
+            log.debug("Chapter progress already exists for player: {} and chapter: {}",
+                    request.getPlayerId(), chapter.getId());
         }
     }
 
     @Transactional
     public void updateChapterProgress(Long chapterProgressId) {
+        log.info("Updating chapter progress with ID: {}", chapterProgressId);
+
         ChapterProgress chapterProgress = chapterProgressRepository.findById(chapterProgressId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Chapter progress not found for " + chapterProgressId));
+                .orElseThrow(() -> {
+                    log.error("Chapter progress not found with ID: {}", chapterProgressId);
+                    return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND,
+                            "Chapter progress not found for " + chapterProgressId);
+                });
 
         if (chapterProgress.getProgressStatus().equals(ProgressStatus.COMPLETED)) {
+            log.debug("Chapter progress {} is already completed, skipping update", chapterProgressId);
             return;
         }
 
         chapterProgress.setCompletedAt(LocalDate.now());
         chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
-        
+
         Long playerProgressId = chapterProgress.getPlayerProgress().getId();
+        log.debug("Retrieving player progress with ID: {}", playerProgressId);
 
         PlayerProgress playerProgress = playerProgressRepository.findById(playerProgressId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player progress not found for " + playerProgressId));
-        
+                .orElseThrow(() -> {
+                    log.error("Player progress not found with ID: {}", playerProgressId);
+                    return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND,
+                            "Player progress not found for " + playerProgressId);
+                });
+
         playerProgress.setCompletedChapters(playerProgress.getCompletedChapters() + 1);
+        log.debug("Updated completed chapters count to: {}", playerProgress.getCompletedChapters());
 
         if (playerProgress.getCompletedChapters() >= playerProgress.getStory().getNumOfChapters()) {
+            log.info("Player {} has completed all chapters in story: {}", playerProgress.getPlayer().getId(), playerProgress.getStory().getTitle());
+
             playerProgress.setCompletedAt(LocalDate.now());
             playerProgress.setProgressStatus(ProgressStatus.COMPLETED);
 
@@ -94,8 +135,12 @@ public class ChapterService {
                     playerProgress.getPlayer().getId(),
                     playerProgress.getStory().getTitle()
             ));
+            log.debug("Published story completion event for player: {}",
+                    playerProgress.getPlayer().getId());
         }
+
         chapterProgressRepository.save(chapterProgress);
         playerProgressRepository.save(playerProgress);
+        log.info("Successfully updated chapter and player progress");
     }
 }

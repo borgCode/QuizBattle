@@ -11,7 +11,6 @@ import {animate, keyframes, style, transition, trigger} from '@angular/animation
 import {MatDialog} from '@angular/material/dialog';
 import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
 import {ContentDialogComponent} from "../shared-components/content-dialog/content-dialog.component";
-import {PlayChapterFacadeService} from './service/play-chapter-facade.service';
 
 @Component({
   selector: 'app-play-chapter',
@@ -42,7 +41,6 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
 
   storyId: number;
   chapterId: number;
-  categories: string[];
   rewardText: string;
   chapterTitle: string;
   chapterWinCondition: number;
