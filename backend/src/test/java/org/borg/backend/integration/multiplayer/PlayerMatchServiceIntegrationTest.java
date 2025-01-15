@@ -99,7 +99,7 @@ public class PlayerMatchServiceIntegrationTest {
                         sendingPlayer.getId(), opponentPlayer.getId())),
                 () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId()).isEmpty()),
                 () -> assertTrue(multiplayerSessionRepository.checkIfOngoingSessionExists(
-                        sendingPlayer, opponentPlayer, GameStatus.ACTIVE))
+                        sendingPlayer.getId(), opponentPlayer.getId(), GameStatus.ACTIVE))
         );
 
         List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
@@ -119,7 +119,7 @@ public class PlayerMatchServiceIntegrationTest {
                         sendingPlayer.getId(), opponentPlayer.getId())),
                 () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId()).isEmpty()),
                 () -> assertFalse(multiplayerSessionRepository.checkIfOngoingSessionExists(
-                        sendingPlayer, opponentPlayer, GameStatus.ACTIVE))
+                        sendingPlayer.getId(), opponentPlayer.getId(), GameStatus.ACTIVE))
         );
 
         List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
@@ -180,7 +180,7 @@ public class PlayerMatchServiceIntegrationTest {
         );
 
         assertTrue(multiplayerSessionRepository.checkIfOngoingSessionExists(
-                sendingPlayer, opponentPlayer, GameStatus.ACTIVE));
+                sendingPlayer.getId(), opponentPlayer.getId(), GameStatus.ACTIVE));
     }
 
     @Test

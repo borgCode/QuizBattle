@@ -51,7 +51,7 @@ public class MessagingService {
     public void sendMessage(SendMessageRequest request) {
         log.info("Processing message send request for conversation: {}, sender: {}, receiver: {}",
                 request.getConversationId(), request.getSenderId(), request.getReceiverId());
-        
+
         Conversation conversation = conversationRepository.findById(request.getConversationId())
                 .orElseThrow(() -> {
                     log.error("Conversation not found with id: {}", request.getConversationId());
@@ -136,7 +136,7 @@ public class MessagingService {
                 conversationRequest.getSenderId(), conversationRequest.getReceiverId());
 
         Conversation conversation = conversationRepository.findByBothPlayerIds(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
-        
+
         if (conversation == null) {
             log.debug("No existing conversation found, creating new conversation");
             return createConversation(conversationRequest.getSenderId(), conversationRequest.getReceiverId());
@@ -147,14 +147,14 @@ public class MessagingService {
 
     public ConversationPreviewDTO getPreviewConversation(long conversationId, long playerId) {
         log.info("Retrieving conversation preview for conversation: {} and player: {}", conversationId, playerId);
-        
+
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> {
                     log.error("Conversation not found with id: {}", conversationId);
                     return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND,
                             String.format("Conversation not found for id: %s", conversationId));
                 });
-        
+
         if (conversation.getPlayer1().getId().equals(playerId) || conversation.getPlayer2().getId().equals(playerId)) {
             log.debug("Player {} authorized to view conversation {}", playerId, conversationId);
             return conversationMapper.toPreviewDTO(conversation, playerId);

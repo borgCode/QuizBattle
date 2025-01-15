@@ -11,7 +11,6 @@ import org.borg.backend.shared.exceptions.BlockException;
 import org.borg.backend.social.block.event.PlayerBlockEvent;
 import org.borg.backend.social.block.model.PlayerBlock;
 import org.borg.backend.social.block.repository.PlayerBlockRepository;
-import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

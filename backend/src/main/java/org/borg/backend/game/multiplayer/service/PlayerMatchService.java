@@ -10,6 +10,8 @@ import org.borg.backend.game.multiplayer.model.PendingSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.game.shared.enums.GameStatus;
+import org.borg.backend.shared.exceptions.BlockException;
+import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.notification.service.NotificationService;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.PlayerService;
@@ -30,6 +32,7 @@ public class PlayerMatchService {
     private final PendingSessionRepository pendingSessionRepository;
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final PlayerService playerService;
+    private final PlayerBlockService playerBlockService;
 
     @Transactional
     public void requestMatch(MatchRequest matchRequest) {
@@ -43,7 +46,7 @@ public class PlayerMatchService {
     public void requestRematch(RematchRequest rematchRequest) {
         MultiplayerSession session = multiplayerSessionRepository.findById(rematchRequest.getSessionId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND,
-                String.format("Multiplayer session with ID %d not found", rematchRequest.getSessionId())));
+                        String.format("Multiplayer session with ID %d not found", rematchRequest.getSessionId())));
 
         if (session.getStatus().equals(GameStatus.ACTIVE)) {
             throw new GameException(GAME_ALREADY_ONGOING,
@@ -56,58 +59,74 @@ public class PlayerMatchService {
                 .filter(player -> player.getId().equals(playerId))
                 .findFirst()
                 .orElseThrow(() -> new GameException(INVALID_SESSION_STATE,
-                String.format("Player %d is not part of session %d", playerId, session.getId())));
+                        String.format("Player %d is not part of session %d", playerId, session.getId())));
 
         Player opponentPlayer = session.getPlayers().stream()
                 .filter(player -> !player.equals(sendingPlayer))
                 .findFirst()
                 .orElseThrow(() -> new GameException(INVALID_SESSION_STATE,
-                String.format("Could not find opponent in session %d", session.getId())));
+                        String.format("Could not find opponent in session %d", session.getId())));
 
         handleMatchRequest(sendingPlayer, opponentPlayer, session);
     }
 
     private void handleMatchRequest(Player sendingPlayer, Player receivingPlayer, MultiplayerSession originalSession) {
-        if (multiplayerSessionRepository.checkIfOngoingSessionExists(sendingPlayer, receivingPlayer, GameStatus.ACTIVE)) {
-            throw new GameException(GAME_ALREADY_ONGOING,
-                    String.format("Active game already exists between players %d and %d",
-                            sendingPlayer.getId(), receivingPlayer.getId()));
-        }
+        validateMatchRequest(sendingPlayer.getId(), receivingPlayer.getId());
 
-        if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), receivingPlayer.getId())) {
-            throw new GameException(REMATCH_REQUEST_ALREADY_SENT,
-                    String.format("Player %d has already sent a match request to player %d",
-                            sendingPlayer.getId(), receivingPlayer.getId()));
-        }
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(receivingPlayer.getId(), sendingPlayer.getId());
 
         if (pendingSession != null) {
-
-            Player startingPlayer = Math.random() < 0.5 ? sendingPlayer : receivingPlayer;
-
-            Long newSessionId = multiplayerSessionRepository.save(
-                    new MultiplayerSession(sendingPlayer, receivingPlayer, startingPlayer)).getId();
-
-            if (originalSession != null) {
-                notificationService.deleteMatchRequestNotification(sendingPlayer.getId(), pendingSession.getId());
-            }
-            pendingSessionRepository.delete(pendingSession);
-
-            if (originalSession != null) {
-                notificationService.sendRematchStartedNotification(sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId);
-                notificationService.sendRematchStartedNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
-            } else {
-                notificationService.sendMatchStartedNotification(sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId);
-                notificationService.sendMatchStartedNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
-            }
+            handleSimultaneousRequests(sendingPlayer, receivingPlayer, originalSession, pendingSession);
         } else {
-            PendingSession newSession = pendingSessionRepository.save(new PendingSession(sendingPlayer.getId(), receivingPlayer.getId()));
+            createNewMatchRequest(sendingPlayer, receivingPlayer, originalSession);
+        }
+    }
 
-            if (originalSession != null) {
-                notificationService.sendRematchRequestNotification(receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
-            } else {
-                notificationService.sendMatchRequestNotification(receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
-            }
+    private void validateMatchRequest(Long senderId, Long receiverId) {
+        if (multiplayerSessionRepository.checkIfOngoingSessionExists(senderId, receiverId, GameStatus.ACTIVE)) {
+            throw new GameException(GAME_ALREADY_ONGOING,
+                    String.format("Active game already exists between players %d and %d",
+                            senderId, receiverId));
+        }
+
+        if (pendingSessionRepository.existsByRequestingPlayerIdAndOpponentId(senderId, receiverId)) {
+            throw new GameException(REMATCH_REQUEST_ALREADY_SENT,
+                    String.format("Player %d has already sent a match request to player %d",
+                            senderId, receiverId));
+        }
+        if (playerBlockService.checkIfBlockIsActive(senderId, receiverId)) {
+            throw new BlockException(CANNOT_SEND_MATCH_REQUEST_TO_BLOCKED,
+                    String.format("Player %d tried to send a match request to blocked player %d", senderId, receiverId));
+        }
+    }
+
+    private void handleSimultaneousRequests(Player sendingPlayer, Player receivingPlayer, MultiplayerSession originalSession, PendingSession pendingSession) {
+        Player startingPlayer = Math.random() < 0.5 ? sendingPlayer : receivingPlayer;
+
+        Long newSessionId = multiplayerSessionRepository.save(
+                new MultiplayerSession(sendingPlayer, receivingPlayer, startingPlayer)).getId();
+
+        if (originalSession != null) {
+            notificationService.deleteMatchRequestNotification(sendingPlayer.getId(), pendingSession.getId());
+        }
+        pendingSessionRepository.delete(pendingSession);
+
+        if (originalSession != null) {
+            notificationService.sendRematchStartedNotification(sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId);
+            notificationService.sendRematchStartedNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
+        } else {
+            notificationService.sendMatchStartedNotification(sendingPlayer.getId(), receivingPlayer.getDisplayName(), newSessionId);
+            notificationService.sendMatchStartedNotification(receivingPlayer.getId(), sendingPlayer.getDisplayName(), newSessionId);
+        }
+    }
+
+    private void createNewMatchRequest(Player sendingPlayer, Player receivingPlayer, MultiplayerSession originalSession) {
+        PendingSession newSession = pendingSessionRepository.save(new PendingSession(sendingPlayer.getId(), receivingPlayer.getId()));
+
+        if (originalSession != null) {
+            notificationService.sendRematchRequestNotification(receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
+        } else {
+            notificationService.sendMatchRequestNotification(receivingPlayer.getId(), sendingPlayer.getId(), sendingPlayer.getDisplayName(), newSession.getId());
         }
     }
 
@@ -115,7 +134,7 @@ public class PlayerMatchService {
     public Long handleMatchAccept(MatchResponse response) {
         PendingSession pendingSession = pendingSessionRepository.findById(response.getPendingSessionId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND,
-                String.format("Pending session with ID %d not found", response.getPendingSessionId())));
+                        String.format("Pending session with ID %d not found", response.getPendingSessionId())));
 
         if (!pendingSession.getOpponentId().equals(response.getSenderId())) {
             throw new AccessDeniedException(

@@ -72,6 +72,27 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 205:
               this.alertMessageService.show("You already blocked this player!", 'error');
               break;
+            case 206:
+              this.alertMessageService.show("You can't block yourself!", 'error')
+              break;
+            case 250:
+              this.alertMessageService.show("The player is already blocked!", 'error');
+              break;
+            case 251:
+              this.alertMessageService.show("You can't block yourself!", 'error');
+              break;
+            case 252:
+              this.alertMessageService.show("You can't unblock yourself!", 'error');
+              break;
+            case 253:
+              this.alertMessageService.show("Can't unblock player that is not blocked!", 'error');
+              break;
+            case 254:
+              this.alertMessageService.show("You can't friend someone that you have blocked!", 'error');
+              break;
+            case 255:
+              this.alertMessageService.show("You can't send a match request to someone you blocked!", 'error');
+              break;
             case 300:
               this.alertMessageService.show('You already sent a rematch request!', 'error');
               break;

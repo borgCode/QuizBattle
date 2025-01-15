@@ -22,7 +22,10 @@ public class MultiplayerSession {
     @ManyToMany
     @JoinTable(name = "session_players",
             joinColumns = @JoinColumn(name = "session_id"),
-            inverseJoinColumns = @JoinColumn(name = "player_id"))
+            inverseJoinColumns = @JoinColumn(name = "player_id"),
+    indexes = {
+         @Index(name = "IX_session_player", columnList = "session_id, player_id")   
+    })
     private List<Player> players;
     
     private Integer currentQuestionIndex;

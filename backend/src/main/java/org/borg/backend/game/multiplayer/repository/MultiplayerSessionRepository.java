@@ -17,10 +17,11 @@ public interface MultiplayerSessionRepository extends JpaRepository<MultiplayerS
 
 
     @Query("SELECT COUNT(ms) > 0 FROM MultiplayerSession ms " +
-    "WHERE :player1 MEMBER OF ms.players AND :player2 MEMBER OF ms.players " +
-    "AND ms.status = :gameStatus")
+            "WHERE EXISTS (SELECT 1 FROM ms.players player WHERE player.id = :player1Id) " +
+            "AND EXISTS (SELECT 1 FROM ms.players player WHERE player.id = :player2Id) " +
+            "AND ms.status = :gameStatus")
     boolean checkIfOngoingSessionExists(
-            @Param("player1") Player sendingPlayer,
-            @Param("player2") Player opponentPlayer,
+            @Param("player1Id") Long player1Id,
+            @Param("player2Id") Long player2Id,
             @Param("gameStatus") GameStatus gameStatus);
 }
