@@ -1,6 +1,7 @@
 package org.borg.backend.unit.game.singleplayer;
 
 import org.borg.backend.game.shared.dto.QuestionDTO;
+import org.borg.backend.game.shared.mapper.QuestionMapper;
 import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.repository.QuestionRepository;
 import org.borg.backend.game.shared.service.GameValidationService;
@@ -41,11 +42,12 @@ public class SinglePlayerQuestionServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
     @Mock
     private GameValidationService gameValidationService;
+    @Mock
+    private QuestionMapper questionMapper;
 
     @Mock
     private ChapterService chapterService;
 
-    
     private RoundSessionService roundSessionService;
     private SinglePlayerQuestionService singlePlayerQuestionService;
     List<Question> mockQuestions;
@@ -53,7 +55,7 @@ public class SinglePlayerQuestionServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        roundSessionService = new RoundSessionService(questionRepository);
+        roundSessionService = new RoundSessionService(questionRepository, questionMapper);
         singlePlayerQuestionService = new SinglePlayerQuestionService(
                 questionRepository,
                 roundSessionService,
@@ -62,7 +64,8 @@ public class SinglePlayerQuestionServiceTest {
                 chapterProgressRepository,
                 chapterService,
                 gameValidationService,
-                statsService
+                statsService,
+                questionMapper
         );
     }
 
@@ -81,11 +84,19 @@ public class SinglePlayerQuestionServiceTest {
                     createTestQuestion(5L, "Q5")
             );
 
+            List<QuestionDTO> mockQuestionDTOs = mockQuestions.stream()
+                    .map(q -> QuestionDTO.builder()
+                            .id(q.getId())
+                            .question(q.getQuestion())
+                            .build())
+                    .toList();
+
             Set<String> categories = Set.of("History");
             ChapterSession chapterSession = new ChapterSession(playerId, categories, 2);
 
             when(chapterSessionService.getSession(playerId)).thenReturn(chapterSession);
             when(questionRepository.findFiveRandomQuestionsByCategory("History")).thenReturn(mockQuestions);
+            when(questionMapper.multipleToDTO(mockQuestions)).thenReturn(mockQuestionDTOs);
 
             List<QuestionDTO> result = singlePlayerQuestionService.getSinglePlayerRoundQuestions(playerId);
 
@@ -138,11 +149,11 @@ public class SinglePlayerQuestionServiceTest {
             Long playerId = 1L;
             Long questionId = 1L;
             SinglePlayerAnswerValidationRequest request = new SinglePlayerAnswerValidationRequest(questionId, "Answer", playerId);
-            
+
             doThrow(new GameException(BusinessErrorCodes.NO_ACTIVE_SESSION,
                     String.format("No active round session found for player %d", playerId)))
                     .when(gameValidationService).validateSinglePlayerAnswer(playerId, questionId);
-            
+
             GameException exception = assertThrows(
                     GameException.class,
                     () -> singlePlayerQuestionService.validateSingleplayerAnswer(request)

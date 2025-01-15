@@ -139,7 +139,7 @@ public class ChapterFullFlowIntegrationTest {
 
         List<QuestionDTO> questions = singlePlayerQuestionService.getSinglePlayerRoundQuestions(player.getId());
         List<Long> questionIds = questions.stream()
-                .map(QuestionDTO::getQuestionId)
+                .map(QuestionDTO::getId)
                 .toList();
 
         assertNotNull(roundSessionService.getSessionQuestions(player.getId()), "Player should be in a started round session");
@@ -152,7 +152,7 @@ public class ChapterFullFlowIntegrationTest {
 
         for (int i = 0; i < fullQuestions.size(); i++) {
             singlePlayerQuestionService.validateSingleplayerAnswer(
-                    new SinglePlayerAnswerValidationRequest(questions.get(i).getQuestionId(), fullQuestions.get(i).getCorrectAnswer(), player.getId()));
+                    new SinglePlayerAnswerValidationRequest(questions.get(i).getId(), fullQuestions.get(i).getCorrectAnswer(), player.getId()));
         }
 
         ChapterRoundResults results = singlePlayerQuestionService.getRoundResults(player.getId());
@@ -195,7 +195,7 @@ public class ChapterFullFlowIntegrationTest {
 
             for (int j = 0; j < fullQuestions.size(); j++) {
                 singlePlayerQuestionService.validateSingleplayerAnswer(
-                        new SinglePlayerAnswerValidationRequest(questions.get(j).getQuestionId(), fullQuestions.get(j).getCorrectAnswer(), player.getId()));
+                        new SinglePlayerAnswerValidationRequest(questions.get(j).getId(), fullQuestions.get(j).getCorrectAnswer(), player.getId()));
             }
             if (i < 1) {
                 singlePlayerQuestionService.getRoundResults(player.getId());
@@ -212,7 +212,7 @@ public class ChapterFullFlowIntegrationTest {
 
         for (int i = 0; i < fullQuestions.size(); i++) {
             singlePlayerQuestionService.validateSingleplayerAnswer(
-                    new SinglePlayerAnswerValidationRequest(questions.get(i).getQuestionId(), fullQuestions.get(i).getOptions().get(2), player.getId()));
+                    new SinglePlayerAnswerValidationRequest(questions.get(i).getId(), fullQuestions.get(i).getOptions().get(2), player.getId()));
         }
 
         ChapterRoundResults results = singlePlayerQuestionService.getRoundResults(player.getId());
@@ -248,7 +248,7 @@ public class ChapterFullFlowIntegrationTest {
 
             for (int j = 0; j < fullQuestions.size(); j++) {
                 singlePlayerQuestionService.validateSingleplayerAnswer(
-                        new SinglePlayerAnswerValidationRequest(questions.get(j).getQuestionId(), fullQuestions.get(i).getOptions().get(2), player.getId()));
+                        new SinglePlayerAnswerValidationRequest(questions.get(j).getId(), fullQuestions.get(i).getOptions().get(2), player.getId()));
             }
             if (i < 1) {
                 singlePlayerQuestionService.getRoundResults(player.getId());
