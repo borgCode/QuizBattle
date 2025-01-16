@@ -15,6 +15,9 @@ export class PlayerInteractionService {
 
   readonly relationshipState$ = this.relationshipStatusSubject.asObservable();
 
+  playerId: number;
+  opponentId: number;
+
   constructor(
     private friendshipService: FriendshipService,
     private blockService: BlockService,
@@ -24,6 +27,8 @@ export class PlayerInteractionService {
   }
 
   loadRelationshipStatus(playerId: number, opponentId: number) {
+    this.playerId = playerId;
+    this.opponentId = opponentId;
     this.friendshipService.getRelationshipStatus({
       relationshipStatusRequest: {
         playerId: playerId,
@@ -36,25 +41,25 @@ export class PlayerInteractionService {
       )).subscribe()
   }
 
-  sendFriendRequest(playerId: number, opponentId: number) {
-    this.friendshipService.addFriend({body: {senderId: playerId, receiverId: opponentId}}).subscribe({
+  sendFriendRequest() {
+    this.friendshipService.addFriend({body: {senderId: this.playerId, receiverId: this.opponentId}}).subscribe({
       next: () => {
         this.alertMessageService.show('Friend request sent', 'success')
-        this.loadRelationshipStatus(playerId, opponentId);
+        this.loadRelationshipStatus(this.playerId, this.opponentId);
       }
     })
   }
 
-  cancelFriendRequest(playerId: number, opponentId: number) {
-    this.friendshipService.removeAsFriend({body: {senderId: playerId, receiverId: opponentId}}).subscribe({
+  cancelFriendRequest() {
+    this.friendshipService.removeAsFriend({body: {senderId: this.playerId, receiverId: this.opponentId}}).subscribe({
       next: () => {
         this.alertMessageService.show('Friend request canceled', 'success')
-        this.loadRelationshipStatus(playerId, opponentId);
+        this.loadRelationshipStatus(this.playerId, this.opponentId);
       }
     })
   }
 
-  removeFriend(playerId: number, opponentId: number) {
+  removeFriend() {
     const dialogRef = this.confirmationDialog.open(ConfirmationDialogComponent, {
       data: {title: "Remove friend", description: "Are you sure you want to remove this player from your friend list?"},
       width: "300px",
@@ -62,26 +67,26 @@ export class PlayerInteractionService {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        this.friendshipService.removeAsFriend({body: {senderId: playerId, receiverId: opponentId}}).subscribe({
+        this.friendshipService.removeAsFriend({body: {senderId: this.playerId, receiverId: this.opponentId}}).subscribe({
           next: () => {
             this.alertMessageService.show('Removed friend', 'success')
-            this.loadRelationshipStatus(playerId, opponentId);
+            this.loadRelationshipStatus(this.playerId, this.opponentId);
           }
         })
       }
     })
   }
 
-  acceptFriend(playerId: number, opponentId: number) {
-    this.friendshipService.acceptFriend({body: {senderId: playerId, receiverId: opponentId}}).subscribe({
+  acceptFriend() {
+    this.friendshipService.acceptFriend({body: {senderId: this.playerId, receiverId: this.opponentId}}).subscribe({
       next: () => {
         this.alertMessageService.show('Accepted friend request', 'success')
-        this.loadRelationshipStatus(playerId, opponentId);
+        this.loadRelationshipStatus(this.playerId, this.opponentId);
       },
     });
   }
 
-  blockPlayer(playerId: number, opponentId: number) {
+  blockPlayer() {
     const dialogRef = this.confirmationDialog.open(ConfirmationDialogComponent, {
       data: {title: "Block player", description: "Are you sure you want to block this player?"},
       width: "300px",
@@ -90,17 +95,17 @@ export class PlayerInteractionService {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-         this.blockService.blockPlayer({blockerId: playerId, blockedId: opponentId}).subscribe({
+         this.blockService.blockPlayer({blockerId: this.playerId, blockedId: this.opponentId}).subscribe({
            next: () => {
              this.alertMessageService.show('Blocked player', 'success')
-             this.loadRelationshipStatus(playerId, opponentId);
+             this.loadRelationshipStatus(this.playerId, this.opponentId);
            }
          })
       }
     })
   }
 
-  unblockPlayer(playerId: number, opponentId: number) {
+  unblockPlayer() {
     const dialogRef = this.confirmationDialog.open(ConfirmationDialogComponent, {
       data: {title: "Unblock player", description: "Are you sure you want to unblock this player?"},
       width: "300px",
@@ -108,10 +113,10 @@ export class PlayerInteractionService {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        this.blockService.unblockPlayer({blockerId: playerId, blockedId: opponentId}).subscribe({
+        this.blockService.unblockPlayer({blockerId: this.playerId, blockedId: this.opponentId}).subscribe({
             next: () => {
               this.alertMessageService.show('Unblocked player', 'success')
-              this.loadRelationshipStatus(playerId, opponentId);
+              this.loadRelationshipStatus(this.playerId, this.opponentId);
             }
           }
         )

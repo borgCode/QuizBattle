@@ -8,15 +8,11 @@ import {AlertMessageService} from '../../../../../../../core/services/alert-mess
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverDialogComponent} from '../../dialog/game-over-dialog/game-over-dialog.component';
 import {GameResult} from '../../../../../../../shared/enums/game-result';
-import {FriendshipService} from '../../../../../../../api/generated/services/friendship.service';
 import {MultiplayerGameService} from '../../../../../../../api/generated/services/multiplayer-game.service';
 import {MultiplayerMatchService} from '../../../../../../../api/generated/services/multiplayer-match.service';
-import {
-  ConfirmationDialogComponent
-} from '../../../../../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
-import {BlockService} from '../../../../../../../api/generated/services/block.service';
 import {GameService} from '../../service/game.service';
 import {PlayerInteractionService} from '../../service/player-interaction.service';
+import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 
 interface Box {
   color: string;
@@ -41,6 +37,8 @@ interface BoxRow {
   styleUrl: './multiplayer-score-window.component.css'
 })
 export class MultiplayerScoreWindowComponent implements OnInit {
+
+
   gameState!: GameStateResponse;
   boxes: BoxRow[] = [];
   opponentIndex: number | null = null;
@@ -55,20 +53,18 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   opponentAvatar: string = '';
   hasAcknowledgedGameOver: boolean;
 
-  friendshipStatus: string;
 
 
   constructor(
     private gameService: GameService,
     protected playerInteractionService: PlayerInteractionService,
+    protected loginStateService: LoginStateService,
     private multiplayerGameService: MultiplayerGameService,
     private multiplayerMatchService: MultiplayerMatchService,
-    private friendshipService: FriendshipService,
     private alertMessageService: AlertMessageService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private gameOverDialog: MatDialog,
-    private confirmationDialog: MatDialog,
   ) {
   }
 
@@ -76,7 +72,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     this.activatedRoute.params.subscribe(value => {
       this.sessionId = value['sessionId'];
       this.resetGameComponents();
-      this.initStoredPlayerId();
+      this.storedPlayerId = this.loginStateService.loggedInUser.id;
       this.initBoxes();
       this.getGameState();
     })
@@ -85,13 +81,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   private resetGameComponents() {
     this.isGameOver = false;
     this.boxes = [];
-  }
-
-  private initStoredPlayerId() {
-    const storedPlayer = localStorage.getItem('loggedInUser');
-    if (storedPlayer) {
-      this.storedPlayerId = JSON.parse(storedPlayer).id;
-    }
   }
 
   private initBoxes() {
@@ -160,29 +149,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   }
 
-  private getFriendshipStatus() {
-    this.friendshipService.getRelationshipStatus({
-      relationshipStatusRequest: {
-        playerId: this.storedPlayerId,
-        targetPlayerId: this.opponentId
-      }
-    }).subscribe({
-      next: value => {
-        if (value) {
-          if (value.blocked) {
-            this.friendshipStatus = "BLOCKED"
-          } else {
-            this.friendshipStatus = value.friendshipStatus
-          }
-        }
-
-      },
-      error: err => {
-        console.log(err)
-      }
-    })
-  }
-
   private handleGameOver() {
     const gameResult: GameResult = (() => {
       if (this.gameState.playerWhoGaveUp) {
@@ -247,28 +213,27 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
 
   sendFriendRequest() {
-    this.playerInteractionService.sendFriendRequest(this.storedPlayerId, this.opponentId);
+    this.playerInteractionService.sendFriendRequest();
   }
 
   cancelFriendRequest() {
-    this.playerInteractionService.cancelFriendRequest(this.storedPlayerId, this.opponentId);
+    this.playerInteractionService.cancelFriendRequest();
   }
 
   blockPlayer() {
-    this.playerInteractionService.blockPlayer(this.storedPlayerId, this.opponentId);
+    this.playerInteractionService.blockPlayer();
 
   }
-
   unBlockPlayer() {
-    this.playerInteractionService.unblockPlayer(this.storedPlayerId, this.opponentId);
+    this.playerInteractionService.unblockPlayer();
   }
 
   removeFriend() {
-    this.playerInteractionService.removeFriend(this.storedPlayerId, this.opponentId);
+    this.playerInteractionService.removeFriend();
   }
 
   acceptFriend() {
-    this.playerInteractionService.acceptFriend(this.storedPlayerId, this.opponentId);
+    this.playerInteractionService.acceptFriend();
   }
 
   backToMultiplayerPage() {
