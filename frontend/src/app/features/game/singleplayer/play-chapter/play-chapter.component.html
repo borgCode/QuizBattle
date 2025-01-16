@@ -3,7 +3,9 @@
   <ng-container *ngIf="!showQuiz">
     <div class="row justify-content-center">
       <div class="col-12 col-md-5">
-        Answer at least {{ chapterWinCondition }} questions correctly to pass each category!
+        <ng-container *ngIf="chapterData$ | async as chapter">
+          Answer at least {{ chapter.roundWinCondition }} questions correctly to pass each category!
+        </ng-container>
       </div>
     </div>
     <div class="row justify-content-center mt-3">
@@ -17,7 +19,11 @@
 
   <ng-container *ngIf="showQuiz">
     <div class="row justify-content-end">
-      <div class="title-text col-12 col-md-8">{{ chapterTitle }}</div>
+      <div class="title-text col-12 col-md-8">
+        <ng-container *ngIf="chapterData$ | async as chapter">
+          Answer at least {{ chapter.title }} questions correctly to pass each category!
+        </ng-container>
+      </div>
       <div class="col-6 col-md-4">
         <i *ngFor="let heart of [1, 2, 3]"
            class="fa-solid fa-heart ms-1"

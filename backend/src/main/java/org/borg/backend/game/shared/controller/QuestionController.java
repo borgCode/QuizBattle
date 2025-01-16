@@ -22,8 +22,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/questions")
-@Tag(name = "Questions")
+@RequestMapping("/question")
+@Tag(name = "Question")
 public class QuestionController {
     
     private final SinglePlayerQuestionService singlePlayerQuestionService;

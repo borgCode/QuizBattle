@@ -4,7 +4,7 @@
 
 export { PlayerService } from './services/player.service';
 export { StoryService } from './services/story.service';
-export { QuestionsService } from './services/questions.service';
+export { QuestionService } from './services/question.service';
 export { NotificationService } from './services/notification.service';
 export { MultiplayerMatchService } from './services/multiplayer-match.service';
 export { MultiplayerGameService } from './services/multiplayer-game.service';

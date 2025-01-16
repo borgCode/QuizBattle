@@ -2,22 +2,26 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ChapterService} from '../../../../api/generated/services/chapter.service';
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
-import {QuestionsService} from '../../../../api/generated/services/questions.service';
 import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
 import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, AsyncPipe} from '@angular/common';
 import {animate, keyframes, style, transition, trigger} from '@angular/animations';
 import {MatDialog} from '@angular/material/dialog';
 import {RoundResultsDialogComponent} from './round-results-dialog/round-results-dialog.component';
 import {ContentDialogComponent} from "../shared-components/content-dialog/content-dialog.component";
+import {PlayChapterFacadeService} from './service/play-chapter-facade.service';
+import {QuestionService} from '../../../../api/generated/services/question.service';
+import {Observable} from 'rxjs';
+import {PlayChapterDto} from '../../../../api/generated/models/play-chapter-dto';
 
 @Component({
   selector: 'app-play-chapter',
   imports: [
     QuestionPanelComponent,
     NgIf,
-    NgForOf
+    NgForOf,
+    AsyncPipe
   ],
   templateUrl: './play-chapter.component.html',
   styleUrl: './play-chapter.component.css',
@@ -42,8 +46,6 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
   storyId: number;
   chapterId: number;
   rewardText: string;
-  chapterTitle: string;
-  chapterWinCondition: number;
 
   questions: QuestionDto[];
   storedPlayerId: number;
@@ -56,13 +58,18 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
   animationState: string = "normal";
   lastLostHeart: number;
 
+  chapterData$: Observable<PlayChapterDto>
+  questions$: Observable<QuestionDto[]>
+  currentQuestionIndex$: Observable<number>
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
 
     private chapterService: ChapterService,
-    private questionService: QuestionsService,
+    private questionService: QuestionService,
     private loginStateService: LoginStateService,
+    private playChapterFacadeService: PlayChapterFacadeService,
     private resultsDialog: MatDialog,
     private endGameDialog: MatDialog
   ) {
@@ -77,31 +84,18 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
       this.chapterId = +params.get("chapterId");
     })
 
-    this.chapterService.startChapter({
-      body: {
-        playerId: this.storedPlayerId,
-        storyId: this.storyId,
-        chapterId: this.chapterId
-      }
-    }).subscribe({
+    this.playChapterFacadeService.startChapter(this.storedPlayerId, this.storyId, this.chapterId).subscribe({
       next: () => {
-        this.chapterService.getChapter({chapterId: this.chapterId}).subscribe({
-          next: chapter => {
-            this.rewardText = chapter.rewardText;
-            this.chapterTitle = chapter.title;
-            this.chapterWinCondition = chapter.roundWinCondition;
-            this.fetchQuestions();
-          }
-        });
-      },
-      error: err => {
-        console.log(err)
-      }
-    });
-  }
+        this.chapterData$ = this.playChapterFacadeService.chapterDetails$;
+        this.questions$ = this.playChapterFacadeService.questions$;
+        this.currentQuestionIndex$ = this.playChapterFacadeService.currentQuestionIndex$;
 
-  get hasQuestions(): boolean {
-    return this.questions.length > 0;
+        this.playChapterFacadeService.fetchQuestions(this.storedPlayerId).subscribe();
+
+        this.questions$.subscribe(questions => this.questions = questions);
+        this.currentQuestionIndex$.subscribe(index => this.currentQuestionIndex = index);
+      }
+    })
   }
 
   private fetchQuestions() {
@@ -123,6 +117,10 @@ export class PlayChapterComponent implements OnInit, OnDestroy {
         }
       }
     })
+  }
+
+  get hasQuestions(): boolean {
+    return this.questions.length > 0;
   }
 
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {

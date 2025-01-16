@@ -45,12 +45,12 @@ ngOnChanges(changes: SimpleChanges) {
 }
 
   selectAnswer(answer: string, i: number) {
-    console.log('Selecting answer for question:', this.question?.questionId);
+    console.log('Selecting answer for question:', this.question?.id);
     this.selectedAnswerIndex = i;
     this.hasClickedOption = true
 
     this.answerSelected.emit({
-      questionId: this.question.questionId,
+      questionId: this.question.id,
       answer: answer
     });
   }
@@ -68,7 +68,7 @@ ngOnChanges(changes: SimpleChanges) {
     if (!this.timerHasRanOut) {
       this.timerHasRanOut = true;
       console.log(this.timerHasRanOut)
-      this.timerRanOut.emit({questionId: this.question.questionId});
+      this.timerRanOut.emit({questionId: this.question.id});
     }
   }
 

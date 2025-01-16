@@ -8,7 +8,7 @@ import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 
 import { PlayerService } from './services/player.service';
 import { StoryService } from './services/story.service';
-import { QuestionsService } from './services/questions.service';
+import { QuestionService } from './services/question.service';
 import { NotificationService } from './services/notification.service';
 import { MultiplayerMatchService } from './services/multiplayer-match.service';
 import { MultiplayerGameService } from './services/multiplayer-game.service';
@@ -30,7 +30,7 @@ import { MultiplayerMatchmakingService } from './services/multiplayer-matchmakin
   providers: [
     PlayerService,
     StoryService,
-    QuestionsService,
+    QuestionService,
     NotificationService,
     MultiplayerMatchService,
     MultiplayerGameService,

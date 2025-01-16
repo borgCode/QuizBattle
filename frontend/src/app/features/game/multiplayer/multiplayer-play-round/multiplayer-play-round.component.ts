@@ -3,11 +3,11 @@ import {MultiplayerCategoryComponent} from './multiplayer-category/multiplayer-c
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgIf} from '@angular/common';
 import {QuestionDto} from '../../../../api/generated/models/question-dto';
-import {QuestionsService} from '../../../../api/generated/services/questions.service';
 import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
 import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
 import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
+import {QuestionService} from '../../../../api/generated/services/question.service';
 
 @Component({
   selector: 'app-multiplayer-play-round',
@@ -31,7 +31,7 @@ export class MultiplayerPlayRoundComponent implements OnInit {
   currentQuestionIndex: number = 0;
 
   constructor(
-    private questionService: QuestionsService,
+    private questionService: QuestionService,
     private loginStateService: LoginStateService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
