@@ -15,7 +15,6 @@ import org.borg.backend.social.friendship.model.Friendship;
 import org.borg.backend.social.friendship.repository.FriendshipRepository;
 import org.borg.backend.social.friendship.service.FriendshipService;
 import org.borg.backend.social.notification.model.Notification;
-import org.borg.backend.social.notification.model.NotificationType;
 import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
@@ -101,8 +101,7 @@ public class PlayerBlockIntegrationTest {
 
         await().atMost(Duration.ofSeconds(2))
                 .untilAsserted(() -> {
-                    boolean existingFriendships = friendshipRepository
-                            .existsByPlayer1AndPlayer2OrPlayer1AndPlayer2(player1, player2, player2, player1);
+                    boolean existingFriendships = friendshipRepository.existsFriendship(player1, player2);
                     assertFalse(existingFriendships);
                 });
     }
@@ -163,8 +162,8 @@ public class PlayerBlockIntegrationTest {
         PlayerInteraction blockedRequest = new PlayerInteraction(player2.getId(), player1.getId());
         friendshipService.sendFriendRequest(blockedRequest);
         
-        List<Friendship> friendships = friendshipRepository.findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
-                player1, player2, player2, player1);
+        Optional<Friendship> friendships = friendshipRepository.findExistingFriendshipByPlayers(
+                player1, player2);
         assertTrue(friendships.isEmpty(), "No friendship should be created when blocked");
 
         

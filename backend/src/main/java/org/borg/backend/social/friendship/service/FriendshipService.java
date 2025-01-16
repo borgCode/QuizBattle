@@ -58,11 +58,11 @@ public class FriendshipService {
 
         Player receivingPlayer = playerService.getPlayerById(request.getReceiverId());
 
-        List<Friendship> existingFriendships = friendshipRepository.
-                findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
-                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
+        Optional<Friendship> existingFriendship = friendshipRepository.
+                findExistingFriendshipByPlayers(
+                        sendingPlayer, receivingPlayer);
 
-        if (existingFriendships.isEmpty()) {
+        if (existingFriendship.isEmpty()) {
             log.info("No existing friendship found, creating new friend request");
             friendshipRepository.save(Friendship.builder()
                     .player1(sendingPlayer)
@@ -72,32 +72,34 @@ public class FriendshipService {
                     .build());
 
             notificationService.sendFriendRequestNotification(receiverId, sendingPlayer, false);
-        } else {
-            Friendship friendship = existingFriendships.get(0);
-            log.debug("Existing friendship found with status: {}", friendship.getStatus());
-            if (friendship.getPlayer1().equals(sendingPlayer)) {
-                switch (friendship.getStatus()) {
-                    case PENDING:
-                        log.warn("Friend request already pending from player {} to player {}", senderId, receiverId);
-                        throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING,
-                                String.format("Friend request from player %d to player %d is already pending",
-                                        senderId, receiverId));
-                    case ACTIVE:
-                        throwAlreadyExistsException(senderId, receiverId);
-                }
-            } else if (friendship.getPlayer2().equals(sendingPlayer)) {
-                switch (friendship.getStatus()) {
-                    case ACTIVE:
-                        throwAlreadyExistsException(senderId, receiverId);
-                    case PENDING:
-                        log.info("Friend request accepted by player {}, updating status to ACTIVE", senderId);
-                        friendship.setStatus(FriendshipStatus.ACTIVE);
-                        friendshipRepository.save(friendship);
-                        notificationService.sendFriendAcceptedNotification(friendship.getPlayer1().getId(), sendingPlayer);
-                        notificationService.sendFriendAcceptedNotification(friendship.getPlayer2().getId(), receivingPlayer);
+            return;
+        }
 
-                        notificationService.deleteFriendRequestByPlayerIds(senderId, receiverId);
-                }
+        Friendship friendship = existingFriendship.get();
+        log.debug("Existing friendship found with status: {}", friendship.getStatus());
+
+        if (friendship.getPlayer1().equals(sendingPlayer)) {
+            switch (friendship.getStatus()) {
+                case PENDING:
+                    log.warn("Friend request already pending from player {} to player {}", senderId, receiverId);
+                    throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_REQUEST_PENDING,
+                            String.format("Friend request from player %d to player %d is already pending",
+                                    senderId, receiverId));
+                case ACTIVE:
+                    throwAlreadyExistsException(senderId, receiverId);
+            }
+        } else if (friendship.getPlayer2().equals(sendingPlayer)) {
+            switch (friendship.getStatus()) {
+                case ACTIVE:
+                    throwAlreadyExistsException(senderId, receiverId);
+                case PENDING:
+                    log.info("Friend request accepted by player {}, updating status to ACTIVE", senderId);
+                    friendship.setStatus(FriendshipStatus.ACTIVE);
+                    friendshipRepository.save(friendship);
+                    notificationService.sendFriendAcceptedNotification(friendship.getPlayer1().getId(), sendingPlayer);
+                    notificationService.sendFriendAcceptedNotification(friendship.getPlayer2().getId(), receivingPlayer);
+
+                    notificationService.deleteFriendRequestByPlayerIds(senderId, receiverId);
             }
         }
     }
@@ -120,11 +122,11 @@ public class FriendshipService {
         Player sendingPlayer = playerService.getPlayerById(senderId);
         Player receivingPlayer = playerService.getPlayerById(receiverId);
 
-        List<Friendship> existingFriendships = friendshipRepository.
-                findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
-                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
+        Optional<Friendship> existingFriendship = friendshipRepository.
+                findExistingFriendshipByPlayers(
+                        sendingPlayer, receivingPlayer);
 
-        if (existingFriendships.isEmpty()) {
+        if (existingFriendship.isEmpty()) {
             log.warn("No friendship found between players {} and {}, deleting notification", senderId, receiverId);
             notificationRepository.deleteById(response.getNotificationId());
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND,
@@ -132,7 +134,7 @@ public class FriendshipService {
                             senderId, receiverId));
         }
 
-        Friendship friendship = existingFriendships.get(0);
+        Friendship friendship = existingFriendship.get();
 
         if (friendship.getStatus().equals(FriendshipStatus.ACTIVE)) {
             log.warn("Friendship already exists between players {} and {}, cannot respond", senderId, receiverId);
@@ -165,17 +167,17 @@ public class FriendshipService {
 
         Long senderId = removeFriendRequest.getSenderId();
         Long receiverId = removeFriendRequest.getReceiverId();
-        
+
         Player sendingPlayer = playerService.getPlayerById(senderId);
         Player receivingPlayer = playerService.getPlayerById(receiverId);
         log.debug("Player {} is removing player {} from their friends", senderId, receiverId);
 
-        List<Friendship> existingFriendships = friendshipRepository
-                .findByPlayer1AndPlayer2OrPlayer1AndPlayer2(
-                        sendingPlayer, receivingPlayer, receivingPlayer, sendingPlayer);
+        Optional<Friendship> existingFriendship = friendshipRepository
+                .findExistingFriendshipByPlayers(
+                        sendingPlayer, receivingPlayer);
 
-        if (!existingFriendships.isEmpty()) {
-            Friendship friendship = existingFriendships.get(0);
+        if (existingFriendship.isPresent()) {
+            Friendship friendship = existingFriendship.get();
             if (friendship.getStatus() == FriendshipStatus.ACTIVE) {
                 friendshipRepository.delete(friendship);
                 log.info("Removed friendship between players {} and {}", senderId, receiverId);
@@ -193,18 +195,15 @@ public class FriendshipService {
     }
 
     public FriendshipStatus getFriendshipStatus(RelationshipStatusRequest request) {
-        List<Friendship> friendships = friendshipRepository
-                .findByPlayer1IdAndPlayer2IdOrPlayer1IdAndPlayer2Id(
-                        request.getPlayerId(),
-                        request.getTargetPlayerId(),
-                        request.getTargetPlayerId(),
-                        request.getPlayerId());
+        Optional<Friendship> friendships = friendshipRepository
+                .findFriendshipBetweenPlayerIds(request.getPlayerId(), request.getTargetPlayerId());
+                        
 
         if (friendships.isEmpty()) {
             return FriendshipStatus.NONE;
         }
 
-        Friendship friendship = friendships.get(0);
+        Friendship friendship = friendships.get();
 
         if (friendship.getStatus() == FriendshipStatus.PENDING) {
             return friendship.getPlayer1().getId().equals(request.getPlayerId()) ?

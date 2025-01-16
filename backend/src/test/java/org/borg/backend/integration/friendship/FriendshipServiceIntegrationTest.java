@@ -156,7 +156,7 @@ class FriendshipServiceIntegrationTest {
                             && notificationsPlayer2.get(0).getType().equals(NotificationType.FRIEND_ACCEPTED))
             );
 
-            assertFalse(friendshipRepository.findByPlayer1AndPlayer2OrPlayer1AndPlayer2(player1, player2, player2, player1).isEmpty());
+            assertFalse(friendshipRepository.findExistingFriendshipByPlayers(player1, player2).isEmpty());
         }
 
         @Test

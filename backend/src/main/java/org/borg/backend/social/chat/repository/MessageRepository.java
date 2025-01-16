@@ -14,11 +14,11 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
     
+    long countByIdInAndReceiverIdNot(Collection<Long> ids, Long receiverId);
+
     @Modifying
     @Transactional
     @Query("UPDATE Message m SET m.read = true " +
             "WHERE m.id IN :ids")
     void markMessagesAsRead(@Param("ids") List<Long> messageIds);
-
-    long countByIdInAndReceiverIdNot(Collection<Long> ids, Long receiverId);
 }

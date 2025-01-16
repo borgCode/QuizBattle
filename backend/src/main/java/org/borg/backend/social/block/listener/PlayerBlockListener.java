@@ -25,10 +25,7 @@ public class PlayerBlockListener {
     @Transactional
     public void handleFriendshipDeletion(PlayerBlockedEvent event) {
         PlayerBlock block = event.block();
-        friendshipRepository.deleteByPlayer1AndPlayer2OrPlayer1AndPlayer2(
-                block.getBlocker(), block.getBlocked(),
-                block.getBlocked(), block.getBlocker()
-        );
+        friendshipRepository.deleteFriendship(block.getBlocker(), block.getBlocked());
         log.info("Deleted friendships between players {} and {}",
                 block.getBlocker().getId(), block.getBlocked().getId());
     }
