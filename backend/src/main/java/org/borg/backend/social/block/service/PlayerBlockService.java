@@ -109,6 +109,6 @@ public class PlayerBlockService {
     }
 
     public boolean checkIfAnyBlockExists(Long player1, Long player2) {
-        return playerBlockRepository.existsByBlockerIdAndBlockedIdOrBlockerIdAndBlockedId(player1, player2, player2, player1);
+        return playerBlockRepository.checkIfBlockExists(player1, player2);
     }
 }

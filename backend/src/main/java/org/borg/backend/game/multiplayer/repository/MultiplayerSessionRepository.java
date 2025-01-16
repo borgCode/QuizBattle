@@ -12,7 +12,9 @@ import java.util.List;
 
 @Repository
 public interface MultiplayerSessionRepository extends JpaRepository<MultiplayerSession, Long> {
-    @Query("SELECT session FROM MultiplayerSession session JOIN session.players player WHERE player.id = :playerId")
+    @Query("SELECT session FROM MultiplayerSession session " +
+            "JOIN session.players player " +
+            "WHERE player.id = :playerId")
     List<MultiplayerSession> findByPlayerId(@Param("playerId") Long playerId);
 
 

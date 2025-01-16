@@ -108,9 +108,8 @@ class MatchMakingServiceIntegrationTest {
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.accepted(player1Sessions.get(0).getId(), player1.getDisplayName()));
 
             MatchmakingSession postAcceptSession = matchmakingSessionRepository
-                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
-                            player1.getId(), player2.getId(),
-                            player2.getId(), player1.getId()
+                    .findMatchmakingSessionByPlayerIds(
+                            player1.getId(), player2.getId()
                     );
             assertNull(postAcceptSession, "Matchmaking session should be cleaned up after both players accepted");
         }
@@ -130,21 +129,18 @@ class MatchMakingServiceIntegrationTest {
             matchMakingService.findMatch(player3.getId());
 
             assertNull(matchmakingSessionRepository
-                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
-                            player1.getId(), player2.getId(),
-                            player2.getId(), player1.getId()
+                    .findMatchmakingSessionByPlayerIds(
+                            player1.getId(), player2.getId()
                     ));
 
             MatchmakingSession player3WithPlayer1 = matchmakingSessionRepository
-                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
-                            player1.getId(), player3.getId(),
-                            player3.getId(), player1.getId()
+                    .findMatchmakingSessionByPlayerIds(
+                            player1.getId(), player3.getId()
                     );
 
             MatchmakingSession player3WithPlayer2 = matchmakingSessionRepository
-                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
-                            player2.getId(), player3.getId(),
-                            player3.getId(), player2.getId()
+                    .findMatchmakingSessionByPlayerIds(
+                            player2.getId(), player3.getId()
                     );
 
             assertTrue(player3WithPlayer1 != null || player3WithPlayer2 != null,
@@ -162,9 +158,8 @@ class MatchMakingServiceIntegrationTest {
             verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.declined());
 
             MatchmakingSession postDeclinedSession = matchmakingSessionRepository
-                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
-                            player1.getId(), player2.getId(),
-                            player2.getId(), player1.getId()
+                    .findMatchmakingSessionByPlayerIds(
+                            player1.getId(), player2.getId()
                     );
             assertNull(postDeclinedSession, "Matchmaking session should be cleaned up after both players after someone declined");
         }
@@ -190,9 +185,8 @@ class MatchMakingServiceIntegrationTest {
             assertEquals(0, matchMakingService.getQueueSize(), "There should be 0 players in the queue");
 
             MatchmakingSession savedMatchmakingSession = matchmakingSessionRepository
-                    .findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(
-                            player1.getId(), player2.getId(),
-                            player2.getId(), player1.getId()
+                    .findMatchmakingSessionByPlayerIds(
+                            player1.getId(), player2.getId()
                     );
 
             verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.matched(savedMatchmakingSession.getId(), player2.getDisplayName()));

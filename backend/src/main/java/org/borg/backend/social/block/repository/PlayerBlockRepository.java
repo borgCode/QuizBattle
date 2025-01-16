@@ -11,12 +11,18 @@ import java.util.List;
 @Repository
 public interface PlayerBlockRepository extends JpaRepository<PlayerBlock, Long> {
 
-    @Query("SELECT DISTINCT p.blocked FROM PlayerBlock p WHERE p.blocker.id = :playerId")
-    List<Player> getBlockedPlayers(Long playerId);
-    
     boolean existsByBlockerIdAndBlockedId(Long blockerId, Long blockedId);
 
     void deleteByBlockerIdAndBlockedId(Long blockerId, Long blockedId);
 
-    boolean existsByBlockerIdAndBlockedIdOrBlockerIdAndBlockedId(Long blockerId, Long blockedId, Long blockerId1, Long blockedId1);
+    @Query("SELECT DISTINCT p.blocked FROM PlayerBlock p WHERE p.blocker.id = :playerId")
+    List<Player> getBlockedPlayers(Long playerId);
+
+
+    @Query("SELECT CASE WHEN EXISTS (" +
+            "  SELECT 1 FROM PlayerBlock pb " +
+            "  WHERE (pb.blocker.id = :player1Id AND pb.blocked.id = :player2Id) " +
+            "     OR (pb.blocker.id = :player2Id AND pb.blocked.id = :player1Id)" +
+            ") THEN true ELSE false END")
+    boolean checkIfBlockExists(Long player1Id, Long player2Id);
 }

@@ -104,16 +104,16 @@ public class MatchMakingService {
             return;
         }
 
-        if (playerId == matchmakingSession.getRequestingPlayerId()) {
-            matchmakingSession.setRequestingPlayerAccepted(true);
+        if (playerId == matchmakingSession.getPlayer1Id()) {
+            matchmakingSession.setPlayer1Accepted(true);
             log.debug("Requesting player {} accepted match", playerId);
-        } else if (playerId == matchmakingSession.getOpponentId()) {
+        } else if (playerId == matchmakingSession.getPlayer2Id()) {
             log.debug("Opponent {} accepted match", playerId);
-            matchmakingSession.setOpponentAccepted(true);
+            matchmakingSession.setPlayer2Accepted(true);
         }
         matchmakingSessionRepository.save(matchmakingSession);
 
-        if (matchmakingSession.isOpponentAccepted() && matchmakingSession.isRequestingPlayerAccepted()) {
+        if (matchmakingSession.isPlayer2Accepted() && matchmakingSession.isPlayer1Accepted()) {
             log.info("Both players accepted match in session {}", matchmakingSessionId);
             createMultiplayerSession(matchmakingSession);
         } else {
@@ -124,7 +124,7 @@ public class MatchMakingService {
     }
 
     private void cancelMatch(MatchmakingSession matchmakingSession, long playerId) {
-        Long opponentId = matchmakingSession.getOpponentId().equals(playerId) ? matchmakingSession.getRequestingPlayerId() : matchmakingSession.getOpponentId();
+        Long opponentId = matchmakingSession.getPlayer2Id().equals(playerId) ? matchmakingSession.getPlayer1Id() : matchmakingSession.getPlayer2Id();
 
         log.info("Cancelling match session {} between players {} and {}",
                 matchmakingSession.getId(), playerId, opponentId);
@@ -134,8 +134,8 @@ public class MatchMakingService {
     }
 
     private void createMultiplayerSession(MatchmakingSession matchmakingSession) {
-        Player player1 = playerService.getPlayerById(matchmakingSession.getRequestingPlayerId());
-        Player player2 = playerService.getPlayerById(matchmakingSession.getOpponentId());
+        Player player1 = playerService.getPlayerById(matchmakingSession.getPlayer1Id());
+        Player player2 = playerService.getPlayerById(matchmakingSession.getPlayer2Id());
 
         //Randomly choose who starts
 

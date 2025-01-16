@@ -20,18 +20,18 @@ public class MatchmakingSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long requestingPlayerId;
-    private Long opponentId;
+    private Long player1Id;
+    private Long player2Id;
     private Instant createdAt;
-    private boolean requestingPlayerAccepted;
-    private boolean opponentAccepted;
+    private boolean player1Accepted;
+    private boolean player2Accepted;
 
 
-    public MatchmakingSession(Long requestingPlayerId, Long opponentId) {
-        this.requestingPlayerId = requestingPlayerId;
-        this.opponentId = opponentId;
+    public MatchmakingSession(Long player1Id, Long player2Id) {
+        this.player1Id = player1Id;
+        this.player2Id = player2Id;
         this.createdAt = Instant.now();
-        this.requestingPlayerAccepted = false;
-        this.opponentAccepted = false;
+        this.player1Accepted = false;
+        this.player2Accepted = false;
     }
 }

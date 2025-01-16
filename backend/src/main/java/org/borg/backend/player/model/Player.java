@@ -17,7 +17,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "players")
+@Table(name = "players",
+indexes = {
+        @Index(name = "IX_player_username", columnList = "username", unique = true)
+})
 public class Player implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

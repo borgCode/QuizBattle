@@ -11,10 +11,14 @@ import java.time.Instant;
 
 public interface MatchmakingSessionRepository extends JpaRepository<MatchmakingSession, Long> {
 
+    
+    @Query("select ms from MatchmakingSession ms " +
+            "where (ms.player1Id = :player1Id and ms.player2Id = :player2Id) " +
+            "OR (ms.player1Id = :player2Id and ms.player2Id = :player1Id)")
+    MatchmakingSession findMatchmakingSessionByPlayerIds(@Param("player1Id") Long player1Id, @Param("player2Id") Long player2Id);
+
     @Modifying
     @Transactional
-    @Query("DELETE FROM MatchmakingSession  ps WHERE ps.createdAt < :instant")
+    @Query("DELETE FROM MatchmakingSession ps WHERE ps.createdAt < :instant")
     void deleteOlderThan(@Param("instant") Instant instant);
-
-    MatchmakingSession findByRequestingPlayerIdAndOpponentIdOrRequestingPlayerIdAndOpponentId(Long requestingPlayerId, Long requestingPlayerId1, Long requestingPlayerId2, Long requestingPlayerId3);
 }
