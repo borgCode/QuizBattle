@@ -15,6 +15,8 @@ import {
   ConfirmationDialogComponent
 } from '../../../../../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
 import {BlockService} from '../../../../../../../api/generated/services/block.service';
+import {GameService} from '../../service/game.service';
+import {PlayerInteractionService} from '../../service/player-interaction.service';
 
 interface Box {
   color: string;
@@ -56,6 +58,8 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
 
   constructor(
+    private gameService: GameService,
+    private playerInteractionService: PlayerInteractionService,
     private multiplayerGameService: MultiplayerGameService,
     private multiplayerMatchService: MultiplayerMatchService,
     private friendshipService: FriendshipService,
@@ -100,8 +104,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   private getGameState() {
-
-    this.multiplayerGameService.getGameState({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
+    this.gameService.getGameState(this.sessionId, this.storedPlayerId).subscribe({
       next: gameState => {
         this.gameState = gameState;
 
@@ -137,7 +140,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
         }
         this.getFriendshipStatus()
       }
-    });
+    })
   }
 
   private indexToBoxPosition(questionIndex: number) {
@@ -244,26 +247,21 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
 
   sendFriendRequest() {
-    this.friendshipService.addFriend({body: {senderId: this.storedPlayerId, receiverId: this.opponentId}}).subscribe({
+    this.playerInteractionService.sendFriendRequest(this.storedPlayerId, this.opponentId).subscribe({
       next: () => {
         this.alertMessageService.show('Friend request sent successfully', 'success')
         this.getFriendshipStatus();
-      },
-    });
+      }
+    })
   }
 
   cancelFriendRequest() {
-    this.friendshipService.removeAsFriend({
-      body: {
-        senderId: this.storedPlayerId,
-        receiverId: this.opponentId
-      }
-    }).subscribe({
+    this.playerInteractionService.cancelFriendRequest(this.storedPlayerId, this.opponentId).subscribe({
       next: () => {
         this.alertMessageService.show('Friend request canceled', 'success')
         this.getFriendshipStatus();
-      },
-    });
+      }
+    })
   }
 
   blockPlayer() {
@@ -275,12 +273,12 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
         if (result === true) {
-          this.blockService.blockPlayer({blockerId: this.storedPlayerId, blockedId: this.opponentId}).subscribe({
+          this.playerInteractionService.blockPlayer(this.storedPlayerId, this.opponentId).subscribe({
             next: () => {
               this.alertMessageService.show('Blocked player', 'success')
               this.getFriendshipStatus();
-            },
-          });
+            }
+          })
         }
       }
     )
@@ -294,12 +292,13 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        this.blockService.unblockPlayer({blockerId: this.storedPlayerId, blockedId: this.opponentId}).subscribe({
-          next: () => {
-            this.alertMessageService.show('Unblocked player', 'success')
-            this.getFriendshipStatus();
-          },
-        });
+        this.playerInteractionService.unblockPlayer(this.storedPlayerId, this.opponentId).subscribe({
+            next: () => {
+              this.alertMessageService.show('Unblocked player', 'success')
+              this.getFriendshipStatus();
+            }
+          }
+        )
       }
     })
   }
@@ -313,28 +312,18 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        this.friendshipService.removeAsFriend({
-          body: {
-            senderId: this.storedPlayerId,
-            receiverId: this.opponentId
-          }
-        }).subscribe({
+        this.playerInteractionService.removeFriend(this.storedPlayerId, this.opponentId).subscribe({
           next: () => {
             this.alertMessageService.show('Removed friend', 'success')
             this.getFriendshipStatus();
-          },
-        });
+          }
+        })
       }
     })
   }
 
   acceptFriend() {
-    this.friendshipService.acceptFriend({
-      body: {
-        senderId: this.storedPlayerId,
-        receiverId: this.opponentId
-      }
-    }).subscribe({
+    this.playerInteractionService.acceptFriend(this.storedPlayerId, this.opponentId).subscribe({
       next: () => {
         this.alertMessageService.show('Accepted friend request', 'success')
         this.getFriendshipStatus();
