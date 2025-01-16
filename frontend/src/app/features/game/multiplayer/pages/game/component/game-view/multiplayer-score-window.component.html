@@ -7,7 +7,8 @@
         maxHeight="150px"></app-player-card>
     </div>
     <div class="score-panel col-4 col-sm-4 align-content-center text-center">
-      <div [ngSwitch]="friendshipStatus">
+      <ng-container *ngIf="playerInteractionService.relationshipState$ | async as relationshipStatus">
+      <div [ngSwitch]="relationshipStatus">
         <div *ngSwitchCase="'NONE'" class="div">
           <div  (click)="sendFriendRequest()" class="btn btn-primary mt-2 me-3">Send friend request</div>
           <div  (click)="blockPlayer()" class="btn btn-danger mt-2">Block player</div>
@@ -28,7 +29,8 @@
           <div  (click)="blockPlayer()" class="btn btn-danger mt-2">Block player</div>
         </div>
       </div>
-      <p class="total-score">{{ playerTotalScore }}
+      </ng-container>
+        <p class="total-score">{{ playerTotalScore }}
         - {{ opponentTotalScore }}</p>
     </div>
     <div class="col-4 col-sm-4 d-flex flex-column justify-content-center">

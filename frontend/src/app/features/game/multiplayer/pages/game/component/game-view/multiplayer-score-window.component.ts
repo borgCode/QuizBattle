@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
 import {PlayerQuestionResult} from '../../../../../../../api/generated/models/player-question-result';
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
@@ -34,7 +34,8 @@ interface BoxRow {
     NgIf,
     PlayerCardComponent,
     NgSwitch,
-    NgSwitchCase
+    NgSwitchCase,
+    AsyncPipe
   ],
   templateUrl: './multiplayer-score-window.component.html',
   styleUrl: './multiplayer-score-window.component.css'
@@ -59,7 +60,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   constructor(
     private gameService: GameService,
-    private playerInteractionService: PlayerInteractionService,
+    protected playerInteractionService: PlayerInteractionService,
     private multiplayerGameService: MultiplayerGameService,
     private multiplayerMatchService: MultiplayerMatchService,
     private friendshipService: FriendshipService,
@@ -68,7 +69,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     private router: Router,
     private gameOverDialog: MatDialog,
     private confirmationDialog: MatDialog,
-    private blockService: BlockService
   ) {
   }
 
@@ -138,7 +138,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             this.handleGameOver();
           }
         }
-        this.getFriendshipStatus()
+        this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.opponentId)
       }
     })
   }
@@ -247,88 +247,28 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
 
   sendFriendRequest() {
-    this.playerInteractionService.sendFriendRequest(this.storedPlayerId, this.opponentId).subscribe({
-      next: () => {
-        this.alertMessageService.show('Friend request sent successfully', 'success')
-        this.getFriendshipStatus();
-      }
-    })
+    this.playerInteractionService.sendFriendRequest(this.storedPlayerId, this.opponentId);
   }
 
   cancelFriendRequest() {
-    this.playerInteractionService.cancelFriendRequest(this.storedPlayerId, this.opponentId).subscribe({
-      next: () => {
-        this.alertMessageService.show('Friend request canceled', 'success')
-        this.getFriendshipStatus();
-      }
-    })
+    this.playerInteractionService.cancelFriendRequest(this.storedPlayerId, this.opponentId);
   }
 
   blockPlayer() {
-    const dialogRef = this.confirmationDialog.open(ConfirmationDialogComponent, {
-      data: {title: "Block player", description: "Are you sure you want to block this player?"},
-      width: "300px",
-      disableClose: true
-    });
+    this.playerInteractionService.blockPlayer(this.storedPlayerId, this.opponentId);
 
-    dialogRef.afterClosed().subscribe(result => {
-        if (result === true) {
-          this.playerInteractionService.blockPlayer(this.storedPlayerId, this.opponentId).subscribe({
-            next: () => {
-              this.alertMessageService.show('Blocked player', 'success')
-              this.getFriendshipStatus();
-            }
-          })
-        }
-      }
-    )
   }
 
   unBlockPlayer() {
-    const dialogRef = this.confirmationDialog.open(ConfirmationDialogComponent, {
-      data: {title: "Unblock player", description: "Are you sure you want to unblock this player?"},
-      width: "300px",
-      disableClose: true
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.playerInteractionService.unblockPlayer(this.storedPlayerId, this.opponentId).subscribe({
-            next: () => {
-              this.alertMessageService.show('Unblocked player', 'success')
-              this.getFriendshipStatus();
-            }
-          }
-        )
-      }
-    })
+    this.playerInteractionService.unblockPlayer(this.storedPlayerId, this.opponentId);
   }
 
-
   removeFriend() {
-    const dialogRef = this.confirmationDialog.open(ConfirmationDialogComponent, {
-      data: {title: "Remove friend", description: "Are you sure you want to remove this player from your friend list?"},
-      width: "300px",
-      disableClose: true
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.playerInteractionService.removeFriend(this.storedPlayerId, this.opponentId).subscribe({
-          next: () => {
-            this.alertMessageService.show('Removed friend', 'success')
-            this.getFriendshipStatus();
-          }
-        })
-      }
-    })
+    this.playerInteractionService.removeFriend(this.storedPlayerId, this.opponentId);
   }
 
   acceptFriend() {
-    this.playerInteractionService.acceptFriend(this.storedPlayerId, this.opponentId).subscribe({
-      next: () => {
-        this.alertMessageService.show('Accepted friend request', 'success')
-        this.getFriendshipStatus();
-      },
-    });
+    this.playerInteractionService.acceptFriend(this.storedPlayerId, this.opponentId);
   }
 
   backToMultiplayerPage() {
