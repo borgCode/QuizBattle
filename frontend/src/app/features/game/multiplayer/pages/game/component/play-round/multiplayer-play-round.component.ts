@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {MultiplayerCategoryComponent} from './multiplayer-category/multiplayer-category.component';
+import {MultiplayerCategoryComponent} from '../category-selection/multiplayer-category.component';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgIf} from '@angular/common';
-import {QuestionDto} from '../../../../api/generated/models/question-dto';
-import {AnswerValidationResponse} from '../../../../api/generated/models/answer-validation-response';
-import {QuestionPanelComponent} from '../../../../shared/components/question-panel/question-panel.component';
-import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
+import {QuestionDto} from '../../../../../../../api/generated/models/question-dto';
+import {AnswerValidationResponse} from '../../../../../../../api/generated/models/answer-validation-response';
+import {QuestionPanelComponent} from '../../../../../../../shared/components/question-panel/question-panel.component';
+import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
-import {QuestionService} from '../../../../api/generated/services/question.service';
+import {QuestionService} from '../../../../../../../api/generated/services/question.service';
 
 @Component({
   selector: 'app-multiplayer-play-round',

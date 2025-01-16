@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle} from '@
 import {MatIcon} from '@angular/material/icon';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {NgIf} from '@angular/common';
-import {GameResult} from '../../../../../../shared/enums/game-result';
+import {GameResult} from '../../../../../../../shared/enums/game-result';
 
 @Component({
   selector: 'app-game-over-dialog',

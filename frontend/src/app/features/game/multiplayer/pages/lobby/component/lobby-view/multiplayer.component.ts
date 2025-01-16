@@ -2,21 +2,21 @@ import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {NgForOf, NgIf, NgStyle, NgSwitch, NgSwitchCase} from '@angular/common';
 import {Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
-import {MatchFoundDialogComponent} from './dialog/match-found-dialog/match-found-dialog.component';
-import {MatchConfirmedDialogComponent} from './dialog/match-confirmed-dialog/match-confirmed-dialog.component';
-import {PlayerDto} from '../../../api/generated/models/player-dto';
-import {MultiplayerSessionDto} from '../../../api/generated/models/multiplayer-session-dto';
-import {LoginStateService} from '../../../core/services/login-state-service/login-state.service';
-import {WebSocketService} from '../../../core/websocket/web-socket.service';
-import {PlayerCardComponent} from '../../../shared/components/player-card/player-card-component';
+import {MatchFoundDialogComponent} from '../../dialog/match-found-dialog/match-found-dialog.component';
+import {MatchConfirmedDialogComponent} from '../../dialog/match-confirmed-dialog/match-confirmed-dialog.component';
+import {PlayerDto} from '../../../../../../../api/generated/models/player-dto';
+import {MultiplayerSessionDto} from '../../../../../../../api/generated/models/multiplayer-session-dto';
+import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
+import {WebSocketService} from '../../../../../../../core/websocket/web-socket.service';
+import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
 import {
   FriendsListDialogComponent
-} from '../../../shared/components/dialog/friends-list-dialog/friends-list-dialog.component';
-import {FriendshipService} from '../../../api/generated/services/friendship.service';
-import {AlertMessageService} from '../../../core/services/alert-message/alert-message.service';
-import {MultiplayerGameService} from '../../../api/generated/services/multiplayer-game.service';
-import {MultiplayerMatchmakingService} from '../../../api/generated/services/multiplayer-matchmaking.service';
-import {MultiplayerMatchService} from '../../../api/generated/services/multiplayer-match.service';
+} from '../../../../../../../shared/components/dialog/friends-list-dialog/friends-list-dialog.component';
+import {FriendshipService} from '../../../../../../../api/generated/services/friendship.service';
+import {AlertMessageService} from '../../../../../../../core/services/alert-message/alert-message.service';
+import {MultiplayerGameService} from '../../../../../../../api/generated/services/multiplayer-game.service';
+import {MultiplayerMatchmakingService} from '../../../../../../../api/generated/services/multiplayer-matchmaking.service';
+import {MultiplayerMatchService} from '../../../../../../../api/generated/services/multiplayer-match.service';
 
 
 interface MatchDecision {

@@ -7,11 +7,11 @@ import {authGuard} from './core/guard/auth.guard';
 
 import {
   MultiplayerPlayRoundComponent
-} from './features/game/multiplayer/multiplayer-play-round/multiplayer-play-round.component';
-import {MultiplayerComponent} from './features/game/multiplayer/multiplayer.component';
+} from './features/game/multiplayer/pages/game/component/play-round/multiplayer-play-round.component';
+import {MultiplayerComponent} from './features/game/multiplayer/pages/lobby/component/lobby-view/multiplayer.component';
 import {
   MultiplayerScoreWindowComponent
-} from './features/game/multiplayer/multiplayer-score-window/multiplayer-score-window.component';
+} from './features/game/multiplayer/pages/game/component/game-view/multiplayer-score-window.component';
 import {EditProfileComponent} from './features/profile/edit-profile/edit-profile.component';
 import {StorySelectionComponent} from './features/game/singleplayer/story-selection/story-selection.component';
 import {StoryOverviewComponent} from './features/game/singleplayer/story-overview/story-overview.component';

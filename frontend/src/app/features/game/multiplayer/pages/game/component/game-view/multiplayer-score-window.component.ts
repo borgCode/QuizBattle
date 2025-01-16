@@ -1,20 +1,20 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
-import {GameStateResponse} from '../../../../api/generated/models/game-state-response';
-import {PlayerQuestionResult} from '../../../../api/generated/models/player-question-result';
-import {PlayerCardComponent} from '../../../../shared/components/player-card/player-card-component';
-import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
+import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
+import {PlayerQuestionResult} from '../../../../../../../api/generated/models/player-question-result';
+import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
+import {AlertMessageService} from '../../../../../../../core/services/alert-message/alert-message.service';
 import {MatDialog} from '@angular/material/dialog';
-import {GameOverDialogComponent} from './dialog/game-over-dialog/game-over-dialog.component';
-import {GameResult} from '../../../../shared/enums/game-result';
-import {FriendshipService} from '../../../../api/generated/services/friendship.service';
-import {MultiplayerGameService} from '../../../../api/generated/services/multiplayer-game.service';
-import {MultiplayerMatchService} from '../../../../api/generated/services/multiplayer-match.service';
+import {GameOverDialogComponent} from '../../dialog/game-over-dialog/game-over-dialog.component';
+import {GameResult} from '../../../../../../../shared/enums/game-result';
+import {FriendshipService} from '../../../../../../../api/generated/services/friendship.service';
+import {MultiplayerGameService} from '../../../../../../../api/generated/services/multiplayer-game.service';
+import {MultiplayerMatchService} from '../../../../../../../api/generated/services/multiplayer-match.service';
 import {
   ConfirmationDialogComponent
-} from '../../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
-import {BlockService} from '../../../../api/generated/services/block.service';
+} from '../../../../../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
+import {BlockService} from '../../../../../../../api/generated/services/block.service';
 
 interface Box {
   color: string;
