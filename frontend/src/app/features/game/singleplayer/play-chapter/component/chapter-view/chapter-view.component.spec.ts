@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlayChapterComponent } from './play-chapter.component';
+import { ChapterViewComponent } from './chapter-view.component';
 
-describe('PlayChapterComponent', () => {
-  let component: PlayChapterComponent;
-  let fixture: ComponentFixture<PlayChapterComponent>;
+describe('ChapterViewComponent', () => {
+  let component: ChapterViewComponent;
+  let fixture: ComponentFixture<ChapterViewComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlayChapterComponent]
+      imports: [ChapterViewComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PlayChapterComponent);
+    fixture = TestBed.createComponent(ChapterViewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
