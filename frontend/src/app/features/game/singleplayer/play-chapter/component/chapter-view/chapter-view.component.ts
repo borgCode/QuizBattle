@@ -1,38 +1,30 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {QuestionDto} from '../../../../../../api/generated/models/question-dto';
-import {Observable} from 'rxjs';
+import {combineLatest, Observable, switchMap, tap} from 'rxjs';
 import {PlayChapterDto} from '../../../../../../api/generated/models/play-chapter-dto';
 import {AnswerState} from '../../interface/answer-state';
 import {HealthState} from '../../interface/health-state';
-import {ChapterService} from '../../../../../../api/generated/services/chapter.service';
-import {LoginStateService} from '../../../../../../core/services/login-state-service/login-state.service';
 import {PlayChapterUiService} from '../../service/play-chapter-ui.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ChapterHeaderComponent} from '../chapter-header/chapter-header.component';
-import {NgIf} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {QuestionPanelComponent} from '../../../../../../shared/components/question-panel/question-panel.component';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-chapter-view',
   imports: [
     ChapterHeaderComponent,
     NgIf,
-    QuestionPanelComponent
+    QuestionPanelComponent,
+    AsyncPipe
   ],
   templateUrl: './chapter-view.component.html',
   styleUrl: './chapter-view.component.css'
 })
-export class ChapterViewComponent {
-  questions: QuestionDto[];
-  storedPlayerId: number;
-  answerIsCorrect: boolean = null;
-  correctAnswerIndex: number;
-  currentQuestionIndex: number = 0;
+export class ChapterViewComponent implements OnInit, OnDestroy{
 
   showQuiz: boolean;
-  currentHealth: number = 3;
-  animationState: string = "normal";
-  lastLostHeart: number;
 
   chapterData$: Observable<PlayChapterDto>
   questions$: Observable<QuestionDto[]>
@@ -40,10 +32,10 @@ export class ChapterViewComponent {
   answerState$: Observable<AnswerState>
   healthState$: Observable<HealthState>
 
+  currentQuestion$: Observable<QuestionDto | null>;
+  hasQuestions$: Observable<boolean>;
 
   constructor(
-    private chapterService: ChapterService,
-    private loginStateService: LoginStateService,
     private playChapterUIService: PlayChapterUiService,
     private router: Router,
     private activatedRoute: ActivatedRoute
@@ -53,43 +45,35 @@ export class ChapterViewComponent {
   }
 
   ngOnInit() {
-    this.storedPlayerId = this.loginStateService.userId;
+    this.activatedRoute.paramMap.pipe(
+      tap(params => this.playChapterUIService.setChapterId(+params.get("chapterId"))),
+      switchMap(() => this.playChapterUIService.startChapter()),
+      tap(() => {
 
-    this.activatedRoute.paramMap.subscribe((params) => {
-      this.playChapterUIService.setChapterId(+params.get("chapterId"));
-    })
-
-    this.healthState$ = this.playChapterUIService.healthStateSubject$;
-    this.healthState$.subscribe(state => {
-      this.currentHealth = state.currentHealth;
-      this.animationState = state.animationState;
-      this.lastLostHeart = state.lastLostHeart;
-    })
-
-    this.answerState$ = this.playChapterUIService.answerStateSubject$;
-    this.answerState$.subscribe(state => {
-      this.answerIsCorrect = state.isCorrect;
-      this.correctAnswerIndex = state.correctAnswerIndex;
-    });
-
-
-    this.playChapterUIService.startChapter().subscribe({
-      next: () => {
         this.chapterData$ = this.playChapterUIService.chapterDetails$;
         this.questions$ = this.playChapterUIService.questions$;
         this.currentQuestionIndex$ = this.playChapterUIService.currentQuestionIndex$;
+        this.healthState$ = this.playChapterUIService.healthStateSubject$;
+        this.answerState$ = this.playChapterUIService.answerStateSubject$;
+
+        this.hasQuestions$ = this.questions$.pipe(
+          map(questions => questions.length > 0)
+        );
+
+        this.currentQuestion$ = combineLatest([
+          this.questions$,
+          this.currentQuestionIndex$
+        ]).pipe(
+          map(([questions, index]) =>
+            questions && index < questions.length ? questions[index] : null
+          )
+        );
 
         this.playChapterUIService.fetchQuestions().subscribe();
-
-        this.questions$.subscribe(questions => this.questions = questions);
-        this.currentQuestionIndex$.subscribe(index => this.currentQuestionIndex = index);
-      }
-    })
+      })
+    ).subscribe();
   }
 
-  get hasQuestions(): boolean {
-    return this.questions.length > 0;
-  }
 
   onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
     this.playChapterUIService.validateAnswer(selectedAnswer.questionId, selectedAnswer.answer)
@@ -100,25 +84,14 @@ export class ChapterViewComponent {
   }
 
   handleRoundFinished() {
-    this.questions = [];
-
     this.playChapterUIService.getRoundResults().subscribe();
   }
 
   onNextQuestion() {
     this.playChapterUIService.advanceToNextQuestion();
   }
-
-  get currentQuestion(): QuestionDto | null {
-    return this.questions && this.currentQuestionIndex < this.questions.length
-      ? this.questions[this.currentQuestionIndex]
-      : null;
-  }
-
   ngOnDestroy() {
-    this.chapterService.clearChapter({
-      playerId: this.storedPlayerId
-    }).subscribe({
+    this.playChapterUIService.clearChapter().subscribe({
       error: err => console.warn("Failed to clear chapter session: ", err)
     })
   }

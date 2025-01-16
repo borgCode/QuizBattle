@@ -217,6 +217,12 @@ export class PlayChapterUiService {
     });
   }
 
+  clearChapter() {
+    return this.chapterService.clearChapter({
+      playerId: this.playerId
+    })
+  }
+
   get chapterDetails$(): Observable<PlayChapterDto> {
     return this.chapterDetailsSubject.asObservable();
   }
@@ -229,10 +235,10 @@ export class PlayChapterUiService {
     return this.currentQuestionIndexSubject.asObservable();
   }
 
+
   get answerStateSubject$(): Observable<AnswerState> {
     return this.answerStateSubject.asObservable();
   }
-
 
   get healthStateSubject$(): BehaviorSubject<HealthState> {
     return this.healthStateSubject;

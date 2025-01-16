@@ -1,8 +1,8 @@
 <div class="container p-5">
   <app-chapter-header
     [chapterData$]="chapterData$"
-    [currentHealth]="currentHealth"
-    [lastLostHeart]="lastLostHeart"
+    [currentHealth]="(healthState$ | async)?.currentHealth"
+    [lastLostHeart]="(healthState$ | async)?.lastLostHeart"
     [showQuiz]="showQuiz"
     (startQuiz)="showQuiz = true">
   </app-chapter-header>
@@ -10,16 +10,17 @@
   <ng-container *ngIf="showQuiz">
     <div class="row justify-content-center">
       <div class="col-12">
-        <app-question-panel
-          [question]="currentQuestion"
-          [isCorrect]="answerIsCorrect"
-          [correctAnswerIndex]="correctAnswerIndex"
-          *ngIf="hasQuestions"
-          (answerSelected)="onAnswerSelected($event)"
-          (timerRanOut)="onTimerRanOut($event)"
-          (handleChapterRound)="handleRoundFinished()"
-          (nextQuestion)="onNextQuestion()"
-        ></app-question-panel>
+        <ng-container *ngIf="hasQuestions$ | async">
+          <app-question-panel
+            [question]="currentQuestion$ | async"
+            [isCorrect]="(answerState$ | async)?.isCorrect"
+            [correctAnswerIndex]="(answerState$ | async)?.correctAnswerIndex"
+            (answerSelected)="onAnswerSelected($event)"
+            (timerRanOut)="onTimerRanOut($event)"
+            (handleChapterRound)="handleRoundFinished()"
+            (nextQuestion)="onNextQuestion()">
+          </app-question-panel>
+        </ng-container>
       </div>
     </div>
   </ng-container>
