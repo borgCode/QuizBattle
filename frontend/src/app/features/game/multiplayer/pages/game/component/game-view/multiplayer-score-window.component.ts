@@ -105,7 +105,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             this.handleGameOver();
           }
         }
-        this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.gameState.opponentDTO.id)
+        this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.gameState.opponentDTO.playerId)
       }
     })
   }
@@ -139,9 +139,9 @@ export class MultiplayerScoreWindowComponent implements OnInit {
           return GameResult.OPPONENT_GAVE_UP
         }
       }
-      if (this.storedPlayerId == this.gameState.winnerId) {
+      if (this.storedPlayerId == this.gameState.sessionPlayerWinnerId) {
         return GameResult.WIN;
-      } else if (this.storedPlayerId == this.gameState.loserId) {
+      } else if (this.storedPlayerId == this.gameState.sessionPlayerLoserId) {
         return GameResult.LOSS
       } else {
         return GameResult.TIE

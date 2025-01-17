@@ -11,7 +11,7 @@ import java.util.Set;
 @Setter
 @Builder
 public class SessionPlayerDTO {
-        private Long id;
+        private Long playerId;
         private String displayName;
         private String base64Image;
         private Integer score;

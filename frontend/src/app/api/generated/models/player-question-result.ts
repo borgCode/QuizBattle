@@ -4,7 +4,6 @@
 
 export interface PlayerQuestionResult {
   correct?: boolean;
-  playerId?: number;
   questionId?: number;
   questionIndex?: number;
 }

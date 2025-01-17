@@ -2,27 +2,28 @@ package org.borg.backend.social.friendship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.borg.backend.social.block.repository.PlayerBlockRepository;
-import org.borg.backend.social.block.service.PlayerBlockService;
-import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
-import org.borg.backend.social.friendship.model.Friendship;
-import org.borg.backend.social.friendship.model.FriendshipStatus;
-import org.borg.backend.social.friendship.dto.PlayerInteraction;
-import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;
+import org.borg.backend.player.dto.PlayerDTO;
+import org.borg.backend.player.mapper.PlayerMapper;
+import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.FriendshipException;
+import org.borg.backend.social.block.repository.PlayerBlockRepository;
+import org.borg.backend.social.block.service.PlayerBlockService;
+import org.borg.backend.social.friendship.dto.PlayerInteraction;
+import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;
+import org.borg.backend.social.friendship.dto.RelationshipStatusRequest;
+import org.borg.backend.social.friendship.model.Friendship;
+import org.borg.backend.social.friendship.model.FriendshipStatus;
 import org.borg.backend.social.friendship.repository.FriendshipRepository;
 import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.borg.backend.social.notification.service.NotificationService;
-import org.borg.backend.player.model.Player;
-import org.borg.backend.player.dto.PlayerDTO;
-import org.borg.backend.player.mapper.PlayerMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -34,7 +35,6 @@ public class FriendshipService {
     private final PlayerService playerService;
     private final PlayerMapper playerMapper;
     private final PlayerBlockService playerBlockService;
-    private final PlayerBlockRepository playerBlockRepository;
 
     @Transactional
     public void sendFriendRequest(PlayerInteraction request) {

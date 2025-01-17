@@ -12,5 +12,6 @@ public interface SessionPlayerMapper {
     @Mapping(target = "base64Image",
             expression = "java(ImageUtil.encodeAvatarImageFileToBase64(sessionPlayer.getPlayer().getAvatarPath()))")
     @Mapping(target = "displayName", source = "player.displayName")
+    @Mapping(target = "playerId", source = "player.id")
     SessionPlayerDTO toDTO(SessionPlayer sessionPlayer);
 }

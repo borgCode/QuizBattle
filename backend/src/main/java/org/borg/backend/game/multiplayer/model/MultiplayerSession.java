@@ -25,8 +25,6 @@ public class MultiplayerSession {
     
     @Enumerated(EnumType.STRING)
     private GameStatus status;
-
-    private Long currentPlayerTurnId;
     
     @ElementCollection
     private List<Long> questionIds = new ArrayList<>();
@@ -37,9 +35,11 @@ public class MultiplayerSession {
     @ElementCollection
     private List<String> roundCategories = new ArrayList<>();
     
-    private Long winnerId = null;
-    private Long loserId = null;
+    private Long sessionPlayerWinnerId = null;
+    private Long sessionPlayerLoserId = null;
     private Boolean isTie = null;
+    
+    private Long currentPlayerTurnId;
     
     
 
@@ -47,11 +47,15 @@ public class MultiplayerSession {
         this.sessionPlayers = new ArrayList<>();
         status = GameStatus.ACTIVE;
         this.currentQuestionIndex = 0;
-        this.currentPlayerTurnId = currentPlayerTurnId;
 
-        this.sessionPlayers.add(buildSessionPlayer(player1));
-        this.sessionPlayers.add(buildSessionPlayer(player2));
+        SessionPlayer sessionPlayer1 = buildSessionPlayer(player1);
+        SessionPlayer sessionPlayer2 = buildSessionPlayer(player2);
+        this.sessionPlayers.add(sessionPlayer1);
+        this.sessionPlayers.add(sessionPlayer2);
+        
+        this.currentPlayerTurnId = currentPlayerTurnId;
     }
+    
 
     private SessionPlayer buildSessionPlayer(Player player) {
         return SessionPlayer.builder()
@@ -64,14 +68,14 @@ public class MultiplayerSession {
                 .questionResults(new HashSet<>()).build();
     }
 
-    public SessionPlayer getSessionPlayerById(Long playerId) {
+    public SessionPlayer getSessionPlayerByPlayerId(Long playerId) {
         return sessionPlayers.stream()
                 .filter(sp -> sp.getPlayer().getId().equals(playerId))
                 .findFirst()
                 .orElse(null);
     }
 
-    public SessionPlayer getOpponentSessionPlayer(Long playerId) {
+    public SessionPlayer getOpponentSessionPlayerId(Long playerId) {
         return sessionPlayers.stream()
                 .filter(sp -> !sp.getPlayer().getId().equals(playerId))
                 .findFirst()

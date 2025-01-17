@@ -22,43 +22,62 @@ public class GameValidationService {
     }
 
     public void validatePlayerTurn(MultiplayerQuestionsRequest request, MultiplayerSession session) {
-        SessionPlayer sessionPlayer = session.getSessionPlayerById(request.getPlayerId());
+        log.debug("Validating player turn for playerId: {}, sessionId: {}", request.getPlayerId(), session.getId());
         
-        if (!session.getCurrentPlayerTurnId().equals(sessionPlayer.getId())) {
+        if (!session.getCurrentPlayerTurnId().equals(request.getPlayerId())) {
+            log.warn("Invalid turn attempt - Player {} tried to play during player {}'s turn",
+                    request.getPlayerId(), session.getCurrentPlayerTurnId());
             throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN,
                     String.format("Player %d attempted to play but it's player %d's turn",
                             request.getPlayerId(), session.getCurrentPlayerTurnId()));
         }
-        
-        SessionPlayer opponent = session.getOpponentSessionPlayer(sessionPlayer.getId());
+
+        SessionPlayer sessionPlayer = session.getSessionPlayerByPlayerId(request.getPlayerId());
+        SessionPlayer opponent = session.getOpponentSessionPlayerId(request.getPlayerId());
 
         if (sessionPlayer.getQuestionsAnswered() > opponent.getQuestionsAnswered()) {
+            log.warn("Player {} (answers: {}) must wait for opponent {} (answers: {}) to catch up",
+                    sessionPlayer.getPlayer().getId(), sessionPlayer.getQuestionsAnswered(),
+                    opponent.getPlayer().getId(), opponent.getQuestionsAnswered());
             throw new GameException(BusinessErrorCodes.MUST_WAIT_FOR_OPPONENT,
                     String.format("Player %d must wait for opponent %d to catch up",
-                            request.getPlayerId(), opponent.getId()));
+                            request.getPlayerId(), opponent.getPlayer().getId()));
         }
 
         if (!session.getQuestionIds().isEmpty()) {
+            log.warn("Player {} attempted to request new questions while {} questions remain unanswered",
+                    request.getPlayerId(), session.getQuestionIds().size());
             throw new GameException(BusinessErrorCodes.MUST_ANSWER_EXISTING_QUESTIONS,
                     String.format("Player %d must answer existing questions before requesting new ones",
                             request.getPlayerId()));
         }
+        
+        log.debug("Player turn validation successful for playerId: {}", request.getPlayerId());
     }
 
     public void validateMultiplayerAnswer(MultiplayerAnswerValidationRequest request, MultiplayerSession session) {
+        log.debug("Validating multiplayer answer - playerId: {}, questionId: {}, sessionId: {}",
+                request.getPlayerId(), request.getQuestionId(), session.getId());
+
         if (!session.getCurrentPlayerTurnId().equals(request.getPlayerId())) {
+            log.warn("Invalid answer attempt - Player {} tried to answer during Player {}'s turn",
+                    request.getPlayerId(), session.getCurrentPlayerTurnId());
             throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN,
-                    String.format("Player %d attempted to answer but it's player %d's turn",
-                            request.getPlayerId(), session.getCurrentPlayerTurnId()));
+                    String.format("Player %d attempted to answer but it's not their turn",
+                            request.getPlayerId()));
         }
 
         if (!session.getQuestionIds().contains(request.getQuestionId())) {
+            log.warn("Invalid question attempt - Question {} is not part of session {} for player {}",
+                    request.getQuestionId(), session.getId(), request.getPlayerId());
             throw new GameException(BusinessErrorCodes.INVALID_QUESTION,
                     String.format("Question %d is not part of the current session for player %d",
                             request.getQuestionId(), request.getPlayerId()));
         }
 
         validateIfQuestionAnswered(request.getPlayerId(), request.getQuestionId());
+        log.debug("Multiplayer answer validation successful for playerId: {}, questionId: {}",
+                request.getPlayerId(), request.getQuestionId());
     }
 
     public void validateSinglePlayerAnswer(Long playerId, Long questionId) {

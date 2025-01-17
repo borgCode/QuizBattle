@@ -68,14 +68,14 @@ public class PlayerMatchService {
         
         Long playerId = rematchRequest.getPlayerId();
         
-        SessionPlayer sendingPlayer = session.getSessionPlayerById(playerId);
+        SessionPlayer sendingPlayer = session.getSessionPlayerByPlayerId(playerId);
         if (sendingPlayer == null) {
             log.error("Player {} not found in session {}", playerId, session.getId());
             throw new GameException(INVALID_SESSION_STATE,
                     String.format("Player %d is not part of session %d", playerId, session.getId()));
         }
         
-        SessionPlayer opponentPlayer = session.getOpponentSessionPlayer(playerId);
+        SessionPlayer opponentPlayer = session.getOpponentSessionPlayerId(playerId);
         if (opponentPlayer == null) {
             log.error("Opponent not found in session {}", session.getId());
             throw new GameException(INVALID_SESSION_STATE,

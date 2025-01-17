@@ -17,13 +17,13 @@ public abstract class GameSessionMapper {
     
     
     @Mapping(target = "playerTurn", source = "multiplayerSession.currentPlayerTurnId")
-    @Mapping(target = "playerDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getSessionPlayerById(playerId)))")
-    @Mapping(target = "opponentDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getOpponentSessionPlayer(playerId)))")
+    @Mapping(target = "playerDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getSessionPlayerByPlayerId(playerId)))")
+    @Mapping(target = "opponentDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getOpponentSessionPlayerId(playerId)))")
     @Mapping(target = "playerWhoGaveUp", expression = "java(multiplayerSession.getPlayerWhoGaveUpId())")
     public abstract GameStateResponse toGameStateResponse(MultiplayerSession multiplayerSession, Long playerId);
 
-    @Mapping(target = "playerDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getSessionPlayerById(playerId)))")
-    @Mapping(target = "opponentDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getOpponentSessionPlayer(playerId)))")
+    @Mapping(target = "playerDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getSessionPlayerByPlayerId(playerId)))")
+    @Mapping(target = "opponentDTO", expression = "java(sessionPlayerMapper.toDTO(multiplayerSession.getOpponentSessionPlayerId(playerId)))")
     @Mapping(target = "currentPlayerTurn", source = "multiplayerSession.currentPlayerTurnId")
     public abstract MultiplayerSessionDTO toMultiplayerSessionDTO(MultiplayerSession multiplayerSession, Long playerId);
     

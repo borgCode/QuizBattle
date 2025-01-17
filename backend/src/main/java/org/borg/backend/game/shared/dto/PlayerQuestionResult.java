@@ -13,8 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Embeddable
 public class PlayerQuestionResult {
-    @Column(name = "player_id")
-    private Long playerId;
     @Column(name = "question_id")
     private Long questionId;
     @Column(name = "question_index")

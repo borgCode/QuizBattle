@@ -68,7 +68,7 @@
         <div class="btn btn-danger btn-lg me-5" data-bs-toggle="modal" data-bs-target="#giveUpModal">
           Give up
         </div>
-        <div *ngIf="gameState.playerTurn === storedPlayerId; else elseBlock"
+        <div *ngIf="gameState.playerTurn === this.storedPlayerId; else elseBlock"
              (click)="handleButtonClick()"
              class="btn btn-success btn-lg">
           Play

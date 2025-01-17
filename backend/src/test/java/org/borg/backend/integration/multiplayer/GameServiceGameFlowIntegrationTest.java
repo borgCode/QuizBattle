@@ -307,9 +307,9 @@ public class GameServiceGameFlowIntegrationTest {
             assertAll("Post-win checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
                             "Game status should be COMPLETED after a player wins."),
-                    () -> assertEquals(player1.getId(), gameStateResponse.getWinnerId(),
+                    () -> assertEquals(player1.getId(), gameStateResponse.getSessionPlayerWinnerId(),
                             "Player 1 should be marked as the winner."),
-                    () -> assertEquals(player2.getId(), gameStateResponse.getLoserId(),
+                    () -> assertEquals(player2.getId(), gameStateResponse.getSessionPlayerLoserId(),
                             "Player 2 should be marked as the loser.")
             );
 
@@ -329,9 +329,9 @@ public class GameServiceGameFlowIntegrationTest {
             assertAll("Post-win checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
                             "Game status should be COMPLETED after a player wins."),
-                    () -> assertEquals(player1.getId(), gameStateResponse.getLoserId(),
+                    () -> assertEquals(player1.getId(), gameStateResponse.getSessionPlayerLoserId(),
                             "Player 1 should be marked as the loser."),
-                    () -> assertEquals(player2.getId(), gameStateResponse.getWinnerId(),
+                    () -> assertEquals(player2.getId(), gameStateResponse.getSessionPlayerWinnerId(),
                             "Player 2 should be marked as the winner.")
             );
             
@@ -352,9 +352,9 @@ public class GameServiceGameFlowIntegrationTest {
             assertAll("Post-tie checks",
                     () -> assertEquals(GameStatus.COMPLETED, gameStateResponse.getStatus(),
                             "Game status should be COMPLETED after a player wins."),
-                    () -> assertNull(gameStateResponse.getLoserId(),
+                    () -> assertNull(gameStateResponse.getSessionPlayerLoserId(),
                             "Loser id should be null"),
-                    () -> assertNull( gameStateResponse.getWinnerId(),
+                    () -> assertNull( gameStateResponse.getSessionPlayerWinnerId(),
                             "Winner id should be null"),
                     () -> assertTrue(gameStateResponse.getIsTie(), "Game should be tied")
             );
@@ -427,8 +427,8 @@ public class GameServiceGameFlowIntegrationTest {
         assertAll("Post give up session checks",
                 () -> assertTrue(updatedPlayer1.isGivenUp(), "Player1 should be marked as given up"),
                 () -> assertEquals(GameStatus.COMPLETED, updatedSession.getStatus(), "Game status should be COMPLETED"),
-                () -> assertEquals(player1.getId(), updatedSession.getLoserId(), "Player1 should be the loser"),
-                () -> assertEquals(player2.getId(), updatedSession.getWinnerId(), "Player2 should be the winner")
+                () -> assertEquals(player1.getId(), updatedSession.getSessionPlayerLoserId(), "Player1 should be the loser"),
+                () -> assertEquals(player2.getId(), updatedSession.getSessionPlayerWinnerId(), "Player2 should be the winner")
         );
         
         verifyNotifications(NotificationType.GAME_LOST, NotificationType.GAME_WON);
