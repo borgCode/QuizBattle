@@ -12,6 +12,7 @@ import {MultiplayerMatchService} from '../../../../../../../api/generated/servic
 import {GameService} from '../../service/game.service';
 import {PlayerInteractionService} from '../../service/player-interaction.service';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
+import {Observable} from 'rxjs';
 
 interface Box {
   color: string;
@@ -45,7 +46,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   hasAcknowledgedGameOver: boolean;
 
   constructor(
-    private gameService: GameService,
+    protected gameService: GameService,
     protected playerInteractionService: PlayerInteractionService,
     protected loginStateService: LoginStateService,
     private multiplayerGameService: MultiplayerGameService,
@@ -58,6 +59,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.activatedRoute.params.subscribe(value => {
       this.sessionId = value['sessionId'];
       this.resetGameComponents();

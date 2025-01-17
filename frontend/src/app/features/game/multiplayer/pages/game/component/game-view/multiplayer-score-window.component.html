@@ -1,4 +1,5 @@
 <div class="container p-2">
+  <ng-container *ngIf="gameService.gameState$ | async as gameState">
   <div class="row align-items-center" style="height: 250px">
     <div class="col-4 col-sm-4 d-flex flex-column justify-content-center">
       <app-player-card
@@ -89,6 +90,7 @@
       </ng-template>
     </div>
   </div>
+  </ng-container>
 </div>
 
 <div class="modal fade" id="giveUpModal">
