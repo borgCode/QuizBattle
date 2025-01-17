@@ -2,7 +2,9 @@ import {Injectable} from '@angular/core';
 import {MultiplayerGameService} from '../../../../../../api/generated/services/multiplayer-game.service';
 import {GameStateResponse} from '../../../../../../api/generated/models/game-state-response';
 import {BehaviorSubject, tap} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {MultiplayerMatchService} from '../../../../../../api/generated/services/multiplayer-match.service';
+import {AlertMessageService} from '../../../../../../core/services/alert-message/alert-message.service';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,9 @@ export class GameService {
 
   constructor(
     private multiplayerGameService: MultiplayerGameService,
+    private multiplayerMatchService: MultiplayerMatchService,
+    private alertMessageService: AlertMessageService,
+    private router: Router,
   ) {
   }
 
@@ -28,7 +33,26 @@ export class GameService {
     )
   }
 
-  readonly gameStatus$ = this.gameState$.pipe(
-    map(state => state?.status)
-  );
+
+  requestRematch() {
+    this.multiplayerMatchService.requestRematch({
+      body: {
+        sessionId: this.sessionId,
+        playerId: this.playerId
+      }
+    }).subscribe({
+      next: () => this.alertMessageService.show('Sent rematch request!', 'success'),
+    })
+  }
+
+  handleGiveUp() {
+    this.multiplayerGameService.giveUp({sessionId: this.sessionId, playerId: this.playerId}).subscribe({
+      next: () => {
+        const currentUrl = this.router.url;
+        this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
+          this.router.navigate([currentUrl]);
+        });
+      }
+    })
+  }
 }

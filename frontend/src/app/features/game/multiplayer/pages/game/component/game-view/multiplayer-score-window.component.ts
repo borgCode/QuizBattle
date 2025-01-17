@@ -3,16 +3,13 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
-import {AlertMessageService} from '../../../../../../../core/services/alert-message/alert-message.service';
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverDialogComponent} from '../../dialog/game-over-dialog/game-over-dialog.component';
 import {GameResult} from '../../../../../../../shared/enums/game-result';
 import {MultiplayerGameService} from '../../../../../../../api/generated/services/multiplayer-game.service';
-import {MultiplayerMatchService} from '../../../../../../../api/generated/services/multiplayer-match.service';
 import {GameService} from '../../service/game.service';
 import {PlayerInteractionService} from '../../service/player-interaction.service';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
-import {Observable} from 'rxjs';
 
 interface Box {
   color: string;
@@ -50,8 +47,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     protected playerInteractionService: PlayerInteractionService,
     protected loginStateService: LoginStateService,
     private multiplayerGameService: MultiplayerGameService,
-    private multiplayerMatchService: MultiplayerMatchService,
-    private alertMessageService: AlertMessageService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private gameOverDialog: MatDialog,
@@ -216,29 +211,15 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     this.playerInteractionService.acceptFriend();
   }
 
-  backToMultiplayerPage() {
-    this.router.navigate(['multiplayer']);
-  }
-
   sendRematchRequest() {
-    this.multiplayerMatchService.requestRematch({
-      body: {
-        sessionId: this.sessionId,
-        playerId: this.storedPlayerId
-      }
-    }).subscribe({
-      next: () => this.alertMessageService.show('Sent rematch request!', 'success'),
-    })
+    this.gameService.requestRematch();
   }
 
   giveUpClick() {
-    this.multiplayerGameService.giveUp({sessionId: this.sessionId, playerId: this.storedPlayerId}).subscribe({
-      next: () => {
-        const currentUrl = this.router.url;
-        this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
-          this.router.navigate([currentUrl]);
-        });
-      }
-    })
+    this.gameService.handleGiveUp();
+  }
+
+  backToMultiplayerPage() {
+    this.router.navigate(['multiplayer']);
   }
 }
