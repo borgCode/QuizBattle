@@ -1,31 +1,31 @@
 package org.borg.backend.integration.multiplayer;
 
-import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
 import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
 import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
+import org.borg.backend.game.multiplayer.dto.SessionPlayerDTO;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.service.GameService;
 import org.borg.backend.game.multiplayer.service.MultiplayerQuestionService;
+import org.borg.backend.game.shared.enums.GameStatus;
+import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.model.RoundType;
+import org.borg.backend.game.shared.repository.QuestionRepository;
 import org.borg.backend.game.shared.service.GameValidationService;
 import org.borg.backend.game.shared.service.RoundSessionService;
-import org.borg.backend.social.notification.model.Notification;
-import org.borg.backend.social.notification.repository.NotificationRepository;
-import org.borg.backend.player.dto.PlayerDTO;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.repository.PlayerRepository;
-import org.borg.backend.game.shared.dto.PlayerQuestionResult;
-import org.borg.backend.game.shared.model.Question;
-import org.borg.backend.game.shared.repository.QuestionRepository;
+import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
-import org.borg.backend.game.shared.enums.GameStatus;
-import org.borg.backend.social.notification.model.NotificationType;
 import org.borg.backend.shared.exceptions.GameException;
+import org.borg.backend.social.notification.model.Notification;
+import org.borg.backend.social.notification.model.NotificationType;
+import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -108,7 +110,7 @@ public class GameServiceGameFlowIntegrationTest {
     @Test
     void testAnswerValidationAndGameStateUpdate() {
 
-        MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1);
+        MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1.getId());
         multiplayerSession.setStatus(GameStatus.ACTIVE);
         multiplayerSessionRepository.save(multiplayerSession);
 
@@ -126,27 +128,36 @@ public class GameServiceGameFlowIntegrationTest {
         GameStateResponse gameStateResponse = gameService.getGameState(multiplayerSession.getId(), player1.getId());
 
 
-        List<Long> expectedPlayerIds = List.of(player1.getId(), player2.getId());
-
-        List<Long> actualPlayerIds = gameStateResponse.getPlayerDTOS().stream()
-                .map(PlayerDTO::getId)
-                .toList();
-
-        List<Long> actualQuestionIds = gameStateResponse.getQuestionResults().stream()
-                .map(PlayerQuestionResult::getQuestionId)
-                .toList();
+        Long actualPlayerTurn = gameStateResponse.getPlayerTurn();
+        SessionPlayerDTO actualPlayerDTO = gameStateResponse.getPlayerDTO();
+        SessionPlayerDTO actualOpponentDTO = gameStateResponse.getOpponentDTO();
+        List<Long> actualQuestionIds = gameStateResponse.getQuestionIds();
 
 
         assertAll("Post round game state check",
-                () -> assertEquals(player2.getId(), gameStateResponse.getPlayerTurn(), "Should be player2's turn, but is not"),
-                () -> assertTrue(actualPlayerIds.containsAll(expectedPlayerIds), "The expected player ids did not match the actual ids"),
-                () -> assertEquals(0, gameStateResponse.getCurrentQuestionIndex(), "Player 2 should start from index 0"),
-                () -> assertEquals(3, gameStateResponse.getScores().get(player1.getId()),
-                        "Player1 did not get all three questions correct as they should have"),
-                () -> assertEquals(GameStatus.ACTIVE, gameStateResponse.getStatus(), "Game should be ACTIVE"),
-                () -> assertTrue(actualQuestionIds.containsAll(expectedQuestionIds), "Expected ids do not match the actual ids"),
-                () -> assertEquals(1, gameStateResponse.getRoundCategories().size(), "Category size should be 1"),
-                () -> assertEquals("Sports", gameStateResponse.getRoundCategories().get(0), "Played category should be sports")
+                () -> assertEquals(player2.getId(), actualPlayerTurn,
+                        "Should be player2's turn, but is not"),
+                () -> assertEquals(0, gameStateResponse.getCurrentQuestionIndex(),
+                        "Player 2 should start from index 0"),
+                () -> assertEquals(GameStatus.ACTIVE, gameStateResponse.getStatus(),
+                        "Game should be ACTIVE"),
+
+                () -> assertEquals(3, actualPlayerDTO.getScore(),
+                        "Player1 score should be 3"),
+                () -> assertEquals(3, actualPlayerDTO.getQuestionsAnswered(),
+                        "Player1 should have answered 3 questions"),
+
+                () -> assertEquals(0, actualOpponentDTO.getScore(),
+                        "Player2 score should be 0"),
+                () -> assertEquals(0, actualOpponentDTO.getQuestionsAnswered(),
+                        "Player2 should not have answered any questions yet"),
+
+                () -> assertTrue(actualQuestionIds.containsAll(expectedQuestionIds),
+                        "Expected question ids do not match the actual ids"),
+                () -> assertEquals(1, gameStateResponse.getRoundCategories().size(),
+                        "Category size should be 1"),
+                () -> assertEquals("Sports", gameStateResponse.getRoundCategories().get(0),
+                        "Played category should be sports")
         );
 
     }
@@ -171,7 +182,7 @@ public class GameServiceGameFlowIntegrationTest {
         List<Question> questions;
         @BeforeEach
         void setUp() {
-            MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1);
+            MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1.getId());
             sessionId = multiplayerSessionRepository.save(multiplayerSession).getId();
             
             questions = loadQuestionsToDB();
@@ -193,12 +204,8 @@ public class GameServiceGameFlowIntegrationTest {
             MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                     .orElseThrow();
             
-            
-            Map<Long, Integer> questionsAnswered = new HashMap<>(Map.of(
-                    player1.getId(), 3,  
-                    player2.getId(), 1  
-            ));
-            session.setQuestionsAnswered(questionsAnswered);
+            session.getSessionPlayers().get(0).setQuestionsAnswered(3);
+            session.getSessionPlayers().get(1).setQuestionsAnswered(1);
             
             session.getQuestionIds().clear();
 
@@ -365,33 +372,35 @@ public class GameServiceGameFlowIntegrationTest {
             
             gameService.acknowledgeGameOver(multiplayerSession.getId(), player1.getId());
 
-            
-            
-            Map<Long, Boolean> firstAcknowledgements = gameService.getGameState(multiplayerSession.getId(), player1.getId()).getPlayerAcknowledgment();
+            GameStateResponse firstState = gameService.getGameState(multiplayerSession.getId(), player1.getId());
             assertAll("First acknowledgement checks",
-                    () -> assertTrue(firstAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
-                    () -> assertFalse(firstAcknowledgements.get(player2.getId()), "Player2 acknowledgement should be false")
-                    );
+                    () -> assertTrue(firstState.getPlayerDTO().isHasAcknowledgedGameOver(),
+                            "Player1 acknowledgement should be true"),
+                    () -> assertFalse(firstState.getOpponentDTO().isHasAcknowledgedGameOver(),
+                            "Player2 acknowledgement should be false")
+            );
             
             gameService.acknowledgeGameOver(multiplayerSession.getId(), player2.getId());
 
-            Map<Long, Boolean> secondAcknowledgements = gameService.getGameState(multiplayerSession.getId(), player1.getId()).getPlayerAcknowledgment();
-
+            GameStateResponse secondState = gameService.getGameState(multiplayerSession.getId(), player1.getId());
             assertAll("Second acknowledgement checks",
-                    () -> assertTrue(secondAcknowledgements.get(player1.getId()), "Player1 acknowledgement should be true"),
-                    () -> assertTrue(secondAcknowledgements.get(player2.getId()), "Player2 acknowledgement should be true")
+                    () -> assertTrue(secondState.getPlayerDTO().isHasAcknowledgedGameOver(),
+                            "Player1 acknowledgement should be true"),
+                    () -> assertTrue(secondState.getOpponentDTO().isHasAcknowledgedGameOver(),
+                            "Player2 acknowledgement should be true")
             );
-            
         }
 
         private MultiplayerSession createAlmostCompleteGame(int player1Score, int player2Score) {
+            MultiplayerSession session = new MultiplayerSession(player1, player2, player1.getId());
+            
+            session.getSessionPlayers().get(0).setQuestionsAnswered(15);
+            session.getSessionPlayers().get(0).setScore(player1Score);
 
-            MultiplayerSession session = new MultiplayerSession(player1, player2, player1);
-            Map<Long, Integer> questionAnswered = new HashMap<>(Map.of(player1.getId(), 15, player2.getId(), 18));
-            Map<Long, Integer> scores = new HashMap<>(Map.of(player1.getId(), player1Score, player2.getId(), player2Score));
-            session.setCurrentPlayerTurn(player1);
-            session.setQuestionsAnswered(questionAnswered);
-            session.setScores(scores);
+            session.getSessionPlayers().get(1).setQuestionsAnswered(18);
+            session.getSessionPlayers().get(1).setScore(player2Score);
+            
+            session.setCurrentPlayerTurnId(player1.getId());
             session.setStatus(GameStatus.ACTIVE);
 
             return session;
@@ -401,7 +410,7 @@ public class GameServiceGameFlowIntegrationTest {
     
     @Test
     void testGiveUpHandling() {
-        MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1);
+        MultiplayerSession multiplayerSession = new MultiplayerSession(player1, player2, player1.getId());
         multiplayerSession.setStatus(GameStatus.ACTIVE);
         multiplayerSessionRepository.save(multiplayerSession);
         
@@ -410,18 +419,17 @@ public class GameServiceGameFlowIntegrationTest {
         MultiplayerSession updatedSession = multiplayerSessionRepository.findById(multiplayerSession.getId())
                 .orElseThrow();
 
-        Long playerWhoGaveUp = updatedSession.getPlayerHasGivenUp().entrySet().stream()
-                .filter(Map.Entry::getValue)
-                .map(Map.Entry::getKey)
+        SessionPlayer updatedPlayer1 = updatedSession.getSessionPlayers().stream()
+                .filter(player -> player.getPlayer().getId().equals(player1.getId()))
                 .findFirst()
-                .orElse(null);
-        
+                .orElseThrow();
+
         assertAll("Post give up session checks",
-                () -> assertEquals(player1.getId(), playerWhoGaveUp, "Player1 should be the one who gave up"),
+                () -> assertTrue(updatedPlayer1.isGivenUp(), "Player1 should be marked as given up"),
                 () -> assertEquals(GameStatus.COMPLETED, updatedSession.getStatus(), "Game status should be COMPLETED"),
                 () -> assertEquals(player1.getId(), updatedSession.getLoserId(), "Player1 should be the loser"),
                 () -> assertEquals(player2.getId(), updatedSession.getWinnerId(), "Player2 should be the winner")
-                );
+        );
         
         verifyNotifications(NotificationType.GAME_LOST, NotificationType.GAME_WON);
     }

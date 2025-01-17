@@ -25,10 +25,8 @@ public class MultiplayerSession {
     
     @Enumerated(EnumType.STRING)
     private GameStatus status;
-    
-    @ManyToOne
-    @JoinColumn(name = "current_player_id")
-    private Player currentPlayerTurn;
+
+    private Long currentPlayerTurnId;
     
     @ElementCollection
     private List<Long> questionIds = new ArrayList<>();
@@ -45,12 +43,12 @@ public class MultiplayerSession {
     
     
 
-    public MultiplayerSession(Player player1, Player player2, Player currentPlayerTurn) {
+    public MultiplayerSession(Player player1, Player player2, Long currentPlayerTurnId) {
         this.sessionPlayers = new ArrayList<>();
         status = GameStatus.ACTIVE;
         this.currentQuestionIndex = 0;
-        this.currentPlayerTurn = currentPlayerTurn;
-        
+        this.currentPlayerTurnId = currentPlayerTurnId;
+
         this.sessionPlayers.add(buildSessionPlayer(player1));
         this.sessionPlayers.add(buildSessionPlayer(player2));
     }
@@ -69,6 +67,13 @@ public class MultiplayerSession {
     public SessionPlayer getSessionPlayerById(Long playerId) {
         return sessionPlayers.stream()
                 .filter(sp -> sp.getPlayer().getId().equals(playerId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public SessionPlayer getOpponentSessionPlayer(Long playerId) {
+        return sessionPlayers.stream()
+                .filter(sp -> !sp.getPlayer().getId().equals(playerId))
                 .findFirst()
                 .orElse(null);
     }

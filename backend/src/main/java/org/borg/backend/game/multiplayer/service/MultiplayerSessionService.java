@@ -24,6 +24,6 @@ public class MultiplayerSessionService {
     }
 
     public List<MultiplayerSessionDTO> getMultiplayerSessionsById(Long playerId) {
-        return gameSessionMapper.multipleToMultiplayerSessionDTO(multiplayerSessionRepository.findByPlayerId(playerId));
+        return gameSessionMapper.multipleToMultiplayerSessionDTO(multiplayerSessionRepository.findByPlayerId(playerId), playerId);
     }
 }

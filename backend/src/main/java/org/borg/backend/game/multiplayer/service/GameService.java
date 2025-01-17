@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
 import org.borg.backend.game.multiplayer.mapper.GameSessionMapper;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
 import org.borg.backend.game.shared.dto.PlayerQuestionResult;
@@ -19,6 +20,7 @@ import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.borg.backend.social.notification.service.NotificationService;
+import org.hibernate.Session;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.borg.backend.game.multiplayer.util.MultiplayerGameConstants.*;
 
 @Slf4j
 @Service
@@ -44,16 +48,14 @@ public class GameService {
         log.debug("Fetching game state for sessionId: {}, playerId: {}", sessionId, playerId);
         MultiplayerSession multiplayerSession = multiplayerSessionService.getSessionById(sessionId);
 
-        boolean playerExistsInSession = multiplayerSession.getPlayers().stream()
-                .anyMatch(player -> player.getId().equals(playerId));
-
-        if (!playerExistsInSession) {
+        SessionPlayer sessionPlayer = multiplayerSession.getSessionPlayerById(playerId);
+        if (sessionPlayer == null) {
             log.warn("Access denied for playerId: {} in sessionId: {}", playerId, sessionId);
             throw new AccessDeniedException("Not authorized to access this game session");
         }
         
         log.debug("Game state fetched successfully for sessionId: {}, playerId: {}", sessionId, playerId);
-        return gameSessionMapper.toGameStateResponse(multiplayerSession);
+        return gameSessionMapper.toGameStateResponse(multiplayerSession, playerId);
     }
 
     @Transactional
@@ -61,38 +63,36 @@ public class GameService {
         log.debug("Updating game state for sessionId: {}, playerId: {}, questionId: {}, isCorrect: {}",
                 sessionId, playerId, questionId, isCorrect);
         MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
-        
+
+        SessionPlayer sessionPlayer = session.getSessionPlayerById(playerId);
         if (isCorrect) {
             log.debug("Updating score for playerId: {}", playerId);
-            Map<Long, Integer> scores = session.getScores();
-            Integer playerScore = scores.getOrDefault(playerId, 0);
-            scores.put(playerId, playerScore + 1);
-            log.debug("PlayerId: {} new score: {}", playerId, playerScore + 1);
+            sessionPlayer.setScore(sessionPlayer.getScore() + 1);
+            log.debug("PlayerId: {} new score: {}", playerId, sessionPlayer.getScore());
         }
+        
+        sessionPlayer.setQuestionsAnswered(sessionPlayer.getQuestionsAnswered() + 1);
+        log.debug("PlayerId: {} questions answered updated to: {}", playerId, sessionPlayer.getQuestionsAnswered());
 
-        Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
-        questionsAnswered.put(playerId, questionsAnswered.get(playerId) + 1);
-        log.debug("PlayerId: {} questions answered updated to: {}", playerId, questionsAnswered.get(playerId));
+        sessionPlayer.getQuestionResults().add(new PlayerQuestionResult(playerId, questionId, sessionPlayer.getQuestionsAnswered() - 1, isCorrect));
 
-        session.getQuestionResults().add(new PlayerQuestionResult(playerId, questionId, session.getQuestionsAnswered().get(playerId) - 1, isCorrect));
-
-        Player opponent = session.getPlayers().stream()
+        SessionPlayer opponent = session.getSessionPlayers().stream()
                 .filter(p -> !p.getId().equals(playerId))
                 .findFirst()
                 .orElseThrow(() -> new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session"));
 
-        if (isGameComplete(questionsAnswered)) {
+        if (isGameComplete(sessionPlayer, opponent)) {
             log.debug("Game is complete for sessionId: {}", sessionId);
             session.setStatus(GameStatus.COMPLETED);
             determineGameOutcome(session);
             sendGameOverNotifications(session);
         } else {
 
-            session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % MultiplayerGameConstants.QUESTIONS_PER_ROUND);
+            session.setCurrentQuestionIndex((session.getCurrentQuestionIndex() + 1) % QUESTIONS_PER_ROUND);
 
             if (session.getCurrentQuestionIndex() == 0) {
-                if (questionsAnswered.get(playerId) > questionsAnswered.get(opponent.getId())) {
-                    session.setCurrentPlayerTurn(opponent);
+                if (sessionPlayer.getQuestionsAnswered() > opponent.getQuestionsAnswered()) {
+                    session.setCurrentPlayerTurnId(opponent.getId());
                     log.debug("Turn changed to opponent: {} for sessionId: {}", opponent.getId(), sessionId);
                 } else {
                     session.getQuestionIds().clear();
@@ -104,21 +104,19 @@ public class GameService {
         log.debug("Game state updated successfully for sessionId: {}", sessionId);
     }
 
-    private boolean isGameComplete(Map<Long, Integer> questionsAnswered) {
-        return questionsAnswered.values().stream()
-                .allMatch(count -> count == MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER);
+    private boolean isGameComplete(SessionPlayer player, SessionPlayer opponent) {
+        return player.getQuestionsAnswered() == TOTAL_QUESTIONS_PER_PLAYER && opponent.getQuestionsAnswered() == TOTAL_QUESTIONS_PER_PLAYER;
     }
 
     private void determineGameOutcome(MultiplayerSession session) {
         log.debug("Determining game outcome for sessionId: {}", session.getId());
-        List<Player> players = session.getPlayers();
+        List<SessionPlayer> players = session.getSessionPlayers();
 
         Long player1Id = players.get(0).getId();
         Long player2Id = players.get(1).getId();
-
-        Map<Long, Integer> scores = session.getScores();
-        int score1 = scores.get(player1Id);
-        int score2 = scores.get(player2Id);
+        
+        int score1 = players.get(0).getScore();
+        int score2 = players.get(1).getScore();
 
         GameResult result;
         if (score1 > score2) {
@@ -137,7 +135,7 @@ public class GameService {
         }
 
         log.info("Game outcome determined for sessionId: {}, result: {}", session.getId(), result);
-        statsService.updateGameStats(players.get(0), players.get(1), result);
+        statsService.updateGameStats(players.get(0).getPlayer(), players.get(1).getPlayer(), result);
 
         applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
         log.debug("GameWonEvent published for sessionId: {}", session.getId());
@@ -146,25 +144,17 @@ public class GameService {
     private void sendGameOverNotifications(MultiplayerSession session) {
         log.debug("Sending game over notifications for sessionId: {}", session.getId());
         if (session.getIsTie()) {
-            notificationService.sendTieNotifications(session.getPlayers(), session.getId());
+            notificationService.sendTieNotifications(session.getSessionPlayers(), session.getId());
         } else {
-            Player loserPlayer = findPlayerInSession(session, session.getLoserId());
-            Player winnerPlayer = findPlayerInSession(session, session.getWinnerId());
+            Player loserPlayer = session.getSessionPlayerById(session.getLoserId()).getPlayer();
+            Player winnerPlayer = session.getSessionPlayerById(session.getWinnerId()).getPlayer();
             
             notificationService.sendGameWonNotification(session.getWinnerId(), loserPlayer.getDisplayName(), session.getId());
             notificationService.sendGameLostNotification(session.getLoserId(), winnerPlayer.getDisplayName(), session.getId());
             log.debug("Sent game won notification to {} and game lost notification to {}", session.getWinnerId(), session.getLoserId());
         }
     }
-
-    private Player findPlayerInSession(MultiplayerSession session, Long playerId) {
-        log.debug("Finding playerId: {} in sessionId: {}", playerId, session.getId());
-        return session.getPlayers().stream()
-                .filter(p -> p.getId().equals(playerId))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player not found for " + playerId));
-    }
-
+    
     public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
         log.info("Updating session questions and category for sessionId: {}", session.getId());
         
@@ -186,7 +176,7 @@ public class GameService {
         log.info("Acknowledging game over for playerId: {} in sessionId: {}", playerId, sessionId);
         MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
         
-        session.getPlayerAcknowledgment().put(playerId, true);
+        session.getSessionPlayerById(playerId).setHasAcknowledgedGameOver(true);
         multiplayerSessionRepository.save(session);
         log.debug("Marked acknowledgement as true for playerId: {} and saved", playerId);
     }
@@ -196,16 +186,16 @@ public class GameService {
         log.info("Handling give-up for sessionId: {} and playerId: {}", sessionId, playerId);
         MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
 
-        session.getPlayerHasGivenUp().put(playerId, true);
+        session.getSessionPlayerById(playerId).setGivenUp(true);
         session.setStatus(GameStatus.COMPLETED);
         log.debug("Session status set to COMPLETED for sessionId: {}", sessionId);
 
         session.setLoserId(playerId);
         log.debug("Player with ID {} marked as loser for sessionId: {}", playerId, sessionId);
-        session.setWinnerId(session.getPlayers().stream()
+        session.setWinnerId(session.getSessionPlayers().stream()
                 .filter(player -> !player.getId().equals(playerId))
                 .findFirst()
-                .map(Player::getId)
+                .map(SessionPlayer::getId)
                 .orElseThrow(() -> {
                     log.error("Opponent not found for sessionId: {}", sessionId);
                     return new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session");
@@ -213,8 +203,8 @@ public class GameService {
 
         multiplayerSessionRepository.save(session);
         
-        Player loserPlayer = findPlayerInSession(session, session.getLoserId());
-        Player winnerPlayer = findPlayerInSession(session, session.getWinnerId());
+        Player loserPlayer = session.getSessionPlayerById(session.getLoserId()).getPlayer();
+        Player winnerPlayer = session.getSessionPlayerById(session.getWinnerId()).getPlayer();
         
         statsService.updateGameStats(loserPlayer, winnerPlayer, GameResult.WIN_PLAYER2);
         

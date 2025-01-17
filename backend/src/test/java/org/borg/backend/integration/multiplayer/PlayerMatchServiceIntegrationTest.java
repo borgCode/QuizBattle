@@ -66,7 +66,7 @@ public class PlayerMatchServiceIntegrationTest {
         sendingPlayer = createAndSavePlayer("Sender");
         opponentPlayer = createAndSavePlayer("Opponent");
 
-        completedMultiplayerSession = new MultiplayerSession(sendingPlayer, opponentPlayer, sendingPlayer);
+        completedMultiplayerSession = new MultiplayerSession(sendingPlayer, opponentPlayer, sendingPlayer.getId());
         completedMultiplayerSession.setStatus(GameStatus.COMPLETED);
         multiplayerSessionRepository.save(completedMultiplayerSession);
     }
@@ -197,7 +197,7 @@ public class PlayerMatchServiceIntegrationTest {
 
     @Test
     void shouldThrowExceptionWhenAnotherGameIsOngoing() {
-        MultiplayerSession ongoingSession = new MultiplayerSession(sendingPlayer, opponentPlayer, sendingPlayer);
+        MultiplayerSession ongoingSession = new MultiplayerSession(sendingPlayer, opponentPlayer, sendingPlayer.getId());
         ongoingSession.setStatus(GameStatus.ACTIVE);
         multiplayerSessionRepository.save(ongoingSession);
 

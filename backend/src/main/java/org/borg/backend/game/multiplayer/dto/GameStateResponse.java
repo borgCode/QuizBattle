@@ -18,14 +18,12 @@ import java.util.Set;
 @AllArgsConstructor
 public class GameStateResponse {
     private Long playerTurn;
-    private List<PlayerDTO> playerDTOS;
+    private SessionPlayerDTO playerDTO;
+    private SessionPlayerDTO opponentDTO;
     private Integer currentQuestionIndex;
-    private Map<Long, Integer> scores;
     private GameStatus status;
-    private Set<PlayerQuestionResult> questionResults;
     private List<Long> questionIds;
     private List<String> roundCategories;
-    private Map<Long, Boolean> playerAcknowledgment;
     private Long playerWhoGaveUp;
     private Long winnerId;
     private Long loserId;

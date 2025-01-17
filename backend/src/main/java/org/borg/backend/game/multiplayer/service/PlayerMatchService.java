@@ -7,6 +7,7 @@ import org.borg.backend.game.multiplayer.dto.MatchResponse;
 import org.borg.backend.game.multiplayer.dto.RematchRequest;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.model.PendingSession;
+import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.game.multiplayer.repository.PendingSessionRepository;
 import org.borg.backend.game.shared.enums.GameStatus;
@@ -59,34 +60,29 @@ public class PlayerMatchService {
                             String.format("Multiplayer session with ID %d not found", rematchRequest.getSessionId()));
                 });
         
-
         if (session.getStatus().equals(GameStatus.ACTIVE)) {
             log.warn("Attempted rematch request for active session {}", session.getId());
             throw new GameException(GAME_ALREADY_ONGOING,
                     String.format("Cannot request rematch - game session %d is still active", session.getId()));
         }
-
+        
         Long playerId = rematchRequest.getPlayerId();
-
-        Player sendingPlayer = session.getPlayers().stream()
-                .filter(player -> player.getId().equals(playerId))
-                .findFirst()
-                .orElseThrow(() -> {
-                    log.error("Player {} not found in session {}", playerId, session.getId());
-                    return new GameException(INVALID_SESSION_STATE,
-                            String.format("Player %d is not part of session %d", playerId, session.getId()));
-                });
-
-        Player opponentPlayer = session.getPlayers().stream()
-                .filter(player -> !player.equals(sendingPlayer))
-                .findFirst()
-                .orElseThrow(() -> {
-                    log.error("Opponent not found in session {}", session.getId());
-                    return new GameException(INVALID_SESSION_STATE,
-                            String.format("Could not find opponent in session %d", session.getId()));
-                });
-
-        handleMatchRequest(sendingPlayer, opponentPlayer, session);
+        
+        SessionPlayer sendingPlayer = session.getSessionPlayerById(playerId);
+        if (sendingPlayer == null) {
+            log.error("Player {} not found in session {}", playerId, session.getId());
+            throw new GameException(INVALID_SESSION_STATE,
+                    String.format("Player %d is not part of session %d", playerId, session.getId()));
+        }
+        
+        SessionPlayer opponentPlayer = session.getOpponentSessionPlayer(playerId);
+        if (opponentPlayer == null) {
+            log.error("Opponent not found in session {}", session.getId());
+            throw new GameException(INVALID_SESSION_STATE,
+                    String.format("Could not find opponent in session %d", session.getId()));
+        }
+        
+        handleMatchRequest(sendingPlayer.getPlayer(), opponentPlayer.getPlayer(), session);
         log.debug("Rematch request processed successfully for old session {}", session.getId());
     }
 
@@ -141,7 +137,7 @@ public class PlayerMatchService {
         log.debug("Randomly selected player {} to start the game", startingPlayer.getId());
         
         Long newSessionId = multiplayerSessionRepository.save(
-                new MultiplayerSession(sendingPlayer, receivingPlayer, startingPlayer)).getId();
+                new MultiplayerSession(sendingPlayer, receivingPlayer, startingPlayer.getId())).getId();
         log.info("Created new multiplayer session {} for players {} and {}",
                 newSessionId, sendingPlayer.getId(), receivingPlayer.getId());
 
@@ -232,7 +228,7 @@ public class PlayerMatchService {
         log.debug("Randomly selected player {} to start the game", startingPlayer.getId());
 
         MultiplayerSession session = multiplayerSessionRepository.save(
-                new MultiplayerSession(player1, player2, startingPlayer));
+                new MultiplayerSession(player1, player2, startingPlayer.getId()));
         log.info("Created new multiplayer session {} for players {} and {}",
                 session.getId(), player1.getId(), player2.getId());
 

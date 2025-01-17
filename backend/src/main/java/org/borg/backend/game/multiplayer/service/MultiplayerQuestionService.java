@@ -111,7 +111,7 @@ public class MultiplayerQuestionService {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
 
-        boolean playerExistsInSession = session.getPlayers().stream()
+        boolean playerExistsInSession = session.getSessionPlayers().stream()
                 .anyMatch(player -> player.getId().equals(playerId));
 
         if (!playerExistsInSession) {
@@ -141,7 +141,7 @@ public class MultiplayerQuestionService {
         MultiplayerSession session = multiplayerSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
 
-        boolean playerExistsInSession = session.getPlayers().stream()
+        boolean playerExistsInSession = session.getSessionPlayers().stream()
                 .anyMatch(player -> player.getId().equals(playerId));
 
         if (!playerExistsInSession) {

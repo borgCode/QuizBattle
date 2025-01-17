@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
 import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
+import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
@@ -23,23 +24,20 @@ public class GameValidationService {
     }
 
     public void validatePlayerTurn(MultiplayerQuestionsRequest request, MultiplayerSession session) {
-        if (!session.getCurrentPlayerTurn().getId().equals(request.getPlayerId())) {
+        SessionPlayer sessionPlayer = session.getSessionPlayerById(request.getPlayerId());
+        
+        if (!session.getCurrentPlayerTurnId().equals(sessionPlayer.getId())) {
             throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN,
                     String.format("Player %d attempted to play but it's player %d's turn",
-                            request.getPlayerId(), session.getCurrentPlayerTurn().getId()));
+                            request.getPlayerId(), session.getCurrentPlayerTurnId()));
         }
+        
+        SessionPlayer opponent = session.getOpponentSessionPlayer(sessionPlayer.getId());
 
-        Map<Long, Integer> questionsAnswered = session.getQuestionsAnswered();
-        Long opponentId = session.getPlayers().stream()
-                .filter(p -> !p.getId().equals(request.getPlayerId()))
-                .findFirst()
-                .map(Player::getId)
-                .orElseThrow();
-
-        if (questionsAnswered.get(request.getPlayerId()) > questionsAnswered.get(opponentId)) {
+        if (sessionPlayer.getQuestionsAnswered() > opponent.getQuestionsAnswered()) {
             throw new GameException(BusinessErrorCodes.MUST_WAIT_FOR_OPPONENT,
                     String.format("Player %d must wait for opponent %d to catch up",
-                            request.getPlayerId(), opponentId));
+                            request.getPlayerId(), opponent.getId()));
         }
 
         if (!session.getQuestionIds().isEmpty()) {
@@ -50,10 +48,10 @@ public class GameValidationService {
     }
 
     public void validateMultiplayerAnswer(MultiplayerAnswerValidationRequest request, MultiplayerSession session) {
-        if (!session.getCurrentPlayerTurn().getId().equals(request.getPlayerId())) {
+        if (!session.getCurrentPlayerTurnId().equals(request.getPlayerId())) {
             throw new GameException(BusinessErrorCodes.NOT_PLAYER_TURN,
                     String.format("Player %d attempted to answer but it's player %d's turn",
-                            request.getPlayerId(), session.getCurrentPlayerTurn().getId()));
+                            request.getPlayerId(), session.getCurrentPlayerTurnId()));
         }
 
         if (!session.getQuestionIds().contains(request.getQuestionId())) {

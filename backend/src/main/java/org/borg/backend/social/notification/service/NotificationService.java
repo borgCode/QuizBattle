@@ -2,6 +2,7 @@ package org.borg.backend.social.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.social.notification.model.Notification;
 import org.borg.backend.social.notification.model.NotificationType;
 import org.borg.backend.social.notification.repository.NotificationRepository;
@@ -111,9 +112,9 @@ public class NotificationService {
         buildAndSaveNotification(loserId, null, GAME_LOST, message, sessionId, null);
     }
 
-    public void sendTieNotifications(List<Player> players, Long sessionId) {
-        Player player1 = players.get(0);
-        Player player2 = players.get(1);
+    public void sendTieNotifications(List<SessionPlayer> players, Long sessionId) {
+        Player player1 = players.get(0).getPlayer();
+        Player player2 = players.get(1).getPlayer();
         
         log.debug("Sending tie notifications to Player {} and {}", player1.getId(), player2.getId());
 

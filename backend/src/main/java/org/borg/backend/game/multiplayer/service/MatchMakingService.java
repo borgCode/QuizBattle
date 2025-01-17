@@ -141,7 +141,7 @@ public class MatchMakingService {
 
         Player startingPlayer = Math.random() < 0.5 ? player1 : player2;
 
-        MultiplayerSession session = new MultiplayerSession(player1, player2, startingPlayer);
+        MultiplayerSession session = new MultiplayerSession(player1, player2, startingPlayer.getId());
         multiplayerSessionRepository.save(session);
 
         messagingTemplate.convertAndSend("/topic/match" + player1.getId(),
