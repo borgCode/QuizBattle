@@ -98,7 +98,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
           this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct)
         })
 
-        this.hasAcknowledgedGameOver = gameState.playerDTO.givenUp;
+        this.hasAcknowledgedGameOver = gameState.playerDTO.hasAcknowledgedGameOver;
 
         if (gameState.status == 'COMPLETED') {
           this.isGameOver = true;

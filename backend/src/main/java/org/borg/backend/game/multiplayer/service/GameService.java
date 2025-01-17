@@ -193,7 +193,7 @@ public class GameService {
 
         SessionPlayer sessionPlayer = session.getSessionPlayerByPlayerId(playerId);
 
-        session.getSessionPlayerByPlayerId(playerId).setGivenUp(true);
+        sessionPlayer.setGivenUp(true);
         session.setStatus(GameStatus.COMPLETED);
         log.debug("Session status set to COMPLETED for sessionId: {}", sessionId);
 
