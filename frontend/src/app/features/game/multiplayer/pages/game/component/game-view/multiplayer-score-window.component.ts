@@ -10,15 +10,8 @@ import {MultiplayerGameService} from '../../../../../../../api/generated/service
 import {GameService} from '../../service/game.service';
 import {PlayerInteractionService} from '../../service/player-interaction.service';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
+import {ScoreBoxesComponent} from '../score-boxes/score-boxes.component';
 
-interface Box {
-  color: string;
-}
-
-interface BoxRow {
-  left: Box[];
-  right: Box[];
-}
 
 @Component({
   selector: 'app-multiplayer-score-window',
@@ -28,7 +21,8 @@ interface BoxRow {
     PlayerCardComponent,
     NgSwitch,
     NgSwitchCase,
-    AsyncPipe
+    AsyncPipe,
+    ScoreBoxesComponent
   ],
   templateUrl: './multiplayer-score-window.component.html',
   styleUrl: './multiplayer-score-window.component.css'
@@ -36,11 +30,11 @@ interface BoxRow {
 export class MultiplayerScoreWindowComponent implements OnInit {
 
   gameState!: GameStateResponse;
-  boxes: BoxRow[] = [];
   storedPlayerId: number;
   sessionId: number;
   isGameOver: boolean = false;
   hasAcknowledgedGameOver: boolean;
+  resetBoxesTrigger = false;
 
   constructor(
     protected gameService: GameService,
@@ -57,41 +51,25 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
     this.activatedRoute.params.subscribe(value => {
       this.sessionId = value['sessionId'];
-      this.resetGameComponents();
+      this.resetComponents();
       this.storedPlayerId = this.loginStateService.loggedInUser.id;
-      this.initBoxes();
       this.getGameState();
     })
   }
 
-  private resetGameComponents() {
+  private resetComponents() {
     this.isGameOver = false;
-    this.boxes = [];
+    this.resetBoxesTrigger = false;
+    setTimeout(() => {
+      this.resetBoxesTrigger = true;
+    });
   }
 
-  private initBoxes() {
-    for (let i = 0; i < 6; i++) {
-      this.boxes.push({
-        left: Array.from({length: 3}, () => ({color: '#ccc'})),
-        right: Array.from({length: 3}, () => ({color: '#ccc'}))
-      });
-    }
-  }
 
   private getGameState() {
     this.gameService.getGameState(this.sessionId, this.storedPlayerId).subscribe({
       next: gameState => {
         this.gameState = gameState;
-
-        this.gameState.playerDTO.questionResults.forEach((result) => {
-          const position = this.indexToBoxPosition(result.questionIndex);
-          this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct)
-        })
-
-        this.gameState.opponentDTO.questionResults.forEach((result) => {
-          const position = this.indexToBoxPosition(result.questionIndex);
-          this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct)
-        })
 
         this.hasAcknowledgedGameOver = gameState.playerDTO.hasAcknowledgedGameOver;
 
@@ -105,23 +83,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
         this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.gameState.opponentDTO.playerId)
       }
     })
-  }
-
-  private indexToBoxPosition(questionIndex: number) {
-    const width = 3;
-    return {
-      rowIndex: Math.floor(questionIndex / width),
-      colIndex: questionIndex % width
-    }
-  }
-
-  updateBoxColor(side: "left" | "right", rowIndex: number, colIndex: number, correct: boolean) {
-    if (correct) {
-      this.boxes[rowIndex][side][colIndex].color = '#66FF00'
-    } else {
-      this.boxes[rowIndex][side][colIndex].color = '#EF0107'
-    }
-
   }
 
   private handleGameOver() {
@@ -166,7 +127,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     })
   }
 
-  handleButtonClick() {
+  handlePlayButtonClick() {
     console.log(this.gameState.questionIds.length)
     if (this.gameState?.questionIds?.length > 0) {
       this.openPlayQuestions();
@@ -199,6 +160,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     this.playerInteractionService.blockPlayer();
 
   }
+
   unBlockPlayer() {
     this.playerInteractionService.unblockPlayer();
   }
@@ -222,4 +184,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   backToMultiplayerPage() {
     this.router.navigate(['multiplayer']);
   }
+
+
 }

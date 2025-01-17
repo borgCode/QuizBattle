@@ -1,0 +1,13 @@
+.square {
+  width: 70px;
+  height: 70px;
+  background-color: #ccc;
+  border: 1px solid #999;
+}
+
+@media (max-width: 768px) {
+  .square {
+    width: 40px;
+    height: 40px;
+  }
+}
