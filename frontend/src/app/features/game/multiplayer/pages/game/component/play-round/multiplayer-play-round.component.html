@@ -1,15 +1,14 @@
 <app-multiplayer-category
-  [categories] = "categories"
-  *ngIf="shouldShowCategories"
+  [categories] = "categories$ | async"
+  *ngIf="shouldShowCategories$ | async"
   (categorySelected) = "onCategorySelected($event)"
   ></app-multiplayer-category>
 <app-question-panel
-  [question]="currentQuestion"
-  [isCorrect]="answerIsCorrect"
-  [correctAnswerIndex]="correctAnswerIndex"
-  *ngIf="shouldShowQuestions"
+  [question]="currentQuestion$ | async"
+  [isCorrect]="(answerState$ | async)?.isCorrect"
+  [correctAnswerIndex]="(answerState$ | async)?.correctAnswerIndex"
+  *ngIf="shouldShowQuestions$ | async"
   (answerSelected)="onAnswerSelected($event)"
-  (resetQuestionState)="resetQuestionState();"
   (timerRanOut)="onTimerRanOut($event)"
   (nextQuestion)="onNextQuestion()"
 ></app-question-panel>

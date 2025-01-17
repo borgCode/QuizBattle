@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {AsyncPipe, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
 import {MatDialog} from '@angular/material/dialog';
@@ -16,7 +16,6 @@ import {ScoreBoxesComponent} from '../score-boxes/score-boxes.component';
 @Component({
   selector: 'app-multiplayer-score-window',
   imports: [
-    NgForOf,
     NgIf,
     PlayerCardComponent,
     NgSwitch,

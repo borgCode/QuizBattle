@@ -79,7 +79,6 @@ export class ScoreBoxesComponent implements OnInit, OnChanges {
     } else {
       this.boxes[rowIndex][side][colIndex].color = '#EF0107'
     }
-
   }
 }
 

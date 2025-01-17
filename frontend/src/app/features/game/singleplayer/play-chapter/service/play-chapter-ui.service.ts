@@ -4,7 +4,6 @@ import {QuestionService} from "../../../../../api/generated/services/question.se
 import {BehaviorSubject, Observable, switchMap, tap} from "rxjs";
 import {QuestionDto} from "../../../../../api/generated/models/question-dto";
 import {PlayChapterDto} from "../../../../../api/generated/models/play-chapter-dto";
-import {AnswerState} from '../interface/answer-state';
 import {AnswerValidationResponse} from '../../../../../api/generated/models/answer-validation-response';
 import {HealthState} from '../interface/health-state';
 import {LoginStateService} from '../../../../../core/services/login-state-service/login-state.service';
@@ -12,6 +11,7 @@ import {RoundResultsDialogComponent} from '../round-results-dialog/round-results
 import {MatDialog} from '@angular/material/dialog';
 import {ContentDialogComponent} from '../../shared-components/content-dialog/content-dialog.component';
 import {Router} from '@angular/router';
+import {AnswerState} from '../../../interface/answer-state';
 
 @Injectable({
   providedIn: 'root'

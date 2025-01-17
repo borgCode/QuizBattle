@@ -2,7 +2,6 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {QuestionDto} from '../../../../../../api/generated/models/question-dto';
 import {combineLatest, Observable, switchMap, tap} from 'rxjs';
 import {PlayChapterDto} from '../../../../../../api/generated/models/play-chapter-dto';
-import {AnswerState} from '../../interface/answer-state';
 import {HealthState} from '../../interface/health-state';
 import {PlayChapterUiService} from '../../service/play-chapter-ui.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -10,6 +9,7 @@ import {ChapterHeaderComponent} from '../chapter-header/chapter-header.component
 import {AsyncPipe, NgIf} from '@angular/common';
 import {QuestionPanelComponent} from '../../../../../../shared/components/question-panel/question-panel.component';
 import {map} from 'rxjs/operators';
+import {AnswerState} from '../../../../interface/answer-state';
 
 @Component({
   selector: 'app-chapter-view',

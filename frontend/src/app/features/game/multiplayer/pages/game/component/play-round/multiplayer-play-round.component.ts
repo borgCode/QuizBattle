@@ -1,13 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MultiplayerCategoryComponent} from '../category-selection/multiplayer-category.component';
-import {ActivatedRoute, Router} from '@angular/router';
-import {NgIf} from '@angular/common';
+import {ActivatedRoute} from '@angular/router';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {QuestionDto} from '../../../../../../../api/generated/models/question-dto';
-import {AnswerValidationResponse} from '../../../../../../../api/generated/models/answer-validation-response';
 import {QuestionPanelComponent} from '../../../../../../../shared/components/question-panel/question-panel.component';
-import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
-import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
-import {QuestionService} from '../../../../../../../api/generated/services/question.service';
+import {GameService} from '../../service/game.service';
+import {combineLatest, Observable} from 'rxjs';
+import {AnswerState} from '../../../../../interface/answer-state';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-multiplayer-play-round',
@@ -15,183 +15,97 @@ import {QuestionService} from '../../../../../../../api/generated/services/quest
     MultiplayerCategoryComponent,
     QuestionPanelComponent,
     NgIf,
-    QuestionPanelComponent
+    QuestionPanelComponent,
+    AsyncPipe
   ],
   templateUrl: './multiplayer-play-round.component.html',
   styleUrl: './multiplayer-play-round.component.css'
 })
-export class MultiplayerPlayRoundComponent implements OnInit {
-  categories: Array<string> = [];
-  selectedCategory: string | null = null;
+export class MultiplayerPlayRoundComponent implements OnInit, OnDestroy {
   questions: QuestionDto[] = [];
   sessionId: number;
-  storedPlayerId: number;
-  answerIsCorrect: boolean = null;
-  correctAnswerIndex: number;
-  currentQuestionIndex: number = 0;
+
+
+
+  questions$: Observable<QuestionDto[]>
+  currentQuestionIndex$: Observable<number>
+  answerState$: Observable<AnswerState>
+  categories$: Observable<string[]>
+  currentQuestion$: Observable<QuestionDto | null>;
+  shouldShowCategories$: Observable<boolean>
+  shouldShowQuestions$: Observable<boolean>
 
   constructor(
-    private questionService: QuestionService,
-    private loginStateService: LoginStateService,
+
     private activatedRoute: ActivatedRoute,
-    private router: Router,
+
+    protected gameService: GameService
   ) {
   }
 
   ngOnInit() {
-    this.storedPlayerId = this.loginStateService.userId;
-
     this.activatedRoute.params.subscribe(value => {
       this.sessionId = value['sessionId'];
     });
 
+    this.questions$ = this.gameService.questions$;
+    this.currentQuestionIndex$ = this.gameService.currentQuestionIndex$;
+    this.answerState$ = this.gameService.answerState$;
+    this.categories$ = this.gameService.categories$;
+    this.currentQuestion$ = this.questions$.pipe(
+      map(questions => questions && questions.length > 0 ? questions[0] : null)
+    );
 
-    this.questionService.restoreSessionQuestions({playerId: this.storedPlayerId}).subscribe({
-      next: progress => {
-        console.log(progress)
-        if (progress && progress.questions.length > 0) {
-          this.questions = progress.questions;
-          this.currentQuestionIndex = progress.currentIndex;
-        } else {
+    this.currentQuestion$ = combineLatest([
+      this.questions$,
+      this.currentQuestionIndex$
+    ]).pipe(
+      map(([questions, currentIndex]) =>
+        questions && questions.length > 0 ? questions[currentIndex] : null
+      )
+    );
 
-          let questionIds = (history.state as any).questionIds;
+    this.shouldShowCategories$ = combineLatest([
+      this.categories$,
+      this.questions$
+    ]).pipe(
+      map(([categories, questions]) =>
+        categories?.length > 0 && (!questions || questions.length === 0)
+      )
+    );
 
-          if (questionIds) {
-            this.questionService.getActiveSessionQuestions({
-              sessionId: this.sessionId,
-              playerId: this.storedPlayerId
-            }).subscribe({
-              next: questions => {
-                this.questions = questions;
-              },
-              error: err => {
-                console.log('No active questions found, returning to score screen');
-                this.router.navigate(['multiplayer', this.sessionId]);
-              }
-            })
+    this.shouldShowQuestions$ = this.questions$.pipe(
+      map(questions => questions?.length > 0)
+    );
 
-          } else {
-            this.loadCategorySelection();
-          }
-        }
-      },
-      error: err => {
-        console.error('Error getting session questions:', err);
-        this.router.navigate(['multiplayer', this.sessionId]);
-      }
-    })
+    const questionIds = (history.state as any).questionIds;
+
+    this.gameService.getQuestions(questionIds).subscribe()
+
   }
 
-  get currentQuestion(): QuestionDto | null {
-    return this.questions && this.currentQuestionIndex < this.questions.length
-      ? this.questions[this.currentQuestionIndex]
-      : null;
+  onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
+    this.gameService.validateAnswer(selectedAnswer);
   }
-
-  private loadCategorySelection() {
-    this.resetState();
-
-    this.questionService.getThreeRandomCategories({
-      sessionId: this.sessionId,
-      playerId: this.storedPlayerId
-    }).subscribe({
-      next: categories =>
-        this.categories = categories
-    })
-  }
-
-  private resetState() {
-    this.selectedCategory = null;
-    this.questions = [];
-    this.answerIsCorrect = null;
-    this.correctAnswerIndex = null;
-  }
-
 
   onCategorySelected(category: string) {
-    this.selectedCategory = category;
-
-    this.questionService.getNewQuestionsForCategory({
-      body: {
-        category: category,
-        sessionId: this.sessionId,
-        playerId: this.storedPlayerId
-      }
-    }).subscribe({
-      next: data => {
-        if (data && data.length > 0) {
-          this.questions = data;
-        } else {
-          console.log("This category has already been played, please choose another");
-          this.selectedCategory = null;
-          this.loadCategorySelection();
-        }
-      },
-      error: err => {
-        console.log(err)
-      }
-    });
+    this.gameService.onCategorySelected(category);
   }
 
   onNextQuestion() {
-    this.currentQuestionIndex++;
-    if (this.currentQuestionIndex >= this.questions.length) {
-      this.router.navigate(['multiplayer', this.sessionId]);
-    } else {
-      this.resetQuestionState();
-    }
+    this.gameService.onNextQuestion();
   }
-  onAnswerSelected(selectedAnswer: { questionId: number, answer: string }) {
 
-    const validationRequest = {
-      body: {
-        questionId: selectedAnswer.questionId,
-        sessionId: this.sessionId,
-        answer: selectedAnswer.answer,
-        playerId: this.storedPlayerId
-      }
-    }
+  onTimerRanOut(event: { questionId: number }) {
+    this.gameService.validateAnswer({
+      questionId: event.questionId,
+      answer: null
+    });
+  }
 
-    this.questionService.validateMultiplayerAnswer(validationRequest).subscribe({
-      next: (response: AnswerValidationResponse) => {
-        this.answerIsCorrect = response.correct;
-        this.correctAnswerIndex = response.correctAnswerIndex
-      },
-      error: err => {
-        console.log(err)
-      }
+  ngOnDestroy() {
+    this.gameService.clearRoundQuestions().subscribe({
+      error: err => console.warn("Failed to clear round session: ", err)
     })
   }
-
-  resetQuestionState() {
-    this.answerIsCorrect = null;
-    this.correctAnswerIndex = null;
-  }
-
-  onTimerRanOut($event: { questionId: number }) {
-    const validationRequest = {
-      body: {
-        questionId: $event.questionId,
-        sessionId: this.sessionId,
-        answer: null,
-        playerId: this.storedPlayerId
-      }
-    }
-    this.questionService.validateMultiplayerAnswer(validationRequest).subscribe({
-      next: (response: AnswerValidationResponse) => {
-        this.answerIsCorrect = response.correct;
-        this.correctAnswerIndex = response.correctAnswerIndex
-      }
-    })
-  }
-
-  get shouldShowCategories(): boolean {
-    return this.categories.length > 0 && !this.questions.length;
-  }
-
-  get shouldShowQuestions(): boolean {
-    return this.questions.length > 0;
-  }
-
-
 }
