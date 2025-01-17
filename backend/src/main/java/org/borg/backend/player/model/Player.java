@@ -2,6 +2,7 @@ package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.social.friendship.model.Friendship;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.auth.model.Role;
@@ -40,8 +41,8 @@ public class Player implements UserDetails {
 
     private String avatarPath;
 
-    @ManyToMany(mappedBy = "players")
-    private List<MultiplayerSession> session;
+    @OneToMany(mappedBy = "player")
+    private List<SessionPlayer> sessions;
 
     @OneToMany(mappedBy = "player1", cascade = CascadeType.ALL)
     private Set<Friendship> friendshipsInitiated = new HashSet<>();

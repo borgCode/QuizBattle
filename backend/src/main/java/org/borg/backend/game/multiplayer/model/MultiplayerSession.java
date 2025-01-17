@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.game.shared.dto.PlayerQuestionResult;
 
 import java.util.*;
 
@@ -18,23 +17,11 @@ public class MultiplayerSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @ManyToMany
-    @JoinTable(name = "session_players",
-            joinColumns = @JoinColumn(name = "session_id"),
-            inverseJoinColumns = @JoinColumn(name = "player_id"),
-    indexes = {
-         @Index(name = "IX_session_player", columnList = "session_id, player_id")   
-    })
-    private List<Player> players;
+
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL)
+    private List<SessionPlayer> sessionPlayers;
     
     private Integer currentQuestionIndex;
-    
-    @ElementCollection
-    @CollectionTable(name = "player_scores")
-    @MapKeyColumn(name = "player_id")
-    @Column(name = "scores")
-    private Map<Long, Integer> scores;
     
     @Enumerated(EnumType.STRING)
     private GameStatus status;
@@ -44,41 +31,13 @@ public class MultiplayerSession {
     private Player currentPlayerTurn;
     
     @ElementCollection
-    @CollectionTable(name = "questions_answered")
-    @MapKeyColumn(name = "player_id")
-    @Column(name = "count")
-    private Map<Long, Integer> questionsAnswered;
-    
-    @ElementCollection
     private List<Long> questionIds = new ArrayList<>();
-    
-    @ElementCollection
-    @CollectionTable(name = "player_question_results")
-    private Set<PlayerQuestionResult> questionResults = new HashSet<>();
     
     @ElementCollection
     private Set<String> playedCategories = new HashSet<>();
     
     @ElementCollection
     private List<String> roundCategories = new ArrayList<>();
-
-    @ElementCollection
-    @CollectionTable(name = "player_acknowledgment")
-    @MapKeyColumn(name = "player_id")
-    @Column(name = "has_acknowledged_game_over")
-    private Map<Long, Boolean> playerAcknowledgment;
-
-    @ElementCollection
-    @CollectionTable(name = "player_rematch")
-    @MapKeyColumn(name = "player_id")
-    @Column(name = "wants_rematch")
-    private Map<Long, Boolean> playerWantsRematch;
-
-    @ElementCollection
-    @CollectionTable(name = "player_giving_up")
-    @MapKeyColumn(name = "player_id")
-    @Column(name = "has_given_up")
-    private Map<Long, Boolean> playerHasGivenUp;
     
     private Long winnerId = null;
     private Long loserId = null;
@@ -87,21 +46,37 @@ public class MultiplayerSession {
     
 
     public MultiplayerSession(Player player1, Player player2, Player currentPlayerTurn) {
-        players = new ArrayList<>(List.of(player1, player2));
-        scores = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
-        playerAcknowledgment = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
-        playerWantsRematch = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
-        playerHasGivenUp = new HashMap<>(Map.of(player1.getId(), false, player2.getId(), false));
+        this.sessionPlayers = new ArrayList<>();
         status = GameStatus.ACTIVE;
         this.currentQuestionIndex = 0;
         this.currentPlayerTurn = currentPlayerTurn;
-        questionsAnswered = new HashMap<>(Map.of(player1.getId(), 0, player2.getId(), 0));
+        
+        this.sessionPlayers.add(buildSessionPlayer(player1));
+        this.sessionPlayers.add(buildSessionPlayer(player2));
     }
-    
+
+    private SessionPlayer buildSessionPlayer(Player player) {
+        return SessionPlayer.builder()
+                .session(this)
+                .player(player)
+                .score(0)
+                .questionsAnswered(0)
+                .hasAcknowledgedGameOver(false)
+                .givenUp(false)
+                .questionResults(new HashSet<>()).build();
+    }
+
+    public SessionPlayer getSessionPlayerById(Long playerId) {
+        return sessionPlayers.stream()
+                .filter(sp -> sp.getPlayer().getId().equals(playerId))
+                .findFirst()
+                .orElse(null);
+    }
+
     public Long getPlayerWhoGaveUpId() {
-        return getPlayerHasGivenUp().entrySet().stream()
-                .filter(Map.Entry::getValue)
-                .map(Map.Entry::getKey)
+        return sessionPlayers.stream()
+                .filter(SessionPlayer::isGivenUp)
+                .map(sp -> sp.getPlayer().getId())
                 .findFirst()
                 .orElse(null);
     }
