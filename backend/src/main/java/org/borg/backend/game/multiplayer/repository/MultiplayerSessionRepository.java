@@ -1,8 +1,7 @@
 package org.borg.backend.game.multiplayer.repository;
 
-import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
-import org.borg.backend.player.model.Player;
+import org.borg.backend.game.shared.enums.GameStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

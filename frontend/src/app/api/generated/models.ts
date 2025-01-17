@@ -38,6 +38,7 @@ export type { RelationshipStatus } from './models/relationship-status';
 export type { RelationshipStatusRequest } from './models/relationship-status-request';
 export type { RematchRequest } from './models/rematch-request';
 export type { RoundSessionProgress } from './models/round-session-progress';
+export type { SessionPlayerDto } from './models/session-player-dto';
 export type { SinglePlayerAnswerValidationRequest } from './models/single-player-answer-validation-request';
 export type { StartChapterRequest } from './models/start-chapter-request';
 export type { Stats } from './models/stats';

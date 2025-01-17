@@ -7,7 +7,6 @@ import org.borg.backend.game.multiplayer.mapper.GameSessionMapper;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
-import org.borg.backend.game.multiplayer.util.MultiplayerGameConstants;
 import org.borg.backend.game.shared.dto.PlayerQuestionResult;
 import org.borg.backend.game.shared.enums.GameResult;
 import org.borg.backend.game.shared.enums.GameStatus;
@@ -18,18 +17,16 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
-import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.borg.backend.social.notification.service.NotificationService;
-import org.hibernate.Session;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
-import static org.borg.backend.game.multiplayer.util.MultiplayerGameConstants.*;
+import static org.borg.backend.game.multiplayer.util.MultiplayerGameConstants.QUESTIONS_PER_ROUND;
+import static org.borg.backend.game.multiplayer.util.MultiplayerGameConstants.TOTAL_QUESTIONS_PER_PLAYER;
 
 @Slf4j
 @Service

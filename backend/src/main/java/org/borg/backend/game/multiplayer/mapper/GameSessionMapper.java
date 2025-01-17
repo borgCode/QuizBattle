@@ -3,8 +3,6 @@ package org.borg.backend.game.multiplayer.mapper;
 import org.borg.backend.game.multiplayer.dto.GameStateResponse;
 import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
-import org.borg.backend.game.multiplayer.model.SessionPlayer;
-import org.borg.backend.player.mapper.PlayerMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;

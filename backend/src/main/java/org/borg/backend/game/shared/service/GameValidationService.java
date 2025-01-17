@@ -5,13 +5,11 @@ import org.borg.backend.game.multiplayer.dto.MultiplayerAnswerValidationRequest;
 import org.borg.backend.game.multiplayer.dto.MultiplayerQuestionsRequest;
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.model.SessionPlayer;
-import org.borg.backend.player.model.Player;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service

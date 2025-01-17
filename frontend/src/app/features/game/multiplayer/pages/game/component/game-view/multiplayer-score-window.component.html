@@ -2,8 +2,8 @@
   <div class="row align-items-center" style="height: 250px">
     <div class="col-4 col-sm-4 d-flex flex-column justify-content-center">
       <app-player-card
-        [playerAvatar]="'data:image/jpeg;base64,' + gameState.playerDTOS[(opponentIndex + 1) % 2].base64Image"
-        [playerDisplayName]="gameState.playerDTOS[(opponentIndex + 1) % 2].displayName"
+        [playerAvatar]="'data:image/jpeg;base64,' + gameState.playerDTO.base64Image"
+        [playerDisplayName]="gameState.playerDTO.displayName"
         maxHeight="150px"></app-player-card>
     </div>
     <div class="score-panel col-4 col-sm-4 align-content-center text-center">
@@ -30,13 +30,13 @@
         </div>
       </div>
       </ng-container>
-        <p class="total-score">{{ playerTotalScore }}
-        - {{ opponentTotalScore }}</p>
+        <p class="total-score">{{ gameState.playerDTO.score }}
+        - {{ gameState.opponentDTO.score }}</p>
     </div>
     <div class="col-4 col-sm-4 d-flex flex-column justify-content-center">
       <app-player-card
-        [playerAvatar]="opponentAvatar"
-        [playerDisplayName]="opponentDisplayName"
+        [playerAvatar]="'data:image/jpeg;base64,' + gameState.opponentDTO.base64Image"
+        [playerDisplayName]="gameState.opponentDTO.displayName"
         maxHeight="150px"></app-player-card>
 
     </div>

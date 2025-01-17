@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
-import {PlayerQuestionResult} from '../../../../../../../api/generated/models/player-question-result';
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
 import {AlertMessageService} from '../../../../../../../core/services/alert-message/alert-message.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -38,22 +37,12 @@ interface BoxRow {
 })
 export class MultiplayerScoreWindowComponent implements OnInit {
 
-
   gameState!: GameStateResponse;
   boxes: BoxRow[] = [];
-  opponentIndex: number | null = null;
-  results: Array<PlayerQuestionResult> = [];
   storedPlayerId: number;
   sessionId: number;
   isGameOver: boolean = false;
-  playerTotalScore: number;
-  opponentTotalScore: number;
-  opponentId: number;
-  opponentDisplayName: string;
-  opponentAvatar: string = '';
   hasAcknowledgedGameOver: boolean;
-
-
 
   constructor(
     private gameService: GameService,
@@ -97,28 +86,17 @@ export class MultiplayerScoreWindowComponent implements OnInit {
       next: gameState => {
         this.gameState = gameState;
 
-        this.opponentIndex = this.gameState.playerDTOS.findIndex(player => player.id !== this.storedPlayerId);
-        this.opponentId = this.gameState.playerDTOS[this.opponentIndex].id;
+        this.gameState.playerDTO.questionResults.forEach((result) => {
+          const position = this.indexToBoxPosition(result.questionIndex);
+          this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct)
+        })
 
-        this.playerTotalScore = gameState.scores[gameState.playerDTOS[(this.opponentIndex + 1) % 2].id];
-        this.opponentTotalScore = gameState.scores[gameState.playerDTOS[this.opponentIndex].id];
+        this.gameState.opponentDTO.questionResults.forEach((result) => {
+          const position = this.indexToBoxPosition(result.questionIndex);
+          this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct)
+        })
 
-        this.opponentDisplayName = gameState.playerDTOS[this.opponentIndex].displayName;
-        this.opponentAvatar = 'data:image/jpeg;base64,' + gameState.playerDTOS[this.opponentIndex].base64Image;
-
-        this.results = this.gameState.questionResults
-
-        this.results.forEach((result) => {
-            if (result.playerId == this.storedPlayerId) {
-              const position = this.indexToBoxPosition(result.questionIndex);
-              this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct)
-            } else {
-              const position = this.indexToBoxPosition(result.questionIndex);
-              this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct);
-            }
-          }
-        )
-        this.hasAcknowledgedGameOver = gameState.playerAcknowledgment[this.storedPlayerId];
+        this.hasAcknowledgedGameOver = gameState.playerDTO.givenUp;
 
         if (gameState.status == 'COMPLETED') {
           this.isGameOver = true;
@@ -127,7 +105,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
             this.handleGameOver();
           }
         }
-        this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.opponentId)
+        this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.gameState.opponentDTO.id)
       }
     })
   }
@@ -184,7 +162,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
   private showGameOverDialog(gameResult: GameResult) {
     this.gameOverDialog.open(GameOverDialogComponent, {
-      data: {gameResult: gameResult, opponentName: this.opponentDisplayName},
+      data: {gameResult: gameResult, opponentName: this.gameState.opponentDTO.displayName},
       width: '300px',
       disableClose: true,
       autoFocus: false

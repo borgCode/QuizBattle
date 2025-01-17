@@ -28,15 +28,6 @@ export class GameService {
     )
   }
 
-
-  readonly scores$ = this.gameState$.pipe(
-    map(state => state?.scores ?? {})
-  );
-
-  readonly questionResults$ = this.gameState$.pipe(
-    map(state => state?.questionResults ?? [])
-  );
-
   readonly gameStatus$ = this.gameState$.pipe(
     map(state => state?.status)
   );

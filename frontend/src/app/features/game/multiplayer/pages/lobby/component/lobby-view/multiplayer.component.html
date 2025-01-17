@@ -43,12 +43,12 @@
                   <!-- Player 1 Section -->
                   <div class="col-md-4 d-flex align-items-center">
                     <div class="player-avatar bg-light rounded-circle p-2 me-3">
-                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTOS[0].base64Image"
+                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTO.base64Image"
                            style="max-height: 40px; max-width: 40px" alt="Player 1" class="rounded-circle"/>
                     </div>
                     <div class="player-info">
-                      <div class="fw-bold">{{ gameSession.playerDTOS[0].displayName }}</div>
-                      <div class="text-primary fs-4">{{ gameSession.scores[gameSession.playerDTOS[0].id] }}</div>
+                      <div class="fw-bold">{{ gameSession.playerDTO.displayName }}</div>
+                      <div class="text-primary fs-4">{{ gameSession.playerDTO.score }}</div>
                     </div>
                   </div>
 
@@ -69,11 +69,11 @@
                   <!-- Player 2 Section -->
                   <div class="col-md-4 d-flex align-items-center justify-content-end">
                     <div class="player-info text-end">
-                      <div class="fw-bold">{{ gameSession.playerDTOS[1].displayName }}</div>
-                      <div class="text-primary fs-4">{{ gameSession.scores[gameSession.playerDTOS[1].id] }}</div>
+                      <div class="fw-bold">{{ gameSession.opponentDTO.displayName }}</div>
+                      <div class="text-primary fs-4">{{ gameSession.opponentDTO.score }}</div>
                     </div>
                     <div class="player-avatar bg-light rounded-circle p-2 ms-3">
-                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTOS[1].base64Image"
+                      <img [src]="'data:image/jpeg;base64,' + gameSession.opponentDTO.base64Image"
                            style="max-height: 40px; max-width: 40px" alt="Player 2" class="rounded-circle"/>
                     </div>
                   </div>
