@@ -137,8 +137,6 @@ public class MatchMakingService {
         Player player1 = playerService.getPlayerById(matchmakingSession.getPlayer1Id());
         Player player2 = playerService.getPlayerById(matchmakingSession.getPlayer2Id());
 
-        //Randomly choose who starts
-
         Player startingPlayer = Math.random() < 0.5 ? player1 : player2;
 
         MultiplayerSession session = new MultiplayerSession(player1, player2, startingPlayer.getId());

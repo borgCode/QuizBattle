@@ -22,39 +22,65 @@ public class StatsService {
     @Transactional
     public void updateQuestionStats(Long playerId, String category, boolean isCorrect) {
         log.debug("Starting stats update for {} in category {}", playerId, category);
-        
+
         Player player = playerService.getPlayerById(playerId);
+        log.debug("Retrieved player {}: current stats for category {}: correct={}, total={}",
+                playerId,
+                category,
+                player.getStats().getCategoryStats().get(category).getCorrect(),
+                player.getStats().getCategoryStats().get(category).getQuestionsAnswered());
 
         player.getStats().incrementQuestionsAnswered(category);
 
         if (isCorrect) {
             player.getStats().incrementCorrectAnswer(category);
+            log.debug("Incremented correct answers for player {} in category {}", playerId, category);
         }
-        
-        Player updatedPlayer = playerRepository.save(player);
 
-        log.debug("After update, correct answers: {}", updatedPlayer.getStats().getCategoryStats().get(category).getCorrect());
+        Player updatedPlayer = playerRepository.save(player);
+        log.info("Updated player {} stats: category={}, correct={}/{}",
+                playerId,
+                category,
+                updatedPlayer.getStats().getCategoryStats().get(category).getCorrect(),
+                updatedPlayer.getStats().getCategoryStats().get(category).getQuestionsAnswered());
     }
 
     @Transactional
     public void updateGameStats(Player player1, Player player2, GameResult result) {
+        log.debug("Updating game stats for players {} and {} with result {}",
+                player1.getId(), player2.getId(), result);
+        
         Stats player1Stats = player1.getStats();
         Stats player2Stats = player2.getStats();
+
+        log.debug("Current stats - Player {}: W={}/L={}/T={}, Player {}: W={}/L={}/T={}",
+                player1.getId(),
+                player1Stats.getNumOfWins(), player1Stats.getNumOfLosses(), player1Stats.getNumOfTies(),
+                player2.getId(),
+                player2Stats.getNumOfWins(), player2Stats.getNumOfLosses(), player2Stats.getNumOfTies());
 
         if (result.equals(GameResult.WIN_PLAYER1)) {
             player1Stats.incrementWins();
             player2Stats.incrementLosses();
+            log.info("Game result: Player {} won against Player {}", player1.getId(), player2.getId());
         } else if (result.equals(GameResult.WIN_PLAYER2)) {
             player1Stats.incrementLosses();
             player2Stats.incrementWins();
+            log.info("Game result: Player {} won against Player {}", player2.getId(), player1.getId());
         } else {
             player1Stats.incrementTies();
             player2Stats.incrementTies();
+            log.info("Game result: Tie between Player {} and Player {}", player1.getId(), player2.getId());
         }
 
         player1.setStats(player1Stats);
         player2.setStats(player2Stats);
 
         playerRepository.saveAll(List.of(player1, player2));
+        log.debug("Updated stats - Player {}: W={}/L={}/T={}, Player {}: W={}/L={}/T={}",
+                player1.getId(),
+                player1Stats.getNumOfWins(), player1Stats.getNumOfLosses(), player1Stats.getNumOfTies(),
+                player2.getId(),
+                player2Stats.getNumOfWins(), player2Stats.getNumOfLosses(), player2Stats.getNumOfTies());
     }
 }

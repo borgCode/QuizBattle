@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MultiplayerGameService} from '../../../../../../api/generated/services/multiplayer-game.service';
 import {GameStateResponse} from '../../../../../../api/generated/models/game-state-response';
-import {BehaviorSubject, Observable, tap} from 'rxjs';
+import {BehaviorSubject, tap} from 'rxjs';
 import {MultiplayerMatchService} from '../../../../../../api/generated/services/multiplayer-match.service';
 import {AlertMessageService} from '../../../../../../core/services/alert-message/alert-message.service';
 import {Router} from '@angular/router';

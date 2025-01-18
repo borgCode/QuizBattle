@@ -36,11 +36,13 @@ public class AchievementService {
     }
 
     public void handleStoryAchievement(Long playerId, String storyName) {
-        Achievement achievement = achievementRepository.findByName(storyName);
+        log.debug("Processing story achievement for player {}, story: {}", playerId, storyName);
 
+        Achievement achievement = achievementRepository.findByName(storyName);
         Player player = playerService.getPlayerById(playerId);
 
         if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
+            log.debug("Player {} already has story achievement for {}", playerId, storyName);
             return;
         }
 
@@ -52,18 +54,28 @@ public class AchievementService {
                 .build();
 
         userUnlockedAchievementRepository.save(unlockedAchievement);
+        log.info("Player {} unlocked new story achievement: {}", player.getUsername(), storyName);
         sendAchievementNotification(player, unlockedAchievement);
     }
 
     @Transactional
     public void handleCategoryAchievement(Long playerId, String category) {
-        
+        log.debug("Processing category achievement for player {}, category: {}", playerId, category);
+
         Achievement achievement = achievementRepository.findByName(category);
         Player player = playerService.getPlayerById(playerId);
 
         int correctAnswers = player.getStats().getCategoryStats().get(category).getCorrect();
+        log.debug("Player {} has {} correct answers in category {}",
+                player.getUsername(), correctAnswers, category);
 
-        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
+        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository
+                .findByPlayerAndAchievement(player, achievement);
+
+        if (unlockedAchievement != null) {
+            log.debug("Current achievement level for player {} in category {}: {}",
+                    playerId, category, unlockedAchievement.getCurrentLevel().getLevel());
+        }
 
         AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
         handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
@@ -108,9 +120,14 @@ public class AchievementService {
 
     private void handleAchievementLevelUpdate(Player player, Achievement achievement, UserUnlockedAchievement unlockedAchievement, AchievementLevel newLevel) {
         if (newLevel == null) {
+            log.debug("No new achievement level available for player {} in {}",
+                    player.getUsername(), achievement.getName());
             return;
         }
+
         if (unlockedAchievement == null) {
+            log.debug("Creating new achievement entry for player {} in {}",
+                    player.getUsername(), achievement.getName());
             unlockedAchievement = UserUnlockedAchievement.builder()
                     .player(player)
                     .achievement(achievement)
@@ -118,11 +135,17 @@ public class AchievementService {
                     .achievedAt(Instant.now())
                     .build();
         } else {
+            log.debug("Updating achievement level for player {} in {} from {} to {}",
+                    player.getUsername(), achievement.getName(),
+                    unlockedAchievement.getCurrentLevel().getLevel(), newLevel.getLevel());
             unlockedAchievement.setCurrentLevel(newLevel);
             unlockedAchievement.setAchievedAt(Instant.now());
         }
 
         userUnlockedAchievementRepository.save(unlockedAchievement);
+        log.info("Player {} reached {} achievement level {}: {}",
+                player.getUsername(), achievement.getName(),
+                newLevel.getLevel(), newLevel.getDescription());
 
         sendAchievementNotification(player, unlockedAchievement);
     }
