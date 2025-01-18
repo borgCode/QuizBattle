@@ -15,6 +15,7 @@ import {
   FriendsListDialogComponent
 } from '../../../../../../shared/components/dialog/friends-list-dialog/friends-list-dialog.component';
 import {MultiplayerMatchService} from '../../../../../../api/generated/services/multiplayer-match.service';
+import {map} from 'rxjs/operators';
 
 interface MatchDecision {
   matchmakingSessionId: number;
@@ -63,6 +64,11 @@ export class LobbyService {
     this.friendService.getFriends({playerId: this.playerId}).pipe(
       tap(friends => this.friendsSubject.next(friends)),
       switchMap(() => this.multiplayerGameService.getPlayerSessions({playerId: this.playerId}).pipe(
+        map(sessions => sessions.sort((a, b) => {
+          if (a.status === 'ACTIVE' && b.status === 'COMPLETED') return -1;
+          if (a.status === 'COMPLETED' && b.status === 'ACTIVE') return 1;
+          return 0;
+        })),
         tap(sessions => this.sessionsSubject.next(sessions))
       )
     )).subscribe()

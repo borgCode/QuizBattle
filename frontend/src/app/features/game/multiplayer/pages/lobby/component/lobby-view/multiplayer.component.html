@@ -15,9 +15,11 @@
                  class="btn btn-success btn-lg"
                  [class.disabled]="state.isSearching || state.waitingForOpponent"
                  [ngStyle]="{'cursor': (state.isSearching || state.waitingForOpponent) ? 'not-allowed' : 'pointer'}">
-              {{ state.waitingForOpponent ? 'Waiting for Opponent to accept' :
-              state.isSearching ? 'Finding Game' :
-                'Find Game' }}
+              {{
+                state.waitingForOpponent ? 'Waiting for Opponent to accept' :
+                  state.isSearching ? 'Finding Game' :
+                    'Find Game'
+              }}
               <span *ngIf="state.isSearching || state.waitingForOpponent" class="loading-dots"></span>
             </div>
           </div>
@@ -44,9 +46,11 @@
         <div class="card-body p-0">
           <ul class="list-group mb-3">
             <ng-container *ngFor="let gameSession of lobbyService.sessions$ | async">
-              <li (click)="openGame(gameSession.id)" class="list-group-item ju" style="cursor: pointer;">
+              <li (click)="openGame(gameSession.id)"
+                  class="list-group-item ju"
+                  [ngClass]="{'completed-game': gameSession.status === 'COMPLETED'}"
+                  style="cursor: pointer;">
                 <div class="row align-items-center">
-
                   <div class="col-md-4 d-flex align-items-center">
                     <div class="player-avatar bg-light rounded-circle p-2 me-3">
                       <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTO.base64Image"
@@ -57,18 +61,23 @@
                       <div class="text-primary fs-4">{{ gameSession.playerDTO.score }}</div>
                     </div>
                   </div>
-                  <div class="col-md-4 text-center">
-                    <div class="versus-badge">
-                      <span class="badge bg-light text-dark px-4 py-2">VS</span>
+                  <ng-container [ngSwitch]="gameSession.status">
+                    <div class="col-md-4 mx-auto text-center">
+                      <div class="versus-badge">
+                        <span class="badge bg-light text-dark px-4 py-2 shadow">VS</span>
+                      </div>
+                      <div class="mt-3">
+                    <span *ngSwitchCase="'ACTIVE'"
+                          class="badge {{ gameSession.currentPlayerTurn === player.id ? 'bg-success' : 'bg-secondary' }} rounded-pill px-4 py-2">
+                      {{ gameSession.currentPlayerTurn === player.id ? "Your Turn!" : "Opponent's Turn" }}
+                    </span>
+                        <span *ngSwitchCase="'COMPLETED'"
+                              class="badge {{ gameSession.winnerId === player.id ? 'bg-success' : 'bg-danger' }} rounded-pill px-4 py-2">
+                      {{ gameSession.winnerId === player.id ? 'You Won!' : 'You lost' }}
+                    </span>
+                      </div>
                     </div>
-                    <div class="mt-2">
-                      <!--                      TODO win/loss instead of complete-->
-                      <ng-container [ngSwitch]="gameSession.status">
-                        <span *ngSwitchCase="'ACTIVE'" class="badge bg-primary rounded-pill px-3">Active</span>
-                        <span *ngSwitchCase="'COMPLETED'" class="badge bg-success rounded-pill px-3">Completed</span>
-                      </ng-container>
-                    </div>
-                  </div>
+                  </ng-container>
                   <div class="col-md-4 d-flex align-items-center justify-content-end">
                     <div class="player-info text-end">
                       <div class="fw-bold">{{ gameSession.opponentDTO.displayName }}</div>

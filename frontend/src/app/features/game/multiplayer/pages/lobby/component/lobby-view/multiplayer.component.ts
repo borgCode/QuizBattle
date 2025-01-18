@@ -1,5 +1,5 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {AsyncPipe, NgForOf, NgIf, NgStyle, NgSwitch, NgSwitchCase} from '@angular/common';
+import {AsyncPipe, NgClass, NgForOf, NgIf, NgStyle, NgSwitch, NgSwitchCase} from '@angular/common';
 import {PlayerDto} from '../../../../../../../api/generated/models/player-dto';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
@@ -15,7 +15,8 @@ import {LobbyService} from '../../service/lobby.service';
     NgStyle,
     NgIf,
     PlayerCardComponent,
-    AsyncPipe
+    AsyncPipe,
+    NgClass
   ],
   templateUrl: './multiplayer.component.html',
   styleUrl: './multiplayer.component.css'
