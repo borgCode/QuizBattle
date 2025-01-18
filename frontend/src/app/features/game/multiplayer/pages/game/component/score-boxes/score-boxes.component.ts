@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {GameService} from '../../service/game.service';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
 
 interface Box {
   color: string;
@@ -34,18 +35,12 @@ export class ScoreBoxesComponent implements OnInit, OnChanges {
     this.initBoxes();
 
     this.gameService.gameState$.subscribe(gameState => {
+      this.updateBoxColors(gameState);
+    });
+
+    this.gameService.gameState$.subscribe(gameState => {
       if (gameState) {
-        this.initBoxes();
-
-        gameState.playerDTO.questionResults.forEach(result => {
-          const position = this.indexToBoxPosition(result.questionIndex);
-          this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct);
-        });
-
-        gameState.opponentDTO.questionResults.forEach(result => {
-          const position = this.indexToBoxPosition(result.questionIndex);
-          this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct);
-        });
+        this.updateBoxColors(gameState);
       }
     });
   }
@@ -80,6 +75,20 @@ export class ScoreBoxesComponent implements OnInit, OnChanges {
     } else {
       this.boxes[rowIndex][side][colIndex].color = '#EF0107'
     }
+  }
+
+  private updateBoxColors(gameState: GameStateResponse) {
+    this.initBoxes();
+
+    gameState.playerDTO.questionResults.forEach(result => {
+      const position = this.indexToBoxPosition(result.questionIndex);
+      this.updateBoxColor('left', position.rowIndex, position.colIndex, result.correct);
+    });
+
+    gameState.opponentDTO.questionResults.forEach(result => {
+      const position = this.indexToBoxPosition(result.questionIndex);
+      this.updateBoxColor('right', position.rowIndex, position.colIndex, result.correct);
+    });
   }
 }
 

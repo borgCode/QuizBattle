@@ -10,8 +10,8 @@ import {
 } from './features/game/multiplayer/pages/game/component/play-round/multiplayer-play-round.component';
 import {MultiplayerComponent} from './features/game/multiplayer/pages/lobby/component/lobby-view/multiplayer.component';
 import {
-  MultiplayerScoreWindowComponent
-} from './features/game/multiplayer/pages/game/component/game-view/multiplayer-score-window.component';
+  GameViewComponent
+} from './features/game/multiplayer/pages/game/component/game-view/game-view.component';
 import {EditProfileComponent} from './features/profile/edit-profile/edit-profile.component';
 import {StorySelectionComponent} from './features/game/singleplayer/story-selection/story-selection.component';
 import {StoryOverviewComponent} from './features/game/singleplayer/story-overview/story-overview.component';
@@ -28,7 +28,7 @@ export const routes: Routes = [
   {path: 'edit-profile', component: EditProfileComponent, canActivate:[authGuard]},
   {path: 'settings', component: SettingsComponent, canActivate: [authGuard]},
   {path: 'multiplayer', component: MultiplayerComponent, canActivate:[authGuard]},
-  {path: 'multiplayer/:sessionId', component: MultiplayerScoreWindowComponent, canActivate:[authGuard]},
+  {path: 'multiplayer/:sessionId', component: GameViewComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId/play', component: MultiplayerPlayRoundComponent, canActivate:[authGuard]},
   {path: 'singleplayer', component: StorySelectionComponent, canActivate:[authGuard]},
   {path: 'singleplayer/story/:storyId', component: StoryOverviewComponent, canActivate:[authGuard]},

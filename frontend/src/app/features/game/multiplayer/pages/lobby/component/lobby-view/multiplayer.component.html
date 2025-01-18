@@ -8,25 +8,31 @@
           [playerAvatar]="image"
         ></app-player-card>
       </div>
-      <div class="col-md-3 align-content-center">
-        <div (click)="!isSearching && !waitingForOpponent && findGame()"
-             class="btn btn-success btn-lg"
-             [class.disabled]="isSearching || waitingForOpponent"
-             [ngStyle]="{'cursor': (isSearching || waitingForOpponent) ? 'not-allowed' : 'pointer'}">
-          {{ getButtonText() }}
-          <span *ngIf="isSearching || waitingForOpponent" class="loading-dots"></span>
-        </div>
-      </div>
-      <div class="col-md-3 align-content-center" *ngIf="shouldShowCancelMatchmaking">
-        <div class="btn btn-danger btn-lg"
-             (click)="leaveMatchmakingQueue()">
-          Stop searching
-        </div>
-      </div>
-      <div class="col-md-3 align-content-center">
-        <div (click)="!isSearching && openFriendDialog()"
-             class="btn btn-success btn-lg">
-          Send invite to friend
+      <div class="col-md-9 align-content-center">
+        <div class="row" *ngIf="lobbyService.matchmakingState$ | async as state">
+          <div class="col-md-4">
+            <div (click)="!state.isSearching && !state.waitingForOpponent && findGame()"
+                 class="btn btn-success btn-lg"
+                 [class.disabled]="state.isSearching || state.waitingForOpponent"
+                 [ngStyle]="{'cursor': (state.isSearching || state.waitingForOpponent) ? 'not-allowed' : 'pointer'}">
+              {{ state.waitingForOpponent ? 'Waiting for Opponent to accept' :
+              state.isSearching ? 'Finding Game' :
+                'Find Game' }}
+              <span *ngIf="state.isSearching || state.waitingForOpponent" class="loading-dots"></span>
+            </div>
+          </div>
+          <div class="col-md-4" *ngIf="state.showCancelMatchmaking">
+            <div class="btn btn-danger btn-lg"
+                 (click)="leaveMatchmakingQueue()">
+              Stop searching
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div (click)="!state.isSearching && openFriendDialog()"
+                 class="btn btn-success btn-lg">
+              Send invite to friend
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -37,10 +43,10 @@
         </div>
         <div class="card-body p-0">
           <ul class="list-group mb-3">
-            <ng-container *ngFor="let gameSession of gameSessions">
+            <ng-container *ngFor="let gameSession of lobbyService.sessions$ | async">
               <li (click)="openGame(gameSession.id)" class="list-group-item ju" style="cursor: pointer;">
                 <div class="row align-items-center">
-                  <!-- Player 1 Section -->
+
                   <div class="col-md-4 d-flex align-items-center">
                     <div class="player-avatar bg-light rounded-circle p-2 me-3">
                       <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTO.base64Image"
@@ -52,7 +58,7 @@
                     </div>
                   </div>
 
-                  <!-- VS Section -->
+
                   <div class="col-md-4 text-center">
                     <div class="versus-badge">
                       <span class="badge bg-light text-dark px-4 py-2">VS</span>
@@ -66,7 +72,6 @@
                     </div>
                   </div>
 
-                  <!-- Player 2 Section -->
                   <div class="col-md-4 d-flex align-items-center justify-content-end">
                     <div class="player-info text-end">
                       <div class="fw-bold">{{ gameSession.opponentDTO.displayName }}</div>

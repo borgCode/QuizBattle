@@ -5,13 +5,12 @@ import {GameStateResponse} from '../../../../../../../api/generated/models/game-
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
 import {GameService} from '../../service/game.service';
 import {PlayerInteractionService} from '../../service/player-interaction.service';
-import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 import {ScoreBoxesComponent} from '../score-boxes/score-boxes.component';
 import {Observable} from 'rxjs';
 
 
 @Component({
-  selector: 'app-multiplayer-score-window',
+  selector: 'app-game-view',
   imports: [
     NgIf,
     PlayerCardComponent,
@@ -20,35 +19,32 @@ import {Observable} from 'rxjs';
     AsyncPipe,
     ScoreBoxesComponent
   ],
-  templateUrl: './multiplayer-score-window.component.html',
-  styleUrl: './multiplayer-score-window.component.css'
+  templateUrl: './game-view.component.html',
+  styleUrl: './game-view.component.css'
 })
-export class MultiplayerScoreWindowComponent implements OnInit {
+export class GameViewComponent implements OnInit {
 
-  gameState!: GameStateResponse;
-  storedPlayerId: number;
   sessionId: number;
   hasAcknowledgedGameOver: boolean;
   resetBoxesTrigger = false;
 
   gameOver$: Observable<boolean>;
+  gameState$: Observable<GameStateResponse>;
   constructor(
     protected gameService: GameService,
     protected playerInteractionService: PlayerInteractionService,
-    protected loginStateService: LoginStateService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
 
   ) {
     this.gameOver$ = this.gameService.gameOver$;
+    this.gameState$ = this.gameService.gameState$;
   }
 
   ngOnInit() {
-
     this.activatedRoute.params.subscribe(value => {
       this.gameService.sessionId = value['sessionId'];
       this.resetComponents();
-      this.storedPlayerId = this.loginStateService.loggedInUser.id;
       this.getGameState();
     })
   }
@@ -63,24 +59,22 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   private getGameState() {
     this.gameService.getGameState().subscribe({
       next: gameState => {
-        this.gameState = gameState;
-        this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.gameState.opponentDTO.playerId)
+        this.playerInteractionService.loadRelationshipStatus(this.gameService.playerId, gameState.opponentDTO.playerId)
       }
     })
   }
 
-  handlePlayButtonClick() {
-    console.log(this.gameState.questionIds.length)
-    if (this.gameState?.questionIds?.length > 0) {
-      this.openPlayQuestions();
+  handlePlayButtonClick(gameState: GameStateResponse) {
+    if (gameState.questionIds.length > 0) {
+      this.openPlayQuestions(gameState);
     } else {
       this.openCategorySelection();
     }
   }
 
-  openPlayQuestions() {
+  openPlayQuestions(gameState: GameStateResponse) {
     this.router.navigate(['multiplayer', this.gameService.sessionId, 'play'],
-      {state: {questionIds: this.gameState.questionIds}});
+      {state: {questionIds: gameState.questionIds}});
   }
 
   openCategorySelection() {
@@ -123,6 +117,4 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   backToMultiplayerPage() {
     this.router.navigate(['multiplayer']);
   }
-
-
 }

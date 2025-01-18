@@ -9,7 +9,7 @@ import {QuestionService} from '../../../../../../api/generated/services/question
 import {QuestionDto} from '../../../../../../api/generated/models/question-dto';
 import {AnswerState} from '../../../../interface/answer-state';
 import {LoginStateService} from '../../../../../../core/services/login-state-service/login-state.service';
-import {GameResult} from '../../../../../../shared/enums/game-result';
+import {GameResult} from '../enums/game-result';
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverDialogComponent} from '../dialog/game-over-dialog/game-over-dialog.component';
 import {map} from 'rxjs/operators';
@@ -27,11 +27,11 @@ export class GameService {
   private categoriesSubject = new BehaviorSubject<string[]>([]);
   private gameOverSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  questions$ = this.questionsSubject.asObservable();
-  currentQuestionIndex$ = this.currentQuestionIndexSubject.asObservable();
-  answerState$ = this.answerStateSubject.asObservable();
-  categories$ = this.categoriesSubject.asObservable();
-  gameOver$ = this.gameOverSubject.asObservable();
+  readonly questions$ = this.questionsSubject.asObservable();
+  readonly currentQuestionIndex$ = this.currentQuestionIndexSubject.asObservable();
+  readonly answerState$ = this.answerStateSubject.asObservable();
+  readonly categories$ = this.categoriesSubject.asObservable();
+  readonly gameOver$ = this.gameOverSubject.asObservable();
 
   private _playerId: number;
   private _sessionId: number;
