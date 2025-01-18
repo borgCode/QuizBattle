@@ -25,8 +25,6 @@ export class MultiplayerPlayRoundComponent implements OnInit, OnDestroy {
   questions: QuestionDto[] = [];
   sessionId: number;
 
-
-
   questions$: Observable<QuestionDto[]>
   currentQuestionIndex$: Observable<number>
   answerState$: Observable<AnswerState>
@@ -36,9 +34,7 @@ export class MultiplayerPlayRoundComponent implements OnInit, OnDestroy {
   shouldShowQuestions$: Observable<boolean>
 
   constructor(
-
     private activatedRoute: ActivatedRoute,
-
     protected gameService: GameService
   ) {
   }
@@ -79,7 +75,6 @@ export class MultiplayerPlayRoundComponent implements OnInit, OnDestroy {
     );
 
     const questionIds = (history.state as any).questionIds;
-
     this.gameService.getQuestions(questionIds).subscribe()
 
   }

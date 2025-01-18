@@ -35,6 +35,7 @@ export class ScoreBoxesComponent implements OnInit, OnChanges {
 
     this.gameService.gameState$.subscribe(gameState => {
       if (gameState) {
+        this.initBoxes();
 
         gameState.playerDTO.questionResults.forEach(result => {
           const position = this.indexToBoxPosition(result.questionIndex);

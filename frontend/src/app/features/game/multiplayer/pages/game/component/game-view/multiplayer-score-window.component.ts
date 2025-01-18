@@ -3,14 +3,11 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AsyncPipe, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
-import {MatDialog} from '@angular/material/dialog';
-import {GameOverDialogComponent} from '../../dialog/game-over-dialog/game-over-dialog.component';
-import {GameResult} from '../../../../../../../shared/enums/game-result';
-import {MultiplayerGameService} from '../../../../../../../api/generated/services/multiplayer-game.service';
 import {GameService} from '../../service/game.service';
 import {PlayerInteractionService} from '../../service/player-interaction.service';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 import {ScoreBoxesComponent} from '../score-boxes/score-boxes.component';
+import {Observable} from 'rxjs';
 
 
 @Component({
@@ -31,19 +28,19 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   gameState!: GameStateResponse;
   storedPlayerId: number;
   sessionId: number;
-  isGameOver: boolean = false;
   hasAcknowledgedGameOver: boolean;
   resetBoxesTrigger = false;
 
+  gameOver$: Observable<boolean>;
   constructor(
     protected gameService: GameService,
     protected playerInteractionService: PlayerInteractionService,
     protected loginStateService: LoginStateService,
-    private multiplayerGameService: MultiplayerGameService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private gameOverDialog: MatDialog,
+
   ) {
+    this.gameOver$ = this.gameService.gameOver$;
   }
 
   ngOnInit() {
@@ -57,72 +54,18 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   }
 
   private resetComponents() {
-    this.isGameOver = false;
     this.resetBoxesTrigger = false;
     setTimeout(() => {
       this.resetBoxesTrigger = true;
     });
   }
 
-
   private getGameState() {
     this.gameService.getGameState().subscribe({
       next: gameState => {
         this.gameState = gameState;
-
-        this.hasAcknowledgedGameOver = gameState.playerDTO.hasAcknowledgedGameOver;
-
-        if (gameState.status == 'COMPLETED') {
-          this.isGameOver = true;
-
-          if (!this.hasAcknowledgedGameOver) {
-            this.handleGameOver();
-          }
-        }
         this.playerInteractionService.loadRelationshipStatus(this.storedPlayerId, this.gameState.opponentDTO.playerId)
       }
-    })
-  }
-
-  private handleGameOver() {
-    const gameResult: GameResult = (() => {
-      if (this.gameState.playerWhoGaveUp) {
-        console.log("A player gave up: " + this.gameState.playerWhoGaveUp)
-        if (this.storedPlayerId == this.gameState.playerWhoGaveUp) {
-          console.log("Player gave up")
-          return GameResult.PLAYER_GAVE_UP
-        } else {
-          console.log("Opponent gave up")
-          return GameResult.OPPONENT_GAVE_UP
-        }
-      }
-      if (this.storedPlayerId == this.gameState.sessionPlayerWinnerId) {
-        return GameResult.WIN;
-      } else if (this.storedPlayerId == this.gameState.sessionPlayerLoserId) {
-        return GameResult.LOSS
-      } else {
-        return GameResult.TIE
-      }
-    })();
-
-    this.showGameOverDialog(gameResult);
-
-    console.log("Sending complete game")
-    this.multiplayerGameService.acknowledgeGameOver({
-      sessionId: this.sessionId,
-      playerId: this.storedPlayerId
-    }).subscribe({
-      next: () => console.log('Request successful!'),
-      error: (err) => console.error('Error occurred:', err),
-    });
-  }
-
-  private showGameOverDialog(gameResult: GameResult) {
-    this.gameOverDialog.open(GameOverDialogComponent, {
-      data: {gameResult: gameResult, opponentName: this.gameState.opponentDTO.displayName},
-      width: '300px',
-      disableClose: true,
-      autoFocus: false
     })
   }
 
@@ -135,9 +78,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
     }
   }
 
-  //When player should play the same category as the other player
   openPlayQuestions() {
-
     this.router.navigate(['multiplayer', this.gameService.sessionId, 'play'],
       {state: {questionIds: this.gameState.questionIds}});
   }
@@ -145,7 +86,6 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   openCategorySelection() {
     this.router.navigate(['multiplayer', this.gameService.sessionId, 'play']);
   }
-
 
   sendFriendRequest() {
     this.playerInteractionService.sendFriendRequest();

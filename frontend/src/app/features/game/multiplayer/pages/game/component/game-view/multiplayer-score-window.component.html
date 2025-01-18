@@ -46,21 +46,21 @@
     [resetTrigger]="resetBoxesTrigger"></app-score-boxes>
   <div class="row mt-3">
     <div class="col-12 text-center">
-      <div *ngIf="!isGameOver; else gameOverBlock">
-        <div class="btn btn-danger btn-lg me-5" data-bs-toggle="modal" data-bs-target="#giveUpModal">
-          Give up
-        </div>
-        <div *ngIf="gameState.playerTurn === this.storedPlayerId; else elseBlock"
-             (click)="handlePlayButtonClick()"
-             class="btn btn-success btn-lg">
-          Play
-        </div>
-        <ng-template #elseBlock>
-          <div class="btn btn-secondary" disabled="">
-            Waiting for other player
-          </div>
-        </ng-template>
+      <ng-container *ngIf="(gameOver$ | async) === false; else gameOverBlock">
+      <div class="btn btn-danger btn-lg me-5" data-bs-toggle="modal" data-bs-target="#giveUpModal">
+        Give up
       </div>
+      <div *ngIf="gameState.playerTurn === this.storedPlayerId; else elseBlock"
+           (click)="handlePlayButtonClick()"
+           class="btn btn-success btn-lg">
+        Play
+      </div>
+      <ng-template #elseBlock>
+        <div class="btn btn-secondary" disabled="">
+          Waiting for other player
+        </div>
+      </ng-template>
+    </ng-container>
       <ng-template #gameOverBlock>
         <div class="btn btn-success btn-lg me-5" (click)="backToMultiplayerPage()">
           Back to menu

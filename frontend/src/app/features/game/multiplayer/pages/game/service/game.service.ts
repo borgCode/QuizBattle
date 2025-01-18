@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MultiplayerGameService} from '../../../../../../api/generated/services/multiplayer-game.service';
 import {GameStateResponse} from '../../../../../../api/generated/models/game-state-response';
-import {BehaviorSubject, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, of, switchMap, tap} from 'rxjs';
 import {MultiplayerMatchService} from '../../../../../../api/generated/services/multiplayer-match.service';
 import {AlertMessageService} from '../../../../../../core/services/alert-message/alert-message.service';
 import {Router} from '@angular/router';
@@ -9,6 +9,10 @@ import {QuestionService} from '../../../../../../api/generated/services/question
 import {QuestionDto} from '../../../../../../api/generated/models/question-dto';
 import {AnswerState} from '../../../../interface/answer-state';
 import {LoginStateService} from '../../../../../../core/services/login-state-service/login-state.service';
+import {GameResult} from '../../../../../../shared/enums/game-result';
+import {MatDialog} from '@angular/material/dialog';
+import {GameOverDialogComponent} from '../dialog/game-over-dialog/game-over-dialog.component';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -21,11 +25,13 @@ export class GameService {
   private currentQuestionIndexSubject: BehaviorSubject<number> = new BehaviorSubject(0);
   private answerStateSubject: BehaviorSubject<AnswerState> = new BehaviorSubject<AnswerState>(null);
   private categoriesSubject = new BehaviorSubject<string[]>([]);
+  private gameOverSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   questions$ = this.questionsSubject.asObservable();
   currentQuestionIndex$ = this.currentQuestionIndexSubject.asObservable();
   answerState$ = this.answerStateSubject.asObservable();
   categories$ = this.categoriesSubject.asObservable();
+  gameOver$ = this.gameOverSubject.asObservable();
 
   private _playerId: number;
   private _sessionId: number;
@@ -37,13 +43,64 @@ export class GameService {
     private loginStateService: LoginStateService,
     private questionService: QuestionService,
     private router: Router,
+    private gameOverDialog: MatDialog,
   ) {
   }
 
   getGameState() {
+    this.gameOverSubject.next(false);
     return this.multiplayerGameService.getGameState({sessionId: this.sessionId, playerId: this.playerId}).pipe(
-      tap(gameState => this.gameStateSubject.next(gameState))
+      tap(gameState => {
+        this.gameStateSubject.next(gameState)
+      }),
+      switchMap(gameState => {
+        if (gameState.status === 'COMPLETED') {
+          this.gameOverSubject.next(true);
+
+          if (!gameState.playerDTO.hasAcknowledgedGameOver) {
+            const gameResult = this.determineGameResult(gameState);
+            this.showGameOverDialog(gameResult, gameState);
+            return this.multiplayerGameService.acknowledgeGameOver({
+              sessionId: this.sessionId,
+              playerId: this.playerId
+            }).pipe(
+              map(() => gameState)
+            );
+          }
+        }
+        return of(gameState);
+      })
     )
+  }
+
+  private determineGameResult(gameState: GameStateResponse) {
+    if (gameState.playerWhoGaveUp) {
+      console.log("A player gave up: " + gameState.playerWhoGaveUp);
+      if (this.playerId === gameState.playerWhoGaveUp) {
+        console.log("Player gave up");
+        return GameResult.PLAYER_GAVE_UP;
+      } else {
+        console.log("Opponent gave up");
+        return GameResult.OPPONENT_GAVE_UP;
+      }
+    }
+
+    if (this.playerId === gameState.sessionPlayerWinnerId) {
+      return GameResult.WIN;
+    } else if (this.playerId === gameState.sessionPlayerLoserId) {
+      return GameResult.LOSS;
+    } else {
+      return GameResult.TIE;
+    }
+  }
+
+  private showGameOverDialog(gameResult: GameResult, gameState: GameStateResponse) {
+    this.gameOverDialog.open(GameOverDialogComponent, {
+      data: {gameResult: gameResult, opponentName: gameState.opponentDTO.displayName},
+      width: '300px',
+      disableClose: true,
+      autoFocus: false
+    })
   }
 
   getQuestions(questionIds: number[]) {
@@ -77,10 +134,10 @@ export class GameService {
     this.getCategories();
   }
 
-   resetRoundState() {
+  resetRoundState() {
     this.resetAnswerState();
     this.currentQuestionIndexSubject.next(0);
-     this.questionsSubject.next([]);
+    this.questionsSubject.next([]);
   }
 
   resetAnswerState() {
@@ -110,6 +167,7 @@ export class GameService {
       next: questions => {
         if (questions && questions.length > 0) {
           this.questionsSubject.next(questions)
+          this.currentQuestionIndexSubject.next(0);
         } else {
           console.log("This category has already been played, please choose another");
           this.loadCategorySelection();
@@ -122,7 +180,6 @@ export class GameService {
   }
 
   onNextQuestion() {
-
     this.currentQuestionIndexSubject.next(this.currentQuestionIndexSubject.value + 1);
 
     if (this.currentQuestionIndexSubject.value >= this.questionsSubject.value.length) {
@@ -134,16 +191,14 @@ export class GameService {
   }
 
   validateAnswer(selectedAnswer: { questionId: number, answer: string | null }) {
-    const validationRequest = {
+    this.questionService.validateMultiplayerAnswer({
       body: {
         questionId: selectedAnswer.questionId,
         sessionId: this.sessionId,
         answer: selectedAnswer.answer,
         playerId: this.playerId
       }
-    };
-
-    this.questionService.validateMultiplayerAnswer(validationRequest).subscribe({
+    }).subscribe({
       next: (response) => {
         this.answerStateSubject.next({
           isCorrect: response.correct,
@@ -190,7 +245,6 @@ export class GameService {
   }
 
   get sessionId(): number {
-    // Could add validation/error handling if needed since this should always be set
     return this._sessionId;
   }
 
