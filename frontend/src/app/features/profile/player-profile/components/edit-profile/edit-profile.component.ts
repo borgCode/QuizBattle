@@ -7,7 +7,6 @@ import {firstValueFrom} from 'rxjs';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
-import {ProfileService} from '../service/profile.service';
 
 
 @Component({

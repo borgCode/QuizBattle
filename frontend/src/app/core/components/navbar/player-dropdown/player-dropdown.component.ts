@@ -1,9 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {PlayerDto} from '../../../../api/generated/models/player-dto';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
-import {Router, RouterLink, RouterLinkActive} from '@angular/router';
+import {RouterLink, RouterLinkActive} from '@angular/router';
 import {TokenService} from '../../../services/token/token.service';
-import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-player-dropdown',

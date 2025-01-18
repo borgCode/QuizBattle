@@ -31,7 +31,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   readNotifications$ = this.readNotifications.asObservable();
 
   playerId: number;
-
+  private dropdown: any;
 
   constructor(
     protected notificationService: NotificationService,
@@ -67,8 +67,16 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl)
     });
+
+    const dropdownElement = document.getElementById('notificationsDropdown');
+    this.dropdown = new bootstrap.Dropdown(dropdownElement);
   }
 
+  private closeDropdown() {
+    if (this.dropdown) {
+      this.dropdown.hide();
+    }
+  }
 
   private fetchNotifications() {
     console.log("User id: " + this.playerId)
@@ -86,8 +94,6 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   }
 
   acceptFriendRequest(originalSender: number, notificationId: number) {
-    //Remove value from notif bell
-
     this.friendshipService.acceptFriend({
       body: {
         senderId: this.playerId, receiverId: originalSender, notificationId: notificationId
@@ -145,6 +151,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
 
         goToGameButton.addEventListener('click', () => {
           this.router.navigate(['multiplayer', sessionId]);
+          this.closeDropdown();
           modal.style.display = 'none';
           modal.classList.remove('show');
         })
@@ -174,6 +181,7 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   async goToGame(notificationId: number, startedSessionId: number) {
     this.markAsRead(notificationId);
     this.router.navigate(['multiplayer', startedSessionId]);
+    this.closeDropdown();
   }
 
   requestRematch(notificationId: number, startedSessionId: number) {
