@@ -11,9 +11,12 @@ import java.util.List;
 
 @Repository
 public interface MultiplayerSessionRepository extends JpaRepository<MultiplayerSession, Long> {
+    
+    
     @Query("SELECT session FROM MultiplayerSession session " +
             "JOIN session.sessionPlayers sp " +
-            "WHERE sp.player.id = :playerId")
+            "WHERE sp.player.id = :playerId " +
+            "ORDER BY session.lastUpdatedAt DESC")
     List<MultiplayerSession> findByPlayerId(@Param("playerId") Long playerId);
 
 

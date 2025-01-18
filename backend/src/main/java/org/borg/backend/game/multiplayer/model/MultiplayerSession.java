@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.borg.backend.game.shared.enums.GameStatus;
 import org.borg.backend.player.model.Player;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Instant;
 import java.util.*;
 
 @Getter
@@ -40,6 +43,14 @@ public class MultiplayerSession {
     private Boolean isTie = null;
     
     private Long currentPlayerTurnId;
+    
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Instant createdAt;
+    
+    @UpdateTimestamp
+    @Column(insertable = false)
+    private Instant lastUpdatedAt;
     
     
 
