@@ -19,7 +19,6 @@ export class PlayerDropdownComponent implements OnInit {
 
   constructor(
     private loginStateService: LoginStateService,
-    private router: Router,
     private tokenService: TokenService
   ) {
   }
@@ -37,6 +36,6 @@ export class PlayerDropdownComponent implements OnInit {
   logout() {
     this.tokenService.clearTokens();
     this.loginStateService.clearLoggedInUser();
-    this.router.navigate(['/login']);
+    window.location.href = '/login';
   }
 }

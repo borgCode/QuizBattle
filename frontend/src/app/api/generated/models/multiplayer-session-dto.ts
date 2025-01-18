@@ -9,4 +9,5 @@ export interface MultiplayerSessionDto {
   opponentDTO?: SessionPlayerDto;
   playerDTO?: SessionPlayerDto;
   status?: 'ACTIVE' | 'COMPLETED';
+  winnerId?: number;
 }

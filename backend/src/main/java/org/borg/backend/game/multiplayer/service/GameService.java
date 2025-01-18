@@ -118,13 +118,13 @@ public class GameService {
 
         GameResult result;
         if (score1 > score2) {
-            session.setSessionPlayerWinnerId(player1Id);
-            session.setSessionPlayerLoserId(player2Id);
+            session.setWinnerId(player1Id);
+            session.setLoserId(player2Id);
             session.setIsTie(false);
             result = GameResult.WIN_PLAYER1;
         } else if (score1 < score2) {
-            session.setSessionPlayerWinnerId(player2Id);
-            session.setSessionPlayerLoserId(player1Id);
+            session.setWinnerId(player2Id);
+            session.setLoserId(player1Id);
             session.setIsTie(false);
             result = GameResult.WIN_PLAYER2;
         } else {
@@ -135,7 +135,7 @@ public class GameService {
         log.info("Game outcome determined for sessionId: {}, result: {}", session.getId(), result);
         statsService.updateGameStats(sessionPlayers.get(0).getPlayer(), sessionPlayers.get(1).getPlayer(), result);
         
-        applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getSessionPlayerWinnerId()));
+        applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
         log.debug("GameWonEvent published for sessionId: {}", session.getId());
     }
 
@@ -144,8 +144,8 @@ public class GameService {
         if (session.getIsTie()) {
             notificationService.sendTieNotifications(session.getSessionPlayers(), session.getId());
         } else {
-            SessionPlayer loserSessionPlayer = session.getSessionPlayerByPlayerId(session.getSessionPlayerLoserId());
-            SessionPlayer winnerSessionPlayer = session.getSessionPlayerByPlayerId(session.getSessionPlayerWinnerId());
+            SessionPlayer loserSessionPlayer = session.getSessionPlayerByPlayerId(session.getLoserId());
+            SessionPlayer winnerSessionPlayer = session.getSessionPlayerByPlayerId(session.getWinnerId());
             
             notificationService.sendGameWonNotification(
                     winnerSessionPlayer.getPlayer().getId(),
@@ -197,7 +197,7 @@ public class GameService {
         session.setStatus(GameStatus.COMPLETED);
         log.debug("Session status set to COMPLETED for sessionId: {}", sessionId);
 
-        session.setSessionPlayerLoserId(sessionPlayer.getPlayer().getId());
+        session.setLoserId(sessionPlayer.getPlayer().getId());
         log.debug("Player with ID {} marked as loser for sessionId: {}", playerId, sessionId);
 
 
@@ -209,7 +209,7 @@ public class GameService {
                     return new GameException(BusinessErrorCodes.INVALID_SESSION_STATE, "Opponent not found in session");
                 });
 
-        session.setSessionPlayerWinnerId(opponent.getPlayer().getId());
+        session.setWinnerId(opponent.getPlayer().getId());
 
         multiplayerSessionRepository.save(session);
         

@@ -21,7 +21,7 @@ public class GameStateResponse {
     private List<Long> questionIds;
     private List<String> roundCategories;
     private Long playerWhoGaveUp;
-    private Long sessionPlayerWinnerId;
-    private Long sessionPlayerLoserId;
+    private Long winnerId;
+    private Long loserId;
     private Boolean isTie;
 }

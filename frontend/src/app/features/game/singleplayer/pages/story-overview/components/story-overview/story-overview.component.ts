@@ -53,7 +53,6 @@ export class StoryOverviewComponent implements OnInit {
                 this.storyTitle = data.title;
                 console.log(this.playerProgress)
             }
-
         })
     }
 
@@ -72,7 +71,6 @@ export class StoryOverviewComponent implements OnInit {
         } else {
             message = "You've already completed this chapter, do you want to play it again?"
         }
-
 
         const dialogRef = this.chapterDialog.open(ContentDialogComponent, {
             data: {contentTitle: title, message: message, onlyOkButton: false},

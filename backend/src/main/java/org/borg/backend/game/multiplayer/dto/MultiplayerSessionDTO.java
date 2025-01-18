@@ -14,4 +14,5 @@ public class MultiplayerSessionDTO {
     private SessionPlayerDTO opponentDTO;
     private GameStatus status;
     private Long currentPlayerTurn;
+    private Long winnerId;
 }

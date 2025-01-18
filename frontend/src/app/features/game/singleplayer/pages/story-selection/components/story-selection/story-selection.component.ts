@@ -24,7 +24,6 @@ export class StorySelectionComponent implements OnInit {
   stories: StoryDto[]
   playerProgress: PlayerProgressDto[]
 
-
   constructor(
     private storyService: StoryService,
     private startDialog: MatDialog,
@@ -40,7 +39,6 @@ export class StorySelectionComponent implements OnInit {
         this.playerProgress = data.playerProgressList;
       }
     })
-
   }
 
   showStartStoryDialog(title: string, id: number, index: number) {
@@ -62,7 +60,6 @@ export class StorySelectionComponent implements OnInit {
       maxHeight: '90vh',
       width: '300px',
     })
-
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result === "yes") {

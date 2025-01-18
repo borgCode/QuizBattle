@@ -6,13 +6,13 @@ import { SessionPlayerDto } from '../models/session-player-dto';
 export interface GameStateResponse {
   currentQuestionIndex?: number;
   isTie?: boolean;
+  loserId?: number;
   opponentDTO?: SessionPlayerDto;
   playerDTO?: SessionPlayerDto;
   playerTurn?: number;
   playerWhoGaveUp?: number;
   questionIds?: Array<number>;
   roundCategories?: Array<string>;
-  sessionPlayerLoserId?: number;
-  sessionPlayerWinnerId?: number;
   status?: 'ACTIVE' | 'COMPLETED';
+  winnerId?: number;
 }

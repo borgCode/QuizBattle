@@ -23,11 +23,9 @@ export class LoginStateService {
     }
   }
 
-
   updateLoginState(hasToken: boolean): void {
     this.isLoggedInSubject.next(hasToken);
   }
-
 
   get loggedInUser(): PlayerDto {
     return this._loggedInUser;
@@ -44,12 +42,5 @@ export class LoginStateService {
     this.playerSubject.next(null);
     localStorage.removeItem('loggedInUser');
     this.isLoggedInSubject.next(false);
-  }
-
-  get userId() {
-    const storedPlayer = localStorage.getItem('loggedInUser');
-    if (storedPlayer) {
-      return JSON.parse(storedPlayer).id;
-    }
   }
 }

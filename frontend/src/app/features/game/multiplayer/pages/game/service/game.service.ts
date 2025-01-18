@@ -85,9 +85,9 @@ export class GameService {
       }
     }
 
-    if (this.playerId === gameState.sessionPlayerWinnerId) {
+    if (this.playerId === gameState.winnerId) {
       return GameResult.WIN;
-    } else if (this.playerId === gameState.sessionPlayerLoserId) {
+    } else if (this.playerId === gameState.loserId) {
       return GameResult.LOSS;
     } else {
       return GameResult.TIE;

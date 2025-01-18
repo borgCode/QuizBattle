@@ -35,8 +35,8 @@ public class MultiplayerSession {
     @ElementCollection
     private List<String> roundCategories = new ArrayList<>();
     
-    private Long sessionPlayerWinnerId = null;
-    private Long sessionPlayerLoserId = null;
+    private Long winnerId = null;
+    private Long loserId = null;
     private Boolean isTie = null;
     
     private Long currentPlayerTurnId;
