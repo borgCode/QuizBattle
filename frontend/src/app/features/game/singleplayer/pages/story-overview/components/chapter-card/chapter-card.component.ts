@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {ChapterOverviewDto} from '../../../../../../api/generated/models/chapter-overview-dto';
+import {ChapterOverviewDto} from '../../../../../../../api/generated/models/chapter-overview-dto';
 
 
 

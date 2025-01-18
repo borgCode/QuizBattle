@@ -3,10 +3,10 @@ import {MultiplayerCategoryComponent} from '../category-selection/multiplayer-ca
 import {ActivatedRoute} from '@angular/router';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {QuestionDto} from '../../../../../../../api/generated/models/question-dto';
-import {QuestionPanelComponent} from '../../../../../../../shared/components/question-panel/question-panel.component';
+import {QuestionPanelComponent} from '../../../../../shared/component/question-panel/question-panel.component';
 import {GameService} from '../../service/game.service';
 import {combineLatest, Observable} from 'rxjs';
-import {AnswerState} from '../../../../../interface/answer-state';
+import {AnswerState} from '../../../../../shared/interface/answer-state';
 import {map} from 'rxjs/operators';
 
 @Component({

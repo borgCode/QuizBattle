@@ -7,7 +7,7 @@ import {AlertMessageService} from '../../../../../../core/services/alert-message
 import {Router} from '@angular/router';
 import {QuestionService} from '../../../../../../api/generated/services/question.service';
 import {QuestionDto} from '../../../../../../api/generated/models/question-dto';
-import {AnswerState} from '../../../../interface/answer-state';
+import {AnswerState} from '../../../../shared/interface/answer-state';
 import {LoginStateService} from '../../../../../../core/services/login-state-service/login-state.service';
 import {GameResult} from '../enums/game-result';
 import {MatDialog} from '@angular/material/dialog';

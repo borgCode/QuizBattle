@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {StoryService} from '../../../../api/generated/services/story.service';
+import {StoryService} from '../../../../../../../api/generated/services/story.service';
 import {NgForOf, NgIf} from '@angular/common';
-import {ChapterCardComponent} from './components/chapter-card/chapter-card.component';
-import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
+import {ChapterCardComponent} from '../chapter-card/chapter-card.component';
+import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
+import {PlayerProgressDto} from '../../../../../../../api/generated/models/player-progress-dto';
 import {MatDialog} from '@angular/material/dialog';
-import {ContentDialogComponent} from '../shared-components/content-dialog/content-dialog.component';
-import {ChapterOverviewDto} from '../../../../api/generated/models/chapter-overview-dto';
+import {ContentDialogComponent} from '../../../shared/content-dialog/content-dialog.component';
+import {ChapterOverviewDto} from '../../../../../../../api/generated/models/chapter-overview-dto';
 
 @Component({
     selector: 'app-story-overview',

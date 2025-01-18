@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {StoryDto} from '../../../../../../api/generated/models/story-dto';
+import {StoryDto} from '../../../../../../../api/generated/models/story-dto';
 
 
 @Component({

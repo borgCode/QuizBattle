@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {Observable} from 'rxjs';
-import {PlayChapterDto} from '../../../../../../api/generated/models/play-chapter-dto';
+import {PlayChapterDto} from '../../../../../../../api/generated/models/play-chapter-dto';
 import {animate, keyframes, style, transition, trigger} from '@angular/animations';
 
 @Component({

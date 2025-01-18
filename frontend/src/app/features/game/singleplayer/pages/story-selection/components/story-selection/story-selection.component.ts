@@ -1,14 +1,14 @@
 import {Component, OnInit} from '@angular/core';
-import {StoryService} from '../../../../api/generated/services/story.service';
-import {StoryCardComponent} from './components/story-card/story-card.component';
+import {StoryService} from '../../../../../../../api/generated/services/story.service';
+import {StoryCardComponent} from '../story-card/story-card.component';
 import {NgForOf, NgIf} from '@angular/common';
-import {StoryDto} from '../../../../api/generated/models/story-dto';
+import {StoryDto} from '../../../../../../../api/generated/models/story-dto';
 
 import {MatDialog} from '@angular/material/dialog';
-import {ContentDialogComponent} from '../shared-components/content-dialog/content-dialog.component';
+import {ContentDialogComponent} from '../../../shared/content-dialog/content-dialog.component';
 import {Router} from '@angular/router';
-import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
-import {PlayerProgressDto} from '../../../../api/generated/models/player-progress-dto';
+import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
+import {PlayerProgressDto} from '../../../../../../../api/generated/models/player-progress-dto';
 
 @Component({
   selector: 'app-story-selection',

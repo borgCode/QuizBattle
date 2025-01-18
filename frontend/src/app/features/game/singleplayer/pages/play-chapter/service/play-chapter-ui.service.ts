@@ -1,17 +1,17 @@
 import {Injectable} from '@angular/core';
-import {ChapterService} from "../../../../../api/generated/services/chapter.service";
-import {QuestionService} from "../../../../../api/generated/services/question.service";
+import {ChapterService} from "../../../../../../api/generated/services/chapter.service";
+import {QuestionService} from "../../../../../../api/generated/services/question.service";
 import {BehaviorSubject, Observable, switchMap, tap} from "rxjs";
-import {QuestionDto} from "../../../../../api/generated/models/question-dto";
-import {PlayChapterDto} from "../../../../../api/generated/models/play-chapter-dto";
-import {AnswerValidationResponse} from '../../../../../api/generated/models/answer-validation-response';
+import {QuestionDto} from "../../../../../../api/generated/models/question-dto";
+import {PlayChapterDto} from "../../../../../../api/generated/models/play-chapter-dto";
+import {AnswerValidationResponse} from '../../../../../../api/generated/models/answer-validation-response';
 import {HealthState} from '../interface/health-state';
-import {LoginStateService} from '../../../../../core/services/login-state-service/login-state.service';
+import {LoginStateService} from '../../../../../../core/services/login-state-service/login-state.service';
 import {RoundResultsDialogComponent} from '../round-results-dialog/round-results-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
-import {ContentDialogComponent} from '../../shared-components/content-dialog/content-dialog.component';
+import {ContentDialogComponent} from '../../shared/content-dialog/content-dialog.component';
 import {Router} from '@angular/router';
-import {AnswerState} from '../../../interface/answer-state';
+import {AnswerState} from '../../../../shared/interface/answer-state';
 
 @Injectable({
   providedIn: 'root'

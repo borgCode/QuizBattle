@@ -13,12 +13,12 @@ import {
   GameViewComponent
 } from './features/game/multiplayer/pages/game/component/game-view/game-view.component';
 import {EditProfileComponent} from './features/profile/edit-profile/edit-profile.component';
-import {StorySelectionComponent} from './features/game/singleplayer/story-selection/story-selection.component';
-import {StoryOverviewComponent} from './features/game/singleplayer/story-overview/story-overview.component';
+import {StorySelectionComponent} from './features/game/singleplayer/pages/story-selection/components/story-selection/story-selection.component';
+import {StoryOverviewComponent} from './features/game/singleplayer/pages/story-overview/components/story-overview/story-overview.component';
 import {SettingsComponent} from './features/settings/settings.component';
 import {
   ChapterViewComponent
-} from './features/game/singleplayer/play-chapter/component/chapter-view/chapter-view.component';
+} from './features/game/singleplayer/pages/play-chapter/component/chapter-view/chapter-view.component';
 
 
 export const routes: Routes = [

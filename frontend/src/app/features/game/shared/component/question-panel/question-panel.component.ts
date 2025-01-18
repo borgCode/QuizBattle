@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
-import {TimerComponent} from './timer/timer.component';
-import {QuestionDto} from '../../../api/generated/models/question-dto';
+import {TimerComponent} from '../timer/timer.component';
+import {QuestionDto} from '../../../../../api/generated/models/question-dto';
 import {NgForOf} from '@angular/common';
 
 @Component({
