@@ -1,0 +1,81 @@
+<div class="container p-5 p-md-3">
+  <ng-container *ngIf="loginStateService.player$ | async as player">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card" style="max-height: 400px;">
+          <img [src]="'data:image/jpeg;base64,' + player.base64Image" class="card-img-top img-fluid" style="max-height: 250px" alt="">
+          <div class="card-body text-center py-1">
+            <h5 class="card-title">{{ player?.displayName }}</h5>
+            <a (click)="openEditProfile()" class="btn btn-primary">Edit Profile</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card" style="max-height: 400px;">
+          <div class="card-header">Stats</div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li class="list-group-item">Total games played: {{ player?.stats.numOfGames }}</li>
+              <li class="list-group-item">Wins: {{ player?.stats.numOfWins }}</li>
+              <li class="list-group-item">Losses: {{ player?.stats.numOfLosses }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card" style="max-height: 400px;">
+          <ul class="nav nav-tabs nav-justified">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" href="#friends">Friends</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#blocked">Blocked</a>
+            </li>
+          </ul>
+          <ng-container *ngIf="profileService.relationships$ | async as relationships">
+          <div class="tab-content relationship-panel" style="overflow-y: auto;">
+            <div class="tab-pane fade show active p-2" id="friends">
+              <app-relationship-panel
+                [relationships]="relationships.friendsList"
+                [type]="'friends'"
+                (relationshipActionSelected)="handleAction($event)">
+              </app-relationship-panel>
+            </div>
+            <div class="tab-pane fade p-2" id="blocked">
+              <app-relationship-panel
+                [relationships]="relationships.blockedList"
+                [type]="'blocked'"
+                (relationshipActionSelected)="handleAction($event)">
+              </app-relationship-panel>
+            </div>
+          </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <ul class="nav nav-tabs nav-justified">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#category">Category performance</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#achievements">Achievements</a>
+          </li>
+        </ul>
+        <div class="tab-content relationship-panel" style="overflow-y: auto;">
+          <div class="tab-pane fade show active p-2" id="category">
+            <app-category-pie-chart
+                [categoryStats]="player.stats.categoryStats">
+              </app-category-pie-chart>
+          </div>
+          <div class="tab-pane fade p-2" id="achievements">
+              <app-achievements-panel
+                [achievements]="profileService.achievements$ | async">
+              </app-achievements-panel>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

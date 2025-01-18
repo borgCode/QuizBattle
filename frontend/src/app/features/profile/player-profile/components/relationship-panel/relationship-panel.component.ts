@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {PlayerDto} from '../../../../api/generated/models/player-dto';
+import {PlayerDto} from '../../../../../api/generated/models/player-dto';
 import {NgForOf, NgIf} from '@angular/common';
 
 @Component({

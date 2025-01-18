@@ -1,6 +1,6 @@
 import {Routes} from '@angular/router';
 import {LoginComponent} from './features/auth/login/login.component';
-import {PlayerProfileComponent} from './features/profile/player-profile/player-profile.component';
+import {PlayerProfileComponent} from './features/profile/player-profile/components/profile-view/player-profile.component';
 import {ModeSelectionComponent} from './features/game/mode-selection/mode-selection.component';
 import {RegisterComponent} from './features/auth/register/register.component';
 import {authGuard} from './core/guard/auth.guard';
@@ -12,7 +12,7 @@ import {MultiplayerComponent} from './features/game/multiplayer/pages/lobby/comp
 import {
   GameViewComponent
 } from './features/game/multiplayer/pages/game/component/game-view/game-view.component';
-import {EditProfileComponent} from './features/profile/edit-profile/edit-profile.component';
+import {EditProfileComponent} from './features/profile/player-profile/components/edit-profile/edit-profile.component';
 import {StorySelectionComponent} from './features/game/singleplayer/pages/story-selection/components/story-selection/story-selection.component';
 import {StoryOverviewComponent} from './features/game/singleplayer/pages/story-overview/components/story-overview/story-overview.component';
 import {SettingsComponent} from './features/settings/settings.component';

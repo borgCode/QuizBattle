@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {UserUnlockedAchievementDto} from '../../../../api/generated/models/user-unlocked-achievement-dto';
+import {UserUnlockedAchievementDto} from '../../../../../api/generated/models/user-unlocked-achievement-dto';
 import {NgForOf} from '@angular/common';
 
 @Component({

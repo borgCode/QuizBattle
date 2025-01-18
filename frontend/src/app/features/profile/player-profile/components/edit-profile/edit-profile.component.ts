@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {PlayerDto} from '../../../api/generated/models/player-dto';
-import {LoginStateService} from '../../../core/services/login-state-service/login-state.service';
-import {PlayerService} from '../../../api/generated/services/player.service';
-import {PlayerCardComponent} from '../../../shared/components/player-card/player-card-component';
+import {PlayerDto} from '../../../../../api/generated/models/player-dto';
+import {LoginStateService} from '../../../../../core/services/login-state-service/login-state.service';
+import {PlayerService} from '../../../../../api/generated/services/player.service';
+import {PlayerCardComponent} from '../../../../../shared/components/player-card/player-card-component';
 import {firstValueFrom} from 'rxjs';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
+import {ProfileService} from '../service/profile.service';
 
 
 @Component({
@@ -39,12 +40,10 @@ export class EditProfileComponent implements OnInit {
   ngOnInit() {
     this.player = this.loginStateService.loggedInUser;
 
-
     if (!this.player) {
       console.warn('No logged-in user found!');
+      return;
     }
-
-    this.image = 'data:image/jpeg;base64,' + this.player.base64Image;
 
     this.displayName = new FormControl(this.player.displayName, [
       Validators.required
@@ -108,7 +107,6 @@ export class EditProfileComponent implements OnInit {
     } finally {
       this.isSaving = false;
     }
-
   }
 }
 

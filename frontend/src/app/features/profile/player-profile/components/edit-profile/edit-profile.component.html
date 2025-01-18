@@ -3,7 +3,7 @@
     <div class="col-12 col-md-4 text-center">
       <app-player-card
         maxHeight="250px"
-        [playerAvatar]="image"
+        [playerAvatar]="'data:image/jpeg;base64,' + this.player.base64Image"
         [playerDisplayName]="player.displayName">
       </app-player-card>
       <div class="mb-3 mt-3">
