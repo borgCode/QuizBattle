@@ -45,7 +45,7 @@ export class MultiplayerPlayRoundComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.activatedRoute.params.subscribe(value => {
-      this.sessionId = value['sessionId'];
+      this.gameService.sessionId = value['sessionId'];
     });
 
     this.questions$ = this.gameService.questions$;

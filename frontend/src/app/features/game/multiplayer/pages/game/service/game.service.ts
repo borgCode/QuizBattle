@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {MultiplayerGameService} from '../../../../../../api/generated/services/multiplayer-game.service';
 import {GameStateResponse} from '../../../../../../api/generated/models/game-state-response';
-import {BehaviorSubject, tap} from 'rxjs';
+import {BehaviorSubject, switchMap, tap} from 'rxjs';
 import {MultiplayerMatchService} from '../../../../../../api/generated/services/multiplayer-match.service';
 import {AlertMessageService} from '../../../../../../core/services/alert-message/alert-message.service';
 import {Router} from '@angular/router';
 import {QuestionService} from '../../../../../../api/generated/services/question.service';
 import {QuestionDto} from '../../../../../../api/generated/models/question-dto';
 import {AnswerState} from '../../../../interface/answer-state';
+import {LoginStateService} from '../../../../../../core/services/login-state-service/login-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,53 +27,49 @@ export class GameService {
   answerState$ = this.answerStateSubject.asObservable();
   categories$ = this.categoriesSubject.asObservable();
 
-  sessionId: number;
-  playerId: number;
-
+  private _playerId: number;
+  private _sessionId: number;
 
   constructor(
     private multiplayerGameService: MultiplayerGameService,
     private multiplayerMatchService: MultiplayerMatchService,
     private alertMessageService: AlertMessageService,
+    private loginStateService: LoginStateService,
     private questionService: QuestionService,
     private router: Router,
   ) {
   }
 
-  getGameState(sessionId: number, playerId: number) {
-    this.sessionId = sessionId;
-    this.playerId = playerId;
-    return this.multiplayerGameService.getGameState({sessionId: sessionId, playerId: playerId}).pipe(
+  getGameState() {
+    return this.multiplayerGameService.getGameState({sessionId: this.sessionId, playerId: this.playerId}).pipe(
       tap(gameState => this.gameStateSubject.next(gameState))
     )
   }
 
   getQuestions(questionIds: number[]) {
+    console.log("MP: Attempting to restore questions for player:", this.playerId);
     return this.questionService.restoreSessionQuestions({playerId: this.playerId}).pipe(
-      tap(roundProgress => {
+      switchMap(roundProgress => {
         if (roundProgress?.questions.length > 0) {
-          this.questionsSubject.next(roundProgress.questions)
+          this.questionsSubject.next(roundProgress.questions);
           this.currentQuestionIndexSubject.next(roundProgress.currentIndex);
+          return this.questions$;
         } else if (questionIds) {
-          this.questionService.getActiveSessionQuestions({
+          return this.questionService.getActiveSessionQuestions({
             sessionId: this.sessionId,
             playerId: this.playerId
-          }).subscribe({
-            next: questions => {
+          }).pipe(
+            tap(questions => {
               this.questionsSubject.next(questions);
               this.currentQuestionIndexSubject.next(0);
-            },
-            error: err => {
-              console.log('No active questions found, returning to score screen');
-              this.router.navigate(['multiplayer', this.sessionId]);
-            }
-          })
-
+            })
+          );
         } else {
           this.loadCategorySelection();
+          return this.questions$;
         }
       })
-    )
+    );
   }
 
   private loadCategorySelection() {
@@ -183,5 +180,21 @@ export class GameService {
         });
       }
     })
+  }
+
+  get playerId(): number {
+    if (!this._playerId) {
+      this._playerId = this.loginStateService.loggedInUser.id;
+    }
+    return this._playerId;
+  }
+
+  get sessionId(): number {
+    // Could add validation/error handling if needed since this should always be set
+    return this._sessionId;
+  }
+
+  set sessionId(value: number) {
+    this._sessionId = value;
   }
 }

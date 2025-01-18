@@ -48,11 +48,11 @@ public class RoundSessionService {
 
         RoundAnswer answer = new RoundAnswer(questionId, isCorrect, session.getCurrentIndex());
         session.getAnswers().put(session.getCurrentIndex(), answer);
-        log.debug("Saving  {} answer to {}", questionId, session.getCurrentIndex());
+        log.debug("Saving answer {} to index {}", questionId, session.getCurrentIndex());
         
         
         session.setCurrentIndex(session.getCurrentIndex() + 1);
-        log.debug("Current session index {} for {}", session.getCurrentIndex(), playerId);
+        log.debug("Current session index {} for Player {}", session.getCurrentIndex(), playerId);
         
         session.getAnsweredQuestionIds().add(questionId);
         return session.isComplete();

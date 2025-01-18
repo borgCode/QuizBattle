@@ -58,6 +58,7 @@ export class PlayChapterUiService {
   }
 
   fetchQuestions() {
+    console.log("SP: Attempting to restore questions for player:", this.playerId);
     return this.questionService.restoreSessionQuestions({playerId: this.playerId}).pipe(
       switchMap(progress => {
         if (progress?.questions.length > 0) {

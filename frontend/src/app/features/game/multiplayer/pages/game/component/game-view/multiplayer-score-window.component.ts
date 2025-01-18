@@ -49,7 +49,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   ngOnInit() {
 
     this.activatedRoute.params.subscribe(value => {
-      this.sessionId = value['sessionId'];
+      this.gameService.sessionId = value['sessionId'];
       this.resetComponents();
       this.storedPlayerId = this.loginStateService.loggedInUser.id;
       this.getGameState();
@@ -66,7 +66,7 @@ export class MultiplayerScoreWindowComponent implements OnInit {
 
 
   private getGameState() {
-    this.gameService.getGameState(this.sessionId, this.storedPlayerId).subscribe({
+    this.gameService.getGameState().subscribe({
       next: gameState => {
         this.gameState = gameState;
 
@@ -138,12 +138,12 @@ export class MultiplayerScoreWindowComponent implements OnInit {
   //When player should play the same category as the other player
   openPlayQuestions() {
 
-    this.router.navigate(['multiplayer', this.sessionId, 'play'],
+    this.router.navigate(['multiplayer', this.gameService.sessionId, 'play'],
       {state: {questionIds: this.gameState.questionIds}});
   }
 
   openCategorySelection() {
-    this.router.navigate(['multiplayer', this.sessionId, 'play']);
+    this.router.navigate(['multiplayer', this.gameService.sessionId, 'play']);
   }
 
 

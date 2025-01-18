@@ -3,6 +3,7 @@ package org.borg.backend.player.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.shared.enums.GameResult;
+import org.borg.backend.player.model.CategoryStats;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
@@ -21,28 +22,29 @@ public class StatsService {
 
     @Transactional
     public void updateQuestionStats(Long playerId, String category, boolean isCorrect) {
-        log.debug("Starting stats update for {} in category {}", playerId, category);
+        log.debug("Starting stats update for playerId={}, category={}", playerId, category);
 
         Player player = playerService.getPlayerById(playerId);
-        log.debug("Retrieved player {}: current stats for category {}: correct={}, total={}",
-                playerId,
-                category,
-                player.getStats().getCategoryStats().get(category).getCorrect(),
-                player.getStats().getCategoryStats().get(category).getQuestionsAnswered());
+        Stats stats = player.getStats();
+        CategoryStats categoryStats = stats.getCategoryStats().get(category);
 
-        player.getStats().incrementQuestionsAnswered(category);
-
-        if (isCorrect) {
-            player.getStats().incrementCorrectAnswer(category);
-            log.debug("Incremented correct answers for player {} in category {}", playerId, category);
+        if (categoryStats == null) {
+            log.debug("Player {} has no stats for category {}. Initializing stats.", playerId, category);
+        } else {
+            log.debug("Current stats for playerId={}, category={}: correct={}, total={}",
+                    playerId, category, categoryStats.getCorrect(), categoryStats.getQuestionsAnswered());
+            stats.incrementQuestionsAnswered(category);
         }
 
-        Player updatedPlayer = playerRepository.save(player);
-        log.info("Updated player {} stats: category={}, correct={}/{}",
-                playerId,
-                category,
-                updatedPlayer.getStats().getCategoryStats().get(category).getCorrect(),
-                updatedPlayer.getStats().getCategoryStats().get(category).getQuestionsAnswered());
+        if (isCorrect) {
+            stats.incrementCorrectAnswer(category);
+            log.debug("Correct answer incremented for playerId={}, category={}", playerId, category);
+        }
+
+        playerRepository.save(player);
+        log.info("Updated stats for playerId={}, category={}: correct={}, total={}",
+                playerId, category, stats.getCategoryStats().get(category).getCorrect(),
+                stats.getCategoryStats().get(category).getQuestionsAnswered());
     }
 
     @Transactional
