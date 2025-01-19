@@ -14,10 +14,6 @@ public class CategoryStats {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "stats_id")
-    @JsonIgnore
-    private Stats stats;
     
     private String category;
     private int correct;

@@ -24,7 +24,7 @@ public class Stats {
     private int numOfLosses;
     private int numOfTies;
 
-    @OneToMany(mappedBy = "stats", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapKey(name = "category")
     private Map<String, CategoryStats> categoryStats = new HashMap<>();
 
@@ -45,18 +45,10 @@ public class Stats {
     }
 
     public void incrementQuestionsAnswered(String category) {
-        categoryStats.computeIfAbsent(category, k -> {
-            CategoryStats newStats = new CategoryStats(category);
-            newStats.setStats(this);
-            return newStats;
-        }).incrementQuestionsAnswered();
+        categoryStats.computeIfAbsent(category, k -> new CategoryStats(category)).incrementQuestionsAnswered();
     }
 
     public void incrementCorrectAnswer(String category) {
-        categoryStats.computeIfAbsent(category, k -> {
-            CategoryStats newStats = new CategoryStats(category);
-            newStats.setStats(this);
-            return newStats;
-        }).incrementCorrectAnswers();
+        categoryStats.computeIfAbsent(category, k -> new CategoryStats(category)).incrementCorrectAnswers();
     }
 }

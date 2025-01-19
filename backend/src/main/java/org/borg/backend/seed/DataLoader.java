@@ -40,7 +40,7 @@ public class DataLoader implements CommandLineRunner {
 //        //Faker 
 //
 //        generateFakerData();
-//        log.info("Finished generating data");
+        log.info("Finished generating data");
  
 
 
@@ -49,14 +49,14 @@ public class DataLoader implements CommandLineRunner {
     
 
     private void generateFakerData() {
-        Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "USER role not initialized"));
-        
-        List<Player> players = playerRepository.saveAll(initFakeDataService.generateRandomPlayers(userRole, 100000));
-        questionRepository.saveAll(initFakeDataService.generateRandomQuestions(100000));
-        
-        initFakeDataService.generateCompletedMultiplayerGames(players, 500000);
-        initFakeDataService.generateActiveMultiplayerGames(players, 10000);
-        initFakeDataService.generatePlayerStats(players);
+//        Role userRole = roleRepository.findByName("USER")
+//                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "USER role not initialized"));
+//        
+//        List<Player> players = playerRepository.saveAll(initFakeDataService.generateRandomPlayers(userRole, 100000));
+//        questionRepository.saveAll(initFakeDataService.generateRandomQuestions(100000));
+//        
+//        initFakeDataService.generateCompletedMultiplayerGames(players, 500000);
+//        initFakeDataService.generateActiveMultiplayerGames(players, 10000);
+//        initFakeDataService.generatePlayerStats(players);
     }
 }

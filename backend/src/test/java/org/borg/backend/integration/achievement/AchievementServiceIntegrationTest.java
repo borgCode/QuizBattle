@@ -99,7 +99,6 @@ public class AchievementServiceIntegrationTest {
                     .build();
 
             Stats stats = player.getStats();
-            categoryStats.setStats(stats);
             stats.setCategoryStats(Map.of("Geography", categoryStats));
             player = playerRepository.save(player);
 
@@ -308,8 +307,7 @@ public class AchievementServiceIntegrationTest {
                             .correct(0)
                             .questionsAnswered(0)
                             .build();
-
-                    categoryStats.setStats(stats);
+                    
                     stats.getCategoryStats().put(category, categoryStats);
                 }
                 playerRepository.save(player);

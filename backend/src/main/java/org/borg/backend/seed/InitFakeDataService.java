@@ -16,6 +16,7 @@ import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -186,14 +187,14 @@ public class InitFakeDataService {
         }
     }
     
-    public List<MultiplayerSession> generateCompletedMultiplayerGames(List<Player> players, int count) {
-        return IntStream.range(0, count)
+    public void generateCompletedMultiplayerGames(List<Player> players, int count) {
+        IntStream.range(0, count)
                 .mapToObj(i -> {
                     Collections.shuffle(players, random);
-                    
+
                     Player player1 = players.get(0);
                     Player player2 = players.get(1);
-                    
+
                     return generateCompletedMultiplayerSessions(player1, player2);
                 })
                 .collect(Collectors.toList());
@@ -279,7 +280,7 @@ public class InitFakeDataService {
         }
     }
 
-    public List<MultiplayerSession> generateActiveMultiplayerGames(List<Player> players, int count) {
+    public void generateActiveMultiplayerGames(List<Player> players, int count) {
         Set<String> playerPairs = new HashSet<>();
         List<MultiplayerSession> sessions = new ArrayList<>();
 
@@ -307,13 +308,11 @@ public class InitFakeDataService {
             throw new IllegalStateException("Could not generate requested number of unique game sessions. " +
                     "Generated " + sessions.size() + " out of " + count + " requested sessions.");
         }
-
-        return sessions;
     }
-    
+    @Transactional
     public void generatePlayerStats(List<Player> players) {
-        for (Player player : players) {
-            playerRepository.save(generatePlayerStat(player));
+        for (int i = 0; i < 1000; i++) {
+            playerRepository.save(generatePlayerStat(players.get(i)));
         }
         
     }
@@ -338,6 +337,10 @@ public class InitFakeDataService {
             categoryStats.setCorrect(faker.number().numberBetween(2000, 3500));
             player.getStats().getCategoryStats().put(categories.get(i), categoryStats);
         }
+        player.getStats().setNumOfWins(faker.number().numberBetween(10000, 15000));
+        player.getStats().setNumOfLosses(faker.number().numberBetween(10000, 15000));
+        player.getStats().setNumOfGames(player.getStats().getNumOfWins() + player.getStats().getNumOfLosses()); 
+        
         return player;
     }
 }
