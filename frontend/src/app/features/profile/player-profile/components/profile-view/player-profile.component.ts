@@ -6,7 +6,7 @@ import {RelationshipPanelComponent} from '../relationship-panel/relationship-pan
 import {Router} from '@angular/router';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {AchievementsPanelComponent} from '../achievements-panel/achievements-panel.component';
-import {ProfileService} from '../service/profile.service';
+import {ProfileService} from '../../service/profile.service';
 
 @Component({
   selector: 'app-user-profile',

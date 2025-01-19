@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import {PlayerService} from '../../../../../api/generated/services/player.service';
-import {FriendshipService} from '../../../../../api/generated/services/friendship.service';
-import {LoginStateService} from '../../../../../core/services/login-state-service/login-state.service';
+import {PlayerService} from '../../../../api/generated/services/player.service';
+import {FriendshipService} from '../../../../api/generated/services/friendship.service';
+import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 import {BehaviorSubject, switchMap, tap} from 'rxjs';
-import {Relationship} from '../../interface/relationship';
-import {AchievementService} from '../../../../../api/generated/services/achievement.service';
-import {UserUnlockedAchievementDto} from '../../../../../api/generated/models/user-unlocked-achievement-dto';
-import {AlertMessageService} from '../../../../../core/services/alert-message/alert-message.service';
-import {WhisperWindowService} from '../../../../../core/services/whisper-window/whisper-window.service';
-import {BlockService} from '../../../../../api/generated/services/block.service';
-import {MultiplayerMatchService} from '../../../../../api/generated/services/multiplayer-match.service';
-import {MessageService} from '../../../../../api/generated/services/message.service';
+import {Relationship} from '../interface/relationship';
+import {AchievementService} from '../../../../api/generated/services/achievement.service';
+import {UserUnlockedAchievementDto} from '../../../../api/generated/models/user-unlocked-achievement-dto';
+import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
+import {WhisperWindowService} from '../../../../core/services/whisper-window/whisper-window.service';
+import {BlockService} from '../../../../api/generated/services/block.service';
+import {MultiplayerMatchService} from '../../../../api/generated/services/multiplayer-match.service';
+import {MessageService} from '../../../../api/generated/services/message.service';
 
 
 @Injectable({

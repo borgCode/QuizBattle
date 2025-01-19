@@ -40,10 +40,11 @@ public class DataLoader implements CommandLineRunner {
 //        //Faker 
 //
 //        generateFakerData();
-//        log.info("Finished generating data");
- 
+       
+        
+        initFakeDataService.generateMessages(100, 10L, 11L);
 
-
+        log.info("Finished generating data");
     }
 
     

@@ -63,7 +63,6 @@ public class MessagingService {
                 .senderId(request.getSenderId())
                 .receiverId(request.getReceiverId())
                 .content(request.getMessage())
-                .sentAt(Instant.now())
                 .read(false)
                 .build());
 
@@ -83,8 +82,7 @@ public class MessagingService {
 
         if (!isLastMessageRead) {
             try {
-                simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/conversation/unread", conversation.getId()
-                );
+                simpMessagingTemplate.convertAndSendToUser(request.getReceiverUsername(), "/queue/conversation/unread", conversation.getId());
                 log.debug("Sent unread conversation notification to user: {}", request.getReceiverUsername());
             } catch (Exception e) {
                 log.error("Failed to send unread conversation notification to user: {}",

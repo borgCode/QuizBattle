@@ -2,6 +2,7 @@ package org.borg.backend.social.chat.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
@@ -29,7 +30,9 @@ public class Message {
 
     @Column(name = "receiver_id", nullable = false)
     private Long receiverId;
-    
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private Instant sentAt;
     
     @Column(name = "is_read")

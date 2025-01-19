@@ -14,6 +14,11 @@ import org.borg.backend.player.model.CategoryStats;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
+import org.borg.backend.player.service.PlayerService;
+import org.borg.backend.social.chat.model.Conversation;
+import org.borg.backend.social.chat.model.Message;
+import org.borg.backend.social.chat.repository.ConversationRepository;
+import org.borg.backend.social.chat.repository.MessageRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +36,14 @@ public class InitFakeDataService {
     private final MultiplayerSessionRepository multiplayerSessionRepository;
     private final Random random = new Random();
     private final PlayerRepository playerRepository;
-    
+    private final MessageRepository messageRepository;
+    private final ConversationRepository conversationRepository;
+    private final PlayerService playerService;
 
     public enum Outcome {
         PLAYER1_WINS,
         PLAYER2_WINS,
-        TIE
+        TIE;
     }
 
     private Player generateRandomPlayer(Role role, Set<String> existingUsernames) {
@@ -44,8 +51,8 @@ public class InitFakeDataService {
         do {
             username = faker.name().username();
         } while (existingUsernames.contains(username));
-        existingUsernames.add(username); 
-        
+        existingUsernames.add(username);
+
         return Player.builder()
                 .username(username)
                 .displayName(faker.name().name())
@@ -56,23 +63,23 @@ public class InitFakeDataService {
                 .enabled(true)
                 .build();
     }
-    
+
     public List<Player> generateRandomPlayers(Role role, int count) {
         Set<String> existingUsernames = new HashSet<>();
         return IntStream.range(0, count)
                 .mapToObj(i -> generateRandomPlayer(role, existingUsernames))
                 .collect(Collectors.toList());
     }
-    
+
     public Question generateRandomQuestion() {
         String correctAnswer = faker.lorem().word();
-        
+
         List<String> options = IntStream.range(0, 4)
                 .mapToObj(i -> i == 0
-                        ? correctAnswer 
-                        : faker.lorem().word()) 
+                        ? correctAnswer
+                        : faker.lorem().word())
                 .collect(Collectors.toList());
-        
+
         return Question.builder()
                 .category(getRandomCategory())
                 .question(faker.lorem().sentence())
@@ -80,12 +87,13 @@ public class InitFakeDataService {
                 .correctAnswer(correctAnswer)
                 .build();
     }
+
     public List<Question> generateRandomQuestions(int count) {
         return IntStream.range(0, count)
                 .mapToObj(i -> generateRandomQuestion())
                 .collect(Collectors.toList());
     }
-    
+
     public String getRandomCategory() {
         List<String> categories = List.of(
                 "Animals",
@@ -100,11 +108,11 @@ public class InitFakeDataService {
                 "Sports",
                 "Television"
         );
-        
+
         int randomIndex = faker.random().nextInt(categories.size());
         return categories.get(randomIndex);
     }
-    
+
     public MultiplayerSession generateCompletedMultiplayerSessions(Player player1, Player player2) {
         Long currentPlayerTurnId = faker.random().nextBoolean() ? player1.getId() : player2.getId();
 
@@ -119,15 +127,13 @@ public class InitFakeDataService {
             categories.add(randomCategory);
             roundCategories.add(randomCategory);
         }
-  
+
         session.setPlayedCategories(categories);
         session.setRoundCategories(roundCategories);
-
 
         SessionPlayer sessionPlayer1 = session.getSessionPlayers().get(0);
         SessionPlayer sessionPlayer2 = session.getSessionPlayers().get(1);
 
-        
         setupBasePlayerData(sessionPlayer1);
         setupBasePlayerData(sessionPlayer2);
 
@@ -136,7 +142,7 @@ public class InitFakeDataService {
             case PLAYER2_WINS -> setupWinnerLoser(session, sessionPlayer2, sessionPlayer1);
             case TIE -> setupTie(session, sessionPlayer1, sessionPlayer2);
         }
-        
+
         return multiplayerSessionRepository.save(session);
     }
 
@@ -149,7 +155,7 @@ public class InitFakeDataService {
         for (int i = 0; i < 18; i++) {
             results.add(PlayerQuestionResult.builder()
                     .questionId((long) (i + 1))
-                    .questionIndex(i)           
+                    .questionIndex(i)
                     .build());
         }
         sessionPlayer.setQuestionResults(results);
@@ -161,9 +167,8 @@ public class InitFakeDataService {
     }
 
     private void setupWinnerLoser(MultiplayerSession session, SessionPlayer winner, SessionPlayer loser) {
-        setPlayerResults(winner.getQuestionResults(), 15); 
-        setPlayerResults(loser.getQuestionResults(), 9); 
-
+        setPlayerResults(winner.getQuestionResults(), 15);
+        setPlayerResults(loser.getQuestionResults(), 9);
 
         session.setWinnerId(winner.getPlayer().getId());
         session.setLoserId(loser.getPlayer().getId());
@@ -178,15 +183,15 @@ public class InitFakeDataService {
         session.setLoserId(null);
         session.setIsTie(true);
     }
-    
-    private  void setPlayerResults(Set<PlayerQuestionResult> questionResults, int correctAnswers) {
+
+    private void setPlayerResults(Set<PlayerQuestionResult> questionResults, int correctAnswers) {
         int count = 0;
         for (PlayerQuestionResult result : questionResults) {
             result.setCorrect(count < correctAnswers);
             count++;
         }
     }
-    
+
     public void generateCompletedMultiplayerGames(List<Player> players, int count) {
         IntStream.range(0, count)
                 .mapToObj(i -> {
@@ -205,12 +210,12 @@ public class InitFakeDataService {
 
         MultiplayerSession session = new MultiplayerSession(player1, player2, currentPlayerTurnId);
         session.setStatus(GameStatus.ACTIVE);
-        
+
         int[] validQuestionCounts = {0, 3, 6, 9, 12, 15};
-        
+
         int player1QuestionsIndex = random.nextInt(validQuestionCounts.length);
         int player1Questions = validQuestionCounts[player1QuestionsIndex];
-        
+
         int player2QuestionsIndex;
         if (player1QuestionsIndex == 0) {
             player2QuestionsIndex = random.nextInt(2);
@@ -220,15 +225,15 @@ public class InitFakeDataService {
             player2QuestionsIndex = player1QuestionsIndex + (random.nextInt(3) - 1);
         }
         int player2Questions = validQuestionCounts[player2QuestionsIndex];
-        
+
         int currentQuestionIndex = Math.max(player1Questions, player2Questions);
         session.setCurrentQuestionIndex(currentQuestionIndex);
-        
+
         int completeCategorySets = currentQuestionIndex / 3;
 
         Set<String> playedCategories = new HashSet<>();
         List<String> roundCategories = new ArrayList<>();
-        
+
         for (int i = 0; i < completeCategorySets; i++) {
             String randomCategory = getRandomCategory();
             playedCategories.add(randomCategory);
@@ -243,7 +248,7 @@ public class InitFakeDataService {
 
         setupActivePlayerData(sessionPlayer1, player1Questions);
         setupActivePlayerData(sessionPlayer2, player2Questions);
-        
+
         setPartialPlayerResults(sessionPlayer1.getQuestionResults(), random.nextInt(player1Questions + 1), player1Questions);
         setPartialPlayerResults(sessionPlayer2.getQuestionResults(), random.nextInt(player2Questions + 1), player2Questions);
 
@@ -309,12 +314,12 @@ public class InitFakeDataService {
                     "Generated " + sessions.size() + " out of " + count + " requested sessions.");
         }
     }
+
     @Transactional
     public void generatePlayerStats(List<Player> players) {
         for (int i = 0; i < 1000; i++) {
             playerRepository.save(generatePlayerStat(players.get(i)));
         }
-        
     }
 
     private Player generatePlayerStat(Player player) {
@@ -339,8 +344,37 @@ public class InitFakeDataService {
         }
         player.getStats().setNumOfWins(faker.number().numberBetween(10000, 15000));
         player.getStats().setNumOfLosses(faker.number().numberBetween(10000, 15000));
-        player.getStats().setNumOfGames(player.getStats().getNumOfWins() + player.getStats().getNumOfLosses()); 
-        
+        player.getStats().setNumOfGames(player.getStats().getNumOfWins() + player.getStats().getNumOfLosses());
+
         return player;
+    }
+
+    @Transactional
+    public void generateMessages(int count, Long receiverId, Long senderId) {
+        Player player1 = playerService.getPlayerById(senderId);
+        Player player2 = playerService.getPlayerById(receiverId);
+        Conversation conversation = conversationRepository.save(Conversation.builder()
+                .player1(player1)
+                .player2(player2)
+                .build());
+        
+        
+        Message latestMessage = null;
+        for (int i = 0; i < count; i++) {
+            Message message = generateMessage(receiverId, senderId, conversation);
+            messageRepository.save(message);
+            latestMessage = message; 
+        }
+        conversation.setLatestMessage(latestMessage);
+        conversationRepository.save(conversation);
+    }
+
+    private Message generateMessage(Long receiverId, Long senderId, Conversation conversation) {
+        return Message.builder()
+                .receiverId(receiverId)
+                .senderId(senderId)
+                .conversation(conversation)
+                .read(false)
+                .content(faker.lorem().sentence(3)).build();
     }
 }
