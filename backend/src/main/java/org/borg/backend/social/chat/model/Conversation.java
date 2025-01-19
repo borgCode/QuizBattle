@@ -13,6 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_player1_player2", columnList = "player1_id, player2_id"),
+        @Index(name = "idx_player2_player1", columnList = "player2_id, player1_id")
+})
 public class Conversation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

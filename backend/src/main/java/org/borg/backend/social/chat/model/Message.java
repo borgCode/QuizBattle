@@ -11,6 +11,9 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(indexes = {
+        @Index(name = "IX_receiver_id", columnList = "receiver_id")
+})
 public class Message {
 
     @Id

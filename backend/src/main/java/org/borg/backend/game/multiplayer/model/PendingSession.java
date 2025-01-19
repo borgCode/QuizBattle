@@ -1,9 +1,6 @@
 package org.borg.backend.game.multiplayer.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +11,9 @@ import java.time.Instant;
 @Setter
 @Entity
 @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "IX_requestingId_opponentId", columnList = "requesting_player_id, opponent_id")
+})
 public class PendingSession {
 
     @Id

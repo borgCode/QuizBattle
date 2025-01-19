@@ -13,6 +13,9 @@ import java.util.List;
 @Setter
 @Builder
 @Entity
+@Table(indexes = {
+        @Index(name = "findByName", columnList = "name")
+})
 public class Achievement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -40,7 +40,7 @@ public class DataLoader implements CommandLineRunner {
 //        //Faker 
 //
 //        generateFakerData();
-        log.info("Finished generating data");
+//        log.info("Finished generating data");
  
 
 

@@ -16,6 +16,9 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "multiplayer_session", indexes = {
+        @Index(name = "IX_status", columnList = "status")
+})
 public class MultiplayerSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

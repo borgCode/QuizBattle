@@ -14,6 +14,10 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(indexes = {
+        @Index(name = "IX_blocker_blocked", columnList = "blocker_id, blocked_id"),
+        @Index(name = "IX_blocked_blocker", columnList = "blocked_id, blocker_id")
+})
 public class PlayerBlock {
    
     @Id

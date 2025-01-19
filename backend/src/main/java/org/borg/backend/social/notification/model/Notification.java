@@ -12,6 +12,9 @@ import java.time.Instant;
 @Builder
 @ToString
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_recipient_sender", columnList = "recipient_id, sender_id")
+})
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

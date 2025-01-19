@@ -1,10 +1,7 @@
 package org.borg.backend.game.multiplayer.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,8 +10,13 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
+@Entity
+@Table(indexes = {
+        @Index(name = "IX_player1_player2", columnList = "player1id, player2id"),
+        @Index(name = "IX_player2_player1", columnList = "player2id, player1id"),
+        @Index(name = "IX_createdAt", columnList = "created_at")
+})
 public class MatchmakingSession {
 
     @Id
