@@ -71,7 +71,7 @@ public class MultiplayerQuestionService {
         log.debug("Initializing session for player: {}", request.getPlayerId());
         roundSessionService.initializeSession(request.getPlayerId(), questionIds, request.getCategory(), RoundType.MULTIPLAYER);
 
-        gameService.updateSessionQuestionsAndCategory(session, questions, request.getCategory());
+        gameService.updateSessionQuestionsAndCategory(session, questionIds, request.getCategory());
 
         List<QuestionDTO> questionDTOs = questionMapper.multipleToDTO(questions);
         log.debug("Returning {} questions for player {}", questionDTOs.size(), request.getPlayerId());

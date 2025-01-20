@@ -121,7 +121,7 @@ public class GameServiceGameFlowIntegrationTest {
                 .toList();
 
         roundSessionService.initializeSession(player1.getId(), expectedQuestionIds, "Sports", RoundType.MULTIPLAYER);
-        gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+        gameService.updateSessionQuestionsAndCategory(multiplayerSession, expectedQuestionIds, "Sports");
 
         questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
@@ -278,16 +278,20 @@ public class GameServiceGameFlowIntegrationTest {
             );
             assertEquals(BusinessErrorCodes.QUESTION_ALREADY_ANSWERED, exception.getErrorCode());
         }
-        
     }
 
     @Nested
     class gameCompletionTests {
         private List<Question> questions;
+        private List<Long> questionIds;
 
         @BeforeEach
         void setUp() {
             questions = loadQuestionsToDB();
+
+             questionIds = questions.stream()
+                    .map(Question::getId)
+                    .toList();
 
             roundSessionService.initializeSession(player1.getId(), questions.stream().map(Question::getId).toList(), "Sports", RoundType.MULTIPLAYER);
 
@@ -298,7 +302,7 @@ public class GameServiceGameFlowIntegrationTest {
 
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 5));
 
-            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questionIds, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
@@ -320,7 +324,7 @@ public class GameServiceGameFlowIntegrationTest {
         void testGameCompleteLoss() {
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(5, 18));
 
-            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questionIds, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
@@ -336,14 +340,13 @@ public class GameServiceGameFlowIntegrationTest {
             );
             
             verifyNotifications(NotificationType.GAME_LOST, NotificationType.GAME_WON);
-            
         }
         
         @Test
         void testGameCompleteTie() {
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 18));
 
-            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questionIds, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
 
@@ -358,7 +361,6 @@ public class GameServiceGameFlowIntegrationTest {
                             "Winner id should be null"),
                     () -> assertTrue(gameStateResponse.getIsTie(), "Game should be tied")
             );
-            
             verifyNotifications(NotificationType.GAME_TIED, NotificationType.GAME_TIED);
         }
         
@@ -366,7 +368,7 @@ public class GameServiceGameFlowIntegrationTest {
         void testGameOverAcknowledgement() {
             MultiplayerSession multiplayerSession = multiplayerSessionRepository.save(createAlmostCompleteGame(15, 5));
 
-            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questions, "Sports");
+            gameService.updateSessionQuestionsAndCategory(multiplayerSession, questionIds, "Sports");
 
             questions.forEach(question -> validateCorrectAnswer(question, multiplayerSession.getId()));
             
@@ -405,7 +407,6 @@ public class GameServiceGameFlowIntegrationTest {
 
             return session;
         }
-
     }
     
     @Test
@@ -453,8 +454,7 @@ public class GameServiceGameFlowIntegrationTest {
         questionObj3.setQuestion("In what sport does Fanny Chmelar compete for Germany?");
         questionObj3.setOptions(Arrays.asList("Skiing", "Swimming", "Showjumping", "Gymnastics"));
         questionObj3.setCorrectAnswer("Skiing");
-
-
+        
         return questionRepository.saveAll(List.of(questionObj1, questionObj2, questionObj3));
     }
 

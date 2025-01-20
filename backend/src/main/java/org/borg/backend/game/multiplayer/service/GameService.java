@@ -23,6 +23,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.borg.backend.game.multiplayer.util.MultiplayerGameConstants.QUESTIONS_PER_ROUND;
@@ -56,7 +57,7 @@ public class GameService {
     }
 
     @Transactional
-    public synchronized void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
+    public void updateGameState(Long sessionId, Long playerId, Long questionId, boolean isCorrect) {
         log.debug("Updating game state for sessionId: {}, playerId: {}, questionId: {}, isCorrect: {}",
                 sessionId, playerId, questionId, isCorrect);
         MultiplayerSession session = multiplayerSessionService.getSessionById(sessionId);
@@ -160,14 +161,14 @@ public class GameService {
         }
     }
     
-    public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Question> questions, String selectedCategory) {
+    public void updateSessionQuestionsAndCategory(MultiplayerSession session, List<Long> questionsIds, String selectedCategory) {
         log.info("Updating session questions and category for sessionId: {}", session.getId());
         
         session.getQuestionIds().clear();
-        for (Question question : questions) {
-            session.getQuestionIds().add(question.getId());
-            log.debug("Added question id: {}", question.getId());
-        }
+        
+        session.setQuestionIds(new ArrayList<>(questionsIds));
+        log.debug("Added new session questions: {} for session {}", questionsIds, session);
+        
         session.getPlayedCategories().add(selectedCategory);
         log.debug("Added category: {} to played session categories", selectedCategory);
 
