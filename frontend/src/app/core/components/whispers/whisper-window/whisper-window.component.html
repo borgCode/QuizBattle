@@ -15,13 +15,13 @@
   <div class="message-area" #messageArea>
     <ng-container *ngFor="let message of conversation.messages">
       <ng-container *ngIf="message.senderId == this.storedPlayer.id; else elseBlock">
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break">
           <span class="player">{{ this.storedPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
       </ng-container>
       <ng-template #elseBlock>
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break" #messageElement [attr.data-message-id]="!message.read ? message.id : null">
           <span class="other-player">{{ conversation.otherPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
@@ -29,13 +29,13 @@
     </ng-container>
     <ng-container *ngFor="let message of newMessages$ | async">
       <ng-container *ngIf="message.senderId == this.storedPlayer.id; else newElseBlock">
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break">
           <span class="player">{{ this.storedPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
       </ng-container>
       <ng-template #newElseBlock>
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="message.id">
+        <div class="message-item text-break" #messageElement [attr.data-message-id]="!message.isRead ? message.id : null">>
           <span class="other-player">{{ conversation.otherPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>

@@ -74,7 +74,12 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
           const messageElement = entry.target as HTMLElement;
           return messageElement.querySelector(".other-player") !== null;
         })
-        .map(entry => entry.target.getAttribute("data-message-id"));
+        .map(entry => {
+          const messageId = entry.target.getAttribute("data-message-id");
+          return messageId !== null ? messageId : null;
+
+        })
+        .filter(id => id !== null);
 
       if (visibleMessageIds.length > 0) {
         const ids = visibleMessageIds.map(id => parseInt(id));
