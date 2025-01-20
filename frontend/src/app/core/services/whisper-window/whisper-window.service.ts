@@ -9,7 +9,7 @@ export interface Message {
   senderId: number,
   receiverId: number,
   sentAt: string,
-  isRead: boolean,
+  read: boolean,
   content: string
 }
 
@@ -82,7 +82,7 @@ export class WhisperWindowService {
         senderId: param.messageRequest.senderId,
         receiverId: param.messageRequest.receiverId,
         sentAt: new Date().toISOString(),
-        isRead: true,
+        read: true,
         content: param.messageRequest.message
       }
     )

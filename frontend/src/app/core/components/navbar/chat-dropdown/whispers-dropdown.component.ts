@@ -33,6 +33,7 @@ export class WhispersDropdownComponent implements OnInit {
 
   playerId: number;
 
+
   constructor(
     private messageService: MessageService,
     private loginStateService: LoginStateService,
@@ -80,6 +81,7 @@ export class WhispersDropdownComponent implements OnInit {
 
 
   ngOnInit() {
+
     this.loginStateService.isLoggedIn$.subscribe(isLoggedIn => {
       if (isLoggedIn) {
         this.playerId = this.loginStateService.loggedInUser.id;

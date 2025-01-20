@@ -2,7 +2,7 @@ import {
   AfterViewChecked,
   AfterViewInit,
   Component,
-  ElementRef,
+  ElementRef, HostListener,
   Input,
   QueryList,
   ViewChild,
@@ -43,6 +43,10 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   message$: Observable<Message>
 
+  isWindowFocused: boolean = true;
+
+  private pendingMessagesToMarkAsRead = new Set<string>();
+
   constructor(
     private whisperWindowService: WhisperWindowService,
     private loginStateService: LoginStateService,
@@ -68,6 +72,7 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   ngAfterViewInit() {
     const observer = new IntersectionObserver((entries) => {
+
       const visibleMessageIds = entries
         .filter(entry => entry.isIntersecting)
         .filter(entry => {
@@ -82,16 +87,11 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
         .filter(id => id !== null);
 
       if (visibleMessageIds.length > 0) {
-        const ids = visibleMessageIds.map(id => parseInt(id));
-        console.log(ids);
-        this.messageService.markAsRead1({
-          body: {
-            messageIds: ids,
-            playerId: this.storedPlayer.id,
-            conversationId: this.conversation.id,
-            username: this.storedPlayer.username
-          }
-        }).subscribe();
+        if (this.isWindowFocused) {
+          this.markMessagesAsRead(visibleMessageIds);
+        } else {
+          visibleMessageIds.forEach(id => this.pendingMessagesToMarkAsRead.add(id));
+        }
         visibleMessageIds.forEach(id => {
           const element = this.messageElements.find(el =>
             el.nativeElement.getAttribute('data-message-id') === id
@@ -136,5 +136,35 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
   closeConversation() {
     this.whisperWindowService.removeFromConversations(this.conversation);
+  }
+
+  @HostListener('window:focus', ['$event'])
+  onFocus(event: FocusEvent): void {
+    console.log("focused")
+    this.isWindowFocused = true;
+
+    if (this.pendingMessagesToMarkAsRead.size > 0) {
+      const messageIds = Array.from(this.pendingMessagesToMarkAsRead);
+      this.markMessagesAsRead(messageIds);
+      this.pendingMessagesToMarkAsRead.clear();
+    }
+  }
+
+  @HostListener('window:blur', ['$event'])
+  onBlur(event: FocusEvent): void {
+    console.log("Not focused")
+    this.isWindowFocused = false;
+  }
+
+  private markMessagesAsRead(messageIds: string[]) {
+    const ids = messageIds.map(id => parseInt(id));
+    this.messageService.markAsRead1({
+      body: {
+        messageIds: ids,
+        playerId: this.storedPlayer.id,
+        conversationId: this.conversation.id,
+        username: this.storedPlayer.username
+      }
+    }).subscribe();
   }
 }

@@ -35,7 +35,7 @@
         </div>
       </ng-container>
       <ng-template #newElseBlock>
-        <div class="message-item text-break" #messageElement [attr.data-message-id]="!message.isRead ? message.id : null">>
+        <div class="message-item text-break" #messageElement [attr.data-message-id]="!message.read ? message.id : null">>
           <span class="other-player">{{ conversation.otherPlayer.displayName }}: </span>
           <span class="message-text">{{ message.content }}</span>
         </div>
