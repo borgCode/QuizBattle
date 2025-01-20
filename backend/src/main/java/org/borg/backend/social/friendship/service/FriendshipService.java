@@ -138,6 +138,7 @@ public class FriendshipService {
 
         if (friendship.getStatus().equals(FriendshipStatus.ACTIVE)) {
             log.warn("Friendship already exists between players {} and {}, cannot respond", senderId, receiverId);
+            notificationRepository.deleteById(response.getNotificationId());
             throw new FriendshipException(BusinessErrorCodes.FRIENDSHIP_ALREADY_EXISTS,
                     String.format("Friendship already exists between players %d and %d",
                             senderId, receiverId));
@@ -185,7 +186,8 @@ public class FriendshipService {
             if (friendship.getStatus() == FriendshipStatus.PENDING) {
                 friendshipRepository.delete(friendship);
                 notificationService.deleteFriendRequestByPlayerIds(receiverId, senderId);
-                log.debug("Deleted pending friend request notification between players {} and {}", receiverId, senderId);
+                log.debug("Deleting pending friend request notification sent by player {} to player {}", receiverId, senderId);
+
             }
         }
     }
