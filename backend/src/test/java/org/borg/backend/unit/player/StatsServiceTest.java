@@ -1,6 +1,5 @@
-package org.borg.backend.unit.player.stats;
+package org.borg.backend.unit.player;
 
-import org.aspectj.lang.annotation.Before;
 import org.borg.backend.game.shared.enums.GameResult;
 import org.borg.backend.player.model.CategoryStats;
 import org.borg.backend.player.model.Player;
@@ -8,7 +7,6 @@ import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.player.service.StatsService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,8 +18,10 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class StatsServiceTest {
     @Mock

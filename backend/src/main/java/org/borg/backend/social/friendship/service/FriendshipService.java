@@ -8,7 +8,6 @@ import org.borg.backend.player.model.Player;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.FriendshipException;
-import org.borg.backend.social.block.repository.PlayerBlockRepository;
 import org.borg.backend.social.block.service.PlayerBlockService;
 import org.borg.backend.social.friendship.dto.PlayerInteraction;
 import org.borg.backend.social.friendship.dto.PlayerInteractionResponse;

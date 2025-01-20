@@ -3,7 +3,6 @@ package org.borg.backend.player.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.shared.enums.GameResult;
-import org.borg.backend.player.model.CategoryStats;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
