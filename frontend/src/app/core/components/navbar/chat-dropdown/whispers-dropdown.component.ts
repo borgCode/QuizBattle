@@ -41,25 +41,40 @@ export class WhispersDropdownComponent implements OnInit {
     private websocketService: WebSocketService
   ) {
     this.websocketService.conversationReadEvent$.subscribe(conversationId => {
-      const currentUnread = this.unreadConversations.getValue();
-      const updatedUnread = currentUnread.filter(
-        conv => conv.id !== conversationId);
-      this.unreadConversations.next(updatedUnread);
 
-    })
+      const currentUnread = this.unreadConversations.getValue();
+      const currentRead = this.readConversations.getValue();
+
+      const conversationToMove = currentUnread.find(conv => conv.id === conversationId);
+
+      if (conversationToMove) {
+        const updatedUnread = currentUnread.filter(conv => conv.id !== conversationId);
+        const updatedRead = currentRead.some(conv => conv.id === conversationId)
+          ? currentRead
+          : [...currentRead, conversationToMove];
+
+        this.unreadConversations.next(updatedUnread);
+        this.readConversations.next(updatedRead);
+      }
+    });
+
     this.websocketService.conversationUnreadEvent$.subscribe(conversationId => {
       const currentUnread = this.unreadConversations.getValue();
+      const currentRead = this.readConversations.getValue();
 
-      if (!currentUnread.some(conv => conv.id === conversationId)) {
-        this.messageService.getPreviewConversation({
-          playerId: this.playerId,
-          conversationId: conversationId
-        }).subscribe({
-          next: conversation => {
-            this.unreadConversations.next([...currentUnread, conversation]);
-          }
-        })
-      }
+      const filteredUnread = currentUnread.filter(conv => conv.id !== conversationId);
+      const filteredRead = currentRead.filter(conv => conv.id !== conversationId);
+
+      this.readConversations.next(filteredRead);
+
+      this.messageService.getPreviewConversation({
+        playerId: this.playerId,
+        conversationId: conversationId
+      }).subscribe({
+        next: conversation => {
+          this.unreadConversations.next([...filteredUnread, conversation]);
+        }
+      });
     });
   }
 

@@ -78,6 +78,7 @@ export class WhisperWindowComponent implements AfterViewChecked, AfterViewInit {
 
       if (visibleMessageIds.length > 0) {
         const ids = visibleMessageIds.map(id => parseInt(id));
+        console.log(ids);
         this.messageService.markAsRead1({
           body: {
             messageIds: ids,
