@@ -26,15 +26,8 @@ public class StatsService {
 
         Player player = playerService.getPlayerById(playerId);
         Stats stats = player.getStats();
-        CategoryStats categoryStats = stats.getCategoryStats().get(category);
-
-        if (categoryStats == null) {
-            log.debug("Player {} has no stats for category {}. Initializing stats.", playerId, category);
-        } else {
-            log.debug("Current stats for playerId={}, category={}: correct={}, total={}",
-                    playerId, category, categoryStats.getCorrect(), categoryStats.getQuestionsAnswered());
-            stats.incrementQuestionsAnswered(category);
-        }
+        
+        stats.incrementQuestionsAnswered(category);
 
         if (isCorrect) {
             stats.incrementCorrectAnswer(category);
