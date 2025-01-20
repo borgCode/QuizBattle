@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +39,8 @@ public class GameServiceTest {
     private StatsService statsService;
     @Mock
     private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @InjectMocks
     private GameService gameService;
@@ -68,7 +71,12 @@ public class GameServiceTest {
                     () -> verify(eventPublisher).publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId())),
                     () -> verify(multiplayerSessionRepository).save(session),
                     () -> verify(notificationService).sendGameWonNotification(1L, "player2", session.getId()),
-                    () -> verify(notificationService).sendGameLostNotification(2L, "player1", session.getId()));
+                    () -> verify(notificationService).sendGameLostNotification(2L, "player1", session.getId()),
+                    () -> verify(simpMessagingTemplate).convertAndSendToUser(
+                            "player2",
+                            "queue/session/" + session.getId(),
+                            "refresh"
+                    ));
             
         }
 
@@ -87,7 +95,12 @@ public class GameServiceTest {
                     () -> verify(eventPublisher).publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId())),
                     () -> verify(multiplayerSessionRepository).save(session),
                     () -> verify(notificationService).sendGameWonNotification(2L, "player1", session.getId()),
-                    () -> verify(notificationService).sendGameLostNotification(1L, "player2", session.getId()));
+                    () -> verify(notificationService).sendGameLostNotification(1L, "player2", session.getId()),
+                    () -> verify(simpMessagingTemplate).convertAndSendToUser(
+                            "player2",
+                            "queue/session/" + session.getId(),
+                            "refresh"
+                    ));
         }
 
         @Test
@@ -104,7 +117,12 @@ public class GameServiceTest {
                     () -> assertTrue(session.getIsTie(), "Game should be marked as tie"),
                     () -> verify(statsService).updateGameStats(any(), any(), eq(GameResult.TIE)),
                     () -> verify(multiplayerSessionRepository).save(session),
-                    () -> verify(notificationService).sendTieNotifications(session.getSessionPlayers(), session.getId()));
+                    () -> verify(notificationService).sendTieNotifications(session.getSessionPlayers(), session.getId()),
+                    () -> verify(simpMessagingTemplate).convertAndSendToUser(
+                            "player2",
+                            "queue/session/" + session.getId(),
+                            "refresh"
+                    ));
         }
     }
 
