@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Client} from '@stomp/stompjs';
+import {Client, StompSubscription} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {TokenService} from '../services/token/token.service';
 import {BehaviorSubject, Subject} from 'rxjs';
@@ -25,6 +25,8 @@ export class WebSocketService {
 
   private conversationUnreadSubject = new Subject<number>();
   conversationUnreadEvent$ = this.conversationUnreadSubject.asObservable()
+
+  private subscriptions: Map<string, StompSubscription> = new Map();
 
   constructor(
     private tokenService: TokenService,
@@ -136,11 +138,24 @@ export class WebSocketService {
     }
   }
 
+  unsubscribe(destination: string) {
+    const subscription = this.subscriptions.get(destination);
+    if (subscription) {
+      subscription.unsubscribe();
+      this.subscriptions.delete(destination);
+    }
+  }
+
   private initSub(destination: string, callback: (message: any) => void) {
     console.log(`Subscribing to: ${destination}`);
-    this.stompClient.subscribe(destination, (message) => {
+    const subscription = this.stompClient.subscribe(destination, (message) => {
       console.log(`Received message on ${destination}:`, message.body);
-      callback(JSON.parse(message.body));
+      try {
+        callback(JSON.parse(message.body));
+      } catch {
+        callback(message.body);
+      }
     });
+    this.subscriptions.set(destination, subscription)
   }
 }

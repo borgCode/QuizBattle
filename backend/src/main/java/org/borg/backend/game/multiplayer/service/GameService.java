@@ -10,7 +10,6 @@ import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository
 import org.borg.backend.game.shared.dto.PlayerQuestionResult;
 import org.borg.backend.game.shared.enums.GameResult;
 import org.borg.backend.game.shared.enums.GameStatus;
-import org.borg.backend.game.shared.model.Question;
 import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.model.Player;
@@ -19,6 +18,7 @@ import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.GameException;
 import org.borg.backend.social.notification.service.NotificationService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +41,7 @@ public class GameService {
     private final StatsService statsService;
     private final MultiplayerSessionService multiplayerSessionService;
     private final GameSessionMapper gameSessionMapper;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public GameStateResponse getGameState(long sessionId, long playerId) {
         log.debug("Fetching game state for sessionId: {}, playerId: {}", sessionId, playerId);
@@ -93,6 +94,8 @@ public class GameService {
                 if (sessionPlayer.getQuestionsAnswered() > opponent.getQuestionsAnswered()) {
                     session.setCurrentPlayerTurnId(opponent.getPlayer().getId());
                     log.debug("Turn changed to opponent: {} for sessionId: {}", opponent.getPlayer().getId(), sessionId);
+                    
+                    simpMessagingTemplate.convertAndSendToUser(opponent.getPlayer().getUsername(), "queue/session/" + sessionId, "refresh");
                 } else {
                     session.getQuestionIds().clear();
                     roundSessionService.finishSession(playerId);

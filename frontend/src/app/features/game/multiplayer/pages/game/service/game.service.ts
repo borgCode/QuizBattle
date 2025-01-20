@@ -13,6 +13,7 @@ import {GameResult} from '../enums/game-result';
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverDialogComponent} from '../dialog/game-over-dialog/game-over-dialog.component';
 import {map} from 'rxjs/operators';
+import {WebSocketService} from '../../../../../../core/websocket/web-socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,7 @@ export class GameService {
   constructor(
     private multiplayerGameService: MultiplayerGameService,
     private multiplayerMatchService: MultiplayerMatchService,
+    private websocketService: WebSocketService,
     private alertMessageService: AlertMessageService,
     private loginStateService: LoginStateService,
     private questionService: QuestionService,
@@ -47,7 +49,16 @@ export class GameService {
   ) {
   }
 
+  initWebsocketSub() {
+    this.websocketService.subscribe("/user/queue/session/" + this.sessionId, () => this.getGameState().subscribe());
+  }
+
+  unsubscribeFromSocket() {
+    this.websocketService.unsubscribe("/user/queue/session/" + this.sessionId);
+  }
+
   getGameState() {
+    console.log("fetching game state")
     this.gameOverSubject.next(false);
     return this.multiplayerGameService.getGameState({sessionId: this.sessionId, playerId: this.playerId}).pipe(
       tap(gameState => {

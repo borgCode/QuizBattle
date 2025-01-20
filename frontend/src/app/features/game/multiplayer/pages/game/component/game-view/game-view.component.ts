@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AsyncPipe, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {GameStateResponse} from '../../../../../../../api/generated/models/game-state-response';
@@ -22,7 +22,7 @@ import {Observable} from 'rxjs';
   templateUrl: './game-view.component.html',
   styleUrl: './game-view.component.css'
 })
-export class GameViewComponent implements OnInit {
+export class GameViewComponent implements OnInit, OnDestroy {
 
   sessionId: number;
   hasAcknowledgedGameOver: boolean;
@@ -30,6 +30,8 @@ export class GameViewComponent implements OnInit {
 
   gameOver$: Observable<boolean>;
   gameState$: Observable<GameStateResponse>;
+
+
   constructor(
     protected gameService: GameService,
     protected playerInteractionService: PlayerInteractionService,
@@ -42,11 +44,17 @@ export class GameViewComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.activatedRoute.params.subscribe(value => {
       this.gameService.sessionId = value['sessionId'];
+      this.gameService.initWebsocketSub();
       this.resetComponents();
       this.getGameState();
     })
+  }
+
+  ngOnDestroy() {
+    this.gameService.unsubscribeFromSocket();
   }
 
   private resetComponents() {
