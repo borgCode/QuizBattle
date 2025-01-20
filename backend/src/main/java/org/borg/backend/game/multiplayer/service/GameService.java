@@ -81,8 +81,10 @@ public class GameService {
 
         sessionPlayer.getQuestionResults().add(new PlayerQuestionResult(questionId, sessionPlayer.getQuestionsAnswered() - 1, isCorrect));
         
-        if (isGameComplete(sessionPlayer, opponent)) {
+        boolean isGameComplete = isGameComplete(sessionPlayer, opponent);
+        if (isGameComplete) {
             log.debug("Game is complete for sessionId: {}", sessionId);
+            
             session.setStatus(GameStatus.COMPLETED);
             determineGameOutcome(session);
             sendGameOverNotifications(session);
@@ -94,7 +96,6 @@ public class GameService {
                 if (sessionPlayer.getQuestionsAnswered() > opponent.getQuestionsAnswered()) {
                     session.setCurrentPlayerTurnId(opponent.getPlayer().getId());
                     log.debug("Turn changed to opponent: {} for sessionId: {}", opponent.getPlayer().getId(), sessionId);
-                    
                     simpMessagingTemplate.convertAndSendToUser(opponent.getPlayer().getUsername(), "queue/session/" + sessionId, "refresh");
                 } else {
                     session.getQuestionIds().clear();
@@ -105,7 +106,9 @@ public class GameService {
         multiplayerSessionRepository.save(session);
         log.debug("Game state updated successfully for sessionId: {}", sessionId);
         
-        simpMessagingTemplate.convertAndSendToUser(opponent.getPlayer().getUsername(), "queue/session/" + session.getId(), "refresh");
+        if (isGameComplete) {
+            simpMessagingTemplate.convertAndSendToUser(opponent.getPlayer().getUsername(), "queue/session/" + sessionId, "refresh");
+        }
     }
 
     private boolean isGameComplete(SessionPlayer player, SessionPlayer opponent) {

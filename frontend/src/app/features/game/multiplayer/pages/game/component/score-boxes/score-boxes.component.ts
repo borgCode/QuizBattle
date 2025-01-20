@@ -37,26 +37,29 @@ export class ScoreBoxesComponent implements OnInit, OnChanges {
     this.gameService.gameState$.subscribe(gameState => {
       this.updateBoxColors(gameState);
     });
-
-    this.gameService.gameState$.subscribe(gameState => {
-      if (gameState) {
-        this.updateBoxColors(gameState);
-      }
-    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['resetTrigger'] && changes['resetTrigger'].currentValue) {
+      console.log('Boxes reset due to resetTrigger change');
       this.initBoxes();
     }
+    console.log('Boxes after reset:', this.boxes);
   }
 
   private initBoxes() {
-    this.boxes = [];
-    for (let i = 0; i < 6; i++) {
-      this.boxes.push({
-        left: Array.from({length: 3}, () => ({color: '#ccc'})),
-        right: Array.from({length: 3}, () => ({color: '#ccc'}))
+    if (this.boxes.length === 0) {
+
+      for (let i = 0; i < 6; i++) {
+        this.boxes.push({
+          left: Array.from({length: 3}, () => ({color: '#ccc'})),
+          right: Array.from({length: 3}, () => ({color: '#ccc'}))
+        });
+      }
+    } else {
+      this.boxes.forEach(row => {
+        row.left.forEach(box => box.color = '#ccc');
+        row.right.forEach(box => box.color = '#ccc');
       });
     }
   }
