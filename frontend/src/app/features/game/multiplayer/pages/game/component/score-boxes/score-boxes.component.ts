@@ -40,7 +40,7 @@ export class ScoreBoxesComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['resetTrigger'] && changes['resetTrigger'].currentValue) {
+    if (changes['resetTrigger'] && changes['resetTrigger'].currentValue === false) {
       console.log('Boxes reset due to resetTrigger change');
       this.initBoxes();
     }

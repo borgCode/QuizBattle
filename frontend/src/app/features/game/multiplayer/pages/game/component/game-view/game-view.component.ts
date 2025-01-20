@@ -61,7 +61,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
     this.resetBoxesTrigger = false;
     setTimeout(() => {
       this.resetBoxesTrigger = true;
-    });
+    }, 50);
   }
 
   private getGameState() {
