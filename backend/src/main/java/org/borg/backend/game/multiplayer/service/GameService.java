@@ -104,6 +104,8 @@ public class GameService {
         }
         multiplayerSessionRepository.save(session);
         log.debug("Game state updated successfully for sessionId: {}", sessionId);
+        
+        simpMessagingTemplate.convertAndSendToUser(opponent.getPlayer().getUsername(), "queue/session/" + session.getId(), "refresh");
     }
 
     private boolean isGameComplete(SessionPlayer player, SessionPlayer opponent) {
@@ -139,7 +141,9 @@ public class GameService {
         log.info("Game outcome determined for sessionId: {}, result: {}", session.getId(), result);
         statsService.updateGameStats(sessionPlayers.get(0).getPlayer(), sessionPlayers.get(1).getPlayer(), result);
         
-        applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
+        if (!result.equals(GameResult.TIE)) {
+            applicationEventPublisher.publishEvent(new AchievementEvents.GameWonEvent(session.getWinnerId()));
+        }
         log.debug("GameWonEvent published for sessionId: {}", session.getId());
     }
 
