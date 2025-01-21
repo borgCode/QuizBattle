@@ -15,6 +15,8 @@ import org.borg.backend.player.model.ProgressStatus;
 import org.borg.backend.player.model.StoryProgress;
 import org.borg.backend.player.repository.StoryProgressRepository;
 import org.borg.backend.player.service.PlayerService;
+import org.borg.backend.shared.enums.BusinessErrorCodes;
+import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,8 +29,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.borg.backend.player.events.AchievementEvents.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ChapterServiceTest {
@@ -237,6 +239,96 @@ public class ChapterServiceTest {
             chapterService.startChapter(request);
             
             verify(chapterSessionService).initializeChapterSession(request.getPlayerId(), chapter);
+        }
+    }
+    
+    @Nested
+    class UpdateChapterTests {
+        ChapterProgress chapterProgress;
+        
+        @Test
+        void shouldThrowError_WhenChapterProgressNotFound() {
+            when(chapterProgressRepository.findById(1L)).thenReturn(Optional.empty());
+            
+            ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                    () -> chapterService.updateChapterProgress(1L));
+            
+            assertEquals(BusinessErrorCodes.RESOURCE_NOT_FOUND, exception.getErrorCode());
+        }
+        
+        @Test
+        void shouldDoNothing_WhenChapterAlreadyCompleted() {
+            chapterProgress = ChapterProgress.builder()
+                    .progressStatus(ProgressStatus.COMPLETED)
+                    .id(1L).build();
+            
+            when(chapterProgressRepository.findById(chapterProgress.getId())).thenReturn(Optional.of(chapterProgress));
+            
+            chapterService.updateChapterProgress(chapterProgress.getId());
+            
+            verify(storyProgressRepository, never()).findById(any());
+        }
+        
+        @Test
+        void shouldSetChapterToComplete_AndIncrementCompletedChapters() {
+            Story story = Story.builder()
+                    .numOfChapters(999).build();
+            StoryProgress storyProgress = StoryProgress.builder()
+                    .completedChapters(0)
+                    .story(story)
+                    .id(1L).build();
+            chapterProgress = ChapterProgress.builder()
+                    .progressStatus(ProgressStatus.IN_PROGRESS)
+                    .storyProgress(storyProgress)
+                    .id(1L).build();
+           
+
+            when(chapterProgressRepository.findById(chapterProgress.getId())).thenReturn(Optional.of(chapterProgress));
+            when(storyProgressRepository.findById(storyProgress.getId())).thenReturn(Optional.of(storyProgress));
+            
+            chapterService.updateChapterProgress(chapterProgress.getId());
+            
+            ArgumentCaptor<ChapterProgress> chapterCaptor = ArgumentCaptor.forClass(ChapterProgress.class);
+            verify(chapterProgressRepository).save(chapterCaptor.capture());
+            
+            ArgumentCaptor<StoryProgress> storyCaptor = ArgumentCaptor.forClass(StoryProgress.class);
+            verify(storyProgressRepository).save(storyCaptor.capture());
+            
+            ChapterProgress savedChapterProgress = chapterCaptor.getValue();
+            assertEquals(ProgressStatus.COMPLETED, savedChapterProgress.getProgressStatus());
+            
+            StoryProgress savedStoryProgress = storyCaptor.getValue();
+            assertEquals(1, savedStoryProgress.getCompletedChapters());
+        }
+        
+        @Test
+        void shouldCompleteStory_WhenAllChaptersComplete() {
+            Story story = Story.builder()
+                    .title("Test")
+                    .numOfChapters(2).build();
+            StoryProgress storyProgress = StoryProgress.builder()
+                    .completedChapters(1)
+                    .player(player)
+                    .story(story)
+                    .id(1L).build();
+            chapterProgress = ChapterProgress.builder()
+                    .progressStatus(ProgressStatus.IN_PROGRESS)
+                    .storyProgress(storyProgress)
+                    .id(1L).build();
+            StoryCompletedEvent achievementEvent = new StoryCompletedEvent(player.getId(), story.getTitle());
+
+            when(chapterProgressRepository.findById(chapterProgress.getId())).thenReturn(Optional.of(chapterProgress));
+            when(storyProgressRepository.findById(storyProgress.getId())).thenReturn(Optional.of(storyProgress));
+
+            chapterService.updateChapterProgress(chapterProgress.getId());
+            
+            ArgumentCaptor<StoryProgress> storyCaptor = ArgumentCaptor.forClass(StoryProgress.class);
+            verify(storyProgressRepository).save(storyCaptor.capture());
+
+            StoryProgress savedStoryProgress = storyCaptor.getValue();
+            assertEquals(ProgressStatus.COMPLETED, savedStoryProgress.getProgressStatus());
+            
+            verify(applicationEventPublisher, atMostOnce()).publishEvent(achievementEvent);
         }
     }
 }
