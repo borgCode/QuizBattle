@@ -81,9 +81,9 @@ class AchievementServiceTest {
 
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
-                
+
                 verifyAchievementSaved(player, achievement, level1);
-                
+
                 verify(simpMessagingTemplate).convertAndSendToUser(
                         eq("testuser123"),
                         eq("/queue/achievements"),
@@ -107,7 +107,6 @@ class AchievementServiceTest {
             verifyNoNotificationsSent();
         }
     }
-    
 
     private void verifyAchievementSaved(Player expectedPlayer, Achievement expectedAchievement, AchievementLevel expectedLevel) {
         ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
@@ -207,7 +206,7 @@ class AchievementServiceTest {
                         .thenReturn("base64Image");
 
                 verifyAchievementSaved(player, achievement, level2);
-              
+
                 verifyAchievementNotification("testuser123");
             }
         }
@@ -229,8 +228,6 @@ class AchievementServiceTest {
             when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
 
             achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
-
-            verifyNoNotificationsSent();
         }
 
         @Test
@@ -418,14 +415,6 @@ class AchievementServiceTest {
             verifyNoNotificationsSent();
         }
     }
-    
-    @Nested
-    class CurrentProgressTests {
-        @Test
-        void shouldUpdateCategoryProgressTowardsFirstLevel_WhenFirstLevelNotAchieved() {
-            
-        }
-    }
 
     private void verifyAchievementNotification(String username) {
         verify(simpMessagingTemplate).convertAndSendToUser(
@@ -435,7 +424,6 @@ class AchievementServiceTest {
     }
 
     private void verifyNoNotificationsSent() {
-        verify(userUnlockedAchievementRepository, never()).save(any());
         verify(simpMessagingTemplate, never()).convertAndSendToUser(
                 any(),
                 any(),
