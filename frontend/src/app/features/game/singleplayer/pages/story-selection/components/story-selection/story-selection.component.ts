@@ -8,7 +8,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {ContentDialogComponent} from '../../../shared/content-dialog/content-dialog.component';
 import {Router} from '@angular/router';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
-import {PlayerProgressDto} from '../../../../../../../api/generated/models/player-progress-dto';
+import {StoryProgressDto} from '../../../../../../../api/generated/models/story-progress-dto';
 
 @Component({
   selector: 'app-story-selection',
@@ -22,7 +22,7 @@ import {PlayerProgressDto} from '../../../../../../../api/generated/models/playe
 })
 export class StorySelectionComponent implements OnInit {
   stories: StoryDto[]
-  playerProgress: PlayerProgressDto[]
+  storyProgress: StoryProgressDto[]
 
   constructor(
     private storyService: StoryService,
@@ -36,7 +36,7 @@ export class StorySelectionComponent implements OnInit {
     this.storyService.getAllStories({playerId: this.loginStateService.loggedInUser.id}).subscribe({
       next: data => {
         this.stories = data.stories;
-        this.playerProgress = data.playerProgressList;
+        this.storyProgress = data.storyProgressDTOS;
       }
     })
   }
@@ -44,7 +44,7 @@ export class StorySelectionComponent implements OnInit {
   showStartStoryDialog(title: string, id: number, index: number) {
     let message: string
 
-    switch (this.playerProgress[index].progressStatus) {
+    switch (this.storyProgress[index].progressStatus) {
       case "NOT_STARTED":
         message = "Would you like to start this story?"
         break;

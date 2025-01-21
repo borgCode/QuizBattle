@@ -4,10 +4,10 @@ import {NgForOf, NgIf} from '@angular/common';
 import {ChapterCardComponent} from '../chapter-card/chapter-card.component';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {PlayerProgressDto} from '../../../../../../../api/generated/models/player-progress-dto';
 import {MatDialog} from '@angular/material/dialog';
 import {ContentDialogComponent} from '../../../shared/content-dialog/content-dialog.component';
 import {ChapterOverviewDto} from '../../../../../../../api/generated/models/chapter-overview-dto';
+import {StoryProgressDto} from '../../../../../../../api/generated/models/story-progress-dto';
 
 @Component({
     selector: 'app-story-overview',
@@ -21,7 +21,7 @@ import {ChapterOverviewDto} from '../../../../../../../api/generated/models/chap
 })
 export class StoryOverviewComponent implements OnInit {
     chapters: ChapterOverviewDto[]
-    playerProgress: PlayerProgressDto;
+    storyProgress: StoryProgressDto;
     storyTitle: string;
     storyId: number
 
@@ -48,10 +48,10 @@ export class StoryOverviewComponent implements OnInit {
             next: data => {
                 console.log(data)
                 this.chapters = data.chapters;
-                this.playerProgress = data.playerProgress
-                console.log(this.playerProgress)
+                this.storyProgress = data.storyProgressDTO
+                console.log(this.storyProgress)
                 this.storyTitle = data.title;
-                console.log(this.playerProgress)
+                console.log(this.storyProgress)
             }
         })
     }
@@ -66,7 +66,7 @@ export class StoryOverviewComponent implements OnInit {
 
     openChapterDialog(title: string, id: number, index: number) {
         let message: string
-        if (this.playerProgress.completedChapters <= index) {
+        if (this.storyProgress.completedChapters <= index) {
             message = "Would you like to start this chapter?"
         } else {
             message = "You've already completed this chapter, do you want to play it again?"
@@ -79,7 +79,7 @@ export class StoryOverviewComponent implements OnInit {
         })
 
         dialogRef.afterClosed().subscribe((result) => {
-            console.log(this.playerProgress.id)
+            console.log(this.storyProgress.id)
             if (result === "yes") {
                 this.router.navigate(['singleplayer/story/chapter', id], {
                     state: {

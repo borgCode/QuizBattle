@@ -31,6 +31,7 @@ public class ChapterService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChapterSessionService chapterSessionService;
     private final ChapterMapper chapterMapper;
+    private final StoryService storyService;
 
     public PlayChapterDTO getChapter(Long chapterId) {
         log.debug("Fetching chapter with ID: {}", chapterId);
@@ -51,13 +52,20 @@ public class ChapterService {
                 request.getPlayerId(), request.getStoryId(), request.getChapterId());
 
         StoryProgress storyProgress = storyProgressRepository.findByPlayerIdAndStoryId(request.getPlayerId(), request.getStoryId());
-        log.debug("Found story progress for player: {}, current status: {}",
-                request.getPlayerId(), storyProgress.getProgressStatus());
 
-        storyProgress.setStartedAt(LocalDate.now());
-        storyProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);
-        storyProgress.setCurrentChapterId(request.getChapterId());
-
+        if (storyProgress == null) {
+            log.error("Story progress not found for player ID: {}", request.getPlayerId());
+            storyProgress = storyService.ensureStoryProgress(request.getPlayerId(), request.getStoryId());
+        }
+        
+        if (storyProgress.getProgressStatus().equals(ProgressStatus.IN_PROGRESS)) {
+            storyProgress.setLastPlayed(LocalDate.now());
+        } else {
+            storyProgress.setStartedAt(LocalDate.now());
+            storyProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);
+            storyProgress.setCurrentChapterId(request.getChapterId());
+        }
+        
         storyProgress = storyProgressRepository.save(storyProgress);
         log.debug("Updated story progress status to IN_PROGRESS");
 

@@ -2,14 +2,14 @@
   <div class="row g-2">
     <ng-container *ngFor="let chapter of chapters; let i = index">
       <div class="col-md-4"
-      (click)="i > playerProgress.completedChapters ? openLockedDialog(chapter.title, chapter.unlockCondition) : openChapterDialog(chapter.title, chapter.id, i)">
+      (click)="i > storyProgress.completedChapters ? openLockedDialog(chapter.title, chapter.unlockCondition) : openChapterDialog(chapter.title, chapter.id, i)">
         <div class="chapter-card">
-          <ng-container *ngIf="i > playerProgress.completedChapters" class="lock-overlay">
+          <ng-container *ngIf="i > storyProgress.completedChapters" class="lock-overlay">
             <div class="lock-overlay">
             <i class="fas fa-lock"></i>
             </div>
           </ng-container>
-          <ng-container *ngIf="i < playerProgress.completedChapters" class="completed-overlay">
+          <ng-container *ngIf="i < storyProgress.completedChapters" class="completed-overlay">
             <div class="completed-overlay">
               <i class="fa-solid fa-check fa-lg"></i>
             </div>

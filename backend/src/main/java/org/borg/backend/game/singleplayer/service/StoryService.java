@@ -88,6 +88,20 @@ public class StoryService {
                 .build();
     }
 
+    @Transactional
+    public StoryProgress ensureStoryProgress(Long playerId, Long storyId) {
+        log.debug("Ensuring story progress exists for player: {} and story: {}", playerId, storyId);
+        Story story = storyRepository.findById(storyId)
+                    .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND,
+                            "Story not found: " + storyId));
+
+        StoryProgress progress = createInitialProgress(playerId, story);
+        progress = storyProgressRepository.save(progress);
+            log.info("Created new story progress for player: {} and story: {}", playerId, storyId);
+            
+        return progress;
+    }
+    
     public StoryOverviewDTO getStoryOverview(StoryOverviewRequest request) {
         Story story = storyRepository.findById(request.getStoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Story not found for " + request.getStoryId()));
