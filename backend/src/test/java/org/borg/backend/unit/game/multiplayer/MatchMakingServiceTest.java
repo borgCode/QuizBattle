@@ -1,4 +1,4 @@
-package org.borg.backend.unit.game.multiplayer.service;
+package org.borg.backend.unit.game.multiplayer;
 
 import org.borg.backend.game.multiplayer.dto.MatchmakingResponse;
 import org.borg.backend.game.multiplayer.service.MatchMakingService;

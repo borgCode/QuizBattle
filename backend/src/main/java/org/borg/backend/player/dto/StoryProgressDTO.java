@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
-public class PlayerProgressDTO {
+public class StoryProgressDTO {
     private Long id;
     private Long currentChapterId;
     private Integer completedChapters;

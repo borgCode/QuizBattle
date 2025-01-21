@@ -10,9 +10,9 @@ import org.borg.backend.game.singleplayer.model.ChapterProgress;
 import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.player.model.PlayerProgress;
+import org.borg.backend.player.model.StoryProgress;
 import org.borg.backend.player.model.ProgressStatus;
-import org.borg.backend.player.repository.PlayerProgressRepository;
+import org.borg.backend.player.repository.StoryProgressRepository;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,7 +26,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ChapterService {
     private final ChapterRepository chapterRepository;
-    private final PlayerProgressRepository playerProgressRepository;
+    private final StoryProgressRepository storyProgressRepository;
     private final ChapterProgressRepository chapterProgressRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChapterSessionService chapterSessionService;
@@ -50,16 +50,16 @@ public class ChapterService {
         log.info("Starting chapter for player: {}, story: {}, chapter: {}",
                 request.getPlayerId(), request.getStoryId(), request.getChapterId());
 
-        PlayerProgress playerProgress = playerProgressRepository.findByPlayerIdAndStoryId(request.getPlayerId(), request.getStoryId());
-        log.debug("Found player progress for player: {}, current status: {}",
-                request.getPlayerId(), playerProgress.getProgressStatus());
+        StoryProgress storyProgress = storyProgressRepository.findByPlayerIdAndStoryId(request.getPlayerId(), request.getStoryId());
+        log.debug("Found story progress for player: {}, current status: {}",
+                request.getPlayerId(), storyProgress.getProgressStatus());
 
-        playerProgress.setStartedAt(LocalDate.now());
-        playerProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);
-        playerProgress.setCurrentChapterId(request.getChapterId());
+        storyProgress.setStartedAt(LocalDate.now());
+        storyProgress.setProgressStatus(ProgressStatus.IN_PROGRESS);
+        storyProgress.setCurrentChapterId(request.getChapterId());
 
-        playerProgress = playerProgressRepository.save(playerProgress);
-        log.debug("Updated player progress status to IN_PROGRESS");
+        storyProgress = storyProgressRepository.save(storyProgress);
+        log.debug("Updated story progress status to IN_PROGRESS");
 
         Chapter chapter = chapterRepository.findById(request.getChapterId())
                 .orElseThrow(() -> {
@@ -71,14 +71,14 @@ public class ChapterService {
         log.debug("Initializing chapter session for player: {}", request.getPlayerId());
         chapterSessionService.initializeChapterSession(request.getPlayerId(), chapter);
 
-        ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapter.getId());
+        ChapterProgress chapterProgress = chapterProgressRepository.findByStoryProgressIdAndChapterId(storyProgress.getId(), chapter.getId());
 
         if (chapterProgress == null) {
             log.debug("Creating new chapter progress for player: {} and chapter: {}",
                     request.getPlayerId(), chapter.getId());
 
             chapterProgress = ChapterProgress.builder()
-                    .playerProgress(playerProgress)
+                    .storyProgress(storyProgress)
                     .chapter(chapter)
                     .startedAt(LocalDate.now())
                     .progressStatus(ProgressStatus.IN_PROGRESS)
@@ -112,35 +112,35 @@ public class ChapterService {
         chapterProgress.setCompletedAt(LocalDate.now());
         chapterProgress.setProgressStatus(ProgressStatus.COMPLETED);
 
-        Long playerProgressId = chapterProgress.getPlayerProgress().getId();
-        log.debug("Retrieving player progress with ID: {}", playerProgressId);
+        Long storyProgressId = chapterProgress.getStoryProgress().getId();
+        log.debug("Retrieving story progress with ID: {}", storyProgressId);
 
-        PlayerProgress playerProgress = playerProgressRepository.findById(playerProgressId)
+        StoryProgress storyProgress = storyProgressRepository.findById(storyProgressId)
                 .orElseThrow(() -> {
-                    log.error("Player progress not found with ID: {}", playerProgressId);
+                    log.error("Story progress not found with ID: {}", storyProgressId);
                     return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND,
-                            "Player progress not found for " + playerProgressId);
+                            "Story progress not found for " + storyProgressId);
                 });
 
-        playerProgress.setCompletedChapters(playerProgress.getCompletedChapters() + 1);
-        log.debug("Updated completed chapters count to: {}", playerProgress.getCompletedChapters());
+        storyProgress.setCompletedChapters(storyProgress.getCompletedChapters() + 1);
+        log.debug("Updated completed chapters count to: {}", storyProgress.getCompletedChapters());
 
-        if (playerProgress.getCompletedChapters() >= playerProgress.getStory().getNumOfChapters()) {
-            log.info("Player {} has completed all chapters in story: {}", playerProgress.getPlayer().getId(), playerProgress.getStory().getTitle());
+        if (storyProgress.getCompletedChapters() >= storyProgress.getStory().getNumOfChapters()) {
+            log.info("Player {} has completed all chapters in story: {}", storyProgress.getPlayer().getId(), storyProgress.getStory().getTitle());
 
-            playerProgress.setCompletedAt(LocalDate.now());
-            playerProgress.setProgressStatus(ProgressStatus.COMPLETED);
+            storyProgress.setCompletedAt(LocalDate.now());
+            storyProgress.setProgressStatus(ProgressStatus.COMPLETED);
 
             applicationEventPublisher.publishEvent(new AchievementEvents.StoryCompletedEvent(
-                    playerProgress.getPlayer().getId(),
-                    playerProgress.getStory().getTitle()
+                    storyProgress.getPlayer().getId(),
+                    storyProgress.getStory().getTitle()
             ));
             log.debug("Published story completion event for player: {}",
-                    playerProgress.getPlayer().getId());
+                    storyProgress.getPlayer().getId());
         }
 
         chapterProgressRepository.save(chapterProgress);
-        playerProgressRepository.save(playerProgress);
-        log.info("Successfully updated chapter and player progress");
+        storyProgressRepository.save(storyProgress);
+        log.info("Successfully updated chapter and story progress");
     }
 }

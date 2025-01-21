@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChapterProgressRepository extends JpaRepository<ChapterProgress, Long> {
-    ChapterProgress findByPlayerProgressIdAndChapterId(Long playerProgressId, Long chapterId);
+    ChapterProgress findByStoryProgressIdAndChapterId(Long storyProgressId, Long chapterId);
 
     @Query("SELECT cp FROM ChapterProgress cp " +
-            "JOIN cp.playerProgress pp " +
+            "JOIN cp.storyProgress pp " +
             "WHERE pp.player.id = :playerId " +
             "AND cp.chapter.id = :chapterId")
     ChapterProgress findByPlayerIdAndChapterId(

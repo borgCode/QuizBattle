@@ -3,7 +3,7 @@ package org.borg.backend.game.singleplayer.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.borg.backend.player.model.PlayerProgress;
+import org.borg.backend.player.model.StoryProgress;
 import org.borg.backend.player.model.ProgressStatus;
 
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ public class ChapterProgress {
 
     @ManyToOne
     @JoinColumn(name = "player_progress_id")
-    private PlayerProgress playerProgress;
+    private StoryProgress storyProgress;
 
     @ManyToOne
     @JoinColumn(name = "chapter_id")

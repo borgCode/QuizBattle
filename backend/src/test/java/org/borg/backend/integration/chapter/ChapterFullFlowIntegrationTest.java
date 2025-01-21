@@ -19,9 +19,9 @@ import org.borg.backend.game.singleplayer.service.ChapterSessionService;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
 import org.borg.backend.player.listener.AchievementListener;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.PlayerProgress;
+import org.borg.backend.player.model.StoryProgress;
 import org.borg.backend.player.model.ProgressStatus;
-import org.borg.backend.player.repository.PlayerProgressRepository;
+import org.borg.backend.player.repository.StoryProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.service.StatsService;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
@@ -50,7 +50,7 @@ public class ChapterFullFlowIntegrationTest {
     @Autowired
     private ChapterRepository chapterRepository;
     @Autowired
-    private PlayerProgressRepository playerProgressRepository;
+    private StoryProgressRepository storyProgressRepository;
     @Autowired
     private PlayerRepository playerRepository;
     @Autowired
@@ -75,14 +75,14 @@ public class ChapterFullFlowIntegrationTest {
     
     Player player;
     Story story;
-    PlayerProgress playerProgress;
+    StoryProgress storyProgress;
     Chapter chapter;
 
     @BeforeAll
     void setUpOnce() {
         chapterProgressRepository.deleteAll();
         chapterRepository.deleteAll();
-        playerProgressRepository.deleteAll();
+        storyProgressRepository.deleteAll();
         playerRepository.deleteAll();
         storyRepository.deleteAll();
 
@@ -93,7 +93,7 @@ public class ChapterFullFlowIntegrationTest {
     void cleanUpAll() {
         chapterProgressRepository.deleteAll();
         chapterRepository.deleteAll();
-        playerProgressRepository.deleteAll();
+        storyProgressRepository.deleteAll();
         playerRepository.deleteAll();
         storyRepository.deleteAll();
     }
@@ -101,7 +101,7 @@ public class ChapterFullFlowIntegrationTest {
     @AfterEach
     void tearDown() {
         chapterProgressRepository.deleteAll();
-        playerProgressRepository.deleteAll();
+        storyProgressRepository.deleteAll();
         testDataLoader.cleanup();
     }
 
@@ -112,7 +112,7 @@ public class ChapterFullFlowIntegrationTest {
         story = storyRepository.findById(chapter.getStory().getId())
                 .orElseThrow();
 
-        playerProgress = playerProgressRepository.save(PlayerProgress.builder()
+        storyProgress = storyProgressRepository.save(StoryProgress.builder()
                 .player(player)
                 .story(story)
                 .completedChapters(0)
@@ -125,8 +125,8 @@ public class ChapterFullFlowIntegrationTest {
     @Test
     void fullHappyPathFlow() {
 
-        PlayerProgress savedProgress = playerProgressRepository.findByPlayerIdAndStoryId(player.getId(), story.getId());
-        ChapterProgress chapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(savedProgress.getId(), chapter.getId());
+        StoryProgress savedProgress = storyProgressRepository.findByPlayerIdAndStoryId(player.getId(), story.getId());
+        ChapterProgress chapterProgress = chapterProgressRepository.findByStoryProgressIdAndChapterId(savedProgress.getId(), chapter.getId());
 
         assertAll(
                 () -> assertEquals(LocalDate.now(), savedProgress.getStartedAt(), "Started date should be set to today"),
@@ -175,13 +175,13 @@ public class ChapterFullFlowIntegrationTest {
                 () -> assertTrue(resultsAfterLastRound.isRoundPassed(), "Round should be passed")
         );
 
-        ChapterProgress updatedChapterProgress = chapterProgressRepository.findByPlayerProgressIdAndChapterId(playerProgress.getId(), player.getId());
-        PlayerProgress playerProgress = playerProgressRepository.findById(chapterProgress.getPlayerProgress().getId())
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Player progress not found for " + chapterProgress.getPlayerProgress().getId()));
+        ChapterProgress updatedChapterProgress = chapterProgressRepository.findByStoryProgressIdAndChapterId(this.storyProgress.getId(), player.getId());
+        StoryProgress storyProgress = storyProgressRepository.findById(chapterProgress.getStoryProgress().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Story progress not found for " + chapterProgress.getStoryProgress().getId()));
 
         assertAll("Progress updates after chapter complete",
                 () -> assertEquals(ProgressStatus.COMPLETED, updatedChapterProgress.getProgressStatus(), "Chapter should be marked as complete"),
-                () -> assertEquals(1, playerProgress.getCompletedChapters(), "Player progress should have one chapter completed"));
+                () -> assertEquals(1, storyProgress.getCompletedChapters(), "Story progress should have one chapter completed"));
     }
 
     private void playTwoRounds() {

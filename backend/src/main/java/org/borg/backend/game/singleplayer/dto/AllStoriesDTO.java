@@ -3,7 +3,7 @@ package org.borg.backend.game.singleplayer.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.borg.backend.player.dto.PlayerProgressDTO;
+import org.borg.backend.player.dto.StoryProgressDTO;
 
 import java.util.List;
 
@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 public class AllStoriesDTO {
     private List<StoryDTO> stories;
-    private List<PlayerProgressDTO> playerProgressList;
+    private List<StoryProgressDTO> storyProgressDTOS;
 }

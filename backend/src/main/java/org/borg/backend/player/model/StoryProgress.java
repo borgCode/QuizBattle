@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class PlayerProgress {
+public class StoryProgress {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,7 +2,6 @@ package org.borg.backend.unit.player;
 
 import org.borg.backend.player.dto.ChangePasswordRequest;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.Stats;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.exceptions.PasswordException;

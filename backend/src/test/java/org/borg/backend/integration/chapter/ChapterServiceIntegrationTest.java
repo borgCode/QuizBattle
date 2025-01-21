@@ -13,9 +13,9 @@ import org.borg.backend.game.singleplayer.repository.ChapterRepository;
 import org.borg.backend.game.singleplayer.repository.StoryRepository;
 import org.borg.backend.game.singleplayer.service.ChapterService;
 import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.PlayerProgress;
+import org.borg.backend.player.model.StoryProgress;
 import org.borg.backend.player.model.ProgressStatus;
-import org.borg.backend.player.repository.PlayerProgressRepository;
+import org.borg.backend.player.repository.StoryProgressRepository;
 import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.seed.InitDataService;
@@ -46,7 +46,7 @@ class ChapterServiceIntegrationTest {
     @Autowired
     private ChapterRepository chapterRepository;
     @Autowired
-    private PlayerProgressRepository playerProgressRepository;
+    private StoryProgressRepository storyProgressRepository;
     @Autowired
     private ChapterProgressRepository chapterProgressRepository;
     @Autowired
@@ -71,7 +71,7 @@ class ChapterServiceIntegrationTest {
     void setUpOnce() {
         chapterProgressRepository.deleteAll();
         chapterRepository.deleteAll();
-        playerProgressRepository.deleteAll();
+        storyProgressRepository.deleteAll();
         playerRepository.deleteAll();
         storyRepository.deleteAll();
 
@@ -87,7 +87,7 @@ class ChapterServiceIntegrationTest {
     void cleanUpAll() {
         chapterProgressRepository.deleteAll();
         chapterRepository.deleteAll();
-        playerProgressRepository.deleteAll();
+        storyProgressRepository.deleteAll();
         playerRepository.deleteAll();
         storyRepository.deleteAll();
     }
@@ -95,13 +95,13 @@ class ChapterServiceIntegrationTest {
     @AfterEach
     void tearDown() {
         chapterProgressRepository.deleteAll();
-        playerProgressRepository.deleteAll();
+        storyProgressRepository.deleteAll();
         playerRepository.deleteAll();
     }
 
     @Nested
     class chapterUpdateTests {
-        PlayerProgress playerProgress;
+        StoryProgress storyProgress;
         List<Chapter> chapters;
         Player player;
         Story story;
@@ -115,7 +115,7 @@ class ChapterServiceIntegrationTest {
             story = storyRepository.findById(1L)
                     .orElseThrow();
 
-            playerProgress = createPlayerProgress(player, story);
+            storyProgress = createStoryProgress(player, story);
             
             chapters = chapterRepository.findByStoryId(story.getId());
         }
@@ -130,7 +130,7 @@ class ChapterServiceIntegrationTest {
             ));
 
             ChapterProgress firstProgress = chapterProgressRepository
-                    .findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapters.get(0).getId());
+                    .findByStoryProgressIdAndChapterId(storyProgress.getId(), chapters.get(0).getId());
             chapterService.updateChapterProgress(firstProgress.getId());
 
             chapterService.startChapter(new StartChapterRequest(
@@ -140,18 +140,18 @@ class ChapterServiceIntegrationTest {
             ));
 
             ChapterProgress secondProgress = chapterProgressRepository
-                    .findByPlayerProgressIdAndChapterId(playerProgress.getId(), chapters.get(0).getId());
+                    .findByStoryProgressIdAndChapterId(storyProgress.getId(), chapters.get(0).getId());
             chapterService.updateChapterProgress(secondProgress.getId());
 
-            PlayerProgress progressAfterDuplicate = playerProgressRepository
+            StoryProgress progressAfterDuplicate = storyProgressRepository
                     .findByPlayerIdAndStoryId(player.getId(), story.getId());
             assertEquals(1, progressAfterDuplicate.getCompletedChapters(),
                     "Completing same chapter twice should not increment counter");
         }
     }
 
-    private PlayerProgress createPlayerProgress(Player player, Story story) {
-        return playerProgressRepository.save(PlayerProgress.builder()
+    private StoryProgress createStoryProgress(Player player, Story story) {
+        return storyProgressRepository.save(StoryProgress.builder()
                 .player(player)
                 .story(story)
                 .completedChapters(0)
@@ -162,7 +162,7 @@ class ChapterServiceIntegrationTest {
     void multiplePlayersInitiateChaptersSimultaneously() {
 
         Map<Long, Long> playerStoryIds = new ConcurrentHashMap<>();
-        Map<Long, PlayerProgress> playerProgresses = new ConcurrentHashMap<>();
+        Map<Long, StoryProgress> storyProgressMap = new ConcurrentHashMap<>();
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
@@ -187,7 +187,7 @@ class ChapterServiceIntegrationTest {
 
                         Story story = storyRepository.findById(storyId)
                                 .orElseThrow();
-                        PlayerProgress playerProgress = createPlayerProgress(player, story);
+                        StoryProgress storyProgress = createStoryProgress(player, story);
 
                         List<Chapter> chapters = chapterRepository.findByStoryId(storyId);
 
@@ -197,7 +197,7 @@ class ChapterServiceIntegrationTest {
                                 chapters.get(0).getId()
                         ));
 
-                        playerProgresses.put(player.getId(), playerProgress);
+                        storyProgressMap.put(player.getId(), storyProgress);
 
                         finishLatch.countDown();
                     } catch (InterruptedException e) {
@@ -212,16 +212,16 @@ class ChapterServiceIntegrationTest {
             boolean completed = finishLatch.await(10, TimeUnit.SECONDS);
             assertTrue(completed, "Timed out waiting for all threads to complete");
 
-            assertEquals(players.size(), playerProgresses.size(),
+            assertEquals(players.size(), storyProgressMap.size(),
                     "All players should have progress entries");
 
-            playerProgresses.forEach((playerId, progress) -> {
-                Optional<PlayerProgress> storedProgress = playerProgressRepository
+            storyProgressMap.forEach((playerId, progress) -> {
+                Optional<StoryProgress> storedProgress = storyProgressRepository
                         .findById(progress.getId());
                 assertTrue(storedProgress.isPresent());
 
                 assertEquals(playerId, storedProgress.get().getPlayer().getId(),
-                        "Player Id doesn't match player ID linked to PlayerProgress");
+                        "Player Id doesn't match player ID linked to StoryProgress");
 
                 Long playerSelectedStoryId = playerStoryIds.get(playerId);
                 assertEquals(playerSelectedStoryId, storedProgress.get().getStory().getId(),

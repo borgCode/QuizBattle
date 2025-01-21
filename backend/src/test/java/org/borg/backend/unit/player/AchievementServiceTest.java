@@ -1,4 +1,4 @@
-package org.borg.backend.unit.achievement;
+package org.borg.backend.unit.player;
 
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.dto.AchievementNotification;
