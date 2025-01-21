@@ -28,6 +28,10 @@ public class UserUnlockedAchievement {
     @ManyToOne
     @JoinColumn (name = "achievement_level_id")
     private AchievementLevel currentLevel;
+
+    private int nextLevelRequirement;
+    private boolean isMaxLevel;
+    private double progressToNextLevel;
     
     
     private Instant achievedAt; 

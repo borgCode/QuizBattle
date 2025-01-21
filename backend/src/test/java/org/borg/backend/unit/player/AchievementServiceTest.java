@@ -57,7 +57,7 @@ class AchievementServiceTest {
         }
 
         @Test
-        void handleStoryAchievementNotUnlocked() {
+        void handleStoryAchievement_WhenEligible() {
             try (MockedStatic<ImageUtil> imageUtilMock = mockStatic(ImageUtil.class)) {
 
                 AchievementLevel level1 = AchievementLevel.builder()
@@ -81,15 +81,9 @@ class AchievementServiceTest {
 
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
-
-                ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
-                verify(userUnlockedAchievementRepository).save(captor.capture());
-
-                UserUnlockedAchievement savedAchievement = captor.getValue();
-                assertEquals(player, savedAchievement.getPlayer());
-                assertEquals(achievement, savedAchievement.getAchievement());
-                assertEquals(level1, savedAchievement.getCurrentLevel());
-
+                
+                verifyAchievementSaved(player, achievement, level1);
+                
                 verify(simpMessagingTemplate).convertAndSendToUser(
                         eq("testuser123"),
                         eq("/queue/achievements"),
@@ -99,7 +93,6 @@ class AchievementServiceTest {
 
         @Test
         void handleStoryAchievementAlreadyUnlocked() {
-
             Achievement achievement = Achievement.builder()
                     .name(STORY_NAME)
                     .build();
@@ -113,6 +106,17 @@ class AchievementServiceTest {
 
             verifyNoNotificationsSent();
         }
+    }
+    
+
+    private void verifyAchievementSaved(Player expectedPlayer, Achievement expectedAchievement, AchievementLevel expectedLevel) {
+        ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
+        verify(userUnlockedAchievementRepository).save(captor.capture());
+        UserUnlockedAchievement saved = captor.getValue();
+
+        assertEquals(expectedPlayer, saved.getPlayer());
+        assertEquals(expectedAchievement, saved.getAchievement());
+        assertEquals(expectedLevel, saved.getCurrentLevel());
     }
 
     @Nested
@@ -161,14 +165,7 @@ class AchievementServiceTest {
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
 
-                ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
-
-                verify(userUnlockedAchievementRepository).save(captor.capture());
-                UserUnlockedAchievement newUnlockedAchievement = captor.getValue();
-
-                assertEquals(player, newUnlockedAchievement.getPlayer());
-                assertEquals(levelOne, newUnlockedAchievement.getCurrentLevel());
-                assertEquals(achievement, newUnlockedAchievement.getAchievement());
+                verifyAchievementSaved(player, achievement, levelOne);
 
                 verifyAchievementNotification("testuser123");
             }
@@ -209,15 +206,8 @@ class AchievementServiceTest {
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
 
-                ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
-
-                verify(userUnlockedAchievementRepository).save(captor.capture());
-                UserUnlockedAchievement newUnlockedAchievement = captor.getValue();
-
-                assertEquals(player, newUnlockedAchievement.getPlayer());
-                assertEquals(level2, newUnlockedAchievement.getCurrentLevel());
-                assertEquals(achievement, newUnlockedAchievement.getAchievement());
-
+                verifyAchievementSaved(player, achievement, level2);
+              
                 verifyAchievementNotification("testuser123");
             }
         }
@@ -328,14 +318,7 @@ class AchievementServiceTest {
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
 
-                ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
-
-                verify(userUnlockedAchievementRepository).save(captor.capture());
-                UserUnlockedAchievement newUnlockedAchievement = captor.getValue();
-
-                assertEquals(player, newUnlockedAchievement.getPlayer());
-                assertEquals(levelOne, newUnlockedAchievement.getCurrentLevel());
-                assertEquals(achievement, newUnlockedAchievement.getAchievement());
+                verifyAchievementSaved(player, achievement, levelOne);
 
                 verifyAchievementNotification("testuser123");
             }
@@ -373,14 +356,7 @@ class AchievementServiceTest {
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
 
-                ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
-
-                verify(userUnlockedAchievementRepository).save(captor.capture());
-                UserUnlockedAchievement newUnlockedAchievement = captor.getValue();
-
-                assertEquals(player, newUnlockedAchievement.getPlayer());
-                assertEquals(level2, newUnlockedAchievement.getCurrentLevel());
-                assertEquals(achievement, newUnlockedAchievement.getAchievement());
+                verifyAchievementSaved(player, achievement, level2);
 
                 verifyAchievementNotification("testuser123");
             }
@@ -440,6 +416,14 @@ class AchievementServiceTest {
             achievementService.handleVictoryAchievement(PLAYER_ID);
 
             verifyNoNotificationsSent();
+        }
+    }
+    
+    @Nested
+    class CurrentProgressTests {
+        @Test
+        void shouldUpdateCategoryProgressTowardsFirstLevel_WhenFirstLevelNotAchieved() {
+            
         }
     }
 

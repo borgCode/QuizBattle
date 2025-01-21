@@ -13,5 +13,6 @@ public class UserUnlockedAchievementDTO {
     private String description;
     private String imageUrl;
     private int nextLevelRequirement;
-    private boolean isMaxLevel;
+    private boolean maxLevel;
+    private double progressToNextLevel;
 }
