@@ -46,7 +46,7 @@ public class AchievementService {
                 .collect(Collectors.toList());
 
         List<AchievementLevelHistory> levelHistory = historyRepository.findByPlayerId(playerId);
-        
+
         return achievementMapper.multipleToDto(achievements, achievementProgress, levelHistory);
     }
 
@@ -61,6 +61,14 @@ public class AchievementService {
             return;
         }
 
+        achievementProgressRepository.save(
+                AchievementProgress.builder()
+                        .achievement(achievement)
+                        .player(player)
+                        .currentLevel(achievement.getLevels().get(0))
+                        .currentProgress(1)
+                        .nextLevelRequirement(1).build());
+                
         AchievementLevelHistory achievementLevelHistory = historyRepository.save(AchievementLevelHistory.builder()
                 .player(player)
                 .achievement(achievement)

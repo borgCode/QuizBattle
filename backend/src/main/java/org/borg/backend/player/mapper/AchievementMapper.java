@@ -78,18 +78,24 @@ public interface AchievementMapper {
         if (achievements == null || progress == null) {
             return Collections.emptyList();
         }
+        
+        Map<Long, List<AchievementLevelHistory>> historyMap;
+        if (levelHistory == null) {
+            historyMap = new HashMap<>();
+        } else {
+           historyMap =  levelHistory.stream()
+                    .collect(Collectors.groupingBy(h -> h.getAchievement().getId()));
+        }
+        
+        List<AchievementDTO> result = new ArrayList<>(achievements.size());
+        for (int i = 0; i < achievements.size(); i++) {
+            Achievement achievement = achievements.get(i);
+            AchievementProgress achievementProgress = progress.get(i);
+            List<AchievementLevelHistory> history = historyMap.getOrDefault(achievement.getId(), Collections.emptyList());
+            AchievementDTO dto = toDto(achievement, achievementProgress, history);
+            result.add(dto);
+        }
 
-        Map<Long, List<AchievementLevelHistory>> historyMap = levelHistory == null
-                ? new HashMap<>()
-                : levelHistory.stream()
-                .collect(Collectors.groupingBy(h -> h.getAchievement().getId()));
-
-        return IntStream.range(0, achievements.size())
-                .mapToObj(i -> toDto(
-                        achievements.get(i),
-                        progress.get(i),
-                        historyMap.getOrDefault(achievements.get(i).getId(), Collections.emptyList())
-                ))
-                .collect(Collectors.toList());
+        return result;
     }
 }
