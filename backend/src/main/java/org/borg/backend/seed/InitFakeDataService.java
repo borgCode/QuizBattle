@@ -43,7 +43,7 @@ public class InitFakeDataService {
     public enum Outcome {
         PLAYER1_WINS,
         PLAYER2_WINS,
-        TIE;
+        TIE
     }
 
     private Player generateRandomPlayer(Role role, Set<String> existingUsernames) {
@@ -276,11 +276,7 @@ public class InitFakeDataService {
 
         int count = 0;
         for (PlayerQuestionResult result : resultsList) {
-            if (count < correctAnswers) {
-                result.setCorrect(true);
-            } else {
-                result.setCorrect(false);
-            }
+            result.setCorrect(count < correctAnswers);
             count++;
         }
     }

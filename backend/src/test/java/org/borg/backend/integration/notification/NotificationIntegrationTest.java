@@ -33,8 +33,6 @@ public class NotificationIntegrationTest {
     private NotificationRepository notificationRepository;
     @Autowired
     private NotificationService notificationService;
-    Player sendingPlayer;
-    Long playerWithNotificationsId = 1L;
     @Autowired
     private NotificationCleanUpService notificationCleanUpService;
     @Autowired
@@ -45,6 +43,9 @@ public class NotificationIntegrationTest {
     private RoleRepository roleRepository;
     @Autowired
     private PlayerBlockRepository playerBlockRepository;
+    
+    Player sendingPlayer;
+    private final Long playerWithNotificationsId = 1L;
 
     @BeforeEach
     void setUp() {

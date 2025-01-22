@@ -2,7 +2,7 @@ package org.borg.backend.unit.game.singleplayer;
 
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.model.Chapter;
-import org.borg.backend.game.singleplayer.service.ChapterSession;
+import org.borg.backend.game.singleplayer.model.ChapterSession;
 import org.borg.backend.game.singleplayer.service.ChapterSessionService;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

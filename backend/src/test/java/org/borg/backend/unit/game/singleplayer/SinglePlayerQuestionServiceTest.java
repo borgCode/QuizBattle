@@ -9,7 +9,7 @@ import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
 import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.game.singleplayer.service.ChapterService;
-import org.borg.backend.game.singleplayer.service.ChapterSession;
+import org.borg.backend.game.singleplayer.model.ChapterSession;
 import org.borg.backend.game.singleplayer.service.ChapterSessionService;
 import org.borg.backend.game.singleplayer.service.SinglePlayerQuestionService;
 import org.borg.backend.player.service.StatsService;
@@ -135,10 +135,8 @@ public class SinglePlayerQuestionServiceTest {
 
         @Test
         void validateSingleplayerAnswer_whenRequestIsNull_shouldThrowGameException() {
-            SinglePlayerAnswerValidationRequest request = null;
-
             GameException exception = assertThrows(GameException.class,
-                    () -> singlePlayerQuestionService.validateSingleplayerAnswer(request));
+                    () -> singlePlayerQuestionService.validateSingleplayerAnswer(null));
 
             assertEquals(BusinessErrorCodes.NULL_REQUEST, exception.getErrorCode());
             assertEquals("Request cannot be null", exception.getMessage());

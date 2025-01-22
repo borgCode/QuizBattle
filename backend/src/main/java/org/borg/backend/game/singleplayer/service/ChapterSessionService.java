@@ -3,6 +3,7 @@ package org.borg.backend.game.singleplayer.service;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.game.singleplayer.model.Chapter;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
+import org.borg.backend.game.singleplayer.model.ChapterSession;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;

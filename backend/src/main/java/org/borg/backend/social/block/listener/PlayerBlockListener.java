@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.borg.backend.social.block.event.PlayerBlockEvent.*;
+import static org.borg.backend.social.block.event.PlayerBlockEvent.PlayedUnblockedEvent;
 import static org.borg.backend.social.block.event.PlayerBlockEvent.PlayerBlockedEvent;
 
 @Slf4j

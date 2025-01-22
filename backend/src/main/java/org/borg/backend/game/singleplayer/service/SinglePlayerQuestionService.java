@@ -13,6 +13,7 @@ import org.borg.backend.game.shared.service.RoundSessionService;
 import org.borg.backend.game.singleplayer.dto.ChapterRoundResults;
 import org.borg.backend.game.singleplayer.dto.SinglePlayerAnswerValidationRequest;
 import org.borg.backend.game.singleplayer.model.ChapterProgress;
+import org.borg.backend.game.singleplayer.model.ChapterSession;
 import org.borg.backend.game.singleplayer.repository.ChapterProgressRepository;
 import org.borg.backend.player.events.AchievementEvents;
 import org.borg.backend.player.service.StatsService;

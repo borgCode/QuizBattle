@@ -1,4 +1,4 @@
-package org.borg.backend.game.singleplayer.service;
+package org.borg.backend.game.singleplayer.model;
 
 import lombok.Data;
 

@@ -1,16 +1,21 @@
 package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.borg.backend.auth.model.Role;
 import org.borg.backend.game.multiplayer.model.SessionPlayer;
 import org.borg.backend.social.friendship.model.Friendship;
-import org.borg.backend.game.multiplayer.model.MultiplayerSession;
-import org.borg.backend.auth.model.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Builder
