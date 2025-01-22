@@ -9,6 +9,7 @@ import org.borg.backend.player.model.Achievement;
 import org.borg.backend.player.model.AchievementLevel;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.player.model.UserUnlockedAchievement;
+import org.borg.backend.player.repository.AchievementProgressRepository;
 import org.borg.backend.player.repository.AchievementRepository;
 import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
 import org.borg.backend.shared.util.ImageUtil;
@@ -30,6 +31,7 @@ public class AchievementService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final PlayerService playerService;
     private final AchievementMapper achievementMapper;
+    private final AchievementProgressRepository achievementProgressRepository;
 
     public List<UserUnlockedAchievementDTO> getUnlockedAchievements(long playerId) {
         return achievementMapper.multipleToUnlockedAchievementDTO(userUnlockedAchievementRepository.findAllByPlayerId(playerId));
@@ -40,11 +42,17 @@ public class AchievementService {
 
         Achievement achievement = achievementRepository.findByName(storyName);
         Player player = playerService.getPlayerById(playerId);
+        
+        if (!achievementProgressRepository.existsByPlayerAndAchievement(player, achievement)) {
+            log.warn("Progress does not exist, creating ");
+        }
 
         if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
             log.debug("Player {} already has story achievement for {}", playerId, storyName);
             return;
         }
+        
+        
 
         UserUnlockedAchievement unlockedAchievement = UserUnlockedAchievement.builder()
                 .player(player)

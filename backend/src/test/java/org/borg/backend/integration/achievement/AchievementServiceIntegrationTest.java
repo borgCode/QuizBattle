@@ -89,7 +89,7 @@ public class AchievementServiceIntegrationTest {
         }
 
         @Test
-        void testStoryProgressThroughAllLevels() {
+        void testCategoryAchievementProgressThroughAllLevels() {
             createAchievements();
 
             CategoryStats categoryStats = CategoryStats.builder()
