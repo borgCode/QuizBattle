@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,40 +33,21 @@ public class AchievementService {
     private final AchievementProgressRepository achievementProgressRepository;
 
     public List<AchievementDTO> getUnlockedAchievements(long playerId) {
-        log.info("Fetching unlocked achievements for playerId: {}", playerId);
-
+        log.debug("Fetching unlocked achievements for playerId: {}", playerId);
+        
         List<AchievementProgress> achievementProgress = achievementProgressRepository.findByPlayerId(playerId);
-        List<AchievementLevelHistory> levelHistory = historyRepository.findByPlayerId(playerId);
-
         if (achievementProgress.isEmpty()) {
-            log.info("No achievements found for playerId: {}", playerId);
-            return new ArrayList<>();
+            log.debug("No achievement progress found for playerId: {}", playerId);
+            return Collections.emptyList();
         }
         
-        
-
         List<Achievement> achievements = achievementProgress.stream()
                 .map(AchievementProgress::getAchievement)
                 .collect(Collectors.toList());
 
-        achievements.forEach(a -> log.debug("Achievement {} has levels: {}",
-                a.getId(),
-                a.getLevels().stream().map(AchievementLevel::getName).collect(Collectors.joining(", "))
-        ));
-
-        List<AchievementDTO> results = achievementMapper.multipleToDto(
-                achievements,
-                achievementProgress,
-                levelHistory
-        );
+        List<AchievementLevelHistory> levelHistory = historyRepository.findByPlayerId(playerId);
         
-        results.forEach(dto -> {
-            log.debug("Achievement {} has {} unlocked levels",
-                    dto.getName(),
-                    dto.getUnlockedLevels() != null ? dto.getUnlockedLevels().size() : 0);
-        });
-
-        return results;
+        return achievementMapper.multipleToDto(achievements, achievementProgress, levelHistory);
     }
 
     public void handleStoryAchievement(Long playerId, String storyName) {
