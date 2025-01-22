@@ -87,7 +87,7 @@ class AchievementServiceTest {
                 when(historyRepository.save(any())).thenAnswer( invocationOnMock -> 
                         AchievementLevelHistory.builder()
                                 .achievement(achievement)
-                                .achievedLevel(achievement.getLevels().get(0))
+                                .achievementLevel(achievement.getLevels().get(0))
                                 .build());
 
                 achievementService.handleStoryAchievement(PLAYER_ID, STORY_NAME);
@@ -104,7 +104,7 @@ class AchievementServiceTest {
 
                 assertEquals(player, saved.getPlayer());
                 assertEquals(achievement, saved.getAchievement());
-                assertEquals(level1, saved.getAchievedLevel());
+                assertEquals(level1, saved.getAchievementLevel());
 
                 verify(simpMessagingTemplate).convertAndSendToUser(
                         eq("testuser123"),
@@ -189,7 +189,7 @@ class AchievementServiceTest {
                         return AchievementLevelHistory.builder()
                                 .player(history.getPlayer())
                                 .achievement(history.getAchievement())
-                                .achievedLevel(history.getAchievedLevel())
+                                .achievementLevel(history.getAchievementLevel())
                                 .achievedAt(history.getAchievedAt())
                                 .build();
                     });
@@ -212,7 +212,7 @@ class AchievementServiceTest {
             AchievementLevelHistory savedHistory = historyCaptor.getValue();
             assertEquals(player, savedHistory.getPlayer());
             assertEquals(achievement, savedHistory.getAchievement());
-            assertEquals(levelOne, savedHistory.getAchievedLevel());
+            assertEquals(levelOne, savedHistory.getAchievementLevel());
 
             verifyAchievementNotification("testuser123");
         }
@@ -256,7 +256,7 @@ class AchievementServiceTest {
                         return AchievementLevelHistory.builder()
                                 .player(history.getPlayer())
                                 .achievement(history.getAchievement())
-                                .achievedLevel(history.getAchievedLevel())
+                                .achievementLevel(history.getAchievementLevel())
                                 .achievedAt(history.getAchievedAt())
                                 .build();
                     });

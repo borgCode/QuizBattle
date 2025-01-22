@@ -2,6 +2,8 @@ package org.borg.backend.player.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,14 +19,17 @@ public class AchievementProgress {
 
     @ManyToOne
     @JoinColumn(name = "player_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Player player;
 
     @ManyToOne
     @JoinColumn (name = "achievement_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Achievement achievement;
 
     @ManyToOne
     @JoinColumn (name = "achievement_level_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private AchievementLevel currentLevel;
     
     private int currentProgress;

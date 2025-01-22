@@ -50,7 +50,7 @@ public class AchievementService {
         AchievementLevelHistory achievementLevelHistory = historyRepository.save(AchievementLevelHistory.builder()
                 .player(player)
                 .achievement(achievement)
-                .achievedLevel(achievement.getLevels().get(0))
+                .achievementLevel(achievement.getLevels().get(0))
                 .achievedAt(Instant.now())
                 .build());
         
@@ -133,7 +133,7 @@ public class AchievementService {
         AchievementLevelHistory completedAchievement = historyRepository.save(AchievementLevelHistory.builder()
                 .player(progress.getPlayer())
                 .achievement(progress.getAchievement())
-                .achievedLevel(progress.getCurrentLevel())
+                .achievementLevel(progress.getCurrentLevel())
                 .achievedAt(Instant.now())
                 .build());
         
@@ -238,8 +238,8 @@ public class AchievementService {
 
         AchievementNotification achievementNotification = AchievementNotification.builder()
                 .achievementName(achievementLevelHistory.getAchievement().getName())
-                .achievementDescription(achievementLevelHistory.getAchievedLevel().getDescription())
-                .base64Image(ImageUtil.encodeAchievementImageToBase64(achievementLevelHistory.getAchievedLevel().getImageUrl()))
+                .achievementDescription(achievementLevelHistory.getAchievementLevel().getDescription())
+                .base64Image(ImageUtil.encodeAchievementImageToBase64(achievementLevelHistory.getAchievementLevel().getImageUrl()))
                 .earnedAt(achievementLevelHistory.getAchievedAt())
                 .build();
         

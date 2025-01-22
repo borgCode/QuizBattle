@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface AchievementLevelHistoryRepository extends JpaRepository<AchievementLevelHistory, Long> {
     boolean existsByPlayerAndAchievement(Player player, Achievement achievement);
 
-    boolean existsByPlayerAndAchievementLevel(Player player, AchievementLevel attr0);
+    boolean existsByPlayerAndAchievementLevel(Player player, AchievementLevel achievementLevel);
 }
