@@ -1,7 +1,9 @@
 package org.borg.backend.unit.player;
 
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.player.dto.AchievementDTO;
 import org.borg.backend.player.dto.AchievementNotification;
+import org.borg.backend.player.mapper.AchievementMapper;
 import org.borg.backend.player.model.*;
 import org.borg.backend.player.repository.AchievementLevelHistoryRepository;
 import org.borg.backend.player.repository.AchievementProgressRepository;
@@ -15,9 +17,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -36,18 +41,84 @@ class AchievementServiceTest {
     private AchievementLevelHistoryRepository historyRepository;
     @Mock
     private AchievementProgressRepository progressRepository;
+    @Mock
+    private AchievementMapper achievementMapper;
 
     @InjectMocks
     private AchievementService achievementService;
+    private final Long PLAYER_ID = 1L;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+    
+    @Nested
+    class GetPlayerAchievementTests {
+        @Test
+        void getUnlockedAchievements_WhenNoProgress_ReturnsEmptyList() {
+            when(progressRepository.findByPlayerId(PLAYER_ID))
+                    .thenReturn(Collections.emptyList());
+            
+            List<AchievementDTO> result = achievementService.getUnlockedAchievements(PLAYER_ID);
+            
+            assertThat(result).isEmpty();
+            verify(progressRepository).findByPlayerId(PLAYER_ID);
+            verifyNoInteractions(historyRepository, achievementMapper);
+        }
+
+        @Test
+        void getUnlockedAchievements_WithProgress_ReturnsAchievements() {
+            Achievement achievement1 = new Achievement();
+            Achievement achievement2 = new Achievement();
+
+            AchievementProgress progress1 = new AchievementProgress();
+            progress1.setAchievement(achievement1);
+            AchievementProgress progress2 = new AchievementProgress();
+            progress2.setAchievement(achievement2);
+
+            List<AchievementProgress> progressList = Arrays.asList(progress1, progress2);
+            List<Achievement> achievements = Arrays.asList(achievement1, achievement2);
+            List<AchievementLevelHistory> history = List.of(new AchievementLevelHistory());
+            List<AchievementDTO> expectedDtos = Arrays.asList(AchievementDTO.builder().build(), AchievementDTO.builder().build());
+
+            when(progressRepository.findByPlayerId(PLAYER_ID)).thenReturn(progressList);
+            when(historyRepository.findByPlayerId(PLAYER_ID)).thenReturn(history);
+            when(achievementMapper.multipleToDto(achievements, progressList, history))
+                    .thenReturn(expectedDtos);
+            
+            List<AchievementDTO> result = achievementService.getUnlockedAchievements(PLAYER_ID);
+            
+            assertThat(result).isEqualTo(expectedDtos);
+            verify(progressRepository).findByPlayerId(PLAYER_ID);
+            verify(historyRepository).findByPlayerId(PLAYER_ID);
+            verify(achievementMapper).multipleToDto(achievements, progressList, history);
+        }
+
+        @Test
+        void getUnlockedAchievements_WithProgressButNoHistory_HandlesNullHistory() {
+            Achievement achievement = new Achievement();
+            AchievementProgress progress = new AchievementProgress();
+            progress.setAchievement(achievement);
+            List<AchievementProgress> progressList = Collections.singletonList(progress);
+            List<Achievement> achievements = Collections.singletonList(achievement);
+
+            when(progressRepository.findByPlayerId(PLAYER_ID)).thenReturn(progressList);
+            when(historyRepository.findByPlayerId(PLAYER_ID)).thenReturn(null);
+            when(achievementMapper.multipleToDto(achievements, progressList, null))
+                    .thenReturn(Collections.singletonList(AchievementDTO.builder().build()));
+
+            List<AchievementDTO> result = achievementService.getUnlockedAchievements(PLAYER_ID);
+            
+            assertThat(result).hasSize(1);
+            verify(progressRepository).findByPlayerId(PLAYER_ID);
+            verify(historyRepository).findByPlayerId(PLAYER_ID);
+            verify(achievementMapper).multipleToDto(achievements, progressList, null);
+        }
+    }
 
     @Nested
     class StoryAchievementTests {
-        private final Long PLAYER_ID = 1L;
         private final String STORY_NAME = "Tutorial";
         private Player player;
 
@@ -276,9 +347,7 @@ class AchievementServiceTest {
 
     @Nested
     class VictoryTests {
-
-        private final Long PLAYER_ID = 1L;
-
+        
         private final String CATEGORY = "Victories";
 
         AchievementLevel levelOne;

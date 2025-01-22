@@ -29,7 +29,6 @@ public interface AchievementMapper {
     @Mapping(target = "name", source = "achievementLevel.name")
     @Mapping(target = "description", source = "achievementLevel.description")
     @Mapping(target = "imageUrl", expression = "java(ImageUtil.encodeAchievementImageToBase64(levelHistory.getAchievementLevel().getImageUrl()))")
-    @Mapping(target = "achievedAt", source = "achievedAt")
     AchievementLevelDTO toLevelDto(AchievementLevelHistory levelHistory);
 
     @Mapping(target = "imageUrl", expression = "java(ImageUtil.encodeAchievementImageToBase64(level.getImageUrl()))")
