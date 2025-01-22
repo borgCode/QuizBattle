@@ -117,7 +117,7 @@ public class AchievementService {
         boolean isEligibleForNextAchievement = progress.getCurrentProgress() >= progress.getNextLevelRequirement();
         
         if (isEligibleForNextAchievement) {
-            handleAchievementCompletion(progress);
+            handleAchievementCompletion(player, progress);
         } else {
             log.debug("Player {} not eligible for next achievement level", playerId);
         }
@@ -125,9 +125,9 @@ public class AchievementService {
         achievementProgressRepository.save(progress);
     }
 
-    private void handleAchievementCompletion(AchievementProgress progress) {
+    private void handleAchievementCompletion(Player player, AchievementProgress progress) {
         AchievementLevelHistory completedAchievement = historyRepository.save(AchievementLevelHistory.builder()
-                .player(progress.getPlayer())
+                .player(player)
                 .achievement(progress.getAchievement())
                 .achievementLevel(progress.getCurrentLevel())
                 .achievedAt(Instant.now())
@@ -138,10 +138,10 @@ public class AchievementService {
             progress.setCurrentLevel(nextLevel);
             progress.setNextLevelRequirement(nextLevel.getRequirementValue());
         } else {
-            log.debug("Player {} reached max level for achievement {}", progress.getPlayer().getId(), progress.getAchievement().getName());
+            log.debug("Player {} reached max level for achievement {}", player.getId(), progress.getAchievement().getName());
         }
         
-        sendAchievementNotification(progress.getPlayer(), completedAchievement);
+        sendAchievementNotification(player, completedAchievement);
     }
 
     @Transactional
@@ -180,7 +180,7 @@ public class AchievementService {
         boolean isEligibleForNextAchievement = progress.getCurrentProgress() >= progress.getNextLevelRequirement();
 
         if (isEligibleForNextAchievement) {
-            handleAchievementCompletion(progress);
+            handleAchievementCompletion(player, progress);
         } else {
             log.debug("Player {} not eligible for next achievement level", playerId);
         }
@@ -199,7 +199,6 @@ public class AchievementService {
                 .earnedAt(achievementLevelHistory.getAchievedAt())
                 .build();
         
-
         simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
         log.debug("Achievement notification sent successfully");
     }

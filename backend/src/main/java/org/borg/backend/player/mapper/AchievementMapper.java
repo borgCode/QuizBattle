@@ -14,7 +14,6 @@ import org.mapstruct.Named;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Mapper(componentModel = "spring", imports = ImageUtil.class)
 public interface AchievementMapper {

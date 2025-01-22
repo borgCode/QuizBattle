@@ -17,7 +17,7 @@ public class AchievementProgress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Player player;
