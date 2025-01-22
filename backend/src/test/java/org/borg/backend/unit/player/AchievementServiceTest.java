@@ -3,6 +3,7 @@ package org.borg.backend.unit.player;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.dto.AchievementNotification;
 import org.borg.backend.player.model.*;
+import org.borg.backend.player.repository.AchievementLevelHistoryRepository;
 import org.borg.backend.player.repository.AchievementProgressRepository;
 import org.borg.backend.player.repository.AchievementRepository;
 import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
@@ -35,7 +36,7 @@ class AchievementServiceTest {
     @Mock
     private SimpMessagingTemplate simpMessagingTemplate;
     @Mock
-    AchievementProgressRepository achievementProgressRepository;
+    private AchievementLevelHistoryRepository historyRepository;
 
     @InjectMocks
     private AchievementService achievementService;
@@ -79,7 +80,7 @@ class AchievementServiceTest {
                 when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
                 when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                         .thenReturn(false);
-                when(achievementProgressRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(false);
+                when(historyRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(false);
 
                 achievementService.handleStoryAchievement(PLAYER_ID, STORY_NAME);
 
@@ -98,6 +99,7 @@ class AchievementServiceTest {
         @Test
         void handleStoryAchievementAlreadyUnlocked() {
             Achievement achievement = Achievement.builder()
+                    .levels(List.of(AchievementLevel.builder().build()))
                     .name(STORY_NAME)
                     .build();
 
@@ -105,7 +107,7 @@ class AchievementServiceTest {
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
             when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                     .thenReturn(true);
-            when(achievementProgressRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(false);
+            when(historyRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(false);
             
             achievementService.handleStoryAchievement(PLAYER_ID, STORY_NAME);
 

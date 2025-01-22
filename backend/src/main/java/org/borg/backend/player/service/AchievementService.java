@@ -5,10 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.dto.AchievementNotification;
 import org.borg.backend.player.dto.UserUnlockedAchievementDTO;
 import org.borg.backend.player.mapper.AchievementMapper;
-import org.borg.backend.player.model.Achievement;
-import org.borg.backend.player.model.AchievementLevel;
-import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.UserUnlockedAchievement;
+import org.borg.backend.player.model.*;
+import org.borg.backend.player.repository.AchievementLevelHistoryRepository;
 import org.borg.backend.player.repository.AchievementProgressRepository;
 import org.borg.backend.player.repository.AchievementRepository;
 import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
@@ -31,7 +29,7 @@ public class AchievementService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final PlayerService playerService;
     private final AchievementMapper achievementMapper;
-    private final AchievementProgressRepository achievementProgressRepository;
+    private final AchievementLevelHistoryRepository historyRepository;
 
     public List<UserUnlockedAchievementDTO> getUnlockedAchievements(long playerId) {
         return achievementMapper.multipleToUnlockedAchievementDTO(userUnlockedAchievementRepository.findAllByPlayerId(playerId));
@@ -42,17 +40,20 @@ public class AchievementService {
 
         Achievement achievement = achievementRepository.findByName(storyName);
         Player player = playerService.getPlayerById(playerId);
-        
-        if (!achievementProgressRepository.existsByPlayerAndAchievement(player, achievement)) {
-            log.warn("Progress does not exist, creating ");
+
+        if (!historyRepository.existsByPlayerAndAchievement(player, achievement)) {
+            historyRepository.save(AchievementLevelHistory.builder()
+                    .player(player)
+                    .achievement(achievement)
+                    .currentLevel(achievement.getLevels().get(0))
+                    .achievedAt(Instant.now())
+                    .build());
         }
 
         if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
             log.debug("Player {} already has story achievement for {}", playerId, storyName);
             return;
         }
-        
-        
 
         UserUnlockedAchievement unlockedAchievement = UserUnlockedAchievement.builder()
                 .player(player)
@@ -92,7 +93,7 @@ public class AchievementService {
     @Transactional
     public void handleVictoryAchievement(Long playerId) {
         log.debug("Processing victory achievement for player ID: {}", playerId);
-        
+
         Achievement achievement = achievementRepository.findByName("Victories");
         Player player = playerService.getPlayerById(playerId);
 
@@ -161,7 +162,7 @@ public class AchievementService {
     private void sendAchievementNotification(Player player, UserUnlockedAchievement unlockedAchievement) {
         log.debug("Sending achievement notification to player {} for achievement {}",
                 player.getUsername(), unlockedAchievement.getAchievement().getName());
-        
+
         AchievementNotification achievementNotification = AchievementNotification.builder()
                 .achievementName(unlockedAchievement.getAchievement().getName())
                 .achievementDescription(unlockedAchievement.getCurrentLevel().getDescription())
