@@ -107,13 +107,13 @@ public class AchievementService {
 //            log.debug("Progress created for achievement: {} for player: {}", progress.getAchievement().getName(), player.getId());
         }
         
-        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository
-                .findByPlayerAndAchievement(player, achievement);
+//        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository
+//                .findByPlayerAndAchievement(player, achievement);
 
-        if (unlockedAchievement != null) {
-            log.debug("Current achievement level for player {} in category {}: {}",
-                    playerId, category, unlockedAchievement.getCurrentLevel().getLevel());
-        }
+//        if (unlockedAchievement != null) {
+//            log.debug("Current achievement level for player {} in category {}: {}",
+//                    playerId, category, unlockedAchievement.getCurrentLevel().getLevel());
+//        }
         
         boolean isEligibleForNextAchievement = progress.getCurrentProgress() >= progress.getNextLevelRequirement();
         
@@ -124,9 +124,9 @@ public class AchievementService {
         }
         
         achievementProgressRepository.save(progress);
-        
-        AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
-        handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
+//        
+//        AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
+//        handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
     }
 
     private void handleAchievementCompletion(AchievementProgress progress) {
