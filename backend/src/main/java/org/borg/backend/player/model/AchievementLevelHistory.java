@@ -25,7 +25,7 @@ public class AchievementLevelHistory {
 
     @ManyToOne
     @JoinColumn (name = "achievement_level_id")
-    private AchievementLevel currentLevel;
+    private AchievementLevel achievedLevel;
     
     private Instant achievedAt;
 }

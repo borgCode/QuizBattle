@@ -24,5 +24,14 @@ public class Achievement {
     
     @OneToMany(mappedBy = "achievement", cascade = CascadeType.ALL)
     private List<AchievementLevel> levels = new ArrayList<>();
-    
+
+    public AchievementLevel getLastLevel() {
+        return getLevels().get(getLevels().size() - 1);
+    }
+
+    public AchievementLevel getNextLevel(AchievementLevel currentLevel) {
+        List<AchievementLevel> levels = getLevels();
+        int currentIndex = levels.indexOf(currentLevel);
+        return currentIndex < levels.size() - 1 ? levels.get(currentIndex + 1) : null;
+    }
 }

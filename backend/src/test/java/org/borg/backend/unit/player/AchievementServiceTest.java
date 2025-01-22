@@ -87,7 +87,7 @@ class AchievementServiceTest {
                 when(historyRepository.save(any())).thenAnswer( invocationOnMock -> 
                         AchievementLevelHistory.builder()
                                 .achievement(achievement)
-                                .currentLevel(achievement.getLevels().get(0))
+                                .achievedLevel(achievement.getLevels().get(0))
                                 .build());
 
                 achievementService.handleStoryAchievement(PLAYER_ID, STORY_NAME);
@@ -104,7 +104,7 @@ class AchievementServiceTest {
 
                 assertEquals(player, saved.getPlayer());
                 assertEquals(achievement, saved.getAchievement());
-                assertEquals(level1, saved.getCurrentLevel());
+                assertEquals(level1, saved.getAchievedLevel());
 
                 verify(simpMessagingTemplate).convertAndSendToUser(
                         eq("testuser123"),

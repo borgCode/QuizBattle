@@ -50,7 +50,7 @@ public class AchievementService {
         AchievementLevelHistory achievementLevelHistory = historyRepository.save(AchievementLevelHistory.builder()
                 .player(player)
                 .achievement(achievement)
-                .currentLevel(achievement.getLevels().get(0))
+                .achievedLevel(achievement.getLevels().get(0))
                 .achievedAt(Instant.now())
                 .build());
         
@@ -79,6 +79,11 @@ public class AchievementService {
 
         Achievement achievement = achievementRepository.findByName(category);
         Player player = playerService.getPlayerById(playerId);
+        
+        if (historyRepository.existsByPlayerAndAchievementLevel(player, achievement.getLastLevel())) {
+            log.debug("Player {} is already at maximum achievement level: {} for achievement {}", playerId, achievement.getLastLevel(), achievement.getName());
+            return;
+        }
 
         int correctAnswers = player.getStats().getCategoryStats().get(category).getCorrect();
         log.debug("Player {} has {} correct answers in category {}",
@@ -86,6 +91,7 @@ public class AchievementService {
         
         AchievementProgress progress = achievementProgressRepository.findByPlayerAndAchievement(player, achievement);
         if (progress != null) {
+            progress.setCurrentProgress(correctAnswers);
             log.debug("Current achievement level for player {} in category {}: {}. Current progress={}, next level={}",
                     playerId, category, progress.getCurrentLevel().getLevel(), progress.getCurrentProgress(), progress.getNextLevelRequirement());
         } else {
@@ -97,7 +103,8 @@ public class AchievementService {
                             .currentProgress(correctAnswers)
                             .nextLevelRequirement(achievement.getLevels().get(0).getRequirementValue()).build()
             );
-            log.debug("Progress created for achievement: {} for player: {}", progress.getAchievement().getName(), player.getId());
+            //TODO fix tests 
+//            log.debug("Progress created for achievement: {} for player: {}", progress.getAchievement().getName(), player.getId());
         }
         
         UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository
@@ -107,9 +114,38 @@ public class AchievementService {
             log.debug("Current achievement level for player {} in category {}: {}",
                     playerId, category, unlockedAchievement.getCurrentLevel().getLevel());
         }
-
+        
+        boolean isEligibleForNextAchievement = progress.getCurrentProgress() >= progress.getNextLevelRequirement();
+        
+        if (isEligibleForNextAchievement) {
+            handleAchievementCompletion(progress);
+        } else {
+            log.debug("Player {} not eligible for next achievement level", playerId);
+        }
+        
+        achievementProgressRepository.save(progress);
+        
         AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
         handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
+    }
+
+    private void handleAchievementCompletion(AchievementProgress progress) {
+        AchievementLevelHistory completedAchievement = historyRepository.save(AchievementLevelHistory.builder()
+                .player(progress.getPlayer())
+                .achievement(progress.getAchievement())
+                .achievedLevel(progress.getCurrentLevel())
+                .achievedAt(Instant.now())
+                .build());
+        
+        AchievementLevel nextLevel = progress.getAchievement().getNextLevel(progress.getCurrentLevel());
+        if (nextLevel != null) {
+            progress.setCurrentLevel(nextLevel);
+            progress.setNextLevelRequirement(nextLevel.getRequirementValue());
+        } else {
+            log.debug("Player {} reached max level for achievement {}", progress.getPlayer().getId(), progress.getAchievement().getName());
+        }
+        
+        sendAchievementNotification(progress.getPlayer(), completedAchievement);
     }
 
     @Transactional
@@ -202,8 +238,8 @@ public class AchievementService {
 
         AchievementNotification achievementNotification = AchievementNotification.builder()
                 .achievementName(achievementLevelHistory.getAchievement().getName())
-                .achievementDescription(achievementLevelHistory.getCurrentLevel().getDescription())
-                .base64Image(ImageUtil.encodeAchievementImageToBase64(achievementLevelHistory.getCurrentLevel().getImageUrl()))
+                .achievementDescription(achievementLevelHistory.getAchievedLevel().getDescription())
+                .base64Image(ImageUtil.encodeAchievementImageToBase64(achievementLevelHistory.getAchievedLevel().getImageUrl()))
                 .earnedAt(achievementLevelHistory.getAchievedAt())
                 .build();
         
