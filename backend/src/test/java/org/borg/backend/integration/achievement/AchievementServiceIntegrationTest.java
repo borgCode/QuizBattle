@@ -2,17 +2,10 @@ package org.borg.backend.integration.achievement;
 
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.player.events.AchievementEvents;
-import org.borg.backend.player.model.Achievement;
-import org.borg.backend.player.model.AchievementLevel;
-import org.borg.backend.player.model.UserUnlockedAchievement;
-import org.borg.backend.player.repository.AchievementRepository;
-import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
+import org.borg.backend.player.model.*;
+import org.borg.backend.player.repository.*;
 import org.borg.backend.auth.model.Role;
 import org.borg.backend.auth.repository.RoleRepository;
-import org.borg.backend.player.model.CategoryStats;
-import org.borg.backend.player.model.Player;
-import org.borg.backend.player.model.Stats;
-import org.borg.backend.player.repository.PlayerRepository;
 import org.borg.backend.seed.InitDataService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
@@ -38,8 +32,6 @@ public class AchievementServiceIntegrationTest {
     @Autowired
     private PlayerRepository playerRepository;
     @Autowired
-    private UserUnlockedAchievementRepository userUnlockedAchievementRepository;
-    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -47,12 +39,16 @@ public class AchievementServiceIntegrationTest {
     private InitDataService initDataService;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private AchievementProgressRepository achievementProgressRepository;
+    @Autowired
+    private AchievementLevelHistoryRepository achievementLevelHistoryRepository;
 
     @BeforeEach
     void setUp() {
         achievementRepository.deleteAll();
         playerRepository.deleteAll();
-        userUnlockedAchievementRepository.deleteAll();
+       
 
         if (roleRepository.findByName("USER").isEmpty()) {
             Role userRole = new Role();
@@ -63,7 +59,6 @@ public class AchievementServiceIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        userUnlockedAchievementRepository.deleteAll();
         playerRepository.deleteAll();
         achievementRepository.deleteAll();
     }
@@ -98,8 +93,10 @@ public class AchievementServiceIntegrationTest {
                     .questionsAnswered(0)
                     .build();
 
-            Stats stats = player.getStats();
-            stats.setCategoryStats(Map.of("Geography", categoryStats));
+            Map<String, CategoryStats> statsMap = new HashMap<>();
+            statsMap.put("Geography", categoryStats);
+            player.getStats().setCategoryStats(statsMap);
+            
             player = playerRepository.save(player);
 
             increaseStatsToNextLevelAndPublish(5);
@@ -109,6 +106,7 @@ public class AchievementServiceIntegrationTest {
             increaseStatsToNextLevelAndPublish(5);
             assertUnlockedAchievement(3);
         }
+        
 
         private void createAchievements() {
             List<AchievementLevel> levels = List.of(
@@ -164,14 +162,19 @@ public class AchievementServiceIntegrationTest {
                 throw new RuntimeException(e);
             }
 
-            List<UserUnlockedAchievement> unlockedAchievements = userUnlockedAchievementRepository.findAllByPlayerId(player.getId());
+            Achievement achievement = achievementRepository.findByName("Geography");
+            AchievementProgress progress = achievementProgressRepository.findByPlayerAndAchievement(player, achievement);
+            List<AchievementLevelHistory> history = achievementLevelHistoryRepository.findByPlayerAndAchievement(player, achievement);
 
-            UserUnlockedAchievement unlockedAchievement = unlockedAchievements.get(0);
+            int maxLevel = 3;
+            int expectedProgressLevel = achievementLevel == maxLevel ? maxLevel : achievementLevel + 1;
 
-            assertAll("Check unlocked achievement details",
-                    () -> assertEquals(1, unlockedAchievements.size()),
-                    () -> assertEquals("Geography", unlockedAchievement.getAchievement().getName()),
-                    () -> assertEquals(achievementLevel, unlockedAchievement.getCurrentLevel().getLevel())
+            assertAll("Check achievement progress details",
+                    () -> assertNotNull(progress, "Achievement progress should exist"),
+                    () -> assertEquals(expectedProgressLevel, progress.getCurrentLevel().getLevel(),
+                            String.format("Progress level should be %s", achievementLevel == maxLevel ? "at max level" : "one ahead of achieved level")),
+                    () -> assertTrue(history.stream().anyMatch(h -> h.getAchievementLevel().getLevel() == achievementLevel),
+                            "History should contain the achieved level")
             );
         }
     }
@@ -255,22 +258,31 @@ public class AchievementServiceIntegrationTest {
             try {
                 boolean completed = finishLatch.await(10, TimeUnit.SECONDS);
                 assertTrue(completed, "Not all achievement operations completed in time");
-                
+
                 Thread.sleep(100);
-                
+
                 for (Player player : players) {
                     Set<String> playedCategories = playerAwardedAchievements.get(player.getId());
                     assertNotNull(playedCategories, "No achievements recorded for this player");
 
                     for (String playedCategory : playedCategories) {
                         Achievement achievement = achievementRepository.findByName(playedCategory);
-                        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
+                        AchievementProgress progress = achievementProgressRepository.findByPlayerAndAchievement(player, achievement);
+                        List<AchievementLevelHistory> history = achievementLevelHistoryRepository.findByPlayerAndAchievement(player, achievement);
 
-                        assertNotNull(unlockedAchievement, String.format("Achievement: %s not found for player: %s", playedCategory, player.getId()));
+                        assertAll(String.format("Check achievements for player %d, category %s", player.getId(), playedCategory),
+                                () -> assertNotNull(progress, "Achievement progress should exist"),
+                                () -> assertNotNull(progress.getCurrentLevel(), "Current level should be set"),
+                                () -> assertEquals(2, progress.getCurrentLevel().getLevel(), "Progress should be at level 2"),
+                                () -> assertFalse(history.isEmpty(), "Should have history entries"),
+                                () -> assertTrue(history.stream().anyMatch(h -> h.getAchievementLevel().getLevel() == 1),
+                                        "Should have history entry for level 1")
+                        );
                     }
 
-                    List<UserUnlockedAchievement> userUnlockedAchievements = userUnlockedAchievementRepository.findAllByPlayerId(player.getId());
-                    assertEquals(playedCategories.size(), userUnlockedAchievements.size(), String.format("Number of achievements mismatched for player: %s", player.getId()));
+                    List<AchievementProgress> progressList = achievementProgressRepository.findAllByPlayer(player);
+                    assertEquals(playedCategories.size(), progressList.size(),
+                            String.format("Number of achievements mismatched for player: %s", player.getId()));
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -307,7 +319,7 @@ public class AchievementServiceIntegrationTest {
                             .correct(0)
                             .questionsAnswered(0)
                             .build();
-                    
+
                     stats.getCategoryStats().put(category, categoryStats);
                 }
                 playerRepository.save(player);
