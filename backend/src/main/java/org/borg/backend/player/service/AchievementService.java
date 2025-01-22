@@ -30,6 +30,7 @@ public class AchievementService {
     private final PlayerService playerService;
     private final AchievementMapper achievementMapper;
     private final AchievementLevelHistoryRepository historyRepository;
+    private final AchievementProgressRepository achievementProgressRepository;
 
     public List<UserUnlockedAchievementDTO> getUnlockedAchievements(long playerId) {
         return achievementMapper.multipleToUnlockedAchievementDTO(userUnlockedAchievementRepository.findAllByPlayerId(playerId));
@@ -41,30 +42,35 @@ public class AchievementService {
         Achievement achievement = achievementRepository.findByName(storyName);
         Player player = playerService.getPlayerById(playerId);
 
-        if (!historyRepository.existsByPlayerAndAchievement(player, achievement)) {
-            historyRepository.save(AchievementLevelHistory.builder()
-                    .player(player)
-                    .achievement(achievement)
-                    .currentLevel(achievement.getLevels().get(0))
-                    .achievedAt(Instant.now())
-                    .build());
-        }
-
-        if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
+        if (historyRepository.existsByPlayerAndAchievement(player, achievement)) {
             log.debug("Player {} already has story achievement for {}", playerId, storyName);
             return;
         }
 
-        UserUnlockedAchievement unlockedAchievement = UserUnlockedAchievement.builder()
+        AchievementLevelHistory achievementLevelHistory = historyRepository.save(AchievementLevelHistory.builder()
                 .player(player)
                 .achievement(achievement)
                 .currentLevel(achievement.getLevels().get(0))
                 .achievedAt(Instant.now())
-                .build();
+                .build());
+        
+        //TODO clean up
 
-        userUnlockedAchievementRepository.save(unlockedAchievement);
+//        if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
+//            log.debug("Player {} already has story achievement for {}", playerId, storyName);
+//            return;
+//        }
+//
+//        UserUnlockedAchievement unlockedAchievement = UserUnlockedAchievement.builder()
+//                .player(player)
+//                .achievement(achievement)
+//                .currentLevel(achievement.getLevels().get(0))
+//                .achievedAt(Instant.now())
+//                .build();
+//
+//        userUnlockedAchievementRepository.save(unlockedAchievement);
         log.info("Player {} unlocked new story achievement: {}", player.getUsername(), storyName);
-        sendAchievementNotification(player, unlockedAchievement);
+        sendAchievementNotification(player, achievementLevelHistory);
     }
 
     @Transactional
@@ -77,6 +83,8 @@ public class AchievementService {
         int correctAnswers = player.getStats().getCategoryStats().get(category).getCorrect();
         log.debug("Player {} has {} correct answers in category {}",
                 player.getUsername(), correctAnswers, category);
+        
+        AchievementProgress progress = achievementProgressRepository.findBy
 
         UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository
                 .findByPlayerAndAchievement(player, achievement);
@@ -169,6 +177,22 @@ public class AchievementService {
                 .base64Image(ImageUtil.encodeAchievementImageToBase64(unlockedAchievement.getCurrentLevel().getImageUrl()))
                 .earnedAt(unlockedAchievement.getAchievedAt())
                 .build();
+
+        simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
+        log.debug("Achievement notification sent successfully");
+    }
+
+    private void sendAchievementNotification(Player player, AchievementLevelHistory achievementLevelHistory) {
+        log.debug("Sending achievement notification to player {} for achievement {}",
+                player.getUsername(), achievementLevelHistory.getAchievement().getName());
+
+        AchievementNotification achievementNotification = AchievementNotification.builder()
+                .achievementName(achievementLevelHistory.getAchievement().getName())
+                .achievementDescription(achievementLevelHistory.getCurrentLevel().getDescription())
+                .base64Image(ImageUtil.encodeAchievementImageToBase64(achievementLevelHistory.getCurrentLevel().getImageUrl()))
+                .earnedAt(achievementLevelHistory.getAchievedAt())
+                .build();
+        
 
         simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
         log.debug("Achievement notification sent successfully");

@@ -81,13 +81,28 @@ class AchievementServiceTest {
                 when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
                         .thenReturn(false);
                 when(historyRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(false);
+                
+                when(historyRepository.save(any())).thenAnswer( invocationOnMock -> 
+                        AchievementLevelHistory.builder()
+                                .achievement(achievement)
+                                .currentLevel(achievement.getLevels().get(0))
+                                .build());
 
                 achievementService.handleStoryAchievement(PLAYER_ID, STORY_NAME);
 
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
 
-                verifyAchievementSaved(player, achievement, level1);
+//                verifyAchievementSaved(player, achievement, level1);
+
+                //TODO extract when all finished
+                ArgumentCaptor<AchievementLevelHistory> captor = ArgumentCaptor.forClass(AchievementLevelHistory.class);
+                verify(historyRepository).save(captor.capture());
+                AchievementLevelHistory saved = captor.getValue();
+
+                assertEquals(player, saved.getPlayer());
+                assertEquals(achievement, saved.getAchievement());
+                assertEquals(level1, saved.getCurrentLevel());
 
                 verify(simpMessagingTemplate).convertAndSendToUser(
                         eq("testuser123"),
@@ -105,9 +120,7 @@ class AchievementServiceTest {
 
             when(achievementRepository.findByName(STORY_NAME)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
-            when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
-                    .thenReturn(true);
-            when(historyRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(false);
+            when(historyRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(true);
             
             achievementService.handleStoryAchievement(PLAYER_ID, STORY_NAME);
 
