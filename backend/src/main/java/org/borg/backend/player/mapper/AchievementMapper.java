@@ -3,14 +3,15 @@ package org.borg.backend.player.mapper;
 import org.borg.backend.player.dto.AchievementDTO;
 import org.borg.backend.player.dto.AchievementLevelDTO;
 import org.borg.backend.player.dto.AchievementProgressDTO;
-import org.borg.backend.player.dto.UserUnlockedAchievementDTO;
-import org.borg.backend.player.model.*;
+import org.borg.backend.player.model.Achievement;
+import org.borg.backend.player.model.AchievementLevel;
+import org.borg.backend.player.model.AchievementLevelHistory;
+import org.borg.backend.player.model.AchievementProgress;
 import org.borg.backend.shared.util.ImageUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import java.util.stream.IntStream;
 public interface AchievementMapper {
 
     @Mapping(target = "unlockedLevels", expression = "java(mapLevelHistory(levelHistory))")
+    @Mapping(target = "totalLevels", expression = "java(achievement.getLevels().size())")
     @Mapping(target = "nextLevel", expression = "java(getNextLevel(achievement, progress))")
     @Mapping(target = "progress", source = "progress", qualifiedByName = "progress")
     @Mapping(target = "name", source = "achievement.name")

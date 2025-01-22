@@ -1,0 +1,19 @@
+
+.achievement-card .level-item {
+  position: relative;
+}
+
+.achievement-card .level-item.locked {
+  cursor: help;
+}
+
+.tooltip {
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+}
+
+.tooltip-arrow::before {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+

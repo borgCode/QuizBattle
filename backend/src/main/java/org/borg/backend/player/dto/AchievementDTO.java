@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 public class AchievementDTO {
     private String name;
+    private int totalLevels;
     private List<AchievementLevelDTO> unlockedLevels;
     private AchievementLevelDTO nextLevel;
     private AchievementProgressDTO progress;

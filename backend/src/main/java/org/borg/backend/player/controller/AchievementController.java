@@ -3,7 +3,6 @@ package org.borg.backend.player.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.borg.backend.player.dto.AchievementDTO;
-import org.borg.backend.player.dto.UserUnlockedAchievementDTO;
 import org.borg.backend.player.service.AchievementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

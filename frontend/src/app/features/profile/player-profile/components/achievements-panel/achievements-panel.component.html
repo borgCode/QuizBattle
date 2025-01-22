@@ -1,17 +1,9 @@
 <div class="achievements-container">
   <div class="row">
-  <div class="col-md-3 mb-3" *ngFor="let achievement of achievements">
-    <div class="card">
-      <img [src]="'data:image/jpeg;base64,' + achievement.unlockedLevels[achievement.unlockedLevels.length - 1].imageUrl" class="img-fluid" style="max-height: 150px; width: auto;" alt="">
-      <div class="card-body">
-        <h5 class="card-title">
-          {{achievement.name}}
-        </h5>
-        <p class="card-text">
-          {{achievement.name}}
-        </p>
-      </div>
+    <div class="col-12 col-sm-6 col-lg-4 mb-3" *ngFor="let achievement of achievements">
+      <app-achievement-card
+        [achievement]="achievement"
+      ></app-achievement-card>
     </div>
-  </div>
   </div>
 </div>
