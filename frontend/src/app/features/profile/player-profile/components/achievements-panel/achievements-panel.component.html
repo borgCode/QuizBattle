@@ -2,13 +2,13 @@
   <div class="row">
   <div class="col-md-3 mb-3" *ngFor="let achievement of achievements">
     <div class="card">
-      <img [src]="'data:image/jpeg;base64,' +achievement.imageUrl" class="img-fluid" style="max-height: 150px; width: auto;" alt="">
+      <img [src]="'data:image/jpeg;base64,' + achievement.unlockedLevels[achievement.unlockedLevels.length - 1].imageUrl" class="img-fluid" style="max-height: 150px; width: auto;" alt="">
       <div class="card-body">
         <h5 class="card-title">
-          {{achievement.achievementName}}
+          {{achievement.name}}
         </h5>
         <p class="card-text">
-          {{achievement.description}}
+          {{achievement.name}}
         </p>
       </div>
     </div>

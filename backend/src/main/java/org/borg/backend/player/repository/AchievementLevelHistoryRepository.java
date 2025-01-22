@@ -16,4 +16,6 @@ public interface AchievementLevelHistoryRepository extends JpaRepository<Achieve
     boolean existsByPlayerAndAchievementLevel(Player player, AchievementLevel achievementLevel);
 
     List<AchievementLevelHistory> findByPlayerAndAchievement(Player player, Achievement achievement);
+
+    List<AchievementLevelHistory> findByPlayerId(Long playerId);
 }

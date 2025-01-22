@@ -8,13 +8,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { UserUnlockedAchievementDto } from '../../models/user-unlocked-achievement-dto';
+import { AchievementDto } from '../../models/achievement-dto';
 
 export interface GetUnlockedAchievements$Params {
   playerId: number;
 }
 
-export function getUnlockedAchievements(http: HttpClient, rootUrl: string, params: GetUnlockedAchievements$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<UserUnlockedAchievementDto>>> {
+export function getUnlockedAchievements(http: HttpClient, rootUrl: string, params: GetUnlockedAchievements$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<AchievementDto>>> {
   const rb = new RequestBuilder(rootUrl, getUnlockedAchievements.PATH, 'get');
   if (params) {
     rb.path('playerId', params.playerId, {});
@@ -25,7 +25,7 @@ export function getUnlockedAchievements(http: HttpClient, rootUrl: string, param
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<UserUnlockedAchievementDto>>;
+      return r as StrictHttpResponse<Array<AchievementDto>>;
     })
   );
 }

@@ -5,12 +5,12 @@ import {LoginStateService} from '../../../../core/services/login-state-service/l
 import {BehaviorSubject, switchMap, tap} from 'rxjs';
 import {Relationship} from '../interface/relationship';
 import {AchievementService} from '../../../../api/generated/services/achievement.service';
-import {UserUnlockedAchievementDto} from '../../../../api/generated/models/user-unlocked-achievement-dto';
 import {AlertMessageService} from '../../../../core/services/alert-message/alert-message.service';
 import {WhisperWindowService} from '../../../../core/services/whisper-window/whisper-window.service';
 import {BlockService} from '../../../../api/generated/services/block.service';
 import {MultiplayerMatchService} from '../../../../api/generated/services/multiplayer-match.service';
 import {MessageService} from '../../../../api/generated/services/message.service';
+import {AchievementDto} from '../../../../api/generated/models/achievement-dto';
 
 
 @Injectable({
@@ -21,7 +21,7 @@ export class ProfileService {
     friendsList: [],
     blockedList: []
   })
-  private achievementsSubject: BehaviorSubject<UserUnlockedAchievementDto[]> = new BehaviorSubject<UserUnlockedAchievementDto[]>(null);
+  private achievementsSubject: BehaviorSubject<AchievementDto[]> = new BehaviorSubject<AchievementDto[]>(null);
 
   readonly relationships$ = this.relationshipSubject.asObservable();
   readonly achievements$ = this.achievementsSubject.asObservable();
@@ -48,7 +48,10 @@ export class ProfileService {
       }),
       switchMap(() => this.getRelationships(playerId).pipe(
         switchMap(() => this.achievementService.getUnlockedAchievements({playerId: playerId}).pipe(
-          tap(achievements => this.achievementsSubject.next(achievements))
+          tap(achievements =>  {
+            this.achievementsSubject.next(achievements)
+            console.log(achievements)
+          })
         ))
       ))
     ).subscribe();

@@ -10,9 +10,10 @@ import java.util.List;
 
 @Repository
 public interface AchievementProgressRepository extends JpaRepository<AchievementProgress, Long> {
-    boolean existsByPlayerAndAchievement(Player player, Achievement achievement);
 
     AchievementProgress findByPlayerAndAchievement(Player player, Achievement achievement);
 
     List<AchievementProgress> findAllByPlayer(Player player);
+
+    List<AchievementProgress> findByPlayerId(Long playerId);
 }

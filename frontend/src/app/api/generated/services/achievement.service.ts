@@ -11,9 +11,9 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
+import { AchievementDto } from '../models/achievement-dto';
 import { getUnlockedAchievements } from '../fn/achievement/get-unlocked-achievements';
 import { GetUnlockedAchievements$Params } from '../fn/achievement/get-unlocked-achievements';
-import { UserUnlockedAchievementDto } from '../models/user-unlocked-achievement-dto';
 
 @Injectable({ providedIn: 'root' })
 export class AchievementService extends BaseService {
@@ -30,7 +30,7 @@ export class AchievementService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getUnlockedAchievements$Response(params: GetUnlockedAchievements$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<UserUnlockedAchievementDto>>> {
+  getUnlockedAchievements$Response(params: GetUnlockedAchievements$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<AchievementDto>>> {
     return getUnlockedAchievements(this.http, this.rootUrl, params, context);
   }
 
@@ -40,9 +40,9 @@ export class AchievementService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getUnlockedAchievements(params: GetUnlockedAchievements$Params, context?: HttpContext): Observable<Array<UserUnlockedAchievementDto>> {
+  getUnlockedAchievements(params: GetUnlockedAchievements$Params, context?: HttpContext): Observable<Array<AchievementDto>> {
     return this.getUnlockedAchievements$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<UserUnlockedAchievementDto>>): Array<UserUnlockedAchievementDto> => r.body)
+      map((r: StrictHttpResponse<Array<AchievementDto>>): Array<AchievementDto> => r.body)
     );
   }
 

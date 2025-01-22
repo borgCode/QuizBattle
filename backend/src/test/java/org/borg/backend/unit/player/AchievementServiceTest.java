@@ -6,7 +6,6 @@ import org.borg.backend.player.model.*;
 import org.borg.backend.player.repository.AchievementLevelHistoryRepository;
 import org.borg.backend.player.repository.AchievementProgressRepository;
 import org.borg.backend.player.repository.AchievementRepository;
-import org.borg.backend.player.repository.UserUnlockedAchievementRepository;
 import org.borg.backend.player.service.AchievementService;
 import org.borg.backend.player.service.PlayerService;
 import org.borg.backend.shared.util.ImageUtil;
@@ -31,8 +30,6 @@ class AchievementServiceTest {
     private AchievementRepository achievementRepository;
     @Mock
     private PlayerService playerService;
-    @Mock
-    private UserUnlockedAchievementRepository userUnlockedAchievementRepository;
     @Mock
     private SimpMessagingTemplate simpMessagingTemplate;
     @Mock
@@ -80,11 +77,8 @@ class AchievementServiceTest {
 
                 when(achievementRepository.findByName(STORY_NAME)).thenReturn(achievement);
                 when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
-                when(userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement))
-                        .thenReturn(false);
                 when(historyRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(false);
-                
-                when(historyRepository.save(any())).thenAnswer( invocationOnMock -> 
+                when(historyRepository.save(any())).thenAnswer(invocationOnMock ->
                         AchievementLevelHistory.builder()
                                 .achievement(achievement)
                                 .achievementLevel(achievement.getLevels().get(0))
@@ -95,16 +89,7 @@ class AchievementServiceTest {
                 imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
                         .thenReturn("base64Image");
 
-//                verifyAchievementSaved(player, achievement, level1);
-
-                //TODO extract when all finished
-                ArgumentCaptor<AchievementLevelHistory> captor = ArgumentCaptor.forClass(AchievementLevelHistory.class);
-                verify(historyRepository).save(captor.capture());
-                AchievementLevelHistory saved = captor.getValue();
-
-                assertEquals(player, saved.getPlayer());
-                assertEquals(achievement, saved.getAchievement());
-                assertEquals(level1, saved.getAchievementLevel());
+                verifyAchievementHistorySaved(player, achievement, level1);
 
                 verify(simpMessagingTemplate).convertAndSendToUser(
                         eq("testuser123"),
@@ -123,29 +108,20 @@ class AchievementServiceTest {
             when(achievementRepository.findByName(STORY_NAME)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
             when(historyRepository.existsByPlayerAndAchievement(player, achievement)).thenReturn(true);
-            
+
             achievementService.handleStoryAchievement(PLAYER_ID, STORY_NAME);
 
             verifyNoNotificationsSent();
         }
     }
 
-    private void verifyAchievementSaved(Player expectedPlayer, Achievement expectedAchievement, AchievementLevel expectedLevel) {
-        ArgumentCaptor<UserUnlockedAchievement> captor = ArgumentCaptor.forClass(UserUnlockedAchievement.class);
-        verify(userUnlockedAchievementRepository).save(captor.capture());
-        UserUnlockedAchievement saved = captor.getValue();
-
-        assertEquals(expectedPlayer, saved.getPlayer());
-        assertEquals(expectedAchievement, saved.getAchievement());
-        assertEquals(expectedLevel, saved.getCurrentLevel());
-    }
-
     @Nested
     class CategoryAchievementTests {
+
         private final Long PLAYER_ID = 1L;
         private final String CATEGORY = "Science & Nature";
-
         AchievementLevel levelOne;
+
         Player player;
 
         @BeforeEach
@@ -169,51 +145,26 @@ class AchievementServiceTest {
             CategoryStats categoryStats = new CategoryStats();
             categoryStats.setCorrect(5);
             player.getStats().setCategoryStats(Map.of(CATEGORY, categoryStats));
-            
+
             Achievement achievement = Achievement.builder()
                     .name(CATEGORY)
                     .levels(List.of(levelOne))
                     .build();
-            
+
             when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
             when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
             when(historyRepository.existsByPlayerAndAchievementLevel(player, levelOne)).thenReturn(false);
-            
+
             when(progressRepository.save(any(AchievementProgress.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
-            when(historyRepository.save(any(AchievementLevelHistory.class)))
-                    .thenAnswer(invocation -> {
-                        AchievementLevelHistory history = invocation.getArgument(0);
-                        return AchievementLevelHistory.builder()
-                                .player(history.getPlayer())
-                                .achievement(history.getAchievement())
-                                .achievementLevel(history.getAchievementLevel())
-                                .achievedAt(history.getAchievedAt())
-                                .build();
-                    });
-            
+            mockAchievementHistoryBuild();
+
             achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
-            
-            ArgumentCaptor<AchievementProgress> progressCaptor = ArgumentCaptor.forClass(AchievementProgress.class);
-            verify(progressRepository, times(2)).save(progressCaptor.capture());
 
-            AchievementProgress savedProgress = progressCaptor.getValue();
-            assertEquals(achievement, savedProgress.getAchievement());
-            assertEquals(player, savedProgress.getPlayer());
-            assertEquals(levelOne, savedProgress.getCurrentLevel());
-            assertEquals(5, savedProgress.getCurrentProgress());
-            assertEquals(5, savedProgress.getNextLevelRequirement());
-            
-            ArgumentCaptor<AchievementLevelHistory> historyCaptor = ArgumentCaptor.forClass(AchievementLevelHistory.class);
-            verify(historyRepository).save(historyCaptor.capture());
-
-            AchievementLevelHistory savedHistory = historyCaptor.getValue();
-            assertEquals(player, savedHistory.getPlayer());
-            assertEquals(achievement, savedHistory.getAchievement());
-            assertEquals(levelOne, savedHistory.getAchievementLevel());
-
+            verifyAchievementProgressSaved(player, achievement, levelOne, 2, 5);
+            verifyAchievementHistorySaved(player, achievement, levelOne);
             verifyAchievementNotification("testuser123");
         }
 
@@ -222,7 +173,7 @@ class AchievementServiceTest {
             CategoryStats categoryStats = new CategoryStats();
             categoryStats.setCorrect(10);
             player.getStats().setCategoryStats(Map.of(CATEGORY, categoryStats));
-            
+
             AchievementLevel levelTwo = AchievementLevel.builder()
                     .level(2)
                     .description("Researcher")
@@ -234,7 +185,7 @@ class AchievementServiceTest {
                     .name(CATEGORY)
                     .levels(List.of(levelOne, levelTwo))
                     .build();
-            
+
             AchievementProgress existingProgress = AchievementProgress.builder()
                     .achievement(achievement)
                     .player(player)
@@ -242,7 +193,7 @@ class AchievementServiceTest {
                     .currentProgress(10)
                     .nextLevelRequirement(10)
                     .build();
-            
+
             when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
             when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingProgress);
@@ -250,27 +201,11 @@ class AchievementServiceTest {
             when(progressRepository.save(any(AchievementProgress.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
-            when(historyRepository.save(any(AchievementLevelHistory.class)))
-                    .thenAnswer(invocation -> {
-                        AchievementLevelHistory history = invocation.getArgument(0);
-                        return AchievementLevelHistory.builder()
-                                .player(history.getPlayer())
-                                .achievement(history.getAchievement())
-                                .achievementLevel(history.getAchievementLevel())
-                                .achievedAt(history.getAchievedAt())
-                                .build();
-                    });
-            
-            achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
-            
-            ArgumentCaptor<AchievementProgress> progressCaptor = ArgumentCaptor.forClass(AchievementProgress.class);
-            verify(progressRepository).save(progressCaptor.capture());
+            mockAchievementHistoryBuild();
 
-            AchievementProgress savedProgress = progressCaptor.getValue();
-            assertEquals(levelTwo, savedProgress.getCurrentLevel());
-            assertEquals(10, savedProgress.getCurrentProgress());
-            assertEquals(10, savedProgress.getNextLevelRequirement());
-            
+            achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
+
+            verifyAchievementProgressSaved(player, achievement, levelTwo, 1, 10);
             verify(historyRepository).save(any(AchievementLevelHistory.class));
 
             verifyAchievementNotification("testuser123");
@@ -286,7 +221,7 @@ class AchievementServiceTest {
                     .name(CATEGORY)
                     .levels(List.of(levelOne))
                     .build();
-            
+
             AchievementProgress existingProgress = AchievementProgress.builder()
                     .achievement(achievement)
                     .player(player)
@@ -303,10 +238,10 @@ class AchievementServiceTest {
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
             achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
-            
+
             verify(progressRepository).save(any(AchievementProgress.class));
             verify(historyRepository, never()).save(any(AchievementLevelHistory.class));
-           verifyNoNotificationsSent();
+            verifyNoNotificationsSent();
         }
 
         @Test
@@ -332,7 +267,7 @@ class AchievementServiceTest {
             when(historyRepository.existsByPlayerAndAchievementLevel(player, maxLevel)).thenReturn(true);
 
             achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
-            
+
             verify(progressRepository, never()).save(any(AchievementProgress.class));
             verify(historyRepository, never()).save(any(AchievementLevelHistory.class));
             verifyNoNotificationsSent();
@@ -341,7 +276,9 @@ class AchievementServiceTest {
 
     @Nested
     class VictoryTests {
+
         private final Long PLAYER_ID = 1L;
+
         private final String CATEGORY = "Victories";
 
         AchievementLevel levelOne;
@@ -365,65 +302,68 @@ class AchievementServiceTest {
 
         @Test
         void handleGameWon_EligibleForFirstLevel() {
-            try (MockedStatic<ImageUtil> imageUtilMock = Mockito.mockStatic(ImageUtil.class)) {
-                player.getStats().setNumOfWins(5);
+            player.getStats().setNumOfWins(5);
 
-                Achievement achievement = Achievement.builder()
-                        .name(CATEGORY)
-                        .levels(List.of(levelOne))
-                        .build();
+            Achievement achievement = Achievement.builder()
+                    .name(CATEGORY)
+                    .levels(List.of(levelOne))
+                    .build();
 
-                when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
-                when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
-                when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
+            when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
+            when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
+            when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
+            when(historyRepository.existsByPlayerAndAchievementLevel(player, levelOne)).thenReturn(false);
 
-                achievementService.handleVictoryAchievement(PLAYER_ID);
+            when(progressRepository.save(any(AchievementProgress.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
 
-                imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
-                        .thenReturn("base64Image");
+            mockAchievementHistoryBuild();
 
-                verifyAchievementSaved(player, achievement, levelOne);
+            achievementService.handleVictoryAchievement(PLAYER_ID);
 
-                verifyAchievementNotification("testuser123");
-            }
+            verifyAchievementProgressSaved(player, achievement, levelOne, 2, 5);
+            verifyAchievementHistorySaved(player, achievement, levelOne);
+            verifyAchievementNotification("testuser123");
         }
 
         @Test
         void handleGameWon_EligibleForNextLevel() {
-            try (MockedStatic<ImageUtil> imageUtilMock = mockStatic(ImageUtil.class)) {
-                player.getStats().setNumOfWins(10);
+            player.getStats().setNumOfWins(10);
 
-                AchievementLevel level2 = AchievementLevel.builder()
-                        .level(2)
-                        .description("Victorious veteran")
-                        .imageUrl("/path/to/achievement.jpg")
-                        .requirementValue(10)
-                        .build();
+            AchievementLevel levelTwo = AchievementLevel.builder()
+                    .level(2)
+                    .description("Victorious veteran")
+                    .imageUrl("/path/to/achievement2.jpg")
+                    .requirementValue(10)
+                    .build();
 
-                Achievement achievement = Achievement.builder()
-                        .name(CATEGORY)
-                        .levels(List.of(levelOne, level2))
-                        .build();
+            Achievement achievement = Achievement.builder()
+                    .name(CATEGORY)
+                    .levels(List.of(levelOne, levelTwo))
+                    .build();
 
-                UserUnlockedAchievement existingUnlock = UserUnlockedAchievement.builder()
-                        .player(player)
-                        .achievement(achievement)
-                        .currentLevel(levelOne)
-                        .build();
+            AchievementProgress existingProgress = AchievementProgress.builder()
+                    .achievement(achievement)
+                    .player(player)
+                    .currentLevel(levelOne)
+                    .currentProgress(10)
+                    .nextLevelRequirement(10)
+                    .build();
 
-                when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
-                when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
-                when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingUnlock);
+            when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
+            when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
+            when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingProgress);
+            when(historyRepository.existsByPlayerAndAchievementLevel(player, levelTwo)).thenReturn(false);
+            when(progressRepository.save(any(AchievementProgress.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
 
-                achievementService.handleVictoryAchievement(PLAYER_ID);
+            mockAchievementHistoryBuild();
 
-                imageUtilMock.when(() -> ImageUtil.encodeAchievementImageToBase64("/path/to/achievement.jpg"))
-                        .thenReturn("base64Image");
+            achievementService.handleVictoryAchievement(PLAYER_ID);
 
-                verifyAchievementSaved(player, achievement, level2);
-
-                verifyAchievementNotification("testuser123");
-            }
+            verifyAchievementProgressSaved(player, achievement, levelTwo, 1, 10);
+            verify(historyRepository).save(any(AchievementLevelHistory.class));
+            verifyAchievementNotification("testuser123");
         }
 
         @Test
@@ -435,12 +375,25 @@ class AchievementServiceTest {
                     .levels(List.of(levelOne))
                     .build();
 
+            AchievementProgress existingProgress = AchievementProgress.builder()
+                    .achievement(achievement)
+                    .player(player)
+                    .currentLevel(levelOne)
+                    .currentProgress(4)
+                    .nextLevelRequirement(5)
+                    .build();
+
             when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
-            when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
+            when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingProgress);
+            when(historyRepository.existsByPlayerAndAchievementLevel(player, levelOne)).thenReturn(false);
+            when(progressRepository.save(any(AchievementProgress.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
 
             achievementService.handleVictoryAchievement(PLAYER_ID);
 
+            verify(progressRepository).save(any(AchievementProgress.class));
+            verify(historyRepository, never()).save(any(AchievementLevelHistory.class));
             verifyNoNotificationsSent();
         }
 
@@ -451,14 +404,14 @@ class AchievementServiceTest {
             AchievementLevel levelTwo = AchievementLevel.builder()
                     .level(2)
                     .description("Victorious veteran")
-                    .imageUrl("/path/to/achievement.jpg")
+                    .imageUrl("/path/to/achievement2.jpg")
                     .requirementValue(10)
                     .build();
 
             AchievementLevel levelThree = AchievementLevel.builder()
                     .level(3)
                     .description("Victories Master")
-                    .imageUrl("/path/to/achievement.jpg")
+                    .imageUrl("/path/to/achievement3.jpg")
                     .requirementValue(15)
                     .build();
 
@@ -467,20 +420,37 @@ class AchievementServiceTest {
                     .levels(List.of(levelOne, levelTwo, levelThree))
                     .build();
 
-            UserUnlockedAchievement existingUnlock = UserUnlockedAchievement.builder()
-                    .player(player)
-                    .achievement(achievement)
-                    .currentLevel(levelThree)
-                    .build();
-
             when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
-            when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingUnlock);
+            when(historyRepository.existsByPlayerAndAchievementLevel(player, levelThree)).thenReturn(true);
 
             achievementService.handleVictoryAchievement(PLAYER_ID);
 
+            verify(progressRepository, never()).save(any(AchievementProgress.class));
+            verify(historyRepository, never()).save(any(AchievementLevelHistory.class));
             verifyNoNotificationsSent();
         }
+    }
+
+    private void verifyAchievementProgressSaved(Player player, Achievement achievement, AchievementLevel level, int times, int expectedValue) {
+        ArgumentCaptor<AchievementProgress> progressCaptor = ArgumentCaptor.forClass(AchievementProgress.class);
+        verify(progressRepository, times(times)).save(progressCaptor.capture());
+        AchievementProgress savedProgress = progressCaptor.getValue();
+        assertEquals(achievement, savedProgress.getAchievement());
+        assertEquals(player, savedProgress.getPlayer());
+        assertEquals(level, savedProgress.getCurrentLevel());
+        assertEquals(expectedValue, savedProgress.getCurrentProgress());
+        assertEquals(expectedValue, savedProgress.getNextLevelRequirement());
+    }
+
+    private void verifyAchievementHistorySaved(Player expectedPlayer, Achievement expectedAchievement, AchievementLevel expectedLevel) {
+        ArgumentCaptor<AchievementLevelHistory> captor = ArgumentCaptor.forClass(AchievementLevelHistory.class);
+        verify(historyRepository).save(captor.capture());
+        AchievementLevelHistory saved = captor.getValue();
+
+        assertEquals(expectedPlayer, saved.getPlayer());
+        assertEquals(expectedAchievement, saved.getAchievement());
+        assertEquals(expectedLevel, saved.getAchievementLevel());
     }
 
     private void verifyAchievementNotification(String username) {
@@ -496,5 +466,18 @@ class AchievementServiceTest {
                 any(),
                 any()
         );
+    }
+
+    private void mockAchievementHistoryBuild() {
+        when(historyRepository.save(any(AchievementLevelHistory.class)))
+                .thenAnswer(invocation -> {
+                    AchievementLevelHistory history = invocation.getArgument(0);
+                    return AchievementLevelHistory.builder()
+                            .player(history.getPlayer())
+                            .achievement(history.getAchievement())
+                            .achievementLevel(history.getAchievementLevel())
+                            .achievedAt(history.getAchievedAt())
+                            .build();
+                });
     }
 }

@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {UserUnlockedAchievementDto} from '../../../../../api/generated/models/user-unlocked-achievement-dto';
 import {NgForOf} from '@angular/common';
+import {AchievementDto} from '../../../../../api/generated/models/achievement-dto';
 
 @Component({
   selector: 'app-achievements-panel',
@@ -11,6 +11,6 @@ import {NgForOf} from '@angular/common';
   styleUrl: './achievements-panel.component.css'
 })
 export class AchievementsPanelComponent {
-  @Input() achievements!: UserUnlockedAchievementDto[];
+  @Input() achievements!: AchievementDto[];
 
 }

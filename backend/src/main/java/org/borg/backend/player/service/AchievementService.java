@@ -2,8 +2,9 @@ package org.borg.backend.player.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.borg.backend.player.dto.AchievementDTO;
+import org.borg.backend.player.dto.AchievementLevelDTO;
 import org.borg.backend.player.dto.AchievementNotification;
-import org.borg.backend.player.dto.UserUnlockedAchievementDTO;
 import org.borg.backend.player.mapper.AchievementMapper;
 import org.borg.backend.player.model.*;
 import org.borg.backend.player.repository.AchievementLevelHistoryRepository;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional
@@ -25,15 +28,47 @@ import java.util.List;
 public class AchievementService {
 
     private final AchievementRepository achievementRepository;
-    private final UserUnlockedAchievementRepository userUnlockedAchievementRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final PlayerService playerService;
     private final AchievementMapper achievementMapper;
     private final AchievementLevelHistoryRepository historyRepository;
     private final AchievementProgressRepository achievementProgressRepository;
 
-    public List<UserUnlockedAchievementDTO> getUnlockedAchievements(long playerId) {
-        return achievementMapper.multipleToUnlockedAchievementDTO(userUnlockedAchievementRepository.findAllByPlayerId(playerId));
+    public List<AchievementDTO> getUnlockedAchievements(long playerId) {
+        log.info("Fetching unlocked achievements for playerId: {}", playerId);
+
+        List<AchievementProgress> achievementProgress = achievementProgressRepository.findByPlayerId(playerId);
+        List<AchievementLevelHistory> levelHistory = historyRepository.findByPlayerId(playerId);
+
+        if (achievementProgress.isEmpty()) {
+            log.info("No achievements found for playerId: {}", playerId);
+            return new ArrayList<>();
+        }
+        
+        
+
+        List<Achievement> achievements = achievementProgress.stream()
+                .map(AchievementProgress::getAchievement)
+                .collect(Collectors.toList());
+
+        achievements.forEach(a -> log.debug("Achievement {} has levels: {}",
+                a.getId(),
+                a.getLevels().stream().map(AchievementLevel::getName).collect(Collectors.joining(", "))
+        ));
+
+        List<AchievementDTO> results = achievementMapper.multipleToDto(
+                achievements,
+                achievementProgress,
+                levelHistory
+        );
+        
+        results.forEach(dto -> {
+            log.debug("Achievement {} has {} unlocked levels",
+                    dto.getName(),
+                    dto.getUnlockedLevels() != null ? dto.getUnlockedLevels().size() : 0);
+        });
+
+        return results;
     }
 
     public void handleStoryAchievement(Long playerId, String storyName) {
@@ -54,21 +89,6 @@ public class AchievementService {
                 .achievedAt(Instant.now())
                 .build());
         
-        //TODO clean up
-
-//        if (userUnlockedAchievementRepository.existsByPlayerAndAchievement(player, achievement)) {
-//            log.debug("Player {} already has story achievement for {}", playerId, storyName);
-//            return;
-//        }
-//
-//        UserUnlockedAchievement unlockedAchievement = UserUnlockedAchievement.builder()
-//                .player(player)
-//                .achievement(achievement)
-//                .currentLevel(achievement.getLevels().get(0))
-//                .achievedAt(Instant.now())
-//                .build();
-//
-//        userUnlockedAchievementRepository.save(unlockedAchievement);
         log.info("Player {} unlocked new story achievement: {}", player.getUsername(), storyName);
         sendAchievementNotification(player, achievementLevelHistory);
     }
@@ -103,18 +123,10 @@ public class AchievementService {
                             .currentProgress(correctAnswers)
                             .nextLevelRequirement(achievement.getLevels().get(0).getRequirementValue()).build()
             );
-            //TODO fix tests 
-//            log.debug("Progress created for achievement: {} for player: {}", progress.getAchievement().getName(), player.getId());
+         
+            log.debug("Progress created for achievement: {} for player: {}", progress.getAchievement().getName(), player.getId());
         }
-        
-//        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository
-//                .findByPlayerAndAchievement(player, achievement);
 
-//        if (unlockedAchievement != null) {
-//            log.debug("Current achievement level for player {} in category {}: {}",
-//                    playerId, category, unlockedAchievement.getCurrentLevel().getLevel());
-//        }
-        
         boolean isEligibleForNextAchievement = progress.getCurrentProgress() >= progress.getNextLevelRequirement();
         
         if (isEligibleForNextAchievement) {
@@ -124,9 +136,6 @@ public class AchievementService {
         }
         
         achievementProgressRepository.save(progress);
-//        
-//        AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, correctAnswers);
-//        handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
     }
 
     private void handleAchievementCompletion(AchievementProgress progress) {
@@ -155,83 +164,43 @@ public class AchievementService {
         Achievement achievement = achievementRepository.findByName("Victories");
         Player player = playerService.getPlayerById(playerId);
 
-        int numOfWins = player.getStats().getNumOfWins();
-        log.debug("Player {} has {} total victories", player.getUsername(), numOfWins);
-
-        UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement);
-
-        AchievementLevel newLevel = determineNewAchievementLevel(unlockedAchievement, achievement, numOfWins);
-        handleAchievementLevelUpdate(player, achievement, unlockedAchievement, newLevel);
-    }
-
-    private AchievementLevel determineNewAchievementLevel(UserUnlockedAchievement unlockedAchievement, Achievement achievement, int currentProgress) {
-        log.debug("Determining new achievement level - Current progress: {}", currentProgress);
-        if (unlockedAchievement == null) {
-            AchievementLevel firstLevel = achievement.getLevels().get(0);
-            log.debug("No current achievement, checking first level requirement: {}", firstLevel.getRequirementValue());
-
-            return firstLevel.getRequirementValue() <= currentProgress ? firstLevel : null;
-        }
-
-        int currentLevel = unlockedAchievement.getCurrentLevel().getLevel();
-        if (currentLevel >= achievement.getLevels().size()) {
-            log.debug("Already at maximum achievement level: {}", currentLevel);
-            return null;
-        }
-        return achievement.getLevels().stream()
-                .filter(level -> level.getLevel() == currentLevel + 1)
-                .filter(level -> currentProgress >= level.getRequirementValue())
-                .findFirst()
-                .orElse(null);
-    }
-
-    private void handleAchievementLevelUpdate(Player player, Achievement achievement, UserUnlockedAchievement unlockedAchievement, AchievementLevel newLevel) {
-        if (newLevel == null) {
-            log.debug("No new achievement level available for player {} in {}",
-                    player.getUsername(), achievement.getName());
+        if (historyRepository.existsByPlayerAndAchievementLevel(player, achievement.getLastLevel())) {
+            log.debug("Player {} is already at maximum achievement level: {} for achievement {}", playerId, achievement.getLastLevel(), achievement.getName());
             return;
         }
 
-        if (unlockedAchievement == null) {
-            log.debug("Creating new achievement entry for player {} in {}",
-                    player.getUsername(), achievement.getName());
-            unlockedAchievement = UserUnlockedAchievement.builder()
-                    .player(player)
-                    .achievement(achievement)
-                    .currentLevel(newLevel)
-                    .achievedAt(Instant.now())
-                    .build();
+        int numOfWins = player.getStats().getNumOfWins();
+        log.debug("Player {} has {} total victories", player.getUsername(), numOfWins);
+
+        AchievementProgress progress = achievementProgressRepository.findByPlayerAndAchievement(player, achievement);
+        if (progress != null) {
+            progress.setCurrentProgress(numOfWins);
+            log.debug("Current achievement level for player {} in victories: {}. Current progress={}, next level={}",
+                    playerId, progress.getCurrentLevel().getLevel(), progress.getCurrentProgress(), progress.getNextLevelRequirement());
         } else {
-            log.debug("Updating achievement level for player {} in {} from {} to {}",
-                    player.getUsername(), achievement.getName(),
-                    unlockedAchievement.getCurrentLevel().getLevel(), newLevel.getLevel());
-            unlockedAchievement.setCurrentLevel(newLevel);
-            unlockedAchievement.setAchievedAt(Instant.now());
+            progress = achievementProgressRepository.save(
+                    AchievementProgress.builder()
+                            .achievement(achievement)
+                            .player(player)
+                            .currentLevel(achievement.getLevels().get(0))
+                            .currentProgress(numOfWins)
+                            .nextLevelRequirement(achievement.getLevels().get(0).getRequirementValue()).build()
+            );
+
+            log.debug("Progress created for achievement: {} for player: {}", progress.getAchievement().getName(), player.getId());
         }
 
-        userUnlockedAchievementRepository.save(unlockedAchievement);
-        log.info("Player {} reached {} achievement level {}: {}",
-                player.getUsername(), achievement.getName(),
-                newLevel.getLevel(), newLevel.getDescription());
+        boolean isEligibleForNextAchievement = progress.getCurrentProgress() >= progress.getNextLevelRequirement();
 
-        sendAchievementNotification(player, unlockedAchievement);
+        if (isEligibleForNextAchievement) {
+            handleAchievementCompletion(progress);
+        } else {
+            log.debug("Player {} not eligible for next achievement level", playerId);
+        }
+
+        achievementProgressRepository.save(progress);
     }
-
-    private void sendAchievementNotification(Player player, UserUnlockedAchievement unlockedAchievement) {
-        log.debug("Sending achievement notification to player {} for achievement {}",
-                player.getUsername(), unlockedAchievement.getAchievement().getName());
-
-        AchievementNotification achievementNotification = AchievementNotification.builder()
-                .achievementName(unlockedAchievement.getAchievement().getName())
-                .achievementDescription(unlockedAchievement.getCurrentLevel().getDescription())
-                .base64Image(ImageUtil.encodeAchievementImageToBase64(unlockedAchievement.getCurrentLevel().getImageUrl()))
-                .earnedAt(unlockedAchievement.getAchievedAt())
-                .build();
-
-        simpMessagingTemplate.convertAndSendToUser(player.getUsername(), "/queue/achievements", achievementNotification);
-        log.debug("Achievement notification sent successfully");
-    }
-
+    
     private void sendAchievementNotification(Player player, AchievementLevelHistory achievementLevelHistory) {
         log.debug("Sending achievement notification to player {} for achievement {}",
                 player.getUsername(), achievementLevelHistory.getAchievement().getName());
