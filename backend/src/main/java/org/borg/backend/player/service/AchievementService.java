@@ -84,8 +84,22 @@ public class AchievementService {
         log.debug("Player {} has {} correct answers in category {}",
                 player.getUsername(), correctAnswers, category);
         
-        AchievementProgress progress = achievementProgressRepository.findBy
-
+        AchievementProgress progress = achievementProgressRepository.findByPlayerAndAchievement(player, achievement);
+        if (progress != null) {
+            log.debug("Current achievement level for player {} in category {}: {}. Current progress={}, next level={}",
+                    playerId, category, progress.getCurrentLevel().getLevel(), progress.getCurrentProgress(), progress.getNextLevelRequirement());
+        } else {
+            progress = achievementProgressRepository.save(
+                    AchievementProgress.builder()
+                            .achievement(achievement)
+                            .player(player)
+                            .currentLevel(achievement.getLevels().get(0))
+                            .currentProgress(correctAnswers)
+                            .nextLevelRequirement(achievement.getLevels().get(0).getRequirementValue()).build()
+            );
+            log.debug("Progress created for achievement: {} for player: {}", progress.getAchievement().getName(), player.getId());
+        }
+        
         UserUnlockedAchievement unlockedAchievement = userUnlockedAchievementRepository
                 .findByPlayerAndAchievement(player, achievement);
 

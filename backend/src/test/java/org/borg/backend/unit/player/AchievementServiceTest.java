@@ -37,6 +37,8 @@ class AchievementServiceTest {
     private SimpMessagingTemplate simpMessagingTemplate;
     @Mock
     private AchievementLevelHistoryRepository historyRepository;
+    @Mock
+    private AchievementProgressRepository progressRepository;
 
     @InjectMocks
     private AchievementService achievementService;
@@ -178,6 +180,7 @@ class AchievementServiceTest {
                 when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
                 when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
                 when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
+                when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
 
                 achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
 
@@ -219,6 +222,7 @@ class AchievementServiceTest {
                 when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
                 when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
                 when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingUnlock);
+                when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
 
                 achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
 
@@ -246,6 +250,7 @@ class AchievementServiceTest {
             when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
             when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
+            when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
 
             achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
         }
@@ -285,6 +290,7 @@ class AchievementServiceTest {
             when(achievementRepository.findByName(CATEGORY)).thenReturn(achievement);
             when(playerService.getPlayerById(PLAYER_ID)).thenReturn(player);
             when(userUnlockedAchievementRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(existingUnlock);
+            when(progressRepository.findByPlayerAndAchievement(player, achievement)).thenReturn(null);
 
             achievementService.handleCategoryAchievement(PLAYER_ID, CATEGORY);
 
