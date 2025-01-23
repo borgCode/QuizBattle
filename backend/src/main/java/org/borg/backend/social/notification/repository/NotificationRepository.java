@@ -2,6 +2,8 @@ package org.borg.backend.social.notification.repository;
 
 import org.borg.backend.social.notification.model.Notification;
 import org.borg.backend.social.notification.model.NotificationType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,7 +36,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "AND n.isArchived = false " +
             "AND n.hiddenByBlock = false " +
             "ORDER BY n.createdAt DESC")
-    List<Notification> findByPlayerIdAndIsArchivedFalse(@Param("playerId") Long playerId);
+    Page<Notification> findByPlayerIdAndIsArchivedFalse(@Param("playerId") Long playerId, Pageable pageable);
 
     @Modifying
     @Transactional

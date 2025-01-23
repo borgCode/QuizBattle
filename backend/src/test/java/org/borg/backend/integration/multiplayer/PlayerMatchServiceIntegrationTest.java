@@ -23,6 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +53,7 @@ public class PlayerMatchServiceIntegrationTest {
     private Player sendingPlayer;
     private Player opponentPlayer;
     private MultiplayerSession completedMultiplayerSession;
+    private final Pageable pageable = PageRequest.of(0, 15);
 
     @BeforeEach
     void setUp() {
@@ -97,15 +101,14 @@ public class PlayerMatchServiceIntegrationTest {
         assertAll("Post-accept state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
                         sendingPlayer.getId(), opponentPlayer.getId())),
-                () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId()).isEmpty()),
+                () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId(), pageable).isEmpty()),
                 () -> assertTrue(multiplayerSessionRepository.checkIfOngoingSessionExists(
                         sendingPlayer.getId(), opponentPlayer.getId(), GameStatus.ACTIVE))
         );
 
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
-        Notification sendingPlayerNotification = sendingPlayerNotifications.get(0);
+        Page<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId(), pageable);
+        Notification sendingPlayerNotification = sendingPlayerNotifications.getContent().get(0);
         assertEquals(NotificationType.REMATCH_ACCEPTED, sendingPlayerNotification.getType());
-
     }
 
     @Test
@@ -117,13 +120,13 @@ public class PlayerMatchServiceIntegrationTest {
         assertAll("Post-reject state checks",
                 () -> assertNull(pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
                         sendingPlayer.getId(), opponentPlayer.getId())),
-                () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId()).isEmpty()),
+                () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId(), pageable).isEmpty()),
                 () -> assertFalse(multiplayerSessionRepository.checkIfOngoingSessionExists(
                         sendingPlayer.getId(), opponentPlayer.getId(), GameStatus.ACTIVE))
         );
 
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
-        Notification sendingPlayerNotification = sendingPlayerNotifications.get(0);
+        Page<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId(), pageable);
+        Notification sendingPlayerNotification = sendingPlayerNotifications.getContent().get(0);
         assertEquals(NotificationType.REMATCH_DECLINED, sendingPlayerNotification.getType());
     }
     
@@ -134,8 +137,8 @@ public class PlayerMatchServiceIntegrationTest {
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(sendingPlayer.getId(), opponentPlayer.getId());
         assertNotNull(pendingSession);
 
-        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId());
-        Notification opponentNotification = opponentNotifications.get(0);
+        Page<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId(), pageable);
+        Notification opponentNotification = opponentNotifications.getContent().get(0);
         assertAll("Opponent notification checks",
                 () -> assertEquals(pendingSession.getId(), opponentNotification.getPendingSessionId()),
                 () -> assertEquals(sendingPlayer.getDisplayName() + " requested a rematch against you!",
@@ -162,14 +165,14 @@ public class PlayerMatchServiceIntegrationTest {
         RematchRequest rematchRequest = new RematchRequest(completedMultiplayerSession.getId(), sendingPlayer.getId());
         playerMatchService.requestRematch(rematchRequest);
 
-        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId());
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
+        Page<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId(), pageable);
+        Page<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId(), pageable);
 
         assertAll("Both players should only have rematch accepted notifications",
-                () -> assertTrue(opponentNotifications.size() == 1
-                        && opponentNotifications.get(0).getType().equals(NotificationType.REMATCH_ACCEPTED)),
-                () -> assertTrue(sendingPlayerNotifications.size() == 1
-                        && sendingPlayerNotifications.get(0).getType().equals(NotificationType.REMATCH_ACCEPTED))
+                () -> assertTrue(opponentNotifications.getTotalElements() == 1
+                        && opponentNotifications.getContent().get(0).getType().equals(NotificationType.REMATCH_ACCEPTED)),
+                () -> assertTrue(sendingPlayerNotifications.getTotalElements() == 1
+                        && sendingPlayerNotifications.getContent().get(0).getType().equals(NotificationType.REMATCH_ACCEPTED))
         );
 
         assertAll("Previous pending states should be cleaned up",
@@ -230,9 +233,9 @@ public class PlayerMatchServiceIntegrationTest {
         PendingSession pendingSession = pendingSessionRepository.findByRequestingPlayerIdAndOpponentId(
                 sendingPlayer.getId(), opponentPlayer.getId());
         assertNotNull(pendingSession);
-        
-        List<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId());
-        Notification opponentNotification = opponentNotifications.get(0);
+
+        Page<Notification> opponentNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(opponentPlayer.getId(), pageable);
+        Notification opponentNotification = opponentNotifications.getContent().get(0);
         assertAll("Regular match notification checks",
                 () -> assertEquals(pendingSession.getId(), opponentNotification.getPendingSessionId()),
                 () -> assertEquals(sendingPlayer.getDisplayName() + " requested a match against you!",
@@ -250,8 +253,8 @@ public class PlayerMatchServiceIntegrationTest {
         );
         playerMatchService.handleMatchAccept(response);
 
-        List<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId());
-        assertEquals(NotificationType.MATCH_ACCEPTED, sendingPlayerNotifications.get(0).getType());
+        Page<Notification> sendingPlayerNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(sendingPlayer.getId(), pageable);
+        assertEquals(NotificationType.MATCH_ACCEPTED, sendingPlayerNotifications.getContent().get(0).getType());
     }
 }
 

@@ -22,6 +22,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +54,8 @@ class FriendshipServiceIntegrationTest {
 
     private Player player1;
     private Player player2;
+    private final Pageable pageable = PageRequest.of(0, 15);
+    
     @Autowired
     private PlayerBlockService playerBlockService;
 
@@ -94,7 +99,8 @@ class FriendshipServiceIntegrationTest {
 
             friendshipService.handleFriendshipResponse(response, true);
 
-            assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
+            Page<Notification> receiverNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable);
+            assertTrue(receiverNotifications.isEmpty());
 
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
             assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
@@ -106,8 +112,8 @@ class FriendshipServiceIntegrationTest {
                     () -> assertEquals(FriendshipStatus.ACTIVE, actualFriendship.getStatus(), "Friendship should be ACTIVE")
             );
 
-            List<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId());
-            Notification friendRequestAcceptedNotification = notifications.get(0);
+            Page<Notification> senderNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId(), pageable);
+            Notification friendRequestAcceptedNotification = senderNotifications.getContent().get(0);
             assertEquals(NotificationType.FRIEND_ACCEPTED, friendRequestAcceptedNotification.getType());
         }
 
@@ -118,9 +124,9 @@ class FriendshipServiceIntegrationTest {
             friendshipService.handleFriendshipResponse(response, false);
 
             assertAll("Verify friend request rejection",
-                    () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty()),
+                    () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable).isEmpty()),
                     () -> assertTrue(friendshipRepository.findByPlayer1AndPlayer2(player1, player2).isEmpty(), "Friendship was not deleted"),
-                    () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId()).isEmpty())
+                    () -> assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId(), pageable).isEmpty())
             );
         }
 
@@ -146,14 +152,14 @@ class FriendshipServiceIntegrationTest {
             PlayerInteraction secondPlayerInteraction = new PlayerInteraction(player2.getId(), player1.getId());
             friendshipService.sendFriendRequest(secondPlayerInteraction);
 
-            List<Notification> notificationsPlayer1 = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId());
-            List<Notification> notificationsPlayer2 = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId());
+            Page<Notification> notificationsPlayer1 = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId(), pageable);
+            Page<Notification> notificationsPlayer2 = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable);
 
             assertAll("Both players should only have friend request accepted notifications",
-                    () -> assertTrue(notificationsPlayer1.size() == 1
-                            && notificationsPlayer1.get(0).getType().equals(NotificationType.FRIEND_ACCEPTED)),
-                    () -> assertTrue(notificationsPlayer2.size() == 1
-                            && notificationsPlayer2.get(0).getType().equals(NotificationType.FRIEND_ACCEPTED))
+                    () -> assertTrue(notificationsPlayer1.getTotalElements() == 1
+                            && notificationsPlayer1.getContent().get(0).getType().equals(NotificationType.FRIEND_ACCEPTED)),
+                    () -> assertTrue(notificationsPlayer2.getTotalElements() == 1
+                            && notificationsPlayer2.getContent().get(0).getType().equals(NotificationType.FRIEND_ACCEPTED))
             );
 
             assertFalse(friendshipRepository.findExistingFriendshipByPlayers(player1, player2).isEmpty());
@@ -194,7 +200,7 @@ class FriendshipServiceIntegrationTest {
 
             assertEquals(BusinessErrorCodes.FRIENDSHIP_NOT_FOUND, exception.getErrorCode());
 
-            assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
+            assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable).isEmpty());
         }
     }
 
@@ -222,7 +228,7 @@ class FriendshipServiceIntegrationTest {
             Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
             assertFalse(friendship.isPresent(), "Relationship was not deleted from repo after removing friend");
 
-            assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId()).isEmpty());
+            assertTrue(notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable).isEmpty());
         }
     }
     
@@ -259,8 +265,8 @@ class FriendshipServiceIntegrationTest {
 
         Optional<Friendship> friendship = friendshipRepository.findByPlayer1AndPlayer2(player1, player2);
 
-        List<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId());
-        Notification friendRequestNotification = notifications.get(0);
+        Page<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable);
+        Notification friendRequestNotification = notifications.getContent().get(0);
 
         assertTrue(friendship.isPresent(), "Friendship was not saved to repository");
 
