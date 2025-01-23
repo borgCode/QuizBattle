@@ -20,9 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
@@ -169,9 +166,9 @@ public class PlayerBlockIntegrationTest {
                 player1, player2);
         assertTrue(friendships.isEmpty(), "No friendship should be created when blocked");
 
-        Pageable pageable = PageRequest.of(0, 15);
-        Page<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId(), pageable);
-        assertEquals(0, notifications.getContent().size(), "Should have no notifications");
+        
+        List<Notification> notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId());
+        assertEquals(0, notifications.size(), "Should have no notifications");
     }
     
 

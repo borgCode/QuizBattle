@@ -9,8 +9,6 @@ import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +24,8 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
-    public Page<Notification> getActivePlayerNotifications(Long playerId, Pageable pageable) {
-        return notificationRepository.findByPlayerIdAndIsArchivedFalse(playerId, pageable);
+    public List<Notification> getActivePlayerNotifications(Long playerId) {
+        return notificationRepository.findByPlayerIdAndIsArchivedFalse(playerId);
     }
 
     public List<Notification> getAllPlayerNotifications(Long playerId) {

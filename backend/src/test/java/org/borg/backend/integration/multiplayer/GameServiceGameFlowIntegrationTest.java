@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -462,16 +459,16 @@ public class GameServiceGameFlowIntegrationTest {
     }
 
     private void verifyNotifications(NotificationType player1ExpectedType, NotificationType player2ExpectedType) {
-        Pageable pageable = PageRequest.of(0, 15);
-        Page<Notification> player1Notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId(), pageable);
-        Page<Notification> player2Notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable);
+
+        List<Notification> player1Notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player1.getId());
+        List<Notification> player2Notifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId());
 
         assertAll("Post-game notification checks",
-                () -> assertTrue(player1Notifications.getTotalElements() == 1
-                                && player1Notifications.getContent().get(0).getType().equals(player1ExpectedType),
+                () -> assertTrue(player1Notifications.size() == 1
+                                && player1Notifications.get(0).getType().equals(player1ExpectedType),
                         String.format("Player 1 should have one unread %s notification.", player1ExpectedType)),
-                () -> assertTrue(player2Notifications.getTotalElements() == 1
-                                && player2Notifications.getContent().get(0).getType().equals(player2ExpectedType),
+                () -> assertTrue(player2Notifications.size() == 1
+                                && player2Notifications.get(0).getType().equals(player2ExpectedType),
                         String.format("Player 2 should have one unread %s notification.", player2ExpectedType))
         );
     }

@@ -14,9 +14,6 @@ import org.borg.backend.player.model.Player;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -49,7 +46,6 @@ public class NotificationIntegrationTest {
     
     Player sendingPlayer;
     private final Long playerWithNotificationsId = 1L;
-    private final Pageable pageable = PageRequest.of(0, 15);
 
     @BeforeEach
     void setUp() {
@@ -68,15 +64,15 @@ public class NotificationIntegrationTest {
     void testMarkingAsRead() {
         notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 
-        Page<Notification> notificationPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-        assertEquals(1, notificationPage.getContent().size(), "Player should have one notification");
-        assertFalse(notificationPage.getContent().get(0).isRead(), "Notification should be unread");
+        List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        assertEquals(1, notificationList.size(), "Player should have one notification");
+        assertFalse(notificationList.get(0).isRead(), "Notification should be unread");
 
-        notificationService.markAsRead(notificationPage.getContent().get(0).getId(), playerWithNotificationsId);
+        notificationService.markAsRead(notificationList.get(0).getId(), playerWithNotificationsId);
 
-        Page<Notification> updatedNotificationsPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-        assertEquals(1, updatedNotificationsPage.getContent().size(), "Player should have one notification");
-        assertTrue(updatedNotificationsPage.getContent().get(0).isRead(), "Notification should be marked as read");
+        List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        assertEquals(1, notificationList.size(), "Player should have one notification");
+        assertTrue(updatedNotificationsList.get(0).isRead(), "Notification should be marked as read");
     }
 
     @Test
@@ -86,19 +82,19 @@ public class NotificationIntegrationTest {
         notificationService.sendGameLostNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
         notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 
-        Page<Notification> notificationPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-        List<Notification> readNotifications = notificationPage.getContent().stream()
+        List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        List<Notification> readNotifications = notificationList.stream()
                 .filter(Notification::isRead)
                 .toList();
         assertEquals(0, readNotifications.size(), "Player should have 0 read notifications");
 
-        List<Long> notificationIds = notificationPage.getContent().stream()
+        List<Long> notificationIds = notificationList.stream()
                 .map(Notification::getId)
                 .toList();
         notificationService.markAllAsRead(notificationIds, playerWithNotificationsId);
 
-        Page<Notification> updatedNotificationsPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-        List<Notification> updatedReadNotifications = updatedNotificationsPage.getContent().stream()
+        List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        List<Notification> updatedReadNotifications = updatedNotificationsList.stream()
                 .filter(Notification::isRead)
                 .toList();
         assertEquals(4, updatedReadNotifications.size(), "Player should have 4 read notifications");
@@ -108,14 +104,14 @@ public class NotificationIntegrationTest {
     void testMarkingAsArchived() {
         notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 
-        Page<Notification> notificationPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-        notificationService.archiveNotification(notificationPage.getContent().get(0).getId(), playerWithNotificationsId);
+        List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        notificationService.archiveNotification(notificationList.get(0).getId(), playerWithNotificationsId);
 
-        Page<Notification> updatedNotificationsPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-        assertEquals(0, updatedNotificationsPage.getContent().size(), "Notification should be marked as archived");
+        List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        assertEquals(0, updatedNotificationsList.size(), "Notification should be marked as archived");
 
-        List<Notification> allNotifications = notificationService.getAllPlayerNotifications(playerWithNotificationsId);
-        assertEquals(1, allNotifications.size(), "Notification should still exist but be archived");
+        updatedNotificationsList = notificationService.getAllPlayerNotifications(playerWithNotificationsId);
+        assertEquals(1, updatedNotificationsList.size(), "Notification should be marked as archived");
     }
 
     @Test
@@ -127,11 +123,11 @@ public class NotificationIntegrationTest {
         Instant futureTime = Instant.now().plus(Duration.ofHours(25));
         notificationCleanUpService.archiveNotifications(futureTime);
 
-        Page<Notification> activeNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
+        List<Notification> activeNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
         assertAll("Active notifications at 25 hours",
-                () -> assertEquals(1, activeNotifications.getContent().size(),
+                () -> assertEquals(1, activeNotifications.size(),
                         "There should only be one active notification"),
-                () -> assertEquals(NotificationType.GAME_WON, activeNotifications.getContent().get(0).getType(),
+                () -> assertEquals(NotificationType.GAME_WON, activeNotifications.get(0).getType(),
                         "Active notification should be GAME_WON")
         );
 
@@ -141,8 +137,8 @@ public class NotificationIntegrationTest {
         Instant laterTime = Instant.now().plus(Duration.ofHours(49));
         notificationCleanUpService.archiveNotifications(laterTime);
 
-        Page<Notification> laterActiveNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-        assertEquals(0, laterActiveNotifications.getContent().size(),
+        List<Notification> laterActiveNotifications = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+        assertEquals(0, laterActiveNotifications.size(),
                 "There should be no active notifications after 49 hours");
     }
 
@@ -195,17 +191,17 @@ public class NotificationIntegrationTest {
             notificationService.sendGameWonNotification(receiverId, player2.getDisplayName(), 1L);
             notificationService.sendGameLostNotification(receiverId, player2.getDisplayName(), 2L);
 
-            Page<Notification> initialNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(receiverId, pageable);
+            List<Notification> initialNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(receiverId);
             assertFalse(initialNotifications.isEmpty(), "Should have notifications before block");
-            assertFalse(initialNotifications.getContent().stream().anyMatch(Notification::isHiddenByBlock),
+            assertFalse(initialNotifications.stream().anyMatch(Notification::isHiddenByBlock),
                     "No notifications should be hidden initially");
 
             playerBlockService.blockPlayer(receiverId, player2.getId());
 
             await().atMost(Duration.ofSeconds(2))
                     .untilAsserted(() -> {
-                        Page<Notification> hiddenNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId(), pageable);
-                        assertTrue(hiddenNotifications.getContent().stream().allMatch(Notification::isHiddenByBlock),
+                        List<Notification> hiddenNotifications = notificationRepository.findByPlayerIdAndIsArchivedFalse(player2.getId());
+                        assertTrue(hiddenNotifications.stream().allMatch(Notification::isHiddenByBlock),
                                 "All notifications should be hidden after block");
                     });
 
@@ -251,10 +247,10 @@ public class NotificationIntegrationTest {
         void shouldThrowErrorWhenArchiving_WhenNotMatchingPlayerId() {
             notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 
-            Page<Notification> notificationPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
+            List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
 
             AccessDeniedException exception = assertThrows(AccessDeniedException.class,
-                    () -> notificationService.archiveNotification(notificationPage.getContent().get(0).getId(), sendingPlayer.getId()));
+                    () -> notificationService.archiveNotification(notificationList.get(0).getId(), sendingPlayer.getId()));
 
             assertEquals("Not authorized to mark notification as archived", exception.getMessage());
         }
@@ -263,10 +259,10 @@ public class NotificationIntegrationTest {
         void shouldThrowErrorWhenMarkingAsRead_WhenNotMatchingPlayerId() {
             notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
 
-            Page<Notification> notificationPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
+            List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
 
             AccessDeniedException exception = assertThrows(AccessDeniedException.class,
-                    () -> notificationService.markAsRead(notificationPage.getContent().get(0).getId(), sendingPlayer.getId()));
+                    () -> notificationService.markAsRead(notificationList.get(0).getId(), sendingPlayer.getId()));
 
             assertEquals("Not authorized to mark notification as read", exception.getMessage());
         }
@@ -276,8 +272,8 @@ public class NotificationIntegrationTest {
             notificationService.sendFriendAcceptedNotification(playerWithNotificationsId, sendingPlayer);
             notificationService.sendGameWonNotification(playerWithNotificationsId, sendingPlayer.getDisplayName(), 999L);
 
-            Page<Notification> notificationPage = notificationService.getActivePlayerNotifications(playerWithNotificationsId, pageable);
-            List<Long> notificationIds = notificationPage.getContent().stream()
+            List<Notification> notificationList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
+            List<Long> notificationIds = notificationList.stream()
                     .map(Notification::getId)
                     .toList();
 
