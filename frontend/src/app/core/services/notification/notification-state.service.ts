@@ -56,7 +56,7 @@ export class NotificationStateService {
     }).subscribe({
       next: () => {
         this.alertMessageService.show("Accepted friend request!", 'success')
-        this.moveToRead(notificationId);
+        this.removeFromList(notificationId);
       },
     })
   }
@@ -69,7 +69,7 @@ export class NotificationStateService {
     }).subscribe({
       next: () => {
         this.alertMessageService.show("Friend request rejected!", 'success')
-        this.moveToRead(notificationId);
+        this.removeFromList(notificationId);
       },
     })
   }
@@ -85,7 +85,7 @@ export class NotificationStateService {
         rematch: true
       }
     }).pipe(
-      tap(() => this.moveToRead(notificationId))
+      tap(() => this.removeFromList(notificationId))
     )
   }
 
@@ -102,7 +102,7 @@ export class NotificationStateService {
     }).subscribe({
       next: () => {
         this.alertMessageService.show("You declined the rematch!", 'success')
-        this.moveToRead(notificationId);
+        this.removeFromList(notificationId);
       },
     })
   }
@@ -153,16 +153,42 @@ export class NotificationStateService {
     })
   }
 
-  archiveNotification(notificationId: number) {
-    this.notificationService.archiveNotification({notificationId: notificationId, playerId: this._playerId}).subscribe({
-      next: () => {
-        const currentState = this.notificationStateSubject.getValue();
+  private removeFromList(notificationId: number) {
+    const currentState = this.notificationStateSubject.getValue();
+    const notificationExists = currentState.unread.some(n => n.id === notificationId) ||
+      currentState.read.some(n => n.id === notificationId);
+
+    if (notificationExists) {
+      const newUnread = currentState.unread.filter(notification =>
+        notification && notification.id !== notificationId
+      );
+      const newRead = currentState.read.filter(notification =>
+        notification && notification.id !== notificationId
+      );
+
+      if (newUnread.length !== currentState.unread.length ||
+        newRead.length !== currentState.read.length) {
         this.notificationStateSubject.next({
-          unread: currentState.unread.filter(notification => notification.id !== notificationId),
-          read: currentState.read.filter(notification => notification.id !== notificationId),
-        })
+          unread: newUnread,
+          read: newRead
+        });
       }
-    })
+    }
+  }
+
+  archiveNotification(notificationId: number) {
+    this.notificationService.archiveNotification({
+      notificationId: notificationId,
+      playerId: this._playerId
+    }).subscribe({
+      next: () => {
+        this.removeFromList(notificationId);
+      },
+      error: (error) => {
+        console.error('Error archiving notification:', error);
+        this.loadNotifications();
+      }
+    });
   }
 
   set playerId(value: number) {

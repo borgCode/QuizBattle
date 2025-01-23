@@ -26,7 +26,8 @@
       </div>
       <div class="notification-list">
         <div *ngFor="let notification of state.unread">
-          <div class="notification-item p-3 border-bottom unread position-relative"
+          <div *ngIf="notification && notification.id"
+               class="notification-item p-3 border-bottom unread position-relative"
                (click)="markAsRead(notification.id)">
             <ng-container [ngSwitch]="notification.type">
               <div *ngSwitchCase="'FRIEND_REQUEST'" class="d-flex align-items-start p-2">
@@ -300,7 +301,8 @@
       </div>
       <div class="notification-list">
         <div *ngFor="let notification of state.read">
-          <div class="notification-item p-3 border-bottom position-relative">
+          <div *ngIf="notification && notification.id"
+          class="notification-item p-3 border-bottom position-relative">
             <ng-container [ngSwitch]="notification.type">
               <div *ngSwitchCase="'FRIEND_REQUEST'" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
