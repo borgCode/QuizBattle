@@ -1,33 +1,31 @@
 <div class="dropdown">
-  <button class="btn btn-dark position-relative" id="notificationsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-          aria-expanded="false">
-    <i class="fa-regular fa-bell"></i>
-    <ng-container *ngIf="unreadNotifications$ | async as unreadNotifications">
-      <span *ngIf="unreadNotifications.length > 0"
+  <ng-container *ngIf="notificationStateService.notificationState$ | async as state">
+    <button class="btn btn-dark position-relative" id="notificationsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+            aria-expanded="false">
+      <i class="fa-regular fa-bell"></i>
+      <span *ngIf="state.unread.length > 0"
             class="notification-badge position-absolute badge rounded-pill bg-danger">
-        {{ unreadNotifications.length }}
+        {{ state.unread.length }}
       </span>
-    </ng-container>
-  </button>
-  <div class="dropdown-menu dropdown-menu-end notification-panel p-0">
-    <div class="d-flex justify-content-between p-3 border-bottom">
-      <div class="btn btn-light d-flex"
-           data-bs-toggle="tooltip"
-           title="Mark all as read"
-           (click)="markAllAsRead()">
-        <i class="fa-regular fa-envelope-open"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-end notification-panel p-0">
+      <div class="d-flex justify-content-between p-3 border-bottom">
+        <div class="btn btn-light d-flex"
+             data-bs-toggle="tooltip"
+             title="Mark all as read"
+             (click)="markAllAsRead()">
+          <i class="fa-regular fa-envelope-open"></i>
+        </div>
+        <h6>Notifications</h6>
+        <div class="btn btn-light d-flex"
+             data-bs-toggle="tooltip"
+             data-bs-placement="right"
+             title="Archived notifications">
+          <i class="fa-solid fa-box-archive"></i>
+        </div>
       </div>
-      <h6>Notifications</h6>
-      <div class="btn btn-light d-flex"
-           data-bs-toggle="tooltip"
-           data-bs-placement="right"
-           title="Archived notifications">
-        <i class="fa-solid fa-box-archive"></i>
-      </div>
-    </div>
-    <ng-container *ngIf="unreadNotifications$ | async as unreadNotifications">
       <div class="notification-list">
-        <div *ngFor="let notification of unreadNotifications">
+        <div *ngFor="let notification of state.unread">
           <div class="notification-item p-3 border-bottom unread position-relative"
                (click)="markAsRead(notification.id)">
             <ng-container [ngSwitch]="notification.type">
@@ -300,10 +298,8 @@
           </div>
         </div>
       </div>
-    </ng-container>
-    <ng-container *ngIf="readNotifications$ | async as readNotifications">
       <div class="notification-list">
-        <div *ngFor="let notification of readNotifications">
+        <div *ngFor="let notification of state.read">
           <div class="notification-item p-3 border-bottom position-relative">
             <ng-container [ngSwitch]="notification.type">
               <div *ngSwitchCase="'FRIEND_REQUEST'" class="d-flex align-items-start p-2">
@@ -574,8 +570,8 @@
           </div>
         </div>
       </div>
-    </ng-container>
-  </div>
+    </div>
+  </ng-container>
 </div>
 
 <div class="modal fade" id="goToGameModal">

@@ -19,10 +19,20 @@ import org.borg.backend.social.chat.model.Conversation;
 import org.borg.backend.social.chat.model.Message;
 import org.borg.backend.social.chat.repository.ConversationRepository;
 import org.borg.backend.social.chat.repository.MessageRepository;
+import org.borg.backend.social.friendship.model.Friendship;
+import org.borg.backend.social.friendship.model.FriendshipStatus;
+import org.borg.backend.social.friendship.repository.FriendshipRepository;
+import org.borg.backend.social.notification.model.Notification;
+import org.borg.backend.social.notification.model.NotificationType;
+import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,13 +49,15 @@ public class InitFakeDataService {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final PlayerService playerService;
+    private final FriendshipRepository friendshipRepository;
+    private final NotificationRepository notificationRepository;
 
     public enum Outcome {
         PLAYER1_WINS,
         PLAYER2_WINS,
-        TIE
-    }
+        TIE;
 
+    }
     private Player generateRandomPlayer(Role role, Set<String> existingUsernames) {
         String username;
         do {
@@ -63,7 +75,6 @@ public class InitFakeDataService {
                 .enabled(true)
                 .build();
     }
-
     public List<Player> generateRandomPlayers(Role role, int count) {
         Set<String> existingUsernames = new HashSet<>();
         return IntStream.range(0, count)
@@ -313,8 +324,8 @@ public class InitFakeDataService {
 
     @Transactional
     public void generatePlayerStats(List<Player> players) {
-        for (int i = 0; i < 1000; i++) {
-            playerRepository.save(generatePlayerStat(players.get(i)));
+        for (Player player : players) {
+            playerRepository.save(generatePlayerStat(player));
         }
     }
 
@@ -372,5 +383,155 @@ public class InitFakeDataService {
                 .conversation(conversation)
                 .read(false)
                 .content(faker.lorem().sentence(3)).build();
+    }
+
+    public void generateFriendsForPlayer(int count, long playerId) {
+        Player targetPlayer = playerRepository.findById(playerId)
+                .orElseThrow();
+        List<Player> availablePlayers = playerRepository.findAll().stream()
+                .filter(player -> !player.getId().equals(playerId))
+                .toList();
+
+        List<Friendship> friendships = new ArrayList<>();
+        
+        for (int i = 0; i < Math.min(count, availablePlayers.size()); i++) {
+            Player randomPlayer = getRandomUnusedPlayer(availablePlayers, friendships);
+
+            if (randomPlayer == null) {
+                break; 
+            }
+            
+            LocalDate friendshipDate = faker.date().birthday(0, 1)
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            
+            FriendshipStatus status = getRandomFriendshipStatus();
+            
+            boolean isTargetPlayer1 = random.nextBoolean();
+            Friendship friendship = isTargetPlayer1
+                    ? new Friendship(targetPlayer, randomPlayer, friendshipDate, status)
+                    : new Friendship(randomPlayer, targetPlayer, friendshipDate, status);
+
+            friendships.add(friendship);
+        }
+        
+        friendshipRepository.saveAll(friendships);
+    }
+
+    private Player getRandomUnusedPlayer(List<Player> availablePlayers, List<Friendship> existingFriendships) {
+        List<Player> unusedPlayers = availablePlayers.stream()
+                .filter(player -> !isPlayerInFriendships(player, existingFriendships))
+                .toList();
+
+        if (unusedPlayers.isEmpty()) {
+            return null;
+        }
+
+        return unusedPlayers.get(random.nextInt(unusedPlayers.size()));
+    }
+
+    private boolean isPlayerInFriendships(Player player, List<Friendship> friendships) {
+        return friendships.stream()
+                .anyMatch(friendship ->
+                        friendship.getPlayer1().getId().equals(player.getId()) ||
+                                friendship.getPlayer2().getId().equals(player.getId()));
+    }
+
+    private FriendshipStatus getRandomFriendshipStatus() {
+        FriendshipStatus[] statuses = FriendshipStatus.values();
+        return statuses[random.nextInt(statuses.length)];
+    }
+
+    public void generateNotificationsForPlayer(int count, long playerId) {
+        List<Notification> notifications = new ArrayList<>();
+        List<Player> otherPlayers = playerRepository.findAll().stream()
+                .filter(p -> !p.getId().equals(playerId))
+                .toList();
+
+        if (otherPlayers.isEmpty()) {
+            throw new IllegalStateException("Need at least one other player to generate notifications");
+        }
+
+        for (int i = 0; i < count; i++) {
+            notifications.add(generateRandomNotification(playerId, otherPlayers));
+        }
+
+        notificationRepository.saveAll(notifications);
+    }
+
+    private Notification generateRandomNotification(Long playerId, List<Player> otherPlayers) {
+        NotificationType type = getRandomNotificationType();
+        Player otherPlayer = getRandomPlayer(otherPlayers);
+
+        return Notification.builder()
+                .recipientId(playerId)
+                .senderId(needsSender(type) ? otherPlayer.getId() : null)
+                .type(type)
+                .message(generateMessage(type, otherPlayer))
+                .pendingSessionId(isMatchRelated(type) ? faker.random().nextLong(1000) : null)
+                .startedSessionId(isGameRelated(type) ? faker.random().nextLong(1000) : null)
+                .isRead(random.nextBoolean())
+                .isArchived(random.nextInt(100) < 20) 
+                .hiddenByBlock(random.nextInt(100) < 10) 
+                .createdAt(generateRandomTimestamp())
+                .build();
+    }
+
+    private NotificationType getRandomNotificationType() {
+        NotificationType[] types = NotificationType.values();
+        return types[random.nextInt(types.length)];
+    }
+
+    private Player getRandomPlayer(List<Player> players) {
+        return players.get(random.nextInt(players.size()));
+    }
+
+    private boolean needsSender(NotificationType type) {
+        return switch (type) {
+            case FRIEND_REQUEST, FRIEND_ACCEPTED, MATCH_REQUEST, REMATCH_REQUEST -> true;
+            default -> false;
+        };
+    }
+
+    private boolean isMatchRelated(NotificationType type) {
+        return switch (type) {
+            case MATCH_REQUEST, REMATCH_REQUEST -> true;
+            default -> false;
+        };
+    }
+
+    private boolean isGameRelated(NotificationType type) {
+        return switch (type) {
+            case GAME_WON, GAME_LOST, GAME_TIED -> true;
+            default -> false;
+        };
+    }
+
+    private String generateMessage(NotificationType type, Player otherPlayer) {
+        return switch (type) {
+            case FRIEND_REQUEST -> otherPlayer.getDisplayName() + " sent you a friend request!";
+            case FRIEND_ACCEPTED -> otherPlayer.getDisplayName() + " accepted your friend request!";
+            case MATCH_REQUEST -> otherPlayer.getDisplayName() + " requested a match against you!";
+            case MATCH_ACCEPTED -> "Your match request against " + otherPlayer.getDisplayName() + " was accepted!";
+            case MATCH_DECLINED -> "Your match request against " + otherPlayer.getDisplayName() + " was declined!";
+            case REMATCH_REQUEST -> otherPlayer.getDisplayName() + " requested a rematch against you!";
+            case REMATCH_ACCEPTED -> "Your rematch request against " + otherPlayer.getDisplayName() + " was accepted!";
+            case REMATCH_DECLINED -> "Your rematch request against " + otherPlayer.getDisplayName() + " was declined!";
+            case GAME_WON -> "You won your match against " + otherPlayer.getDisplayName() + "!";
+            case GAME_LOST -> "You lost your match against " + otherPlayer.getDisplayName() + "!";
+            case GAME_TIED -> "Your match against " + otherPlayer.getDisplayName() + " was tied!";
+        };
+    }
+
+    private Instant generateRandomTimestamp() {
+        long daysToSubtract = random.nextInt(30);
+        long hoursToSubtract = random.nextInt(24);
+        long minutesToSubtract = random.nextInt(60);
+
+        return Instant.now()
+                .minus(daysToSubtract, ChronoUnit.DAYS)
+                .minus(hoursToSubtract, ChronoUnit.HOURS)
+                .minus(minutesToSubtract, ChronoUnit.MINUTES);
     }
 }

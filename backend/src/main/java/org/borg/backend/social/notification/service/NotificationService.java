@@ -162,6 +162,7 @@ public class NotificationService {
             throw new AccessDeniedException("Not authorized to mark notification as read");
         }
 
+        log.debug("Marking notification {} as read for player {}", notificationId, playerId);
         notification.setRead(true);
         notificationRepository.save(notification);
     }

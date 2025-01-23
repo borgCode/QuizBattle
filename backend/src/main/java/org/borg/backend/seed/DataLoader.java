@@ -42,22 +42,25 @@ public class DataLoader implements CommandLineRunner {
 //        generateFakerData();
        
 //        
-//        initFakeDataService.generateMessages(100, 10L, 11L);
+        
+//        initFakeDataService.generateMessages(100, 1L, 11L);
+//        initFakeDataService.generateFriendsForPlayer(50, 1L);
+//        initFakeDataService.generateNotificationsForPlayer(200, 1L);
 //
-//        log.info("Finished generating data");
+        log.info("Finished generating data");
     }
 
     
 
     private void generateFakerData() {
-//        Role userRole = roleRepository.findByName("USER")
-//                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "USER role not initialized"));
-//        
-//        List<Player> players = playerRepository.saveAll(initFakeDataService.generateRandomPlayers(userRole, 100000));
-//        questionRepository.saveAll(initFakeDataService.generateRandomQuestions(100000));
-//        
-//        initFakeDataService.generateCompletedMultiplayerGames(players, 500000);
-//        initFakeDataService.generateActiveMultiplayerGames(players, 10000);
-//        initFakeDataService.generatePlayerStats(players);
+        Role userRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "USER role not initialized"));
+
+        List<Player> players = playerRepository.saveAll(initFakeDataService.generateRandomPlayers(userRole, 100));
+        questionRepository.saveAll(initFakeDataService.generateRandomQuestions(1000));
+
+        initFakeDataService.generateCompletedMultiplayerGames(players, 5000);
+        initFakeDataService.generateActiveMultiplayerGames(players, 500);
+        initFakeDataService.generatePlayerStats(players);
     }
 }

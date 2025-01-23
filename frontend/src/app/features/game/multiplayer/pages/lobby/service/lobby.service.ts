@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject, combineLatest, switchMap, tap} from 'rxjs';
 import {MultiplayerMatchmakingService} from '../../../../../../api/generated/services/multiplayer-matchmaking.service';
 import {WebSocketService} from '../../../../../../core/websocket/web-socket.service';
@@ -15,7 +15,6 @@ import {
   FriendsListDialogComponent
 } from '../../../../../../shared/components/dialog/friends-list-dialog/friends-list-dialog.component';
 import {MultiplayerMatchService} from '../../../../../../api/generated/services/multiplayer-match.service';
-import {map} from 'rxjs/operators';
 import {PageMultiplayerSessionDto} from '../../../../../../api/generated/models/page-multiplayer-session-dto';
 
 interface MatchDecision {

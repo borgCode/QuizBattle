@@ -26,7 +26,6 @@ public class MultiplayerSessionService {
 
     public Page<MultiplayerSessionDTO> getMultiplayerSessionsById(Long playerId, Pageable pageable) {
         Page<MultiplayerSession> multiplayerSessions = multiplayerSessionRepository.findByPlayerId(playerId, pageable);
-        multiplayerSessions.forEach(multiplayerSession -> System.out.println(multiplayerSession.getStatus()));
         return gameSessionMapper.multipleToMultiplayerSessionDTO(multiplayerSessions, playerId);
     }
 }

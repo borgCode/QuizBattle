@@ -4,7 +4,7 @@ import {LoginStateService} from '../../services/login-state-service/login-state.
 import {AsyncPipe, Location, NgIf} from '@angular/common';
 import {WhispersDropdownComponent} from './chat-dropdown/whispers-dropdown.component';
 import {PlayerDropdownComponent} from './player-dropdown/player-dropdown.component';
-import {NotificationDropdownComponent} from './notification-dropdown/notification-dropdown.component';
+import {NotificationDropdownComponent} from './notification/notification-dropdown/notification-dropdown.component';
 
 @Component({
   selector: 'app-navbar',
