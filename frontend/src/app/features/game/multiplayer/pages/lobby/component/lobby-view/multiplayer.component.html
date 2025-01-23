@@ -39,57 +39,66 @@
       </div>
     </div>
     <div class="row">
-      <div class="card shadow-sm border-0">
+      <div class="card shadow-sm border-0"
+           infiniteScroll
+           [infiniteScrollDistance]="2"
+           [infiniteScrollThrottle]="500"
+           (scrolled)="onScroll()">
         <div class="card-header bg-primary text-white py-3">
           <h5 class="mb-0 text-center">Games</h5>
         </div>
         <div class="card-body p-0">
           <ul class="list-group mb-3">
-            <ng-container *ngFor="let gameSession of lobbyService.sessions$ | async">
-              <li (click)="openGame(gameSession.id)"
-                  class="list-group-item ju"
-                  [ngClass]="{'completed-game': gameSession.status === 'COMPLETED'}"
-                  style="cursor: pointer;">
-                <div class="row align-items-center">
-                  <div class="col-md-4 d-flex align-items-center">
-                    <div class="player-avatar bg-light rounded-circle p-2 me-3">
-                      <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTO.base64Image"
-                           style="max-height: 40px; max-width: 40px" alt="Player 1" class="rounded-circle"/>
-                    </div>
-                    <div class="player-info">
-                      <div class="fw-bold">{{ gameSession.playerDTO.displayName }}</div>
-                      <div class="text-primary fs-4">{{ gameSession.playerDTO.score }}</div>
-                    </div>
-                  </div>
-                  <ng-container [ngSwitch]="gameSession.status">
-                    <div class="col-md-4 mx-auto text-center">
-                      <div class="versus-badge">
-                        <span class="badge bg-light text-dark px-4 py-2 shadow">VS</span>
+            <ng-container *ngIf="lobbyService.sessionState$ | async as state">
+              <ng-container *ngFor="let gameSession of state.sessions">
+                <li (click)="openGame(gameSession.id)"
+                    class="list-group-item ju"
+                    [ngClass]="{'completed-game': gameSession.status === 'COMPLETED'}"
+                    style="cursor: pointer;">
+                  <div class="row align-items-center">
+                    <div class="col-md-4 d-flex align-items-center">
+                      <div class="player-avatar bg-light rounded-circle p-2 me-3">
+                        <img [src]="'data:image/jpeg;base64,' + gameSession.playerDTO.base64Image"
+                             style="max-height: 40px; max-width: 40px" alt="Player 1" class="rounded-circle"/>
                       </div>
-                      <div class="mt-3">
+                      <div class="player-info">
+                        <div class="fw-bold">{{ gameSession.playerDTO.displayName }}</div>
+                        <div class="text-primary fs-4">{{ gameSession.playerDTO.score }}</div>
+                      </div>
+                    </div>
+                    <ng-container [ngSwitch]="gameSession.status">
+                      <div class="col-md-4 mx-auto text-center">
+                        <div class="versus-badge">
+                          <span class="badge bg-light text-dark px-4 py-2 shadow">VS</span>
+                        </div>
+                        <div class="mt-3">
                     <span *ngSwitchCase="'ACTIVE'"
                           class="badge {{ gameSession.currentPlayerTurn === player.id ? 'bg-success' : 'bg-secondary' }} rounded-pill px-4 py-2">
                       {{ gameSession.currentPlayerTurn === player.id ? "Your Turn!" : "Opponent's Turn" }}
                     </span>
-                        <span *ngSwitchCase="'COMPLETED'"
-                              class="badge {{ gameSession.winnerId === player.id ? 'bg-success' : 'bg-danger' }} rounded-pill px-4 py-2">
+                          <span *ngSwitchCase="'COMPLETED'"
+                                class="badge {{ gameSession.winnerId === player.id ? 'bg-success' : 'bg-danger' }} rounded-pill px-4 py-2">
                       {{ gameSession.winnerId === player.id ? 'You Won!' : 'You lost' }}
                     </span>
+                        </div>
+                      </div>
+                    </ng-container>
+                    <div class="col-md-4 d-flex align-items-center justify-content-end">
+                      <div class="player-info text-end">
+                        <div class="fw-bold">{{ gameSession.opponentDTO.displayName }}</div>
+                        <div class="text-primary fs-4">{{ gameSession.opponentDTO.score }}</div>
+                      </div>
+                      <div class="player-avatar bg-light rounded-circle p-2 ms-3">
+                        <img [src]="'data:image/jpeg;base64,' + gameSession.opponentDTO.base64Image"
+                             style="max-height: 40px; max-width: 40px" alt="Player 2" class="rounded-circle"/>
                       </div>
                     </div>
-                  </ng-container>
-                  <div class="col-md-4 d-flex align-items-center justify-content-end">
-                    <div class="player-info text-end">
-                      <div class="fw-bold">{{ gameSession.opponentDTO.displayName }}</div>
-                      <div class="text-primary fs-4">{{ gameSession.opponentDTO.score }}</div>
-                    </div>
-                    <div class="player-avatar bg-light rounded-circle p-2 ms-3">
-                      <img [src]="'data:image/jpeg;base64,' + gameSession.opponentDTO.base64Image"
-                           style="max-height: 40px; max-width: 40px" alt="Player 2" class="rounded-circle"/>
-                    </div>
                   </div>
-                </div>
-              </li>
+                </li>
+              </ng-container>
+              <div *ngIf="state.isLoading" class="loading">
+                Loading...
+              </div>
             </ng-container>
           </ul>
         </div>

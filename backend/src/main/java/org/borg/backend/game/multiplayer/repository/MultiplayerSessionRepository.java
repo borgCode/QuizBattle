@@ -2,12 +2,13 @@ package org.borg.backend.game.multiplayer.repository;
 
 import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.shared.enums.GameStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 
 @Repository
 public interface MultiplayerSessionRepository extends JpaRepository<MultiplayerSession, Long> {
@@ -16,8 +17,8 @@ public interface MultiplayerSessionRepository extends JpaRepository<MultiplayerS
     @Query("SELECT session FROM MultiplayerSession session " +
             "JOIN session.sessionPlayers sp " +
             "WHERE sp.player.id = :playerId " +
-            "ORDER BY session.lastUpdatedAt DESC")
-    List<MultiplayerSession> findByPlayerId(@Param("playerId") Long playerId);
+            "ORDER BY session.status asc, session.lastUpdatedAt desc")
+    Page<MultiplayerSession> findByPlayerId(@Param("playerId") Long playerId, Pageable pageable);
 
 
     @Query("SELECT COUNT(ms) > 0 FROM MultiplayerSession ms " +

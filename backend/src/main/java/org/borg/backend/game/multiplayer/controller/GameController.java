@@ -7,11 +7,13 @@ import org.borg.backend.game.multiplayer.dto.GameStateResponse;
 import org.borg.backend.game.multiplayer.dto.MultiplayerSessionDTO;
 import org.borg.backend.game.multiplayer.service.GameService;
 import org.borg.backend.game.multiplayer.service.MultiplayerSessionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("multiplayer/game")
@@ -24,8 +26,8 @@ public class GameController {
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")
     @GetMapping("players/{playerId}/sessions")
-    public List<MultiplayerSessionDTO> getPlayerSessions(@PathVariable long playerId) {
-        return multiplayerSessionService.getMultiplayerSessionsById(playerId);
+    public Page<MultiplayerSessionDTO> getPlayerSessions(@PathVariable long playerId, @PageableDefault (size = 20) Pageable pageable) {
+        return multiplayerSessionService.getMultiplayerSessionsById(playerId, pageable);
     }
     
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")

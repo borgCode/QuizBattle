@@ -7,9 +7,10 @@ import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.borg.backend.game.multiplayer.repository.MultiplayerSessionRepository;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,9 @@ public class MultiplayerSessionService {
                 .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Session not found for " + sessionId));
     }
 
-    public List<MultiplayerSessionDTO> getMultiplayerSessionsById(Long playerId) {
-        return gameSessionMapper.multipleToMultiplayerSessionDTO(multiplayerSessionRepository.findByPlayerId(playerId), playerId);
+    public Page<MultiplayerSessionDTO> getMultiplayerSessionsById(Long playerId, Pageable pageable) {
+        Page<MultiplayerSession> multiplayerSessions = multiplayerSessionRepository.findByPlayerId(playerId, pageable);
+        multiplayerSessions.forEach(multiplayerSession -> System.out.println(multiplayerSession.getStatus()));
+        return gameSessionMapper.multipleToMultiplayerSessionDTO(multiplayerSessions, playerId);
     }
 }

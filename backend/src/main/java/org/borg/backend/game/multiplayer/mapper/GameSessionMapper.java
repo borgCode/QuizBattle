@@ -6,6 +6,7 @@ import org.borg.backend.game.multiplayer.model.MultiplayerSession;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -27,9 +28,7 @@ public abstract class GameSessionMapper {
     @Mapping(target = "currentPlayerTurn", source = "multiplayerSession.currentPlayerTurnId")
     public abstract MultiplayerSessionDTO toMultiplayerSessionDTO(MultiplayerSession multiplayerSession, Long playerId);
     
-    public List<MultiplayerSessionDTO> multipleToMultiplayerSessionDTO(List<MultiplayerSession> multiplayerSessions, Long playerId) {
-        return multiplayerSessions.stream()
-                .map(session -> toMultiplayerSessionDTO(session, playerId))
-                .toList();
+    public Page<MultiplayerSessionDTO> multipleToMultiplayerSessionDTO(Page<MultiplayerSession> multiplayerSessions, Long playerId) {
+        return  multiplayerSessions.map(session -> toMultiplayerSessionDTO(session, playerId));
     }
 }

@@ -25,6 +25,9 @@ export type { MultiplayerAnswerValidationRequest } from './models/multiplayer-an
 export type { MultiplayerQuestionsRequest } from './models/multiplayer-questions-request';
 export type { MultiplayerSessionDto } from './models/multiplayer-session-dto';
 export type { Notification } from './models/notification';
+export type { Pageable } from './models/pageable';
+export type { PageableObject } from './models/pageable-object';
+export type { PageMultiplayerSessionDto } from './models/page-multiplayer-session-dto';
 export type { PlayChapterDto } from './models/play-chapter-dto';
 export type { PlayerConversationDto } from './models/player-conversation-dto';
 export type { PlayerDto } from './models/player-dto';
@@ -42,6 +45,7 @@ export type { RematchRequest } from './models/rematch-request';
 export type { RoundSessionProgress } from './models/round-session-progress';
 export type { SessionPlayerDto } from './models/session-player-dto';
 export type { SinglePlayerAnswerValidationRequest } from './models/single-player-answer-validation-request';
+export type { SortObject } from './models/sort-object';
 export type { StartChapterRequest } from './models/start-chapter-request';
 export type { Stats } from './models/stats';
 export type { StoryDto } from './models/story-dto';

@@ -49,7 +49,7 @@ export class CategoryPieChartComponent implements OnInit {
             display: true,
             text: 'Category performance',
             font: {
-              size: 50
+              size: 30
             },
             color: 'black',
           },

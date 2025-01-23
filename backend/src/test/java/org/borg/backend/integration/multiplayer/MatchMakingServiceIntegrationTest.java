@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -90,22 +93,32 @@ class MatchMakingServiceIntegrationTest {
             MatchmakingSession matchmakingSession = setupMatchmakingSession();
 
             matchMakingService.handleMatchResponse(matchmakingSession.getId(), player1.getId(), true);
-            assertTrue(multiplayerSessionRepository.findByPlayerId(player1.getId()).isEmpty(), "Multiplayer session should not be created until both players accept");
+
+            Pageable pageable = PageRequest.of(0, 10);
+            assertTrue(multiplayerSessionRepository.findByPlayerId(player1.getId(), pageable).isEmpty(), "Multiplayer session should not be created until both players accept");
 
             verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.waitingForOtherPlayer());
 
             matchMakingService.handleMatchResponse(matchmakingSession.getId(), player2.getId(), true);
 
-            List<MultiplayerSession> player1Sessions = multiplayerSessionRepository.findByPlayerId(player1.getId());
-            List<MultiplayerSession> player2Sessions = multiplayerSessionRepository.findByPlayerId(player2.getId());
+            
+            Page<MultiplayerSession> player1Sessions = multiplayerSessionRepository.findByPlayerId(player1.getId(), pageable);
+            Page<MultiplayerSession> player2Sessions = multiplayerSessionRepository.findByPlayerId(player2.getId(), pageable);
+
             assertAll("Post both accept match checks",
-                    () -> assertEquals(1, player1Sessions.size(), "Player1 should have one active game"),
-                    () -> assertEquals(1, player2Sessions.size(), "Player2 should have one active game"),
-                    () -> assertEquals(player1Sessions.get(0).getId(), player2Sessions.get(0).getId(), "Both players should have the same session ID")
+                    () -> assertEquals(1, player1Sessions.getTotalElements(), "Player1 should have one active game"),
+                    () -> assertEquals(1, player2Sessions.getTotalElements(), "Player2 should have one active game"),
+                    () -> assertEquals(player1Sessions.getContent().get(0).getId(),
+                            player2Sessions.getContent().get(0).getId(),
+                            "Both players should have the same session ID")
             );
 
-            verifyMatchmakingResponse(player1.getId(), MatchmakingResponse.accepted(player1Sessions.get(0).getId(), player2.getDisplayName()));
-            verifyMatchmakingResponse(player2.getId(), MatchmakingResponse.accepted(player1Sessions.get(0).getId(), player1.getDisplayName()));
+            verifyMatchmakingResponse(player1.getId(),
+                    MatchmakingResponse.accepted(player1Sessions.getContent().get(0).getId(),
+                            player2.getDisplayName()));
+            verifyMatchmakingResponse(player2.getId(),
+                    MatchmakingResponse.accepted(player2Sessions.getContent().get(0).getId(),
+                            player1.getDisplayName()));
 
             MatchmakingSession postAcceptSession = matchmakingSessionRepository
                     .findMatchmakingSessionByPlayerIds(

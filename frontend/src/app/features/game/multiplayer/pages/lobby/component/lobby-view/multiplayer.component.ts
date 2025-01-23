@@ -4,7 +4,15 @@ import {PlayerDto} from '../../../../../../../api/generated/models/player-dto';
 import {LoginStateService} from '../../../../../../../core/services/login-state-service/login-state.service';
 import {PlayerCardComponent} from '../../../../../../../shared/components/player-card/player-card-component';
 import {LobbyService} from '../../service/lobby.service';
+import {MultiplayerSessionDto} from '../../../../../../../api/generated/models/multiplayer-session-dto';
+import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 
+interface SessionState {
+  sessions: MultiplayerSessionDto[];
+  currentPage: number;
+  isLoading: boolean;
+  hasMore: boolean;
+}
 
 @Component({
   selector: 'app-multiplayer',
@@ -16,7 +24,8 @@ import {LobbyService} from '../../service/lobby.service';
     NgIf,
     PlayerCardComponent,
     AsyncPipe,
-    NgClass
+    NgClass,
+    InfiniteScrollDirective
   ],
   templateUrl: './multiplayer.component.html',
   styleUrl: './multiplayer.component.css'
@@ -69,5 +78,9 @@ export class MultiplayerComponent implements OnInit, OnDestroy {
 
   openFriendDialog() {
     this.lobbyService.openFriendsDialog();
+  }
+
+  onScroll() {
+    this.lobbyService.loadMoreSessions();
   }
 }

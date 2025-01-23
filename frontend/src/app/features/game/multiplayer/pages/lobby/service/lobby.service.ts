@@ -16,10 +16,18 @@ import {
 } from '../../../../../../shared/components/dialog/friends-list-dialog/friends-list-dialog.component';
 import {MultiplayerMatchService} from '../../../../../../api/generated/services/multiplayer-match.service';
 import {map} from 'rxjs/operators';
+import {PageMultiplayerSessionDto} from '../../../../../../api/generated/models/page-multiplayer-session-dto';
 
 interface MatchDecision {
   matchmakingSessionId: number;
   playerId: number;
+}
+
+interface SessionState {
+  sessions: MultiplayerSessionDto[];
+  currentPage: number;
+  isLoading: boolean;
+  hasMore: boolean;
 }
 
 @Injectable({
@@ -30,12 +38,12 @@ export class LobbyService {
   private showCancelMatchmakingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private waitingForOpponentSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private friendsSubject: BehaviorSubject<PlayerDto[]> = new BehaviorSubject<PlayerDto[]>(null);
-  private sessionsSubject: BehaviorSubject<MultiplayerSessionDto[]> = new BehaviorSubject<MultiplayerSessionDto[]>(null);
+  private sessionStateSubject: BehaviorSubject<SessionState> = new BehaviorSubject<SessionState>(null);
 
   readonly isSearching$ = this.searchingSubject.asObservable();
   readonly showCancelMatchmaking$ = this.showCancelMatchmakingSubject.asObservable();
   readonly waitingForOpponent$ = this.waitingForOpponentSubject.asObservable();
-  readonly sessions$ = this.sessionsSubject.asObservable();
+  readonly sessionState$ = this.sessionStateSubject.asObservable();
 
   readonly matchmakingState$ = combineLatest({
     isSearching: this.isSearching$,
@@ -61,17 +69,22 @@ export class LobbyService {
   initLobbyData(playerId: number) {
     this.playerId = playerId;
 
+    this.sessionStateSubject.next({
+      sessions: [],
+      currentPage: 0,
+      isLoading: false,
+      hasMore: true
+    })
+
     this.friendService.getFriends({playerId: this.playerId}).pipe(
       tap(friends => this.friendsSubject.next(friends)),
-      switchMap(() => this.multiplayerGameService.getPlayerSessions({playerId: this.playerId}).pipe(
-        map(sessions => sessions.sort((a, b) => {
-          if (a.status === 'ACTIVE' && b.status === 'COMPLETED') return -1;
-          if (a.status === 'COMPLETED' && b.status === 'ACTIVE') return 1;
-          return 0;
-        })),
-        tap(sessions => this.sessionsSubject.next(sessions))
-      )
-    )).subscribe()
+      switchMap(() => this.multiplayerGameService.getPlayerSessions({
+        playerId: this.playerId, pageable: {page: 0, size: 20}}).pipe(
+        tap(pageResponse => {
+          this.loadSessions(pageResponse)
+        })
+      ))
+    ).subscribe()
   }
 
   findGame() {
@@ -182,5 +195,37 @@ export class LobbyService {
         })
       }
     })
+  }
+
+  loadSessions(pageResponse: PageMultiplayerSessionDto) {
+    const currentState = this.sessionStateSubject.getValue();
+    const allSessions = [...currentState.sessions, ...pageResponse.content];
+
+    const sortedSessions = allSessions.sort((a, b) => {
+      if (a.status === 'ACTIVE' && b.status === 'COMPLETED') return -1;
+      if (a.status === 'COMPLETED' && b.status === 'ACTIVE') return 1;
+      return 0;
+    });
+
+    this.sessionStateSubject.next({
+      sessions: [...sortedSessions],
+      currentPage: currentState.currentPage + 1,
+      hasMore: pageResponse.number < pageResponse.totalPages - 1,
+      isLoading: false,
+    });
+  }
+
+  loadMoreSessions() {
+    const currentState = this.sessionStateSubject.getValue();
+    if (currentState.isLoading || !currentState.hasMore) return;
+
+    this.sessionStateSubject.next({ ...currentState, isLoading: true });
+
+    this.multiplayerGameService.getPlayerSessions({
+      playerId: this.playerId, pageable: {page: currentState.currentPage, size: 20}}).pipe(
+      tap(pageResponse => {
+        this.loadSessions(pageResponse)
+      })
+    ).subscribe();
   }
 }

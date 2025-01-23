@@ -20,7 +20,7 @@ import { getPlayerSessions } from '../fn/multiplayer-game/get-player-sessions';
 import { GetPlayerSessions$Params } from '../fn/multiplayer-game/get-player-sessions';
 import { giveUp } from '../fn/multiplayer-game/give-up';
 import { GiveUp$Params } from '../fn/multiplayer-game/give-up';
-import { MultiplayerSessionDto } from '../models/multiplayer-session-dto';
+import { PageMultiplayerSessionDto } from '../models/page-multiplayer-session-dto';
 
 @Injectable({ providedIn: 'root' })
 export class MultiplayerGameService extends BaseService {
@@ -112,7 +112,7 @@ export class MultiplayerGameService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getPlayerSessions$Response(params: GetPlayerSessions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<MultiplayerSessionDto>>> {
+  getPlayerSessions$Response(params: GetPlayerSessions$Params, context?: HttpContext): Observable<StrictHttpResponse<PageMultiplayerSessionDto>> {
     return getPlayerSessions(this.http, this.rootUrl, params, context);
   }
 
@@ -122,9 +122,9 @@ export class MultiplayerGameService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getPlayerSessions(params: GetPlayerSessions$Params, context?: HttpContext): Observable<Array<MultiplayerSessionDto>> {
+  getPlayerSessions(params: GetPlayerSessions$Params, context?: HttpContext): Observable<PageMultiplayerSessionDto> {
     return this.getPlayerSessions$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<MultiplayerSessionDto>>): Array<MultiplayerSessionDto> => r.body)
+      map((r: StrictHttpResponse<PageMultiplayerSessionDto>): PageMultiplayerSessionDto => r.body)
     );
   }
 

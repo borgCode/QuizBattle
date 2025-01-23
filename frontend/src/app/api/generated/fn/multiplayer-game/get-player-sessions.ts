@@ -8,16 +8,19 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { MultiplayerSessionDto } from '../../models/multiplayer-session-dto';
+import { Pageable } from '../../models/pageable';
+import { PageMultiplayerSessionDto } from '../../models/page-multiplayer-session-dto';
 
 export interface GetPlayerSessions$Params {
   playerId: number;
+  pageable: Pageable;
 }
 
-export function getPlayerSessions(http: HttpClient, rootUrl: string, params: GetPlayerSessions$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<MultiplayerSessionDto>>> {
+export function getPlayerSessions(http: HttpClient, rootUrl: string, params: GetPlayerSessions$Params, context?: HttpContext): Observable<StrictHttpResponse<PageMultiplayerSessionDto>> {
   const rb = new RequestBuilder(rootUrl, getPlayerSessions.PATH, 'get');
   if (params) {
     rb.path('playerId', params.playerId, {});
+    rb.query('pageable', params.pageable, {});
   }
 
   return http.request(
@@ -25,7 +28,7 @@ export function getPlayerSessions(http: HttpClient, rootUrl: string, params: Get
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<MultiplayerSessionDto>>;
+      return r as StrictHttpResponse<PageMultiplayerSessionDto>;
     })
   );
 }

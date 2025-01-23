@@ -10,7 +10,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import {FullConversationDto} from '../../../../api/generated/models/full-conversation-dto';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {LoginStateService} from '../../../services/login-state-service/login-state.service';
 import {FormsModule} from '@angular/forms';
 import {Message, WhisperWindowService} from '../../../services/whisper-window/whisper-window.service';
@@ -24,7 +24,7 @@ import {MessageService} from '../../../../api/generated/services/message.service
     NgForOf,
     FormsModule,
     NgIf,
-    AsyncPipe
+    AsyncPipe,
   ],
   templateUrl: './whisper-window.component.html',
   styleUrl: './whisper-window.component.css'
