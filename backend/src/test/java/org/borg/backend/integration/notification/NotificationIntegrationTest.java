@@ -114,7 +114,8 @@ public class NotificationIntegrationTest {
         assertEquals(0, updatedNotificationsList.size(), "Notification should be marked as archived");
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Notification> archivedNotifications = notificationService.getArchivedNotifications(playerWithNotificationsId, pageable, null, null);
+        Page<Notification> archivedNotifications = notificationService.getArchivedNotifications(
+                playerWithNotificationsId, pageable, null, null, null);
         assertEquals(1, archivedNotifications.getContent().size(), "Notification should be marked as archived");
     }
 
@@ -137,7 +138,8 @@ public class NotificationIntegrationTest {
 
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Notification> archivedNotifications = notificationService.getArchivedNotifications(playerWithNotificationsId, pageable, null, null);
+        Page<Notification> archivedNotifications = notificationService.getArchivedNotifications(
+                playerWithNotificationsId, pageable, null, null, null);
         assertEquals(2, archivedNotifications.getContent().size(), "There should be 1 archived notifications");
 
         Instant laterTime = Instant.now().plus(Duration.ofHours(49));

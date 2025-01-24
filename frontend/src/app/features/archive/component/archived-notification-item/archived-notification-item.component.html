@@ -10,7 +10,7 @@
           </span>
           <span class="d-inline-flex align-items-center">
             <i class="icon-archive me-1"></i>
-            <span>{{ notification.type }}</span>
+            <span>{{ notification.type.charAt(0).toUpperCase() + notification.type.slice(1).toLowerCase().replace('_', ' ') }}</span>
           </span>
         </div>
       </div>

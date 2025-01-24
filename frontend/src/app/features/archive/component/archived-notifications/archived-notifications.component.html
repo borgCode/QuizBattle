@@ -21,19 +21,75 @@
           </div>
         </div>
         <div class="col-md-6 col-sm-12 mt-3 mt-md-0">
-          <div class="d-flex gap-2 justify-content-start">
-            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.ALL_TIME)"
-                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.ALL_TIME,
-                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.ALL_TIME}">All Time</button>
-            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.TODAY)"
-                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.TODAY,
-                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.TODAY}">Today</button>
-            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.THIS_WEEK)"
-                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.THIS_WEEK,
-                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.THIS_WEEK}">This Week</button>
-            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.THIS_MONTH)"
-                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.THIS_MONTH,
-                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.THIS_MONTH}">This Month</button>
+          <div class="d-flex flex-wrap gap-2 justify-content-start align-items-center">
+            <button
+              class="btn btn-light btn-sm"
+              (click)="setTimeFilter(TimeFilter.ALL_TIME)"
+              [ngClass]="{
+            'btn-primary': notificationArchiveService.timeFilter === TimeFilter.ALL_TIME,
+            'btn-light': notificationArchiveService.timeFilter !== TimeFilter.ALL_TIME
+          }">
+              All Time
+            </button>
+            <button
+              class="btn btn-light btn-sm"
+              (click)="setTimeFilter(TimeFilter.TODAY)"
+              [ngClass]="{
+            'btn-primary': notificationArchiveService.timeFilter === TimeFilter.TODAY,
+            'btn-light': notificationArchiveService.timeFilter !== TimeFilter.TODAY
+          }">
+              Today
+            </button>
+            <button
+              class="btn btn-light btn-sm"
+              (click)="setTimeFilter(TimeFilter.THIS_WEEK)"
+              [ngClass]="{
+            'btn-primary': notificationArchiveService.timeFilter === TimeFilter.THIS_WEEK,
+            'btn-light': notificationArchiveService.timeFilter !== TimeFilter.THIS_WEEK
+          }">
+              This Week
+            </button>
+            <button
+              class="btn btn-light btn-sm"
+              (click)="setTimeFilter(TimeFilter.THIS_MONTH)"
+              [ngClass]="{
+            'btn-primary': notificationArchiveService.timeFilter === TimeFilter.THIS_MONTH,
+            'btn-light': notificationArchiveService.timeFilter !== TimeFilter.THIS_MONTH
+          }">
+              This Month
+            </button>
+            <div class="dropdown ms-5">
+              <button
+                class="btn btn-light btn-sm dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+                {{ selectedType || 'All types' }}
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    (click)="(removeTypeFilter())">
+                    All types
+                    <span *ngIf="selectedType === ''" class="ms-2">
+                      <i class="fa-solid fa-check"></i>
+                    </span>
+                  </a>
+                </li>
+                <li *ngFor="let key of enumKeys">
+                  <a
+                    class="dropdown-item"
+                    (click)="updateTypeFilter(NotificationType[key])">
+                    {{ formatEnumValue(key) }}
+                    <span *ngIf="formatEnumValue(key) === selectedType" class="ms-2">
+                      <i class="fa-solid fa-check"></i>
+                    </span>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -56,12 +112,13 @@
         </div>
         <div class="pagination">
           <div class="page-info">
-            {{state.currentPage}} of {{state.totalPages - 1}}
+            {{ state.currentPage > 0 ? state.currentPage : 1 }}
+            of {{ (state.totalPages - 1) > 0 ? (state.totalPages - 1) : 1 }}
           </div>
           <div class="page-controls">
             <button class="page-btn"
                     [disabled]="state.currentPage === 1"
-            (click)="previousPage()">
+                    (click)="previousPage()">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
             <button class="page-btn"

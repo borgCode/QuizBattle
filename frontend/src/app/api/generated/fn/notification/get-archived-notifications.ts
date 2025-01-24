@@ -16,6 +16,7 @@ export interface GetArchivedNotifications$Params {
   pageable: Pageable;
   searchFilter?: string;
   timeFilter?: 'ALL_TIME' | 'TODAY' | 'THIS_WEEK' | 'THIS_MONTH';
+  typeFilter?: 'FRIEND_REQUEST' | 'FRIEND_ACCEPTED' | 'REMATCH_REQUEST' | 'REMATCH_ACCEPTED' | 'REMATCH_DECLINED' | 'GAME_WON' | 'GAME_LOST' | 'GAME_TIED' | 'MATCH_REQUEST' | 'MATCH_ACCEPTED' | 'MATCH_DECLINED';
 }
 
 export function getArchivedNotifications(http: HttpClient, rootUrl: string, params: GetArchivedNotifications$Params, context?: HttpContext): Observable<StrictHttpResponse<PageNotification>> {
@@ -25,6 +26,7 @@ export function getArchivedNotifications(http: HttpClient, rootUrl: string, para
     rb.query('pageable', params.pageable, {});
     rb.query('searchFilter', params.searchFilter, {});
     rb.query('timeFilter', params.timeFilter, {});
+    rb.query('typeFilter', params.typeFilter, {});
   }
 
   return http.request(

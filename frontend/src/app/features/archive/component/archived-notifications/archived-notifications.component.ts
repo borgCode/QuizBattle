@@ -3,6 +3,7 @@ import {ArchivedNotificationItemComponent} from '../archived-notification-item/a
 import {NotificationArchiveService, TimeFilter} from '../../service/notification-archive.service';
 import {LoginStateService} from '../../../../core/services/login-state-service/login-state.service';
 import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {NotificationType} from "../../../../shared/enum/notification-type";
 
 @Component({
   selector: 'app-archived-notifications',
@@ -17,6 +18,9 @@ import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
   styleUrl: './archived-notifications.component.css'
 })
 export class ArchivedNotificationsComponent implements OnInit {
+  enumKeys = Object.keys(NotificationType);
+
+  selectedType: string = '';
 
   constructor(
     protected notificationArchiveService: NotificationArchiveService,
@@ -46,9 +50,27 @@ export class ArchivedNotificationsComponent implements OnInit {
   }
 
   setTimeFilter(timeFilter: TimeFilter) {
-    this.notificationArchiveService.timeFilter = timeFilter;
+    this.notificationArchiveService.updateTimeFilter(timeFilter);
     this.notificationArchiveService.getNotifications()
   }
 
   protected readonly TimeFilter = TimeFilter;
+
+  updateTypeFilter(typeFilter: NotificationType) {
+    this.selectedType = this.formatEnumValue(typeFilter);
+    this.notificationArchiveService.updateTypeFilter(typeFilter);
+    this.notificationArchiveService.getNotifications();
+  }
+  protected readonly NotificationType = NotificationType;
+
+  removeTypeFilter() {
+    this.selectedType = '';
+    this.notificationArchiveService.removeTypeFilter();
+    this.notificationArchiveService.getNotifications();
+  }
+
+  formatEnumValue(value: string): string {
+    return value.charAt(0).toUpperCase() +
+      value.slice(1).toLowerCase().replace('_', ' ');
+  }
 }

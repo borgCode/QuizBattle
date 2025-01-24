@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.social.notification.model.Notification;
+import org.borg.backend.social.notification.model.NotificationType;
 import org.borg.backend.social.notification.model.TimeFilter;
 import org.borg.backend.social.notification.service.NotificationService;
 import org.springframework.data.domain.Page;
@@ -37,8 +38,9 @@ public class NotificationController {
             @PathVariable long playerId,
             @PageableDefault(size = 20, direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false) String searchFilter,
-            @RequestParam(required = false) TimeFilter timeFilter) {
-        return ResponseEntity.ok(notificationService.getArchivedNotifications(playerId, pageable, searchFilter, timeFilter));
+            @RequestParam(required = false) TimeFilter timeFilter,
+            @RequestParam(required = false)NotificationType typeFilter) {
+        return ResponseEntity.ok(notificationService.getArchivedNotifications(playerId, pageable, searchFilter, timeFilter, typeFilter));
     }
 
     @PreAuthorize("@customSecurityExpression.isPlayerOwner(#playerId)")

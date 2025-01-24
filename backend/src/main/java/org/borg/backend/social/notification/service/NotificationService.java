@@ -35,11 +35,11 @@ public class NotificationService {
         return notificationRepository.findByPlayerIdAndIsArchivedFalse(playerId);
     }
 
-    public Page<Notification> getArchivedNotifications(Long playerId, Pageable pageable, String searchFilter, TimeFilter timeFilter) {
-        log.debug("Fetching archived notifications for player: {} with filters: {},  {}", playerId, searchFilter, timeFilter);
+    public Page<Notification> getArchivedNotifications(Long playerId, Pageable pageable, String searchFilter, TimeFilter timeFilter, NotificationType type) {
+        log.debug("Fetching archived notifications for player: {} with filters: {},  {},  {}", playerId, searchFilter, timeFilter, type );
         
         Instant timeFilterStart = calculateTimeFilterStart(timeFilter);
-        return notificationRepository.findArchivedNotifications(playerId, searchFilter, timeFilterStart, pageable);
+        return notificationRepository.findArchivedNotifications(playerId, searchFilter, timeFilterStart, type, pageable);
     }
 
     private Instant calculateTimeFilterStart(TimeFilter timeFilter) {

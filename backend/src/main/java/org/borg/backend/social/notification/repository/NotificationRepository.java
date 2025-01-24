@@ -38,16 +38,14 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("SELECT n FROM Notification n " +
             "WHERE n.recipientId = :playerId " +
             "AND n.isArchived = true " +
-            "AND CASE " +
-            "    WHEN :searchFilter IS NULL THEN 1 " +
-            "    WHEN n.message LIKE %:searchFilter% THEN 1 " +
-            "    ELSE 0 " +
-            "END = 1 " +
-            "AND (:timeFilterStart IS NULL OR n.createdAt >= :timeFilterStart)")
+            "AND (:searchFilter IS NULL OR n.message LIKE %:searchFilter%) " +
+            "AND (:timeFilterStart IS NULL OR n.createdAt >= :timeFilterStart) " +
+            "AND (:typeFilter IS NULL OR n.type = :typeFilter)")
     Page<Notification> findArchivedNotifications(
             @Param("playerId") Long playerId,
             @Param("searchFilter") String searchFilter,
             @Param("timeFilterStart") Instant timeFilterStart,
+            @Param("typeFilter") NotificationType typeFilter,
             Pageable pageable
     );
 

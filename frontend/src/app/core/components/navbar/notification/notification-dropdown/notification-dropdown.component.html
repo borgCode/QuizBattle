@@ -31,7 +31,7 @@
                class="notification-item p-3 border-bottom unread position-relative"
                (click)="markAsRead(notification.id)">
             <ng-container [ngSwitch]="notification.type">
-              <div *ngSwitchCase="'FRIEND_REQUEST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.FRIEND_REQUEST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-user-group icon"></i>
                 </div>
@@ -59,7 +59,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'FRIEND_ACCEPTED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.FRIEND_ACCEPTED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-user-group icon"></i>
                 </div>
@@ -75,7 +75,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'MATCH_REQUEST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.MATCH_REQUEST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -103,7 +103,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'MATCH_ACCEPTED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.MATCH_ACCEPTED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -125,7 +125,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'MATCH_DECLINED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.MATCH_DECLINED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-ban icon"></i>
                 </div>
@@ -141,7 +141,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'REMATCH_REQUEST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.REMATCH_REQUEST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -169,7 +169,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'REMATCH_ACCEPTED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.REMATCH_ACCEPTED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -191,7 +191,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'REMATCH_DECLINED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.REMATCH_DECLINED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-ban icon"></i>
                 </div>
@@ -207,7 +207,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'GAME_WON'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.GAME_WON" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-trophy icon"></i>
                 </div>
@@ -236,7 +236,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'GAME_LOST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.GAME_LOST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-thumbs-down icon"></i>
                 </div>
@@ -267,7 +267,7 @@
               </div>
 
               <!-- GAME TIED -->
-              <div *ngSwitchCase="'GAME_TIED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.GAME_TIED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-handshake icon"></i>
                 </div>
@@ -305,7 +305,7 @@
           <div *ngIf="notification && notification.id"
           class="notification-item p-3 border-bottom position-relative">
             <ng-container [ngSwitch]="notification.type">
-              <div *ngSwitchCase="'FRIEND_REQUEST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.FRIEND_REQUEST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-user-group icon"></i>
                 </div>
@@ -333,7 +333,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'FRIEND_ACCEPTED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.FRIEND_ACCEPTED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-user-group icon"></i>
                 </div>
@@ -349,7 +349,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'MATCH_REQUEST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.MATCH_REQUEST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -377,7 +377,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'MATCH_ACCEPTED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.MATCH_ACCEPTED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -399,7 +399,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'MATCH_DECLINED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.MATCH_DECLINED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-ban icon"></i>
                 </div>
@@ -415,7 +415,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'REMATCH_REQUEST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.REMATCH_REQUEST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -443,7 +443,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'REMATCH_ACCEPTED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.REMATCH_ACCEPTED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-gamepad icon"></i>
                 </div>
@@ -465,7 +465,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'REMATCH_DECLINED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.REMATCH_DECLINED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-ban icon"></i>
                 </div>
@@ -482,7 +482,7 @@
                 </div>
               </div>
 
-              <div *ngSwitchCase="'GAME_WON'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.GAME_WON" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-trophy icon"></i>
                 </div>
@@ -511,7 +511,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'GAME_LOST'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.GAME_LOST" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-thumbs-down icon"></i>
                 </div>
@@ -540,7 +540,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngSwitchCase="'GAME_TIED'" class="d-flex align-items-start p-2">
+              <div *ngSwitchCase="NotificationType.GAME_TIED" class="d-flex align-items-start p-2">
                 <div class="notification-icon">
                   <i class="fa-solid fa-handshake icon"></i>
                 </div>

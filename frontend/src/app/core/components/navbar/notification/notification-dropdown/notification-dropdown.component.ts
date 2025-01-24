@@ -4,6 +4,7 @@ import {LoginStateService} from '../../../../services/login-state-service/login-
 import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
 import {NotificationStateService} from '../../../../services/notification/notification-state.service';
+import {NotificationType} from '../../../../../shared/enum/notification-type';
 
 declare var bootstrap: any;
 
@@ -134,4 +135,6 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
     this.router.navigate(['archive']);
     this.closeDropdown();
   }
+
+  protected readonly NotificationType = NotificationType;
 }

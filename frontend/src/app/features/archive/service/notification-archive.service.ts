@@ -3,6 +3,7 @@ import {Notification} from '../../../api/generated/models/notification';
 import {BehaviorSubject, debounceTime, distinctUntilChanged} from 'rxjs';
 import {NotificationService} from '../../../api/generated/services/notification.service';
 import {PageNotification} from '../../../api/generated/models/page-notification';
+import {NotificationType} from '../../../shared/enum/notification-type';
 
 interface NotificationState {
   notifications: Notification[];
@@ -25,6 +26,7 @@ export enum TimeFilter {
   providedIn: 'root'
 })
 export class NotificationArchiveService {
+
   private notificationSubject: BehaviorSubject<NotificationState> = new BehaviorSubject<NotificationState>({
     notifications: [],
     currentPage: 0,
@@ -40,6 +42,7 @@ export class NotificationArchiveService {
 
   playerId: number;
   private _timeFilter: TimeFilter
+  private _typeFilter: NotificationType
 
   constructor(
     private notificationService: NotificationService,
@@ -80,7 +83,8 @@ export class NotificationArchiveService {
         page: currentState.currentPage
       },
       timeFilter: this._timeFilter,
-      searchFilter: currentState.searchQuery
+      searchFilter: currentState.searchQuery,
+      typeFilter: this._typeFilter,
     }).subscribe({
       next: pageResponse => this.loadNotifications(pageResponse, true),
       error: () => {
@@ -139,12 +143,37 @@ export class NotificationArchiveService {
   updateSearchQuery(query: string) {
     this.searchQuerySubject.next(query);
   }
-
-  set timeFilter(value: TimeFilter) {
-    this._timeFilter = value;
+  updateTimeFilter(timeFilter: TimeFilter) {
+    this._timeFilter = timeFilter
+    this.resetNotificationState();
   }
+
+  private resetNotificationState() {
+    this.notificationSubject.next({
+      notifications: [],
+      currentPage: 0,
+      isLoading: false,
+      hasMore: true,
+      totalPages: 0,
+      searchQuery: this.searchQuerySubject.value
+    });
+  }
+
+  updateTypeFilter(typeFilter: NotificationType) {
+    this._typeFilter = typeFilter;
+    this.resetNotificationState();
+  }
+  removeTypeFilter() {
+    this._typeFilter = null;
+    this.resetNotificationState();
+  }
+
 
   get timeFilter(): TimeFilter {
     return this._timeFilter;
+  }
+
+  get typeFilter(): NotificationType {
+    return this._typeFilter;
   }
 }
