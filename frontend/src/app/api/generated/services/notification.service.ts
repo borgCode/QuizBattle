@@ -15,13 +15,14 @@ import { archiveNotification } from '../fn/notification/archive-notification';
 import { ArchiveNotification$Params } from '../fn/notification/archive-notification';
 import { getActivePlayerNotifications } from '../fn/notification/get-active-player-notifications';
 import { GetActivePlayerNotifications$Params } from '../fn/notification/get-active-player-notifications';
-import { getAllPlayerNotifications } from '../fn/notification/get-all-player-notifications';
-import { GetAllPlayerNotifications$Params } from '../fn/notification/get-all-player-notifications';
+import { getArchivedNotifications } from '../fn/notification/get-archived-notifications';
+import { GetArchivedNotifications$Params } from '../fn/notification/get-archived-notifications';
 import { markAllAsRead } from '../fn/notification/mark-all-as-read';
 import { MarkAllAsRead$Params } from '../fn/notification/mark-all-as-read';
 import { markAsRead } from '../fn/notification/mark-as-read';
 import { MarkAsRead$Params } from '../fn/notification/mark-as-read';
 import { Notification } from '../models/notification';
+import { PageNotification } from '../models/page-notification';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService extends BaseService {
@@ -129,28 +130,28 @@ export class NotificationService extends BaseService {
     );
   }
 
-  /** Path part for operation `getAllPlayerNotifications()` */
-  static readonly GetAllPlayerNotificationsPath = '/notification/archived/{playerId}';
+  /** Path part for operation `getArchivedNotifications()` */
+  static readonly GetArchivedNotificationsPath = '/notification/archived/{playerId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getAllPlayerNotifications()` instead.
+   * To access only the response body, use `getArchivedNotifications()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getAllPlayerNotifications$Response(params: GetAllPlayerNotifications$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Notification>>> {
-    return getAllPlayerNotifications(this.http, this.rootUrl, params, context);
+  getArchivedNotifications$Response(params: GetArchivedNotifications$Params, context?: HttpContext): Observable<StrictHttpResponse<PageNotification>> {
+    return getArchivedNotifications(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getAllPlayerNotifications$Response()` instead.
+   * To access the full response (for headers, for example), `getArchivedNotifications$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getAllPlayerNotifications(params: GetAllPlayerNotifications$Params, context?: HttpContext): Observable<Array<Notification>> {
-    return this.getAllPlayerNotifications$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<Notification>>): Array<Notification> => r.body)
+  getArchivedNotifications(params: GetArchivedNotifications$Params, context?: HttpContext): Observable<PageNotification> {
+    return this.getArchivedNotifications$Response(params, context).pipe(
+      map((r: StrictHttpResponse<PageNotification>): PageNotification => r.body)
     );
   }
 

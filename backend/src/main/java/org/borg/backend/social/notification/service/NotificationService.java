@@ -3,16 +3,21 @@ package org.borg.backend.social.notification.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.borg.backend.game.multiplayer.model.SessionPlayer;
-import org.borg.backend.social.notification.model.Notification;
-import org.borg.backend.social.notification.model.NotificationType;
-import org.borg.backend.social.notification.repository.NotificationRepository;
 import org.borg.backend.player.model.Player;
 import org.borg.backend.shared.enums.BusinessErrorCodes;
 import org.borg.backend.shared.exceptions.ResourceNotFoundException;
+import org.borg.backend.social.notification.model.Notification;
+import org.borg.backend.social.notification.model.NotificationType;
+import org.borg.backend.social.notification.model.TimeFilter;
+import org.borg.backend.social.notification.repository.NotificationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.borg.backend.social.notification.model.NotificationType.*;
@@ -25,14 +30,43 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public List<Notification> getActivePlayerNotifications(Long playerId) {
+        log.debug("Fetching active notifications for player: {}", playerId);
+        
         return notificationRepository.findByPlayerIdAndIsArchivedFalse(playerId);
     }
 
-    public List<Notification> getAllPlayerNotifications(Long playerId) {
-        return notificationRepository.findByPlayerIdAndIsHiddenFalse(playerId);
+    public Page<Notification> getArchivedNotifications(Long playerId, Pageable pageable, String searchFilter, TimeFilter timeFilter) {
+        log.debug("Fetching archived notifications for player: {} with filters: {},  {}", playerId, searchFilter, timeFilter);
+        
+        Instant timeFilterStart = calculateTimeFilterStart(timeFilter);
+        return notificationRepository.findArchivedNotifications(playerId, searchFilter, timeFilterStart, pageable);
+    }
+
+    private Instant calculateTimeFilterStart(TimeFilter timeFilter) {
+        if (timeFilter == null || timeFilter == TimeFilter.ALL_TIME) {
+            return null;
+        }
+
+        ZoneId userZone = ZoneId.systemDefault();
+        Instant now = Instant.now();
+
+        return switch (timeFilter) {
+            case TODAY -> now.atZone(userZone)
+                    .truncatedTo(ChronoUnit.DAYS)
+                    .toInstant();
+            case THIS_WEEK -> now.atZone(userZone).minusDays(7)
+                    .truncatedTo(ChronoUnit.DAYS)
+                    .toInstant();
+            case THIS_MONTH -> now.atZone(userZone).minusMonths(1)
+                    .truncatedTo(ChronoUnit.DAYS)
+                    .toInstant();
+            default -> null;
+        };
     }
 
     public void sendFriendRequestNotification(Long receiverId, Player sendingPlayer, boolean isHidden) {
+        log.info("Sending friend request notification from player {} to player {}", sendingPlayer.getId(), receiverId);
+        
         String message = sendingPlayer.getDisplayName() + " sent you a friend request!";
         if (isHidden) {
             buildAndSaveHiddenNotification(receiverId, sendingPlayer.getId(), FRIEND_REQUEST, message, null, null);
@@ -42,16 +76,22 @@ public class NotificationService {
     }
 
     public void sendFriendAcceptedNotification(Long receiverId, Player sendingPlayer) {
+        log.info("Sending friend accept notification from player {} to player {}", sendingPlayer.getId(), receiverId);
+        
         String message = sendingPlayer.getDisplayName() + " accepted your friend request!";
         buildAndSaveNotification(receiverId, sendingPlayer.getId(), FRIEND_ACCEPTED, message, null, null);
     }
 
     public void sendMatchStartedNotification(Long receivingId, String senderDisplayName, Long newSessionId) {
+        log.info("Sending match started notification to player {} for session {}", receivingId, newSessionId);
+        
         String message = "Your match request against " + senderDisplayName + " was accepted!";
         buildAndSaveNotification(receivingId, null, MATCH_ACCEPTED, message, newSessionId, null);
     }
 
     public void sendMatchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId, boolean isHidden) {
+        log.info("Sending match request notification from player {} to player {} for session {}", senderId, receivingId, pendingSessionId);
+        
         String message = senderDisplayName + " requested a match against you!";
         if (isHidden) {
             buildAndSaveHiddenNotification(receivingId, senderId, MATCH_REQUEST, message, null, pendingSessionId);
@@ -61,6 +101,7 @@ public class NotificationService {
     }
 
     public void sendMatchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
+        log.info("Sending match accepted notification to player {} for session {}", playerToNotify, newSessionId);
         notificationRepository.deleteById(notificationId);
 
         String message = playerDisplayName + " accepted your match request!";
@@ -68,6 +109,7 @@ public class NotificationService {
     }
 
     public void sendMatchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
+        log.info("Sending match rejected notification to player {}", playerToNotify);
         notificationRepository.deleteById(notificationId);
 
         String message = "Your match request against " + playerDisplayName + " was declined!";
@@ -75,11 +117,14 @@ public class NotificationService {
     }
 
     public void sendRematchStartedNotification(Long receivingId, String senderDisplayName, Long newSessionId) {
+        log.info("Sending rematch started notification to player {} for session {}", receivingId, newSessionId);
+        
         String message = "Your rematch request against " + senderDisplayName + " was accepted!";
         buildAndSaveNotification(receivingId, null, REMATCH_ACCEPTED, message, newSessionId, null);
     }
 
     public void sendRematchRequestNotification(Long receivingId, Long senderId, String senderDisplayName, Long pendingSessionId, boolean isHidden) {
+        log.info("Sending rematch request notification from player {} to player {} for session {}", senderId, receivingId, pendingSessionId);
         String message = senderDisplayName + " requested a rematch against you!";
         if (isHidden) {
             buildAndSaveHiddenNotification(receivingId, senderId, REMATCH_REQUEST, message, null, pendingSessionId);
@@ -89,6 +134,7 @@ public class NotificationService {
     }
 
     public void sendRematchAcceptedNotification(Long playerToNotify, String playerDisplayName, Long notificationId, Long newSessionId) {
+        log.info("Sending rematch accepted notification to player {} for session {}", playerToNotify, newSessionId);
         notificationRepository.deleteById(notificationId);
 
         String message = playerDisplayName + " accepted your request for a rematch!";
@@ -96,6 +142,7 @@ public class NotificationService {
     }
 
     public void sendRematchRejectedNotification(Long playerToNotify, String playerDisplayName, Long notificationId) {
+        log.info("Sending rematch rejected notification to player {}", playerToNotify);
         notificationRepository.deleteById(notificationId);
 
         String message = "Your rematch request against " + playerDisplayName + " was declined!";
@@ -103,11 +150,13 @@ public class NotificationService {
     }
 
     public void sendGameWonNotification(Long winnerId, String opponentDisplayName, Long sessionId) {
+        log.info("Sending game won notification to player {} for session {}", winnerId, sessionId);
         String message = "You won your match against " + opponentDisplayName + "!";
         buildAndSaveNotification(winnerId, null, GAME_WON, message, sessionId, null);
     }
 
     public void sendGameLostNotification(Long loserId, String opponentDisplayName, Long sessionId) {
+        log.info("Sending game lost notification to player {} for session {}", loserId, sessionId);
         String message = "You lost your match against " + opponentDisplayName + "!";
         buildAndSaveNotification(loserId, null, GAME_LOST, message, sessionId, null);
     }
@@ -156,9 +205,15 @@ public class NotificationService {
     }
 
     public void markAsRead(long notificationId, long playerId) {
+        log.debug("Marking notification {} as read for player {}", notificationId, playerId);
+
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for: " + notificationId));
+                .orElseThrow(() -> {
+                    log.error("Notification not found: {}", notificationId);
+                    return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for: " + notificationId);
+                });
         if (!notification.getRecipientId().equals(playerId)) {
+            log.warn("Unauthorized attempt to mark notification {} as read by player {}", notificationId, playerId);
             throw new AccessDeniedException("Not authorized to mark notification as read");
         }
 
@@ -168,20 +223,28 @@ public class NotificationService {
     }
 
     public void markAllAsRead(List<Long> notificationIds, long playerId) {
+        log.debug("Marking notifications {} as read for player {}", notificationIds, playerId);
         long invalidIdCount = notificationRepository.countByIdInAndRecipientIdNot(notificationIds, playerId);
 
         if (invalidIdCount > 0) {
+            log.warn("Unauthorized attempt to mark notifications as read by player {}", playerId);
             throw new AccessDeniedException("Not authorized to mark notifications as read");
         }
+
 
         notificationRepository.markNotificationsAsRead(notificationIds);
     }
 
     public void archiveNotification(long notificationId, long playerId) {
+        log.debug("Archiving notification {} for player {}", notificationId, playerId);
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for " + notificationId));
+                .orElseThrow(() -> {
+                    log.error("Notification not found: {}", notificationId);
+                    return new ResourceNotFoundException(BusinessErrorCodes.RESOURCE_NOT_FOUND, "Notification not found for " + notificationId);
+                });
 
         if (!notification.getRecipientId().equals(playerId)) {
+            log.warn("Unauthorized attempt to archive notification {} by player {}", notificationId, playerId);
             throw new AccessDeniedException("Not authorized to mark notification as archived");
         }
 
@@ -190,10 +253,12 @@ public class NotificationService {
     }
 
     public void deleteFriendRequestByPlayerIds(Long id, Long id1) {
+        log.info("Deleting friend request notification between players {} and {}", id, id1);
         notificationRepository.deleteByRecipientIdAndSenderIdAndType(id, id1, FRIEND_REQUEST);
     }
 
     public void deleteMatchRequestNotification(Long playerId, Long pendingSessionId) {
+        log.info("Deleting match request notification for player {} and session {}", playerId, pendingSessionId);
         Notification notification = notificationRepository.findByRecipientIdAndPendingSessionId(playerId, pendingSessionId);
         if (notification != null) {
             notificationRepository.delete(notification);

@@ -1,0 +1,77 @@
+<div class="notifications-container p-3">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">
+        <div class="title-content">
+          <i class="fa-solid fa-box-archive me-2"></i>
+          <span>Archived Notifications</span>
+        </div>
+      </h2>
+    </div>
+    <div class="card-content p-3">
+      <div class="filters-container row align-items-center">
+        <div class="col-md-6 col-sm-12 search-wrapper">
+          <div class="d-flex align-items-center">
+            <i class="icon-search me-2"></i>
+            <input
+              type="text"
+              placeholder="Search archived notifications..."
+              class="form-control search-input"
+              (input)="onSearchInput($event)">
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-12 mt-3 mt-md-0">
+          <div class="d-flex gap-2 justify-content-start">
+            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.ALL_TIME)"
+                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.ALL_TIME,
+                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.ALL_TIME}">All Time</button>
+            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.TODAY)"
+                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.TODAY,
+                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.TODAY}">Today</button>
+            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.THIS_WEEK)"
+                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.THIS_WEEK,
+                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.THIS_WEEK}">This Week</button>
+            <button class="btn btn-light btn-sm" (click)="setTimeFilter(TimeFilter.THIS_MONTH)"
+                    [ngClass]="{'btn-primary':notificationArchiveService.timeFilter === TimeFilter.THIS_MONTH,
+                     'btn-light': notificationArchiveService.timeFilter !== TimeFilter.THIS_MONTH}">This Month</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="(notificationArchiveService.notificationState$ | async)?.isLoading">
+    <div class="loading-indicator">Loading...</div>
+  </div>
+
+  <div class="notifications-list card p-3">
+    <ng-container *ngIf="notificationArchiveService.notificationState$ | async as state">
+      <div class="card-content">
+        <div class="notifications-wrapper">
+          <ng-container *ngFor="let notification of state.notifications">
+            <app-archived-notification-item
+              [notification]="notification">
+            </app-archived-notification-item>
+          </ng-container>
+        </div>
+        <div class="pagination">
+          <div class="page-info">
+            {{state.currentPage}} of {{state.totalPages - 1}}
+          </div>
+          <div class="page-controls">
+            <button class="page-btn"
+                    [disabled]="state.currentPage === 1"
+            (click)="previousPage()">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button class="page-btn"
+                    [disabled]="!state.hasMore"
+                    (click)="nextPage()">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

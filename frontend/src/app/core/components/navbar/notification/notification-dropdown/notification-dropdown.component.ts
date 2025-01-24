@@ -129,4 +129,9 @@ export class NotificationDropdownComponent implements OnInit, AfterViewInit {
   markAllAsRead() {
     this.notificationStateService.markAllAsRead();
   }
+
+  goToArchives() {
+    this.router.navigate(['archive']);
+    this.closeDropdown();
+  }
 }

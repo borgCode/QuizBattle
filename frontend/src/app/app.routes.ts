@@ -19,6 +19,9 @@ import {SettingsComponent} from './features/settings/settings.component';
 import {
   ChapterViewComponent
 } from './features/game/singleplayer/pages/play-chapter/component/chapter-view/chapter-view.component';
+import {
+  ArchivedNotificationsComponent
+} from './features/archive/component/archived-notifications/archived-notifications.component';
 
 
 export const routes: Routes = [
@@ -27,6 +30,7 @@ export const routes: Routes = [
   {path: 'profile', component: PlayerProfileComponent, canActivate:[authGuard]},
   {path: 'edit-profile', component: EditProfileComponent, canActivate:[authGuard]},
   {path: 'settings', component: SettingsComponent, canActivate: [authGuard]},
+  {path: 'archive', component: ArchivedNotificationsComponent, canActivate: [authGuard]},
   {path: 'multiplayer', component: MultiplayerComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId', component: GameViewComponent, canActivate:[authGuard]},
   {path: 'multiplayer/:sessionId/play', component: MultiplayerPlayRoundComponent, canActivate:[authGuard]},

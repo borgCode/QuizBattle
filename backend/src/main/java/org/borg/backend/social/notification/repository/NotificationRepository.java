@@ -2,6 +2,8 @@ package org.borg.backend.social.notification.repository;
 
 import org.borg.backend.social.notification.model.Notification;
 import org.borg.backend.social.notification.model.NotificationType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,11 +26,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     void deleteByRecipientIdAndSenderId(Long playerId, Long senderId);
 
     void deleteByRecipientIdAndSenderIdAndType(Long playerId, Long senderId, NotificationType notificationType);
-
-    @Query("SELECT n FROM Notification n WHERE n.recipientId = :playerId " +
-            "AND n.hiddenByBlock = false " +
-            "ORDER BY n.createdAt DESC")
-    List<Notification> findByPlayerIdAndIsHiddenFalse(Long playerId);
+    
 
     @Query("SELECT n FROM Notification n WHERE n.recipientId = :playerId " +
             "AND n.isArchived = false " +
@@ -36,11 +34,28 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "ORDER BY n.createdAt DESC")
     List<Notification> findByPlayerIdAndIsArchivedFalse(@Param("playerId") Long playerId);
 
+
+    @Query("SELECT n FROM Notification n " +
+            "WHERE n.recipientId = :playerId " +
+            "AND n.isArchived = true " +
+            "AND CASE " +
+            "    WHEN :searchFilter IS NULL THEN 1 " +
+            "    WHEN n.message LIKE %:searchFilter% THEN 1 " +
+            "    ELSE 0 " +
+            "END = 1 " +
+            "AND (:timeFilterStart IS NULL OR n.createdAt >= :timeFilterStart)")
+    Page<Notification> findArchivedNotifications(
+            @Param("playerId") Long playerId,
+            @Param("searchFilter") String searchFilter,
+            @Param("timeFilterStart") Instant timeFilterStart,
+            Pageable pageable
+    );
+
     @Modifying
     @Transactional
     @Query("DELETE FROM Notification WHERE hiddenByBlock AND createdAt < :threshold")
     void deleteHiddenByOlderThan(@Param("threshold") Instant threshold);
-    
+
     @Modifying
     @Transactional
     @Query("UPDATE Notification n SET n.isArchived = true WHERE n.type IN :types AND n.createdAt < :threshold AND n.isArchived = false")

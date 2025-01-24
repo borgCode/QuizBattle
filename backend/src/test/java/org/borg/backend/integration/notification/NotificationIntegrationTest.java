@@ -14,6 +14,9 @@ import org.borg.backend.player.model.Player;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -110,8 +113,9 @@ public class NotificationIntegrationTest {
         List<Notification> updatedNotificationsList = notificationService.getActivePlayerNotifications(playerWithNotificationsId);
         assertEquals(0, updatedNotificationsList.size(), "Notification should be marked as archived");
 
-        updatedNotificationsList = notificationService.getAllPlayerNotifications(playerWithNotificationsId);
-        assertEquals(1, updatedNotificationsList.size(), "Notification should be marked as archived");
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Notification> archivedNotifications = notificationService.getArchivedNotifications(playerWithNotificationsId, pageable, null, null);
+        assertEquals(1, archivedNotifications.getContent().size(), "Notification should be marked as archived");
     }
 
     @Test
@@ -131,8 +135,10 @@ public class NotificationIntegrationTest {
                         "Active notification should be GAME_WON")
         );
 
-        List<Notification> allNotifications = notificationService.getAllPlayerNotifications(playerWithNotificationsId);
-        assertEquals(2, allNotifications.size(), "There should be two notifications");
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Notification> archivedNotifications = notificationService.getArchivedNotifications(playerWithNotificationsId, pageable, null, null);
+        assertEquals(2, archivedNotifications.getContent().size(), "There should be 1 archived notifications");
 
         Instant laterTime = Instant.now().plus(Duration.ofHours(49));
         notificationCleanUpService.archiveNotifications(laterTime);

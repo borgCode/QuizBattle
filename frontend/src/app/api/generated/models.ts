@@ -28,6 +28,7 @@ export type { Notification } from './models/notification';
 export type { Pageable } from './models/pageable';
 export type { PageableObject } from './models/pageable-object';
 export type { PageMultiplayerSessionDto } from './models/page-multiplayer-session-dto';
+export type { PageNotification } from './models/page-notification';
 export type { PlayChapterDto } from './models/play-chapter-dto';
 export type { PlayerConversationDto } from './models/player-conversation-dto';
 export type { PlayerDto } from './models/player-dto';

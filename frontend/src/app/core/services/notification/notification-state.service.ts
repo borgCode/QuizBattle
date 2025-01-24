@@ -26,7 +26,7 @@ export class NotificationStateService {
   private _playerId: number;
 
   constructor(
-    protected notificationService: NotificationService,
+    private notificationService: NotificationService,
     private friendshipService: FriendshipService,
     private alertMessageService: AlertMessageService,
     private multiplayerMatchService: MultiplayerMatchService,
